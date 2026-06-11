@@ -25,10 +25,12 @@ public partial class Associate_Details : System.Web.UI.Page
                 if (GridView1.Rows.Count > 0)
                 {
                     pnllist.Visible = true;
+                    pnlempty.Visible = false;
                 }
                 else
                 {
                     pnllist.Visible = false;
+                    pnlempty.Visible = true;
                 }
             }
             else
@@ -245,17 +247,42 @@ public partial class Associate_Details : System.Web.UI.Page
 
     protected void btnview_click(object sender, EventArgs e)
     {
-        pnlModal.Visible = true;
-        GridViewRow gvRow = (GridViewRow)(sender as Control).Parent.Parent;
-        int index = gvRow.RowIndex;
+        LinkButton btn = sender as LinkButton;
+        if (btn == null)
+        {
+            return;
+        }
+
+        GridViewRow gvRow = btn.NamingContainer as GridViewRow;
+        if (gvRow == null)
+        {
+            return;
+        }
+
         Label lblmessagetitle = (Label)gvRow.FindControl("lblmessagetitle");
         Label lblmessagedescription = (Label)gvRow.FindControl("lblmessagedescription");
         Label lblfromidgrid = (Label)gvRow.FindControl("lblfromid");
         Label lblmessagedate = (Label)gvRow.FindControl("lbldate");
-        lbltitle.Text = lblmessagetitle.Text;
-        lbldescription.Text = lblmessagedescription.Text;
-        lblfromid.Text = lblfromidgrid.Text;
-        lbldate.Text = lblmessagedate.Text;
+        Label lblAttachment = (Label)gvRow.FindControl("lblHyperLink");
+
+        lblmodtitle.Text = lblmessagetitle != null && !string.IsNullOrWhiteSpace(lblmessagetitle.Text) ? lblmessagetitle.Text : "-";
+        lblmoddescription.Text = lblmessagedescription != null && !string.IsNullOrWhiteSpace(lblmessagedescription.Text) ? lblmessagedescription.Text : "-";
+        lblmodfrom.Text = lblfromidgrid != null && !string.IsNullOrWhiteSpace(lblfromidgrid.Text) ? lblfromidgrid.Text : "-";
+        lblmoddate.Text = lblmessagedate != null && !string.IsNullOrWhiteSpace(lblmessagedate.Text) ? lblmessagedate.Text : "-";
+
+        if (lblAttachment != null && !string.IsNullOrWhiteSpace(lblAttachment.Text))
+        {
+            pnlModAttachment.Visible = true;
+            hlModAttachment.NavigateUrl = ResolveUrl("~/ProductImage/" + lblAttachment.Text);
+            hlModAttachment.Text = lblAttachment.Text;
+        }
+        else
+        {
+            pnlModAttachment.Visible = false;
+            hlModAttachment.NavigateUrl = "";
+            hlModAttachment.Text = "";
+        }
+
         pnlModal_ModalPopupExtender.Show();
     }
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -264,15 +291,17 @@ public partial class Associate_Details : System.Web.UI.Page
         {
             Label lblPgAttachment = (Label)e.Row.FindControl("lblHyperLink");
             HyperLink lnkPgAttachment = (HyperLink)e.Row.FindControl("HyperLink1");
-            if (lblPgAttachment.Text.ToString() == "")
+            if (string.IsNullOrEmpty(lblPgAttachment.Text))
             {
-                lnkPgAttachment.CssClass = "fa fa-ban btn btn-warning disabled";
-                lnkPgAttachment.ToolTip = "No Attachment Found!";
+                lnkPgAttachment.CssClass = "fa fa-ban inbox-attach-btn is-empty";
+                lnkPgAttachment.NavigateUrl = "";
+                lnkPgAttachment.Enabled = false;
+                lnkPgAttachment.ToolTip = "No attachment";
             }
             else
             {
-                lnkPgAttachment.CssClass = "fa fa-download btn btn-info";
-                lnkPgAttachment.ToolTip = "Download Attachment!";
+                lnkPgAttachment.CssClass = "fa fa-download inbox-attach-btn is-available";
+                lnkPgAttachment.ToolTip = "Download attachment";
             }
         }
     }

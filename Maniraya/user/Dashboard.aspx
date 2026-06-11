@@ -39,6 +39,30 @@
         .warning-table > tbody > tr > td {
             border: 1px solid #e6e3e3;
         }
+
+
+        .box.box-primary{
+            padding: 0!important;
+            background: transparent!important;
+            border: none!important;
+            box-shadow: none!important;
+            border-radius: 0!important;
+        }
+
+        body.main-body.app .box.box-primary > .box-body{
+            padding: 0!important;
+            background: transparent!important;
+            border: none!important;
+            box-shadow: none!important;
+            border-radius: 0!important;
+        }
+        body.main-body.app .box.box-primary, body.main-body.app.dark-mode .box.box-primary{
+            padding: 0!important;
+            background: transparent!important;
+            border: none!important;
+            box-shadow: none!important;
+            border-radius: 0!important;
+        }
     </style>
 
 
@@ -132,7 +156,7 @@
         .card {
             background: #FFF none repeat scroll 0% 0%;
             box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             margin-top: 0;
         }
 
@@ -188,140 +212,186 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=7" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
-       <section class="content-header">
-
-       
-            
-
-        <div class="ibox-title pull-left">
-			
-			<div Style="display: none">
-			<h5>Other Income Wallet:
-                <asp:Label ID="lblwalletbalance123" runat="server" Text="Label" CssClass="label-success"></asp:Label>&nbsp;&nbsp;&nbsp;
-              PFS Income Wallet:
-                <asp:Label ID="lblUtilityBalance" runat="server" Text="Label" CssClass="label-success"></asp:Label></h5>
-            <asp:TextBox ID="txtflag" Style="display: none" runat="server"></asp:TextBox>
-            <span id="LblNo" runat="server"></span></div>
-        </div>
-    </section>
+    <div Style="display: none">
+        <asp:TextBox ID="txtflag" Style="display: none" runat="server"></asp:TextBox>
+        <span id="LblNo" runat="server"></span>
+        <asp:Label ID="lblwalletbalance123" runat="server" Text="Label" CssClass="label-success"></asp:Label>
+        <asp:Label ID="lblUtilityBalance" runat="server" Text="Label" CssClass="label-success"></asp:Label>
+    </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
-     <br /><br /><br /><br /><br />
-    <div class="row" style="Color:#ffff">
-
-         <div class="ibox-title pull-left">
-            
-          
-			 <h1 class="pull-left" style="font-size:16px; padding-left:15px">Welcome :  &nbsp; 
-            <br />  User ID : &nbsp; <br />
-
-           Mobile : &nbsp; <br />
-                  Rank : &nbsp; <br />
-        </h1>
-           
-                      <h5 class="pull-right"> 
-                          <asp:Label ID="lblusername" runat="server" Text="Label" ></asp:Label> &nbsp;	<br />
-                          <asp:Label ID="lbluserid" runat="server" Text="Label" ></asp:Label><br />
-                               <asp:Label ID="lblmobile" runat="server" Text="" ></asp:Label><br />
-                          <asp:Label ID="lblrank" runat="server" Text="" ></asp:Label>
-                          
-                      </h5>  
-
-            	</div >
-        
-           
-
-
-
+    <div class="row dash-legacy-welcome">
+        <div class="ibox-title pull-left">
+            <h1 class="pull-left" style="font-size:16px; padding-left:15px">Welcome</h1>
+            <h5 class="pull-right">
+                <asp:Label ID="lblusername" runat="server" Text="Label"></asp:Label>
+                <asp:Label ID="lbluserid" runat="server" Text="Label"></asp:Label>
+                <asp:Label ID="lblmobile" runat="server" Text=""></asp:Label>
+                <asp:Label ID="lblrank" runat="server" Text=""></asp:Label>
+            </h5>
+        </div>
     </div>
-    <div class="row" style="Color:#fff">
-        <div class="col-md-12">
-            <div class="box box-primary">
-                <div class="box-header with-border"  >
+    <div >
+        <div >
+            <div class="box box-primary dash-modern">
+                <div class="box-header with-border">
                     <h3 class="box-title" style="width: 100%">
-                        <marquee direction="left" onmouseover="stop();" onmouseout="start();"> <asp:Literal ID="ltnews" runat="server" ></asp:Literal></marquee>
+                        <marquee direction="left" onmouseover="stop();" onmouseout="start();"><asp:Literal ID="ltnews" runat="server"></asp:Literal></marquee>
                     </h3>
                 </div>
                 <div class="box-body">
 
-                    <div class="row">
-                        <div class="col-md-12" style="display:none;">
+                    <div class="dash-page-head">
+                        <h1 class="dash-page-title">Dashboard</h1>
+                        <div class="dash-page-actions">
+                            <div class="dash-date-pill">
+                                <i class="fa fa-calendar"></i>
+                                <span id="dashDateRange"></span>
+                            </div>
+                            <button type="button" class="dash-icon-btn" onclick="location.reload();" title="Refresh">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <a href="UserProfile.aspx" class="dash-icon-btn" title="Settings">
+                                <i class="fa fa-sliders"></i>
+                            </a>
+                        </div>
+                    </div>
 
-                            <asp:Panel ID="pnlnotification" runat="server">
+                    <div class="dash-welcome-banner">
+                        <div class="dash-welcome-text">
+                            <h2>Welcome Back, <asp:Label ID="lblWelcomeName" runat="server" Text="Member" /></h2>
+                            <p><asp:Literal ID="ltWelcomeNews" runat="server" Text="Stay updated with your latest network activity." /></p>
+                            <span class="dash-welcome-meta">Member ID: <strong><asp:Label ID="lblWelcomeId" runat="server" Text="-" /></strong> &nbsp;|&nbsp; Rank: <strong><asp:Label ID="lblWelcomeRank" runat="server" Text="-" /></strong></span>
+                        </div>
+                        <div class="dash-welcome-actions">
+                            <a href="DownlineReport.aspx" class="dash-btn dash-btn-primary">My Team</a>
+                            <a href="UserWallet.aspx" class="dash-btn dash-btn-outline">My Wallet</a>
+                        </div>
+                    </div>
 
-                                <div class="alert alert-danger">
-                                    <strong>Error!</strong> Please Update your bank details  <a href="UserEdit.aspx">click here</a> to update. 
+                    <div class="dash-stats-grid">
+                        <div class="dash-stat-card accent-red">
+                            <div class="dash-stat-top">
+                                <p class="dash-stat-label">Total Team</p>
+                                <span class="dash-stat-icon"><i class="fa fa-users"></i></span>
+                            </div>
+                            <p class="dash-stat-value"><asp:Label ID="lblStatTeam" runat="server" Text="0" /></p>
+                            <span class="dash-stat-trend neutral"><i class="fa fa-circle"></i> Network members</span>
+                            <a href="DownlineReport.aspx" class="dash-stat-link">View report</a>
+                        </div>
+                        <div class="dash-stat-card accent-green">
+                            <div class="dash-stat-top">
+                                <p class="dash-stat-label">Active Team</p>
+                                <span class="dash-stat-icon"><i class="fa fa-briefcase"></i></span>
+                            </div>
+                            <p class="dash-stat-value"><asp:Label ID="lblStatActiveTeam" runat="server" Text="0" /></p>
+                            <span class="dash-stat-trend up"><i class="fa fa-arrow-up"></i> Active members</span>
+                            <a href="DownlineReport.aspx" class="dash-stat-link">View report</a>
+                        </div>
+                        <div class="dash-stat-card accent-yellow">
+                            <div class="dash-stat-top">
+                                <p class="dash-stat-label">Direct Members</p>
+                                <span class="dash-stat-icon"><i class="fa fa-user-plus"></i></span>
+                            </div>
+                            <p class="dash-stat-value"><asp:Label ID="lblStatDirect" runat="server" Text="0" /></p>
+                            <span class="dash-stat-trend up"><i class="fa fa-arrow-up"></i> Direct referrals</span>
+                            <a href="TreeView.aspx" class="dash-stat-link">View tree</a>
+                        </div>
+                        <div class="dash-stat-card accent-dark">
+                            <div class="dash-stat-top">
+                                <p class="dash-stat-label">Wallet Balance</p>
+                                <span class="dash-stat-icon"><i class="fa fa-inr"></i></span>
+                            </div>
+                            <p class="dash-stat-value"><asp:Label ID="lblStatWallet" runat="server" Text="0" /></p>
+                            <span class="dash-stat-trend neutral"><i class="fa fa-wallet"></i> Available balance</span>
+                            <a href="UserWallet.aspx" class="dash-stat-link">View wallet</a>
+                        </div>
+                    </div>
+
+                    <div class="dash-tools-panel">
+                        <asp:Panel ID="pnlnotification" runat="server" CssClass="dash-tools-alert-wrap">
+                            <div class="dash-tools-alert" role="alert">
+                                <span class="dash-tools-alert-icon" aria-hidden="true"><i class="fa fa-exclamation-triangle"></i></span>
+                                <div class="dash-tools-alert-body">
+                                    <strong>Action required</strong>
+                                    <p>Please update your bank details to receive payouts on time.</p>
                                 </div>
+                                <a href="UserEdit.aspx" class="dash-tools-alert-action">Update now</a>
+                            </div>
+                        </asp:Panel>
 
-                            </asp:Panel>
+                        <div class="dash-tools-grid">
+                            <div id="dvlink" runat="server" visible="True" class="dash-tools-affiliate-card">
+                                <div class="dash-tools-card-head">
+                                    <span class="dash-tools-card-icon" aria-hidden="true"><i class="fa fa-link"></i></span>
+                                    <div class="dash-tools-card-meta">
+                                        <asp:Label ID="Label1" runat="server" Text="Affiliate Link (LEFT)" CssClass="dash-tools-card-title" />
+                                        <span class="dash-tools-card-sub">Share this link to invite new members to your team</span>
+                                    </div>
+                                </div>
+                                <div class="dash-tools-copy-group">
+                                    <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control dash-tools-input" />
+                                    <asp:Button ID="Button1" runat="server" Text="Copy link" CssClass="btn dash-tools-copy-btn" OnClientClick="CopyToClipboard(); return false;" />
+                                </div>
+                            </div>
 
-                        </div>
-                    </div>
-                    <div class="row" id="dvlink" runat="server" visible="True">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <asp:Label ID="Label1" runat="server" Text="Affiliate Link (LEFT) "></asp:Label>
-								  
-								
+                            <div class="dash-tools-news-card">
+                                <div class="dash-tools-news-head">
+                                    <span class="dash-tools-news-icon" aria-hidden="true"><i class="fa fa-bullhorn"></i></span>
+                                    <div class="dash-tools-news-meta">
+                                        <div class="dash-tools-news-meta-top">
+                                            <span class="dash-tools-news-title">Latest Updates</span>
+                                            <span class="dash-tools-live-badge"><span class="dash-tools-live-dot"></span> Live</span>
+                                        </div>
+                                        <span class="dash-tools-news-sub">Company announcements and important notices</span>
+                                    </div>
+                                </div>
+                                <div class="dash-news-bar">
+                                    <div class="dash-news-bar-viewport">
+                                        <marquee class="dash-news-marquee" direction="left" scrollamount="4" onmouseover="this.stop();" onmouseout="this.start();">
+                                            <asp:Literal ID="ltnewsTicker" runat="server"></asp:Literal>
+                                        </marquee>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-7">
-                            <div class="form-group">
 
-                                <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control" />
+                        <div class="row" style="display:none;">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <asp:Label ID="Label2" runat="server" Text="Affiliate Link (RIGHT)"></asp:Label>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="form-group">
+                                    <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <asp:Button ID="Button2" runat="server" Text="Copy" CssClass="btn btn-primary" OnClientClick="CopyToClipboard2()" />
                             </div>
                         </div>
-                        <div class="col-md-2">
-
-
-                            <asp:Button ID="Button1" runat="server" Text="Copy" CssClass="btn btn-primary" OnClientClick="CopyToClipboard()" />
-
-                        </div>
                     </div>
-                      <div class="row" style="display:none;" >
-                    <div class="col-md-3">
-                        <div class="form-group">
 
-                            <asp:Label ID="Label2" runat="server" Text="Affiliate Link (RIGHT)"></asp:Label>
-                        </div>
+                    <div class="dash-section-head">
+                        <h3 class="dash-section-title">Income Overview</h3>
+                        <p class="dash-section-sub">Track all your earnings in one place</p>
                     </div>
-                    <div class="col-md-7">
-                        <div class="form-group">
-
-                            <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-
-                        <asp:Button ID="Button2" runat="server" Text="Copy" CssClass="btn btn-primary" OnClientClick="CopyToClipboard2()" />
-
-                    </div>
-                </div>
-                          <div class="row">
-
+                    <div class="row dash-income-grid">
 
                               <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg, #FFA500 60%,#FFC55C 60%);">
+						<div class="card dash-income-card dash-income-compact tone-red">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-money"></i></span>
 							<div class="card-body">
-								<div class="clearfix" >
-									<div class="float-right">
-										<i class="fa fa-indian-rupee-sign text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left text-white">Reimburse  Income</p><br>
-										<div class="">
-											<h3 class="font-weight-semibold tex
-                                                t-left mb-0 text-white" ><asp:Label ID="lblselfincome" runat="server" Text="Label" ></asp:Label>
-                                              
-											</h3>
-										</div>
-									</div>
-								</div><br>
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-white" aria-hidden="true"></i><a href="#">More Info</a>
-								</p>
+								<p class="dash-income-label">Reimburse Income</p>
+								<h3 class="dash-income-value"><asp:Label ID="lblselfincome" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="#" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -355,125 +425,72 @@
 					</div>
 
   <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg, #808000 60%,#ffed4b 60%);">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-handshake"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa fa-indian-rupee-sign text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Matching Income</p><br>
-										<div class="">
-
-                                            <h3 class="font-weight-semibold tex
-                                                t-left mb-0 text-white" style="display:none" ><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblDIrectorIncomeaa" runat="server" Text="Label" ></asp:Label>
-                                              
-											</h3>
-											<h3 class="font-weight-semibold tex
-                                                t-left mb-0 text-white" ><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblMatching" runat="server" Text="Label" ></asp:Label>
-                                              
-											</h3>
-										</div>
-									</div>
-								</div><br>
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-white" aria-hidden="true"></i><a href="dailypayoutdetail.aspx">More Info</a>
-								</p>
+								<p class="dash-income-label">Matching Income</p>
+								<h3 class="dash-income-value" style="display:none"><asp:Label ID="lblDIrectorIncomeaa" runat="server" Text="Label"></asp:Label></h3>
+								<h3 class="dash-income-value"><asp:Label ID="lblMatching" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="dailypayoutdetail.aspx" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
 
-                               <div class="col-sm-12 col-lg-6 col-xl-4"  >
-						<div class="card" style="background: linear-gradient(110deg, #FFA500 60%,#FFC55C 60%);">
+                               <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-pink">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-gift"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa fa-indian-rupee-sign text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Bonus Income</p><br>
-										<div class="">
-											<h3 class="font-weight-semibold tex
-                                                t-left mb-0 text-white" style="display:none"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lbldailyincome" runat="server" Text="0.00" ></asp:Label>
-                                              
-											</h3>
-                                            <h3 class="font-weight-semibold tex
-                                                t-left mb-0 text-white" ><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblDIrectorIncome" runat="server" Text="0.00" ></asp:Label>
-                                              
-											</h3>
-										</div>
-									</div>
-								</div><br>
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-white" aria-hidden="true"></i><a href="BonusIncomeReport.aspx">More Info</a>
-								</p>
+								<p class="dash-income-label">Bonus Income</p>
+								<h3 class="dash-income-value" style="display:none"><asp:Label ID="lbldailyincome" runat="server" Text="0.00"></asp:Label></h3>
+								<h3 class="dash-income-value"><asp:Label ID="lblDIrectorIncome" runat="server" Text="0.00"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="BonusIncomeReport.aspx" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
                               <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#A36A00 60%,#D18700 60%);"> 
+						<div class="card dash-income-card dash-income-compact tone-orange">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-graduation-cap"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-
-										<i class="fa fa-inr text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Child education Income</p><br />
-										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"> <i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblgoldirector" runat="server" Text="0" ></asp:Label>  </h3>
-										
-                                        
-                                        
-                                        </div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-white" aria-hidden="true"></i> <a href="BonusIncomeReport.aspx">More Info</a> 
-								</p>
-							</div>
-						</div>
-					</div>
-
-                              	<div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg, #FF4B2B 60%, #FF416C 60%);"> 
-							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-
-										<i class="fa fa-inr text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> self education Income</p><br />
-										<div class="">
-											<asp:Label ID="lblleadership" runat="server" Text="0.00" ></asp:Label>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-white" aria-hidden="true"></i> <a href="BonusIncomeReport.aspx">More Info</a> 
-								</p>
+								<p class="dash-income-label">Child Education Income</p>
+								<h3 class="dash-income-value"><asp:Label ID="lblgoldirector" runat="server" Text="0"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="BonusIncomeReport.aspx" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
 
                               	<div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#638320 60%,#9ACD32 60%);">
+						<div class="card dash-income-card dash-income-compact tone-purple">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-book"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa fa-indian-rupee-sign text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Net Income</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="LblCurrentWallet" runat="server" Text="Label"></asp:Label> </h4>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i> <a href="TransactionReport.aspx">More Info</a>
-								</p>
+								<p class="dash-income-label">Self Education Income</p>
+								<h3 class="dash-income-value"><asp:Label ID="lblleadership" runat="server" Text="0.00"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="BonusIncomeReport.aspx" class="dash-income-meta-link">View report</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                              	<div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-green">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-wallet"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Net Income</p>
+								<h3 class="dash-income-value"><asp:Label ID="LblCurrentWallet" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--up">Balance</span>
+									<a href="TransactionReport.aspx" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -573,7 +590,12 @@
 					</div>
 
                         </div>
-                    <div class="row">
+
+                    <div class="dash-section-head dash-section-head--spaced">
+                        <h3 class="dash-section-title">Member Overview</h3>
+                        <p class="dash-section-sub">Rank, team &amp; volume snapshot</p>
+                    </div>
+                    <div class="row dash-metrics-grid">
 
                              <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card" style="background: linear-gradient(110deg, #000075 60%,#0000D1 60%);">
@@ -589,7 +611,7 @@
 											<h3 class="font-weight-semibold text-left mb-0 text-white"><asp:Label ID="LblCredited" runat="server" Text="Label"></asp:Label></h3>
 										</div>
 									</div>
-								</div><br /><br />
+								</div>
 								<%--<p class="text-muted mb-0">
 									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-success" aria-hidden="true"></i> More Info
 								</p>--%>
@@ -610,7 +632,7 @@
 											<h3 class="font-weight-semibold text-left mb-0 text-white"><asp:Label ID="LblDebited" runat="server" Text="Label"></asp:Label></h3>
 										</div>
 									</div>
-								</div><br><br />
+								</div>
 								<%--<p class="text-muted mb-0">
 									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  More Info
 								</p>--%>
@@ -619,67 +641,40 @@
 					</div>
 			
                                 <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg, #964B00 60%,#C46200 60%);"> 
+						<div class="card dash-income-card dash-income-compact tone-gold">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="ti-crown"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-
-										<i class=" side-menu__icon ti-crown  menu-icons text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Rank</p><br />
-									<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblrank1" runat="server" Text="0.00" ></asp:Label><asp:Label ID="lblrankreward" runat="server" Text="0.00" Visible="false" ></asp:Label> </h3>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-white" aria-hidden="true"></i> <a href="RankReport.aspx">More Info</a> 
-								</p>
-									
+								<p class="dash-income-label">Rank</p>
+								<h3 class="dash-income-value is-text"><asp:Label ID="lblrank1" runat="server" Text="0.00"></asp:Label><asp:Label ID="lblrankreward" runat="server" Text="0.00" Visible="false"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<a href="RankReport.aspx" class="dash-income-meta-link">View report</a>
+								</div>
 							</div>
 						</div>
 					</div>
-				
-                        <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg, #964B00 60%,#C46200 60%);"> 
-							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
 
-										<i class=" side-menu__icon ti-crown  menu-icons text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Category </p><br />
-										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblrank2" runat="server" Text="Category Name" ></asp:Label> </h3>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<br>
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-orange">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="ti-crown"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Category</p>
+								<h3 class="dash-income-value is-text"><asp:Label ID="lblrank2" runat="server" Text="Category Name"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Member tier</span>
+								</div>
 							</div>
 						</div>
 					</div>
 
                         		<div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg, #007500 60%,#00D100 60%);">
+						<div class="card dash-income-card dash-income-compact tone-green">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-check"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-
-										<i class="fa fa-check text-white icon-size" ></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Status</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblstatus" runat="server" Text="Label"></asp:Label> || <asp:Label ID="Lblactivatedate2" runat="server" Text="01/07/2024"></asp:Label>  </h4>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<br>
-								</p>
+								<p class="dash-income-label">Status</p>
+								<h3 class="dash-income-value is-text is-sm"><asp:Label ID="lblstatus" runat="server" Text="Label"></asp:Label><span class="dash-income-value-sep">|</span><asp:Label ID="Lblactivatedate2" runat="server" Text="01/07/2024"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--up">Account</span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -793,149 +788,85 @@
 							</div>
 						</div>
 					</div>
-					
-
-                
-					
 				</div>
 
-                         
-
-
-                      <div class="row">
+                      <div class="row dash-metrics-grid">
 					<div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#51087E 60%,#6C0BA9 60%);">
+						<div class="card dash-income-card dash-income-compact tone-indigo">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
+								<p class="dash-income-label">Total Direct</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="LblDirect" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<a href="UserDirectAssociates.aspx" class="dash-income-meta-link">View report</a>
+								</div>
+							</div>
+						</div>
+					</div>
+                          <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-purple">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-check-circle"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Active Direct</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="LblActiveDirect" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<a href="UserDirectAssociates.aspx" class="dash-income-meta-link">View report</a>
+								</div>
+							</div>
+						</div>
+					</div>
 
-										<i class="fa-solid fa-users text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Total Direct</p><br />
-										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white">  <asp:Label ID="LblDirect" runat="server" Text="Label" ></asp:Label></h3>
-										</div>
-									</div>
-								</div><br />
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-white" aria-hidden="true"></i><a href="UserDirectAssociates.aspx">More Info</a> 
-								</p>
-							</div>
-						</div>
-					</div>
-                          <div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg,#51087E 60%,#6C0BA9 60%);">
-							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa-solid fa-users text-white icon-size" ></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Active Direct</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="LblActiveDirect" runat="server" Text="Label" ></asp:Label></h4>
-										</div>
-									</div>
-								</div><br>
-								<p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-white" aria-hidden="true"></i> <a href="UserDirectAssociates.aspx">More Info</a> 
-								</p>
-							</div>
-						</div>
-					</div>
-                      
                         <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa fa-users text-white icon-size"></i>
-                                        <asp:Button ID="Button3" runat="server" Text="Refresh" OnClick="Button3_Click" />
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Total Left Team</p><br />
-										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"><asp:Label ID="LblTotalLeft" runat="server" Text="Label"></asp:Label></h3>
-										</div>
-									</div>
-								</div><br>
-								<p class="text-muted mb-0" style="Display:none">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-success" aria-hidden="true"></i>  Active
-								<asp:Label ID="Lblactiveleft" runat="server" Text="Label"></asp:Label></p>
-                                <p class="text-muted mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Inactive
-								<asp:Label ID="LblInactiveleft" runat="server" Text="Label"></asp:Label></p>
-							</div>
-						</div>
-					</div>
-                            
-                          <div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
-							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-										<i class="fa fa-users text-white icon-size"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">Total Right Team</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="LblTotalright" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Total Left Team</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="LblTotalLeft" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInactiveleft" runat="server" Text="Label"></asp:Label></span>
+									<asp:Label ID="Lblactiveleft" runat="server" Text="Label" Visible="false"></asp:Label>
+									<asp:Button ID="Button3" runat="server" Text="Refresh" CssClass="dash-metric-refresh" OnClick="Button3_Click" />
 								</div>
-								<p class="text-muted mb-0" style="Display:none">
-									<i class="mdi mdi-arrow-up-drop-circle mr-1 text-success" aria-hidden="true"></i>  Active
-								<asp:Label ID="LblActiveRight" runat="server" Text="Label"></asp:Label></p>
-                                 <hr class="hr-white">
-                                <p class="text-white mb-0">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Inactive
-								<asp:Label ID="LblInActiveRight" runat="server" Text="Label"></asp:Label></p>
 							</div>
 						</div>
 					</div>
+
+                          <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Total Right Team</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="LblTotalright" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInActiveRight" runat="server" Text="Label"></asp:Label></span>
+									<asp:Label ID="LblActiveRight" runat="server" Text="Label" Visible="false"></asp:Label>
+								</div>
+							</div>
+						</div>
+					</div>
+
                                      <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left">  Left SV (Bonanza 26 Sept) </p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblleftBonanzasv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Left SV (Bonanza 26 Sept)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblleftBonanzasv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Bonanza volume</span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<br /></p>
 							</div>
 						</div>
 					</div>
 
-
-
-                            <div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+                            <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> Right SV (Bonanza 26-Spet) </p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblRightBonanzasv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Right SV (Bonanza 26 Sept)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblRightBonanzasv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Bonanza volume</span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<br /></p>
 							</div>
 						</div>
 					</div>
@@ -1114,77 +1045,45 @@
 						</div>
 					</div>
                           </div>
-                        <div class="row">
+                        <div class="row dash-metrics-grid">
 
                              <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> LEFT SV (First Purchase)</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblleftjoiningsv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Left SV (First Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblleftjoiningsv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Current Left SV</span>
+									<span class="dash-income-meta-text"><asp:Label ID="lblleftjoiningcarrysv" runat="server" Text="Label"></asp:Label></span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Current Left SV
-                                    
-								  <asp:Label ID="lblleftjoiningcarrysv" runat="server" Text="Label"></asp:Label></p>
 							</div>
 						</div>
 					</div>
 
-
-
-                            <div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+                            <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> Right SV (First Purchase) </p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblrightjoiningsv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Right SV (First Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblrightjoiningsv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Current Right SV</span>
+									<span class="dash-income-meta-text"><asp:Label ID="lblrightjoiningcarrysv" runat="server" Text="Label"></asp:Label></span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Current Left SV
-								  <asp:Label ID="lblrightjoiningcarrysv" runat="server" Text="Label"></asp:Label></p>
 							</div>
 						</div>
 					</div>
-
 
                                        <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-                                        <i class="fa fa-certificate text-white"></i>
-									
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> Self SV (First Purchase)</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lbltotalselfjoiningsv" runat="server" Text="Label"></asp:Label> </h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Self SV (First Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lbltotalselfjoiningsv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Personal volume</span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<br /></p>
 							</div>
 						</div>
 					</div>
@@ -1192,79 +1091,45 @@
                          </div>
                       
 
-                              <div class="row">
+                              <div class="row dash-metrics-grid">
 
                              <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> LEFT SV (Re-Purchase)</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblleftrepurchasesv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Left SV (Re-Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblleftrepurchasesv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Current Left SV</span>
+									<span class="dash-income-meta-text"><asp:Label ID="lblleftrepurchasecarrysv" runat="server" Text="Label"></asp:Label></span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Current Left SV
-                                    
-								  <asp:Label ID="lblleftrepurchasecarrysv" runat="server" Text="Label"></asp:Label></p>
 							</div>
 						</div>
 					</div>
 
-
-
-                            <div class="col-sm-12 col-lg-6 col-xl-4" >
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+                            <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-									  <i class="fa fa-certificate text-white"></i>
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> Right SV (Re-Purchase) </p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lblRightrepurchasesv" runat="server" Text="Label"></asp:Label></h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Right SV (Re-Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblRightrepurchasesv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Current Right SV</span>
+									<span class="dash-income-meta-text"><asp:Label ID="lblRightrepurchasecarrysv" runat="server" Text="Label"></asp:Label></span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<i class="mdi mdi-arrow-down-drop-circle mr-1 text-danger" aria-hidden="true"></i>  Current Left SV
-								  <asp:Label ID="lblRightrepurchasecarrysv" runat="server" Text="Label"></asp:Label></p>
 							</div>
 						</div>
 					</div>
-
-
-
 
                                        <div class="col-sm-12 col-lg-6 col-xl-4">
-						<div class="card" style="background: linear-gradient(110deg,#075264 60%,#9F92FF 60%);">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
 							<div class="card-body">
-								<div class="clearfix">
-									<div class="float-right">
-                                        <i class="fa fa-certificate text-white"></i>
-									
-									</div>
-									<div class="float-left">
-										<p class="mb-0 text-left"> Self SV (Re-Purchase)</p><br />
-										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-white"> <asp:Label ID="lbltotalselfRepurchasesv" runat="server" Text="Label"></asp:Label> </h4>
-										</div>
-									</div>
+								<p class="dash-income-label">Self SV (Re-Purchase)</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lbltotalselfRepurchasesv" runat="server" Text="Label"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Personal volume</span>
 								</div>
-								
-                                 <hr class="hr-white">
-                                <p class="mb-0 text-white">
-									<br /></p>
 							</div>
 						</div>
 					</div>
@@ -1346,13 +1211,8 @@
                                         </div>
                                     </div>
 
-
-                                  
-
-
-
                     </div>
-                    <br />  <br />
+                    
                  <div class="row" style="display:none">
                              <div class="col-sm-12 col-lg-6 col-xl-4">
                                         <div class="card mb-0 gradient-10 gradient-10-shadow border1px-white card-summary gradient-10-hover">
@@ -3037,6 +2897,22 @@ Profit Share Budget</p>
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
     <script type="text/javascript" language="javascript">
+        (function () {
+            var el = document.getElementById("dashDateRange");
+            if (!el) return;
+
+            var end = new Date();
+            var start = new Date();
+            start.setDate(end.getDate() - 29);
+
+            function fmt(d) {
+                var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                return d.getDate() + " " + months[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
+            }
+
+            el.textContent = fmt(start) + " - " + fmt(end);
+        })();
+
         function CopyToClipboard() {
 
 

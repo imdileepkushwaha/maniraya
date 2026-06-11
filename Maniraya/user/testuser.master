@@ -38,6 +38,8 @@
 
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
+    <link href="assets/css/content-header-modern.css?v=1" rel="stylesheet" />
+    <link href="assets/css/box-modern.css?v=5" rel="stylesheet" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -519,10 +521,8 @@
 
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
-                </asp:ContentPlaceHolder>
-            </section>
+            <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
+            </asp:ContentPlaceHolder>
 
             <!-- Main content -->
             <section class="content">
@@ -625,6 +625,7 @@
             })
         </script>
         <script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
+        <script src="assets/js/box-header-enhance.js?v=2"></script>
         <asp:ContentPlaceHolder ID="contentScript" runat="server">
         </asp:ContentPlaceHolder>
     </form>

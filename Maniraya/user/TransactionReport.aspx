@@ -1,15 +1,14 @@
 ﻿<%@ Page Title="Transaction Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="TransactionReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="assets/css/team-associates.css?v=3" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-      <h1 style="color:white;">
-     Transaction Report  
-      </h1>
+      <h1>Transaction Report</h1>
       <ol class="breadcrumb">
-    <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home > </a></li>
-            <li><a href="#">Reports > </a></li>
+        <li><a href="Dashboard.aspx">Home</a></li>
+        <li><a href="#">Reports</a></li>
         <li class="active">Transaction Report</li>
       
       </ol>
@@ -21,8 +20,8 @@
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
 
-            <div class="row" style="color:white;">
-          <div class="col-md-12">
+            <div class="row">
+          <div class="col-md-12 team-page">
               <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Search Criteria</h3>
@@ -98,30 +97,25 @@
 </div>
                 </div>
                              </div>
-                  <div class="row">
-                      <div class="col-md-4">
-                          </div>
-                        <div class="col-md-6">
-                          </div>
-                         <div class="col-md-2">
-                   
-                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control pull-right margin-left-10" AutoPostBack="true" 
-                        OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged" Width="80px">
-                        <asp:ListItem>All</asp:ListItem>                      
-                        <asp:ListItem>25</asp:ListItem>
-                        <asp:ListItem>50</asp:ListItem>
-                        <asp:ListItem>100</asp:ListItem>
-                        <asp:ListItem>500</asp:ListItem>
-                    </asp:DropDownList>
-                  
-                </div>
+                  <div class="team-table-toolbar">
+                      <span class="team-table-caption"><i class="fa fa-list-alt"></i> Transaction List</span>
+                      <div class="form-group team-toolbar-filter">
+                          <label for="<%= ddlRecordFilter.ClientID %>">Show records</label>
+                          <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control team-records-select" AutoPostBack="true"
+                              OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                              <asp:ListItem>All</asp:ListItem>
+                              <asp:ListItem>25</asp:ListItem>
+                              <asp:ListItem>50</asp:ListItem>
+                              <asp:ListItem>100</asp:ListItem>
+                              <asp:ListItem>500</asp:ListItem>
+                          </asp:DropDownList>
+                      </div>
                   </div>
-
-
 
                           <div class="row">
                          <div class="col-md-12">
-                             <div class="form-group table-responsive">
+                             <div class="form-group team-table-group table-responsive">
+                                 <div class="team-table-wrap">
                                 <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand">
                                <Columns>
                                     <asp:TemplateField HeaderText="#">
@@ -169,6 +163,7 @@
                                                                   
                                 </Columns>
                             </asp:GridView>
+                                 </div>
                              </div>
                          </div>
                       
