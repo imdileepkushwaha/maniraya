@@ -15,7 +15,7 @@ namespace DataTier
             try
             {
 
-                connectionString = "Server=97.74.91.222;Initial Catalog=www_maniraya_db;  USER ID=www_maniraya_db;PASSWORD=maniraya@123#; trusted_connection=false";
+                connectionString = "Server=97.74.91.222;Initial Catalog=www_manirayapremium_db;  USER ID=www_manirayapremium_db;PASSWORD=manirayapremium@123#; trusted_connection=false";
 ;                //connectionString = "Server=148.72.210.221;Initial Catalog=RBDCROP_db;  USER ID=RBDCROP_db;PASSWORD=RBDCROP@123#; trusted_connection=false;";
 
             }

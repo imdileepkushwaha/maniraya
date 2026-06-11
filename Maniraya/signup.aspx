@@ -185,7 +185,7 @@
                                         </div>
 
 
-                                        <div class="row" style="display: none;">
+                                        <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label class="text-start">Select Position :</label>
