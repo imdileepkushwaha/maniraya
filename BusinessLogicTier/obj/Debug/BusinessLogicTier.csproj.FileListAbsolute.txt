@@ -693,3 +693,11 @@ c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Debug\Busines
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Debug\Business.2FDD14DE.Up2Date
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Debug\BusinessLogicTier.dll
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Debug\BusinessLogicTier.pdb
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\BusinessLogicTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\BusinessLogicTier.pdb
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\DataTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\Newtonsoft.Json.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\DataTier.pdb
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csprojResolveAssemblyReference.cache
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.pdb
