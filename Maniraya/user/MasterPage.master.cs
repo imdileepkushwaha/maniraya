@@ -15,18 +15,13 @@ public partial class MasterPage : System.Web.UI.MasterPage
             //LblMainId.Text = Session["username"].ToString() + "(" + Session["userid"].ToString() + ")";
             //LblFullname.Text = Session["username"].ToString() + "(" + Session["userid"].ToString() + ")";
             String UserImage = Session["UserImage"].ToString();
-            if (UserImage.ToString() != "")
-            {
-                //dvUserImage1.Src = "~/ProductImage/" + UserImage.ToString();
-                //dvUserImage2.Src = "~/ProductImage/" + UserImage.ToString();
-                dvUserImage3.Src = "~/ProductImage/" + UserImage.ToString();
-            }
-            else
-            {
-                //dvUserImage1.Src = "~/ProductImage/636549111447865966default.png";
-                //dvUserImage2.Src = "~/ProductImage/636549111447865966default.png";
-                dvUserImage3.Src = "~/ProductImage/636549111447865966default.png";
-            }
+            string profileImage = UserImage != ""
+                ? "~/ProductImage/" + UserImage
+                : "~/ProductImage/636549111447865966default.png";
+
+            dvUserImage3.Src = profileImage;
+            imgHeaderUser.Src = profileImage;
+            imgHeaderUserMenu.Src = profileImage;
 
             if (Session["status"].ToString() == "1")
             {
