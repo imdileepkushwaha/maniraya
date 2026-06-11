@@ -5,9 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogicTier", "Busine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTier", "DataTier\DataTier.csproj", "{CA15A485-1A65-4227-895D-BA1586F33F9B}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Maniraya", "Maniraya", "{386F0442-C70B-40C2-85C2-15C2F4F4DA1B}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Maniraya", "Maniraya\", "{386F0442-C70B-40C2-85C2-15C2F4F4DA1B}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		ProjectReferences = "{63832079-123a-4a86-9231-ca2e10f0aba7}|BusinessLogicTier.dll;{CA15A485-1A65-4227-895D-BA1586F33F9B}|DataTier.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/Maniraya"
 		Debug.AspNetCompiler.PhysicalPath = "Maniraya\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Maniraya\"
