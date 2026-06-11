@@ -1,0 +1,303 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="franchiseemaster.master.cs" Inherits="franchiseemaster" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="../bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../dist/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body class="hold-transition skin-blue sidebar-mini" style="background-color: #278BCE;">
+    <form id="form1" runat="server">
+
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="../index2.html" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>U M</b></span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Arsen Business Solutions</b></span>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img id="dvUserImage1" runat="server" src="img/default.png" class="user-image" alt="User Image" />
+                                <asp:Label ID="LblUsernameSideMenu" runat="server" Text="" class="hidden-xs"></asp:Label>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img id="dvUserImage2" runat="server" src="img/default.png" class="img-circle" alt="User Image" />
+                                    <p>
+                                        <asp:Label ID="LblFullname" runat="server" Text=""></asp:Label>
+                                        <small></small>
+                                    </p>
+                                </li>
+                                <!-- Menu Body -->
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="CHangePassword.aspx" class="btn btn-default btn-flat">Change password</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="logout.aspx" class="btn btn-default btn-flat">Logout</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img id="dvUserImage3" runat="server" src="img/default.png" class="img-circle" alt="User Image" />
+                    </div>
+                    <div class="pull-left info">
+                        <p>
+                            <asp:Label ID="LblMainId" runat="server" Text=""></asp:Label>
+                        </p>
+                        <a href="#"><i class="fa fa-circle text-success"></i>Online</a>
+                    </div>
+                </div>
+                <!-- search form -->
+             
+                <!-- /.search form -->
+                <!-- sidebar menu: : style can be found in sidebar.less -->
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">MAIN NAVIGATION</li>
+                    <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
+
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-male"></i><span>My Profile</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserProfile.aspx"><i class="fa fa-angle-right"></i><span>View Profile</span></a></li>
+                            <li><a href="UserEdit.aspx"><i class="fa fa-angle-right"></i><span>Edit Profile</span></a></li>
+                            <li><a href="UserBankDetail.aspx"><i class="fa fa-angle-right"></i><span>Bank Detail</span></a></li>
+                            <li><a href="PhotoUpload.aspx"><i class="fa fa-angle-right"></i><span>Photo Upload</span></a></li>
+                            <li><a href="CHangePassword.aspx"><i class="fa fa-angle-right"></i><span>Change Password</span></a></li>
+                         
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-male"></i><span>KYC Menu</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="SignupForm.aspx"><i class="fa fa-angle-right"></i><span>Signup Form</span></a></li>
+                            <li><a href="PanCardImage.aspx"><i class="fa fa-angle-right"></i><span>Pan Card</span></a></li>
+                            <li><a href="CancelCheckForm.aspx"><i class="fa fa-angle-right"></i><span>Cancel Check/Passbook</span></a></li>
+                            <li><a href="AddressProof.aspx"><i class="fa fa-angle-right"></i><span>Address Proof/Aadhar</span></a></li>
+
+
+                        </ul>
+                    </li>
+                  <%--  <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-user"></i><span>My Network</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserAdd.aspx"><i class="fa fa-angle-right"></i>New Signup</a></li>
+                            <li><a href="UserDirectAssociates.aspx"><i class="fa fa-angle-right"></i>My Direct User</a></li>
+                            <li><a href="DownlineReport.aspx"><i class="fa fa-angle-right"></i>Downline Report </a></li>
+                            <li><a href="treeview.aspx"><i class="fa fa-angle-right"></i>Treeview Report </a></li>
+                              <li><a href="HericalViewofTree.aspx"><i class="fa fa-angle-right"></i>Treeview Chart </a></li>
+                           
+                            
+                        </ul>
+                    </li>      --%>             
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-credit-card"></i><span>My Wallet</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">  
+                               <li><a href="UserWallet.aspx"><i class="fa fa-angle-right"></i>Wallet Status</a></li>   
+                              <li><a href="TransactionReport.aspx"><i class="fa fa-angle-right"></i>Transaction Report </a></li>                      
+                                
+                        </ul>
+                    </li>
+                 
+                 <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-edit"></i><span>E-Pin Management</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="EPinAdd.aspx"><i class="fa fa-angle-right"></i>Generate E-Pin</a></li>
+                            <li><a href="EPinReport.aspx"><i class="fa fa-angle-right"></i>E-Pin Report </a></li>
+                           <%-- <li><a href="EPinTransfer.aspx"><i class="fa fa-angle-right"></i>E-Pin Transfer </a></li>--%>
+                            <li><a href="ActivateUserWithEpin.aspx"><i class="fa fa-angle-right"></i>Activate User With e-pin </a></li>
+                        </ul>
+                    </li>
+                
+                  
+              
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-share"></i><span>Withdrawl</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="WithdrawlRequstAdd.aspx"><i class="fa fa-angle-right"></i>Withdrawl Request</a></li>
+                            <li><a href="WithdrawlRequestReport.aspx"><i class="fa fa-angle-right"></i>Withdrawl Request Report</a></li>
+
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-mail-reply"></i><span>Fund Request</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="DepositRequstAdd.aspx"><i class="fa fa-angle-right"></i>Own Fund Request Add</a></li>
+                            <li><a href="OwnDepositRequestReport.aspx"><i class="fa fa-angle-right"></i>Own Fund Request Report</a></li>
+                             <li><a href="DepositRequestReport.aspx"><i class="fa fa-angle-right"></i>User Request Report</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-wrench"></i><span>Tools</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserDownload.aspx"><i class="fa fa-angle-right"></i>Download</a></li>
+                            <li><a href="BankDetail.aspx"><i class="fa fa-angle-right"></i>Company Bank Details</a></li>
+                        </ul>
+                    </li>
+                  <%--  <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-comments"></i><span>Customer Care</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="NewMessage.aspx"><i class="fa fa-angle-right"></i>Compose Mail</a></li>
+                            <li><a href="Inbox.aspx"><i class="fa fa-angle-right"></i>Inbox</a></li>
+                            <li><a href="Sentbox.aspx"><i class="fa fa-angle-right"></i>Sent Mail</a></li>
+                        </ul>
+                    </li>--%>
+                </ul>
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
+                </asp:ContentPlaceHolder>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <!-- Default box -->
+                <asp:ContentPlaceHolder ID="contentpageData" runat="server"></asp:ContentPlaceHolder>
+
+                <!-- /.box -->
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Arsen Business Solutions</b> 2.4.0
+            </div>
+            <strong>Copyright &copy; 2017-2018 <a href="#">Arsen Business Solutions</a>.</strong> All rights
+    reserved.
+        </footer>
+        <div class="control-sidebar-bg"></div>
+
+        <!-- Control Sidebar -->
+
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+
+
+        <!-- ./wrapper -->
+
+        <!-- jQuery 3 -->
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap 3.3.7 -->
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower_components/fastclick/lib/fastclick.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../dist/js/adminlte.min.js"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script src="../dist/js/demo.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('.sidebar-menu').tree()
+            })
+        </script>
+        <asp:ContentPlaceHolder ID="contentScript" runat="server">
+        </asp:ContentPlaceHolder>
+    </form>
+</body>
+</html>

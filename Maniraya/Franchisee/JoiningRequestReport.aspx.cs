@@ -1,0 +1,343 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+using System.Configuration;
+using BusinessLogicTier;
+using DataTier;
+
+public partial class JoiningRequestReport : System.Web.UI.Page
+{
+    Data ObjData = new Data();
+    clsAccount objaccount = new clsAccount();
+    clsUser objuser = new clsUser();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (Session["fuserid"] != null)
+        {
+            if (!IsPostBack)
+            {
+
+
+            }
+        }
+        else
+        {
+            Response.Redirect("logout.aspx");
+        }
+    }
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        loadgethelp();
+    }
+    void loadgethelp()
+    {
+        if (txtfromdate.Text != "" && txttodate.Text != "")
+        {
+            objaccount.FromDate = Message.GetIndianDate(txtfromdate.Text);
+            objaccount.ToDate = Message.GetIndianDate(txttodate.Text);
+        }
+        else
+        {
+            objaccount.FromDate = DateTime.MinValue;
+            objaccount.ToDate = DateTime.MinValue;
+        }
+        objaccount.WithdrawlRequestStatus = ddstatus.SelectedValue.ToString();
+        DataTable dt = new DataTable();
+        objaccount.UserId = txtuserid.Text;
+       objaccount.DepositrequestTo = Session["fuserid"].ToString();
+        dt = getTopupRequestnew(objaccount);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+
+    }
+    public DataTable getTopupRequestnew(clsAccount objaccount)
+    {
+        string str_query = "SELECT J.ID,J.ApproveBy,J.approvedate,userid,fromuserid,P.PlanName,P.PlanAmount,EmPinNo,status,CASE WHEN J.Status=0 THEN 'Pending' WHEN J.Status=1 THEN 'Approved' END AS Status1,J.entrydate  FROM JoiningProductRequest J JOIN Planmaster P ON J.PlanID=P.Id where 1=1 ";
+
+
+        if (objaccount.FromDate != DateTime.MinValue && objaccount.ToDate != DateTime.MinValue)
+        {
+            str_query += "  and J.entrydate  >= '" + objaccount.FromDate + "'   and J.entrydate   <= '" + objaccount.ToDate + "' ";
+        }
+
+
+
+        if (objaccount.WithdrawlRequestStatus != "0")
+        {
+            str_query += "  and J.status = '" + objaccount.WithdrawlRequestStatus + "' ";
+        }
+
+        if (objaccount.UserId != "")
+        {
+            str_query += "  and J.fromuserid = '" + objaccount.UserId + "' ";
+        }
+        str_query += " and J.userid = '" + objaccount.DepositrequestTo + "'";
+
+        str_query += " order by J.entrydate  desc";
+
+
+
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
+    protected void grdGetHelp_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            Label lblstatus = (Label)e.Row.FindControl("lblstatus");
+            Label lbltransactionid=(Label)e.Row.FindControl("lbltransactionid");
+            Label requestType = (Label)e.Row.FindControl("LblRequestType");
+            //TextBox txttransactionid = (TextBox)e.Row.FindControl("txttransactionid");
+            //DropDownList ddmode = (DropDownList)e.Row.FindControl("ddmode");
+            LinkButton btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
+          //  LinkButton btnReject = (LinkButton)e.Row.FindControl("btnReject");
+            if (lblstatus.Text == "Pending")
+            {
+                lblstatus.Text = "Pending";
+                lblstatus.CssClass = "label label-warning";
+                btnApprove.Visible = true;
+              //  btnReject.Visible = true;
+               // ddmode.Visible = true;
+                //txttransactionid.Visible = true;
+                //lbltransactionid.Visible = false;
+            }
+            else
+                if (lblstatus.Text == "Approved")
+                {
+                    lblstatus.Text = "Approved";
+                    lblstatus.CssClass = "label label-success";
+                    btnApprove.Visible = false;
+                //    btnReject.Visible = false;
+                   // ddmode.Visible = false;
+                   // txttransactionid.Visible = false;
+                   // lbltransactionid.Visible = true;
+                }
+                else
+
+                    if (lblstatus.Text == "Rejected")
+                    {
+                        lblstatus.Text = "Rejected";
+                        lblstatus.CssClass = "label label-danger";
+                        btnApprove.Visible = false;
+                   //     btnReject.Visible = false;
+                        //ddmode.Visible = false;
+                        //txttransactionid.Visible = false;
+                        //lbltransactionid.Visible = false;
+                    }
+
+        }
+    }
+    protected void btnApprove_click(object sender, EventArgs e)
+    {
+        GridViewRow gvRow = (GridViewRow)(sender as Control).Parent.Parent;
+        Label lblgalleryid = (Label)gvRow.FindControl("lblId");
+        Label lblamount = (Label)gvRow.FindControl("lblPlanamount");
+
+        objaccount.UserId = Session["fuserid"].ToString();
+        objaccount.WithdrawlAmount = Convert.ToDecimal(lblamount.Text);
+        //objaccount.Mainamount = Convert.ToDecimal(lblmainamount.Text);
+        objaccount.WithdrawlRequestId = lblgalleryid.Text;
+        objaccount.MentionBy = Session["fuserid"].ToString();
+   
+        DataTable Dt = Approve_topupRequest(objaccount);
+        if (Dt != null)
+        {
+
+            string popupScript = "alert('"+Dt.Rows[0][1].ToString()+"');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            loadgethelp();
+
+        }
+        else
+        {
+            string popupScript = "alert('Something wrong ');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            loadgethelp();
+
+        }
+        loadgethelp();
+    }
+    public DataTable Approve_topupRequest(clsAccount objaccount)
+    {
+        string res = "";
+        string s2 = "";
+        SqlConnection cn;
+        SqlTransaction tr = null;
+        DataTable Dt = new DataTable();
+        cn = ObjData.StartConnectionInTransaction();
+        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            s2 = "sp_approve_Productepinrequest";
+            SqlParameter[] parameter = {                                              
+                new SqlParameter("@GenerateUserId",objaccount.UserId),
+                new SqlParameter("@Amount",objaccount.WithdrawlAmount), 
+                new SqlParameter("@MentionBy",objaccount.MentionBy),
+                new SqlParameter("@ID",objaccount.WithdrawlRequestId),
+              
+                     
+                };
+            Dt = ObjData.RunDataTableProcedureTRans(s2, tr, parameter);
+
+            if (Dt != null && Dt.Rows[0][0].ToString() == "1")
+            {
+                tr.Commit();
+                //s2 = "select mobile,isnull(balanceamount,0) as balanceamount,isnull(utilitybalance,0) as utilitybalance from userdetail where userid='" + objaccount.UserId + "'";
+                //DataTable Dtmsms = ObjData.RunSelectQueryTTrans(s2, tr);
+                //if (Dtmsms.Rows.Count > 0)
+                //{
+                //    string MobileNo = "";
+                //    string BalanceAmount = "";
+                //    MobileNo = Dtmsms.Rows[0]["mobile"].ToString();
+                //    if (objaccount.DepositrequestRequestType == "R")
+                //    {
+                //        BalanceAmount = Dtmsms.Rows[0]["BalanceAmount"].ToString();
+                //    }
+                //    if (objaccount.DepositrequestRequestType == "U")
+                //    {
+                //        BalanceAmount = Dtmsms.Rows[0]["utilityBalance"].ToString();
+                //    }
+                //    string url = objUser.smstemplate("", MobileNo, "", "", "ARSENPAY", "www.arsenpay.in", objaccount.UserId, objaccount.WithdrawlAmount.ToString(), BalanceAmount, objaccount.MentionBy, "", "", "", "fundcredit");
+                //    string Result = url.CallURL();
+                //    objUser.Insert_SendSMS(objaccount.UserMObile, Result, url);
+                //}
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            res = "0";
+            tr.Rollback();
+        }
+        finally
+        {
+            ObjData.EndConnection();
+            tr.Dispose();
+        }
+        return Dt;
+    }
+    protected void btnReject_click(object sender, EventArgs e)
+    {
+        GridViewRow gvRow = (GridViewRow)(sender as Control).Parent.Parent;
+        Label lblgalleryid = (Label)gvRow.FindControl("lblId");
+        objaccount.WithdrawlRequestId = lblgalleryid.Text;
+        objaccount.MentionBy = Session["useradmin"].ToString();
+        string res = Reject_DepositRequest(objaccount);
+        if (res == "t")
+        {
+            string popupScript = "alert('Request Rejected Successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            loadgethelp();
+
+        }
+        else
+        {
+            string popupScript = "alert('Unknow error occurred');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
+        loadgethelp();
+       
+    }
+    public string Reject_DepositRequest(clsAccount objaccount)
+    {
+        string res = "";
+        string s2 = "";
+        SqlConnection cn;
+        SqlTransaction tr = null;
+        DataSet ds = new DataSet();
+        cn = ObjData.StartConnectionInTransaction();
+        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            s2 = "select * from EPinRequest where id=" + objaccount.WithdrawlRequestId + "   and status='Pending' ";
+            DataTable dt = new DataTable();
+            dt = ObjData.RunSelectQueryTTrans(s2, tr);
+            if (dt.Rows.Count > 0)
+            {
+
+                s2 = "update EPinRequest set status='Rejected' , approvedate=getdate() where id=" + objaccount.WithdrawlRequestId + "  ";
+                ObjData.RunInsUpDelQueryTrans(s2, tr);
+
+                res = "t";
+            }
+            else
+            {
+                res = "f";
+            }
+
+
+            tr.Commit();
+        }
+        catch (Exception ex)
+        {
+            res = "0";
+            tr.Rollback();
+        }
+        finally
+        {
+            ObjData.EndConnection();
+            tr.Dispose();
+        }
+        return res;
+    }
+    protected void btncancel_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Dashboard.aspx");
+    }
+    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "photolarge")
+        {
+            int index = Convert.ToInt32(e.CommandArgument.ToString());
+            Label lblid = (Label)GridView1.Rows[index].FindControl("lblNoofEpin");
+            lblid.Text = "MR000001";
+            DataTable dt = getPurchaseProductQuantityChild(lblid.Text);
+            gvOrders.DataSource = dt;
+            gvOrders.DataBind();
+           
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+        }
+    }
+    public DataTable getPurchaseProductQuantityChild(string ID)
+    {
+        string str_query = "SELECT PR.PurchaseID,PR.PurchaseDate,P.ProductName,CASE WHEN P.productimage='' THEN '../ProductImage/images.png' ELSE  '../ProductImage/'+ P.productimage END AS [Image],PR.Quantity,PR.Amount,PR.TotalAmount,PR.ProductID,PR.TotalDP,P.DP FROM UserjoiningPurchaseproductMaster PR INNER  JOIN ProductMaster P ON PR.ProductID=P.ProductID inner join  UserjoiningPurchaseMaster PJ on PJ.Purchaseid=PR.Purchaseid  where 1=1 ";
+
+
+        if (ID != string.Empty)
+        {
+            str_query += " and PJ.orderNO='" + ID + "'";
+        }
+        str_query += " order by PR.PurchaseID";
+        DataTable dt = null;
+
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
+}

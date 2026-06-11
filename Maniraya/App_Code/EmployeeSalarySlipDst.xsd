@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EmployeeSalarySlipDst" targetNamespace="http://tempuri.org/EmployeeSalarySlipDst.xsd" xmlns:mstns="http://tempuri.org/EmployeeSalarySlipDst.xsd" xmlns="http://tempuri.org/EmployeeSalarySlipDst.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="Connection String" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Connection String (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.Connection String.ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EmployeeSalaryDetailTableAdapter" GeneratorDataComponentClassName="EmployeeSalaryDetailTableAdapter" Name="EmployeeSalaryDetail" UserDataComponentName="EmployeeSalaryDetailTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="Connection String (Web.config)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT ed.*,ee.Employeename, convert(CHAR,ed.PaidDate,103) AS paiddate2 , convert(CHAR,ed.ChequeDate,103) AS chequedate2  ,ed.BasicPay+ed.HouseRent+ed.Conveyance+ed.Medical+ed.EmployersContribution+ed.PhoneAllowance+ed.DA+ed.SpecialAllowance+ed.CashAllowance+ed.ExtraWork+ed.Incentive+ed.OtherPayment AS TotalPayment,ed.PF+ed.ESI+ed.Advance+ed.TDS+ed.TotalLeaves+ed.OtherDeduction AS Total_Deduction, (ed.BasicPay+ed.HouseRent+ed.Conveyance+ed.Medical+ed.EmployersContribution+ed.PhoneAllowance+ed.DA+ed.SpecialAllowance+ed.CashAllowance+ed.ExtraWork+ed.Incentive+ed.OtherPayment)-(ed.PF+ed.ESI+ed.Advance+ed.TDS+ed.TotalLeaves+ed.OtherDeduction) AS Total_Salary FROM EmployeeSalaryDetail ed left join EmployeeDetail ee on ed.EmployeeId=ee.EmployeeId</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="id" DataSetColumn="id" />
+              <Mapping SourceColumn="EmployeeId" DataSetColumn="EmployeeId" />
+              <Mapping SourceColumn="SalaryMonth" DataSetColumn="SalaryMonth" />
+              <Mapping SourceColumn="SalaryYear" DataSetColumn="SalaryYear" />
+              <Mapping SourceColumn="PaidDate" DataSetColumn="PaidDate" />
+              <Mapping SourceColumn="BasicPay" DataSetColumn="BasicPay" />
+              <Mapping SourceColumn="HouseRent" DataSetColumn="HouseRent" />
+              <Mapping SourceColumn="Conveyance" DataSetColumn="Conveyance" />
+              <Mapping SourceColumn="Medical" DataSetColumn="Medical" />
+              <Mapping SourceColumn="EmployersContribution" DataSetColumn="EmployersContribution" />
+              <Mapping SourceColumn="PhoneAllowance" DataSetColumn="PhoneAllowance" />
+              <Mapping SourceColumn="DA" DataSetColumn="DA" />
+              <Mapping SourceColumn="SpecialAllowance" DataSetColumn="SpecialAllowance" />
+              <Mapping SourceColumn="CashAllowance" DataSetColumn="CashAllowance" />
+              <Mapping SourceColumn="ExtraWork" DataSetColumn="ExtraWork" />
+              <Mapping SourceColumn="Incentive" DataSetColumn="Incentive" />
+              <Mapping SourceColumn="OtherPayment" DataSetColumn="OtherPayment" />
+              <Mapping SourceColumn="PF" DataSetColumn="PF" />
+              <Mapping SourceColumn="ESI" DataSetColumn="ESI" />
+              <Mapping SourceColumn="Advance" DataSetColumn="Advance" />
+              <Mapping SourceColumn="TDS" DataSetColumn="TDS" />
+              <Mapping SourceColumn="TotalLeaves" DataSetColumn="TotalLeaves" />
+              <Mapping SourceColumn="OtherDeduction" DataSetColumn="OtherDeduction" />
+              <Mapping SourceColumn="Remark" DataSetColumn="Remark" />
+              <Mapping SourceColumn="PaymentMode" DataSetColumn="PaymentMode" />
+              <Mapping SourceColumn="BankName" DataSetColumn="BankName" />
+              <Mapping SourceColumn="BranchName" DataSetColumn="BranchName" />
+              <Mapping SourceColumn="ChequeNo" DataSetColumn="ChequeNo" />
+              <Mapping SourceColumn="ChequeDate" DataSetColumn="ChequeDate" />
+              <Mapping SourceColumn="CashDepositLocation" DataSetColumn="CashDepositLocation" />
+              <Mapping SourceColumn="CashDepositAccountNo" DataSetColumn="CashDepositAccountNo" />
+              <Mapping SourceColumn="CashDepositBranchID" DataSetColumn="CashDepositBranchID" />
+              <Mapping SourceColumn="CashDepositTransactionNo" DataSetColumn="CashDepositTransactionNo" />
+              <Mapping SourceColumn="OnlineTransactionAccountNo" DataSetColumn="OnlineTransactionAccountNo" />
+              <Mapping SourceColumn="OnlineTransactionTransactionNo" DataSetColumn="OnlineTransactionTransactionNo" />
+              <Mapping SourceColumn="OnlineTransactionPaymentDate" DataSetColumn="OnlineTransactionPaymentDate" />
+              <Mapping SourceColumn="BranchId" DataSetColumn="BranchId" />
+              <Mapping SourceColumn="VoucherId" DataSetColumn="VoucherId" />
+              <Mapping SourceColumn="MentionBy" DataSetColumn="MentionBy" />
+              <Mapping SourceColumn="MentionDate" DataSetColumn="MentionDate" />
+              <Mapping SourceColumn="Employeename" DataSetColumn="Employeename" />
+              <Mapping SourceColumn="paiddate2" DataSetColumn="paiddate2" />
+              <Mapping SourceColumn="TotalPayment" DataSetColumn="TotalPayment" />
+              <Mapping SourceColumn="Total_Deduction" DataSetColumn="Total_Deduction" />
+              <Mapping SourceColumn="Total_Salary" DataSetColumn="Total_Salary" />
+              <Mapping SourceColumn="chequedate2" DataSetColumn="chequedate2" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="EmployeeSalarySlipDst" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="EmployeeSalarySlipDst" msprop:Generator_UserDSName="EmployeeSalarySlipDst">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="EmployeeSalaryDetail" msprop:Generator_TableClassName="EmployeeSalaryDetailDataTable" msprop:Generator_TableVarName="tableEmployeeSalaryDetail" msprop:Generator_RowChangedName="EmployeeSalaryDetailRowChanged" msprop:Generator_TablePropName="EmployeeSalaryDetail" msprop:Generator_RowDeletingName="EmployeeSalaryDetailRowDeleting" msprop:Generator_RowChangingName="EmployeeSalaryDetailRowChanging" msprop:Generator_RowEvHandlerName="EmployeeSalaryDetailRowChangeEventHandler" msprop:Generator_RowDeletedName="EmployeeSalaryDetailRowDeleted" msprop:Generator_RowClassName="EmployeeSalaryDetailRow" msprop:Generator_UserTableName="EmployeeSalaryDetail" msprop:Generator_RowEvArgName="EmployeeSalaryDetailRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="id" msprop:Generator_ColumnVarNameInTable="columnid" msprop:Generator_ColumnPropNameInRow="id" msprop:Generator_ColumnPropNameInTable="idColumn" msprop:Generator_UserColumnName="id" type="xs:int" minOccurs="0" />
+              <xs:element name="EmployeeId" msprop:Generator_ColumnVarNameInTable="columnEmployeeId" msprop:Generator_ColumnPropNameInRow="EmployeeId" msprop:Generator_ColumnPropNameInTable="EmployeeIdColumn" msprop:Generator_UserColumnName="EmployeeId" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SalaryMonth" msprop:Generator_ColumnVarNameInTable="columnSalaryMonth" msprop:Generator_ColumnPropNameInRow="SalaryMonth" msprop:Generator_ColumnPropNameInTable="SalaryMonthColumn" msprop:Generator_UserColumnName="SalaryMonth" type="xs:int" minOccurs="0" />
+              <xs:element name="SalaryYear" msprop:Generator_ColumnVarNameInTable="columnSalaryYear" msprop:Generator_ColumnPropNameInRow="SalaryYear" msprop:Generator_ColumnPropNameInTable="SalaryYearColumn" msprop:Generator_UserColumnName="SalaryYear" type="xs:int" minOccurs="0" />
+              <xs:element name="PaidDate" msprop:Generator_ColumnVarNameInTable="columnPaidDate" msprop:Generator_ColumnPropNameInRow="PaidDate" msprop:Generator_ColumnPropNameInTable="PaidDateColumn" msprop:Generator_UserColumnName="PaidDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="BasicPay" msprop:Generator_ColumnVarNameInTable="columnBasicPay" msprop:Generator_ColumnPropNameInRow="BasicPay" msprop:Generator_ColumnPropNameInTable="BasicPayColumn" msprop:Generator_UserColumnName="BasicPay" type="xs:decimal" minOccurs="0" />
+              <xs:element name="HouseRent" msprop:Generator_ColumnVarNameInTable="columnHouseRent" msprop:Generator_ColumnPropNameInRow="HouseRent" msprop:Generator_ColumnPropNameInTable="HouseRentColumn" msprop:Generator_UserColumnName="HouseRent" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Conveyance" msprop:Generator_ColumnVarNameInTable="columnConveyance" msprop:Generator_ColumnPropNameInRow="Conveyance" msprop:Generator_ColumnPropNameInTable="ConveyanceColumn" msprop:Generator_UserColumnName="Conveyance" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Medical" msprop:Generator_ColumnVarNameInTable="columnMedical" msprop:Generator_ColumnPropNameInRow="Medical" msprop:Generator_ColumnPropNameInTable="MedicalColumn" msprop:Generator_UserColumnName="Medical" type="xs:decimal" minOccurs="0" />
+              <xs:element name="EmployersContribution" msprop:Generator_ColumnVarNameInTable="columnEmployersContribution" msprop:Generator_ColumnPropNameInRow="EmployersContribution" msprop:Generator_ColumnPropNameInTable="EmployersContributionColumn" msprop:Generator_UserColumnName="EmployersContribution" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PhoneAllowance" msprop:Generator_ColumnVarNameInTable="columnPhoneAllowance" msprop:Generator_ColumnPropNameInRow="PhoneAllowance" msprop:Generator_ColumnPropNameInTable="PhoneAllowanceColumn" msprop:Generator_UserColumnName="PhoneAllowance" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DA" msprop:Generator_ColumnVarNameInTable="columnDA" msprop:Generator_ColumnPropNameInRow="DA" msprop:Generator_ColumnPropNameInTable="DAColumn" msprop:Generator_UserColumnName="DA" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SpecialAllowance" msprop:Generator_ColumnVarNameInTable="columnSpecialAllowance" msprop:Generator_ColumnPropNameInRow="SpecialAllowance" msprop:Generator_ColumnPropNameInTable="SpecialAllowanceColumn" msprop:Generator_UserColumnName="SpecialAllowance" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CashAllowance" msprop:Generator_ColumnVarNameInTable="columnCashAllowance" msprop:Generator_ColumnPropNameInRow="CashAllowance" msprop:Generator_ColumnPropNameInTable="CashAllowanceColumn" msprop:Generator_UserColumnName="CashAllowance" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ExtraWork" msprop:Generator_ColumnVarNameInTable="columnExtraWork" msprop:Generator_ColumnPropNameInRow="ExtraWork" msprop:Generator_ColumnPropNameInTable="ExtraWorkColumn" msprop:Generator_UserColumnName="ExtraWork" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Incentive" msprop:Generator_ColumnVarNameInTable="columnIncentive" msprop:Generator_ColumnPropNameInRow="Incentive" msprop:Generator_ColumnPropNameInTable="IncentiveColumn" msprop:Generator_UserColumnName="Incentive" type="xs:decimal" minOccurs="0" />
+              <xs:element name="OtherPayment" msprop:Generator_ColumnVarNameInTable="columnOtherPayment" msprop:Generator_ColumnPropNameInRow="OtherPayment" msprop:Generator_ColumnPropNameInTable="OtherPaymentColumn" msprop:Generator_UserColumnName="OtherPayment" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PF" msprop:Generator_ColumnVarNameInTable="columnPF" msprop:Generator_ColumnPropNameInRow="PF" msprop:Generator_ColumnPropNameInTable="PFColumn" msprop:Generator_UserColumnName="PF" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ESI" msprop:Generator_ColumnVarNameInTable="columnESI" msprop:Generator_ColumnPropNameInRow="ESI" msprop:Generator_ColumnPropNameInTable="ESIColumn" msprop:Generator_UserColumnName="ESI" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Advance" msprop:Generator_ColumnVarNameInTable="columnAdvance" msprop:Generator_ColumnPropNameInRow="Advance" msprop:Generator_ColumnPropNameInTable="AdvanceColumn" msprop:Generator_UserColumnName="Advance" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TDS" msprop:Generator_ColumnVarNameInTable="columnTDS" msprop:Generator_ColumnPropNameInRow="TDS" msprop:Generator_ColumnPropNameInTable="TDSColumn" msprop:Generator_UserColumnName="TDS" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TotalLeaves" msprop:Generator_ColumnVarNameInTable="columnTotalLeaves" msprop:Generator_ColumnPropNameInRow="TotalLeaves" msprop:Generator_ColumnPropNameInTable="TotalLeavesColumn" msprop:Generator_UserColumnName="TotalLeaves" type="xs:decimal" minOccurs="0" />
+              <xs:element name="OtherDeduction" msprop:Generator_ColumnVarNameInTable="columnOtherDeduction" msprop:Generator_ColumnPropNameInRow="OtherDeduction" msprop:Generator_ColumnPropNameInTable="OtherDeductionColumn" msprop:Generator_UserColumnName="OtherDeduction" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Remark" msprop:Generator_ColumnVarNameInTable="columnRemark" msprop:Generator_ColumnPropNameInRow="Remark" msprop:Generator_ColumnPropNameInTable="RemarkColumn" msprop:Generator_UserColumnName="Remark" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="500" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PaymentMode" msprop:Generator_ColumnVarNameInTable="columnPaymentMode" msprop:Generator_ColumnPropNameInRow="PaymentMode" msprop:Generator_ColumnPropNameInTable="PaymentModeColumn" msprop:Generator_UserColumnName="PaymentMode" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="BankName" msprop:Generator_ColumnVarNameInTable="columnBankName" msprop:Generator_ColumnPropNameInRow="BankName" msprop:Generator_ColumnPropNameInTable="BankNameColumn" msprop:Generator_UserColumnName="BankName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="BranchName" msprop:Generator_ColumnVarNameInTable="columnBranchName" msprop:Generator_ColumnPropNameInRow="BranchName" msprop:Generator_ColumnPropNameInTable="BranchNameColumn" msprop:Generator_UserColumnName="BranchName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ChequeNo" msprop:Generator_ColumnVarNameInTable="columnChequeNo" msprop:Generator_ColumnPropNameInRow="ChequeNo" msprop:Generator_ColumnPropNameInTable="ChequeNoColumn" msprop:Generator_UserColumnName="ChequeNo" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ChequeDate" msprop:Generator_ColumnVarNameInTable="columnChequeDate" msprop:Generator_ColumnPropNameInRow="ChequeDate" msprop:Generator_ColumnPropNameInTable="ChequeDateColumn" msprop:Generator_UserColumnName="ChequeDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="CashDepositLocation" msprop:Generator_ColumnVarNameInTable="columnCashDepositLocation" msprop:Generator_ColumnPropNameInRow="CashDepositLocation" msprop:Generator_ColumnPropNameInTable="CashDepositLocationColumn" msprop:Generator_UserColumnName="CashDepositLocation" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CashDepositAccountNo" msprop:Generator_ColumnVarNameInTable="columnCashDepositAccountNo" msprop:Generator_ColumnPropNameInRow="CashDepositAccountNo" msprop:Generator_ColumnPropNameInTable="CashDepositAccountNoColumn" msprop:Generator_UserColumnName="CashDepositAccountNo" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CashDepositBranchID" msprop:Generator_ColumnVarNameInTable="columnCashDepositBranchID" msprop:Generator_ColumnPropNameInRow="CashDepositBranchID" msprop:Generator_ColumnPropNameInTable="CashDepositBranchIDColumn" msprop:Generator_UserColumnName="CashDepositBranchID" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CashDepositTransactionNo" msprop:Generator_ColumnVarNameInTable="columnCashDepositTransactionNo" msprop:Generator_ColumnPropNameInRow="CashDepositTransactionNo" msprop:Generator_ColumnPropNameInTable="CashDepositTransactionNoColumn" msprop:Generator_UserColumnName="CashDepositTransactionNo" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="OnlineTransactionAccountNo" msprop:Generator_ColumnVarNameInTable="columnOnlineTransactionAccountNo" msprop:Generator_ColumnPropNameInRow="OnlineTransactionAccountNo" msprop:Generator_ColumnPropNameInTable="OnlineTransactionAccountNoColumn" msprop:Generator_UserColumnName="OnlineTransactionAccountNo" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="OnlineTransactionTransactionNo" msprop:Generator_ColumnVarNameInTable="columnOnlineTransactionTransactionNo" msprop:Generator_ColumnPropNameInRow="OnlineTransactionTransactionNo" msprop:Generator_ColumnPropNameInTable="OnlineTransactionTransactionNoColumn" msprop:Generator_UserColumnName="OnlineTransactionTransactionNo" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="OnlineTransactionPaymentDate" msprop:Generator_ColumnVarNameInTable="columnOnlineTransactionPaymentDate" msprop:Generator_ColumnPropNameInRow="OnlineTransactionPaymentDate" msprop:Generator_ColumnPropNameInTable="OnlineTransactionPaymentDateColumn" msprop:Generator_UserColumnName="OnlineTransactionPaymentDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="BranchId" msprop:Generator_ColumnVarNameInTable="columnBranchId" msprop:Generator_ColumnPropNameInRow="BranchId" msprop:Generator_ColumnPropNameInTable="BranchIdColumn" msprop:Generator_UserColumnName="BranchId" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="VoucherId" msprop:Generator_ColumnVarNameInTable="columnVoucherId" msprop:Generator_ColumnPropNameInRow="VoucherId" msprop:Generator_ColumnPropNameInTable="VoucherIdColumn" msprop:Generator_UserColumnName="VoucherId" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MentionBy" msprop:Generator_ColumnVarNameInTable="columnMentionBy" msprop:Generator_ColumnPropNameInRow="MentionBy" msprop:Generator_ColumnPropNameInTable="MentionByColumn" msprop:Generator_UserColumnName="MentionBy" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MentionDate" msprop:Generator_ColumnVarNameInTable="columnMentionDate" msprop:Generator_ColumnPropNameInRow="MentionDate" msprop:Generator_ColumnPropNameInTable="MentionDateColumn" msprop:Generator_UserColumnName="MentionDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Employeename" msprop:Generator_ColumnVarNameInTable="columnEmployeename" msprop:Generator_ColumnPropNameInRow="Employeename" msprop:Generator_ColumnPropNameInTable="EmployeenameColumn" msprop:Generator_UserColumnName="Employeename" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="paiddate2" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnpaiddate2" msprop:Generator_ColumnPropNameInRow="paiddate2" msprop:Generator_ColumnPropNameInTable="paiddate2Column" msprop:Generator_UserColumnName="paiddate2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="30" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TotalPayment" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnTotalPayment" msprop:Generator_ColumnPropNameInRow="TotalPayment" msprop:Generator_ColumnPropNameInTable="TotalPaymentColumn" msprop:Generator_UserColumnName="TotalPayment" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Total_Deduction" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnTotal_Deduction" msprop:Generator_ColumnPropNameInRow="Total_Deduction" msprop:Generator_ColumnPropNameInTable="Total_DeductionColumn" msprop:Generator_UserColumnName="Total_Deduction" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Total_Salary" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnTotal_Salary" msprop:Generator_ColumnPropNameInRow="Total_Salary" msprop:Generator_ColumnPropNameInTable="Total_SalaryColumn" msprop:Generator_UserColumnName="Total_Salary" type="xs:decimal" minOccurs="0" />
+              <xs:element name="chequedate2" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnchequedate2" msprop:Generator_ColumnPropNameInRow="chequedate2" msprop:Generator_ColumnPropNameInTable="chequedate2Column" msprop:Generator_UserColumnName="chequedate2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="30" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CCA" msprop:Generator_ColumnVarNameInTable="columnCCA" msprop:Generator_ColumnPropNameInRow="CCA" msprop:Generator_ColumnPropNameInTable="CCAColumn" msprop:Generator_UserColumnName="CCA" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

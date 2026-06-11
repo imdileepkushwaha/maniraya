@@ -1,0 +1,36 @@
+protected void CheckBoxList1_SelectedIndexChanged(object sender, EventArgs e)
+{
+    int lastSelectedIndex = 0;
+    string lastSelectedValue = string.Empty;
+
+    foreach (ListItem listitem in CheckBoxList1.Items)
+    {
+        if (listitem.Selected)
+        {
+            int thisIndex = CheckBoxList1.Items.IndexOf(listitem);
+
+            if (lastSelectedIndex < thisIndex)
+            {
+                lastSelectedIndex = thisIndex;
+                lastSelectedValue = listitem.Value;
+            }
+        }
+    }
+}
+
+
+http://web.paypaisa.net/Apirequest?userId=4N75IM&password=9BII2E&tranPin=78956&mobile=9999999999&amount=10&opCode=AC&request_id=7867564535465             
+
+function divexpandcollapse(divname) {
+    var img = "img" + divname;
+    if ($("#" + img).attr("src") == "images/plus.png") {
+        $("#" + img)
+    .closest("tr")
+    .after("" + $("#" + divname)
+    .html() + "")
+        $("#" + img).attr("src", "images/minus.png");
+    } else {
+        $("#" + img).closest("tr").next().remove();
+        $("#" + img).attr("src", "images/plus.png");
+    }
+}

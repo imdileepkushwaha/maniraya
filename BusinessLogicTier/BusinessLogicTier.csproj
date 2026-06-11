@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{63832079-123A-4A86-9231-CA2E10F0ABA7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BusinessLogicTier</RootNamespace>
+    <AssemblyName>BusinessLogicTier</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ARA_StringHunt">
+      <HintPath>..\..\..\Akar_Umoney\Bin\ARA_StringHunt.dll</HintPath>
+    </Reference>
+    <Reference Include="CyberPlatOpenSSL">
+      <HintPath>..\..\..\Akar_Umoney\Bin\CyberPlatOpenSSL.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Akar_Umoney\Bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\..\..\RoundpayProject\My Project\ROUNDPAYMLMNEW\ROUNDPAYMLM\Bin\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="clsAccount.cs" />
+    <Compile Include="clsAd.cs" />
+    <Compile Include="clsAdminRequest.cs" />
+    <Compile Include="clsAPI.cs" />
+    <Compile Include="clsaward.cs" />
+    <Compile Include="clsBank.cs" />
+    <Compile Include="clsCategory.cs" />
+    <Compile Include="clsClosing.cs" />
+    <Compile Include="clsCoupon.cs" />
+    <Compile Include="clsdashboard.cs" />
+    <Compile Include="clsDownload.cs" />
+    <Compile Include="clsdthsuscription.cs" />
+    <Compile Include="clsEPin.cs" />
+    <Compile Include="clsfranchisee.cs" />
+    <Compile Include="clsLogin.cs" />
+    <Compile Include="Clsmail.cs" />
+    <Compile Include="clsMoneyTransfer.cs" />
+    <Compile Include="clsnewmail.cs" />
+    <Compile Include="clsNews.cs" />
+    <Compile Include="clsOperator.cs" />
+    <Compile Include="clsplan.cs" />
+    <Compile Include="clsProduct.cs" />
+    <Compile Include="clsRecharge.cs" />
+    <Compile Include="clsRechargeAPI.cs" />
+    <Compile Include="clsSecureService.cs" />
+    <Compile Include="clsSetting.cs" />
+    <Compile Include="clsState.cs" />
+    <Compile Include="clsSupport.cs" />
+    <Compile Include="clsUser.cs" />
+    <Compile Include="ClsVacation.cs" />
+    <Compile Include="clsvendor.cs" />
+    <Compile Include="clsVerfification.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Documet_Upload_class.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataTier\DataTier.csproj">
+      <Project>{ca15a485-1a65-4227-895d-ba1586f33f9b}</Project>
+      <Name>DataTier</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

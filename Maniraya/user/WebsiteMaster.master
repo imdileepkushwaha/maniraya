@@ -1,0 +1,215 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="WebsiteMaster.master.cs" Inherits="user_WebsiteMaster" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" content="Alteco HTML5 Template - v1.0">
+    <meta name="author" content="">
+
+     <!--Page Title-->
+    <title>Level Demo</title>
+
+    <!--Favicons-->
+    <link rel="shortcut icon" type="image/x-icon" href="img/logo.png" />
+
+    <!-- Mobile Specific Meta-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Google Font  -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&amp;family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/bootstrap.css" media="screen">
+     <!-- Fontawesome CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/font-awesome.min.css" media="screen">
+    <!-- animate CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/animate.css" media="screen">
+    <!-- Et fonts CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/et-fonts.css" media="screen">
+    <!-- icofont CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/icofont.css" media="screen">
+    <!-- bootstrap-touchspin CSS -->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/jquery.bootstrap-touchspin.css" media="screen">
+    <!--Owl Carousel-->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/owl.carousel.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="new_assets/css/owl.theme.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="new_assets/css/owl.transitions.css" media="screen">
+    <!-- Master Slider -->
+    <link rel="stylesheet" href="new_assets/css/masterslider.css" media="screen" />
+    <link rel="stylesheet" href="new_assets/css/ms-staff-style.css" type="text/css" media="screen">
+    <link href="new_assets/css/skins/light-2/style.css" rel='stylesheet' type='text/css' media="screen">
+    <!--Pretty Photo-->
+    <link rel="stylesheet" type="text/css" href="new_assets/css/prettyPhoto.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="new_assets/css/style.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="new_assets/css/responsive.css" media="screen">
+
+    
+    <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body class="home-1  inner portfolio">
+    
+    <div id="page-preloader" class="loder" style="display:none !important;"></div>
+
+    <!--Top Section-->
+    <section id="main-banner">
+        <!--Top Bar-->
+        <div class="top-bar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4 col-md-4 topbar-block">
+                        <ul class="contact">
+                            <li><a href="#"><i class="fa fa-envelope"></i> info@gmail.com</a> </li>
+                            <li><a href="#"><i class="fa fa-phone"></i>+91-987654321</a> </li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-4 topbar-block text-right">
+                      
+                    </div>
+                    <div class="col-sm-4 topbar-block text-right">
+                        <a href="index.aspx" class="btn radius-2x bg"><i class="fa fa-key"></i>sign in</a>
+                        <a href="../register.aspx" class="btn radius-2x"><i class="fa fa-hand-o-right"></i>sign up</a>
+                    </div>
+                    
+                    <!-- login form -->
+                    
+                    
+                    <!-- register form -->
+                   
+                </div>
+            </div>
+        </div>
+        <!--Navigation-->
+        <header>
+            <nav class="navbar" data-spy="affix" data-offset-top="50" id="slide-nav">
+                <div class="container">
+                    <div class="navbar-header col-sm-12 col-md-3">
+                        <button type="button" class="navbar-toggle">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a href="index.html" class="menu-logo"><img src="img/logo.png" alt="logo" style="height:100px;"></a>
+                    </div>
+                    <!--Nav links-->
+                    <div class=" navbar-collapse col-sm-9 col-md-8" id="menu_nav">
+                        <ul class="nav navbar-nav">
+                            <li class="active">
+                                <a href="home.aspx">Home</a>
+                            </li>
+                           <li><a href="#">About Us</a></li>
+                            <li><a href="Gallery.aspx">Gallery</a></li>
+                            <li><a href="#">Product</a></li>
+                              <li><a href="Event.aspx">Event</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!--/.navbar-collapse-->
+                </div>
+            </nav>
+        </header>
+
+  
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+ 
+         </section>
+
+    <asp:ContentPlaceHolder id="ContentPlaceHolder2" runat="server">
+        
+        </asp:ContentPlaceHolder>
+  <footer>
+        <!--Footer Upper-->
+        <section class="footer-upper space overlay">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-3 widget">
+                        <div class="main-heading col-sm-12 no-padding">
+                            <h2>Our Company</h2>
+                        </div>
+                        <div class="about">
+                            <img src="img/logo.png" alt="Logo">
+                        </div>
+                    </div>
+                    <div class="col-sm-3 widget">
+                        <div class="main-heading col-sm-12 no-padding">
+                            <h2>About Us</h2>
+                        </div>
+                        <div class="about">
+                            <p>Lorem ipsum dolor sit amet, consectetur eget orci dictum facilisis vel id tellus.Lore or sit amet, consectetur.. Sed id lorem eg facilisis vel id tellus wrem ipsum dolored get orci dictum facilisis vel id tellus.</p>
+                            <p>Sit amet, consectetur .Lorem ipsum dolo nsectetur lorem eget orci dictum.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3 widget">
+                        <div class="main-heading col-sm-12 no-padding">
+                            <h2>Quick Links</h2>
+                        </div>
+                        <div class="recent-posts">
+                            <ul class="nav navbar-nav">
+                                <li><a href="index.html">Home</a> </li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Gallery</a></li>
+                                <li><a href="#">Product</a></li>
+                                <li><a href="#">Event</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                        </ul>
+                        </div>
+                    </div>
+                   
+                    <div class="col-sm-3 widget">
+                        <div class="main-heading col-sm-12 no-padding">
+                            <h2>Newsletter List</h2>
+                        </div>
+                        <div class="mailing-list">
+                            <p>Lorem ipsum dolor sit amet, consectetur eget orci dictum facilisis velid Donec mo llis hendrerit risus felis quis.</p>
+                            <form action="#" method="post">
+                                <div class="form-group">
+                                    <input type="email" name="email" class="form-control" placeholder="Enter Your Email Address">
+                                </div>
+                                <button type="submit" class="black-border yellow btn">Subscribe Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--Footer Copy Rights-->
+        <section class="copyrights">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 copy-block">
+                        <p><a href="#">Level Demo</a> © 2023 By <a href="#">Sandhya Info Solution.</a> All Rights Reserved</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </footer>
+    <!--All Js-->
+    <script src="new_assets/js/jQuery.js"></script>
+    <script src="new_assets/js/jquery.easing.min.js"></script>
+    <script src="new_assets/js/bootstrap.js"></script>
+    <script src="new_assets/js/count-down.js"></script>
+    <script src="new_assets/js/appear.js"></script>
+    <script src="new_assets/js/jquery.elevatezoom.js"></script>
+    <script src="new_assets/js/jquery.bootstrap-touchspin.js"></script>
+    <script src="new_assets/js/jquery.prettyPhoto.js"></script>
+    <script src="new_assets/js/owl.carousel.js"></script>
+    <script src="new_assets/js/scrolltopcontrol.js"></script>
+    <script src="new_assets/js/wow.min.js"></script>
+    <!-- Master Slider -->
+    <script src="new_assets/js/masterslider.min.js"></script>
+    <script src="new_assets/js/masterslider.staff.carousel.js"></script>
+    <script src="new_assets/js/custom.js"></script>
+    <script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
+   
+</body>
+</html>

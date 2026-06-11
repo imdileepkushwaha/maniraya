@@ -1,0 +1,122 @@
+﻿using BusinessLogicTier;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class admin_DownlineReport : System.Web.UI.Page
+{
+    clsState objState = new clsState();
+    clsUser objUser = new clsUser();
+    clsplan cPlan = new clsplan();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Session["userid"] != null)
+            {
+                txtuserid.Text = Session["userid"].ToString();
+                txtuserid.Enabled = false;
+                loadLeftuser();
+                bindPlans();
+                loadstate();
+            }
+            else
+            {
+                Response.Redirect("logout.aspx");
+            }
+        }
+    }
+
+    protected void bindPlans()
+    {
+        DataTable dt = new DataTable();
+
+        try
+        {
+            dt = cPlan.getPlanAll();
+
+            if (dt.Rows.Count > 0)
+            {
+                ddlPackage.DataSource = dt;
+                ddlPackage.DataTextField = "PlanName";
+                ddlPackage.DataValueField = "Id";
+                ddlPackage.DataBind();
+
+                ddlPackage.Items.Insert(0, new ListItem("Select Package", "0"));
+            }
+        }
+        catch (Exception ex)
+        {
+            Message.Show(ex.Message);
+        }
+        finally
+        {
+            dt = null;
+        }
+    }
+
+    void loadstate()
+    {
+        ddlState.Items.Clear();
+        DataTable dt = new DataTable();
+        objState.CountryId = "1";
+        dt = objState.getState(objState);
+
+        ddlState.DataSource = dt;
+        ddlState.DataTextField = "StateName";
+        ddlState.DataValueField = "StateID";
+        ddlState.DataBind();
+        ListItem li = new ListItem("Select State", "0");
+        ddlState.Items.Insert(0, li);
+    }
+
+    protected void ddlState_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        loadcity();
+        btnSubmit_Click(null, null);
+    }
+
+    void loadcity()
+    {
+        ddlCity.Items.Clear();
+        DataTable dt = new DataTable();
+        objState.StateId = ddlState.SelectedValue.ToString();
+        dt = objState.getCity(objState);
+
+        ddlCity.DataSource = dt;
+        ddlCity.DataTextField = "CityName";
+        ddlCity.DataValueField = "CityID";
+        ddlCity.DataBind();
+        ListItem li = new ListItem("Select City", "0");
+        ddlCity.Items.Insert(0, li);
+    }
+
+    void loadLeftuser()
+    {
+        objUser.UserId = txtuserid.Text;
+        DataTable dt = new DataTable();
+        dt = objUser.getUserDownline(objUser);
+        if (dt.Rows.Count > 0)
+        {
+            dt.Rows[0].Delete();
+        }
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }   
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        loadLeftuser();
+       
+    }
+
+    protected void btnCancel_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Dashboard.aspx");
+    }
+}

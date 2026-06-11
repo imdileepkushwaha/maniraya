@@ -1,0 +1,632 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="usermaster.master.cs" Inherits="user_MasterPage" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><%= clsUtility.ProjectName %></title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="../bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../dist/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+    <!-- Google Font -->
+    <%--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" />--%>
+
+    <link href="../sarah/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	
+    <link href="http://fonts.googleapis.com/css?family=Lato:100italic,100,300italic,300,400italic,400,700italic,700,900italic,900" rel="stylesheet" type="text/css">
+        <link href="../sarah/assets/css/sarah.css" rel="stylesheet">
+		<link href="../sarah/assets/css/essentials.css" rel="stylesheet" type="text/css" />
+		<%--<link href="../sarah/assets/css/layout.css" rel="stylesheet" type="text/css" />--%>
+
+
+    <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<%--<body class="hold-transition skin-blue sidebar-mini" style="background-color: #278BCE;">--%>
+    <body class="hold-transition skin-blue sidebar-mini" style="background-color: #fff;">
+    <form id="form1" runat="server">
+
+        <%--<header class="main-header">--%>
+        <header class="main-header" id="sarah-header" sarah-lpanel-effect="shrink" style="z-index:99999 !important;">
+            <div class="sarah-left-header hidden-xs">
+                <a href="#"><span><%= clsUtility.ProjectName %></span></a>
+                <%--<span class="sarah-sidebar-toggle"><a href="#"></a></span>--%>
+            </div>
+           
+            <!-- Logo -->
+            <%--<a href="../index2.html" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>U M</b></span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Arsen Business Solutions</b></span>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img id="dvUserImage1" runat="server" src="img/default.png" class="user-image" alt="User Image" />
+                                <asp:Label ID="LblUsernameSideMenu" runat="server" Text="" class="hidden-xs"></asp:Label>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img id="dvUserImage2" runat="server" src="img/default.png" class="img-circle" alt="User Image" />
+                                    <p>
+                                        <asp:Label ID="LblFullname" runat="server" Text=""></asp:Label>
+                                        <small></small>
+                                    </p>
+                                </li>
+                                <!-- Menu Body -->
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="CHangePassword.aspx" class="btn btn-default btn-flat">Change password</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="logout.aspx" class="btn btn-default btn-flat">Logout</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                    </ul>
+                </div>
+            </nav>--%>
+
+            <div class="sarah-right-header" sarah-position-type="relative" >
+                <%--<span class="sarah-sidebar-toggle"><a href="#"></a></span>--%>
+
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                 
+                <ul class="right-navbar">
+					<li class="dropdown sarah-rheader-submenu sarah-header-profile">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<span><img src="img/default.png" class="user-image img-circle" alt="User Image" /></span>
+                            <asp:Label ID="LblUsernameSideMenu" Font-Bold="true" runat="server" Text="" class="hidden-xs"></asp:Label> <i class=" fa fa-angle-down"></i></span>
+
+                            
+                                
+						</a> 
+						<ul class="dropdown-menu ">
+							<li><a href="CHangePassword.aspx"><i class="fa fa-key"></i>Change password</a></li>
+							<li><a href="logout.aspx"><i class="fa fa-power-off"></i>Logout</a></li>
+                               
+      
+						</ul>
+					</li>
+				</ul>
+
+
+                    <%--<ul class="nav navbar-nav">
+
+
+
+
+
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="img/default.png" class="user-image" alt="User Image" />
+                                <asp:Label ID="LblUsernameSideMenu" runat="server" Text="" class="hidden-xs"></asp:Label>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img src="img/default.png" class="img-circle" alt="User Image" />
+
+                                    <p>
+                                        <asp:Label ID="LblFullname" runat="server" Text=""></asp:Label>
+                                        <small></small>
+                                    </p>
+                                </li>
+                                <!-- Menu Body -->
+
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="CHangePassword.aspx" class="btn btn-default btn-flat">Change password</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="logout.aspx" class="btn btn-default btn-flat">Sign out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+
+                    </ul>--%>
+                </div>
+
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img id="dvUserImage3" runat="server" src="~/user/img/default.png" class="img-circle" alt="" />
+                    </div>
+                    <div class="pull-right info">
+                       
+                            <asp:Label ID="LblMainId" runat="server" Text=""></asp:Label>
+                        
+                        <%--<a href="#"><i class="fa fa-circle text-success"></i>Online</a>--%>
+                    </div>
+                </div>
+                <!-- search form -->
+             
+                <!-- /.search form -->
+                <!-- sidebar menu: : style can be found in sidebar.less -->
+                  <ul class="sidebar-menu" data-widget="tree">
+                    <%--<li class="header">MAIN NAVIGATION</li>--%>
+                    <li class="header">Navigation</li>
+                    <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
+
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-male"></i><span>My Profile</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserProfile.aspx"><i class="fa fa-angle-right"></i><span>View Profile</span></a></li>
+                            <li><a href="UserEdit.aspx"><i class="fa fa-angle-right"></i><span>Edit Profile</span></a></li>
+                           <%-- <li><a href="requestToChangeNumber.aspx"><i class="fa fa-angle-right"></i><span>Request To Change No.</span></a></li>
+                            <li><a href="UserBankDetail.aspx"><i class="fa fa-angle-right"></i><span>Bank Detail</span></a></li>
+                                <li><a href="Userpaytm.aspx"><i class="fa fa-angle-right"></i><span>Other Detail</span></a></li>
+                            <li><a href="PhotoUpload.aspx"><i class="fa fa-angle-right"></i><span>Photo Upload</span></a></li>--%>
+                            <li><a href="CHangePassword.aspx"><i class="fa fa-angle-right"></i><span>Change Password</span></a></li>
+                            <%--    <li><a href="CHangeTransactionPassword.aspx"><i class="fa fa-angle-right"></i><span>Change T-Password</span></a></li>
+                     <li><a href="UserIDProof.aspx"><i class="fa fa-angle-right"></i><span>ID Card</span></a></li>--%>
+                        </ul>
+                    </li>
+                    <li class="treeview" style="display:none">
+                        <a href="#">
+                            <i class="fa fa-male"></i><span>KYC Menu</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                         <%--   <li><a href="SignupForm.aspx"><i class="fa fa-angle-right"></i><span>Signup Form</span></a></li>--%>
+                            <li><a href="PanCardImage.aspx"><i class="fa fa-angle-right"></i><span>Pan Card</span></a></li>
+                            <li><a href="CancelCheckForm.aspx"><i class="fa fa-angle-right"></i><span>Cancel Check/Passbook</span></a></li>
+                            <li><a href="AddressProof.aspx"><i class="fa fa-angle-right"></i><span>Address Proof/Aadhar</span></a></li>
+                             <%--  <li><a href="GSTImage.aspx"><i class="fa fa-angle-right"></i><span>GST</span></a></li>--%>
+
+                        </ul>
+                    </li>
+                    <li class="treeview" runat="server" visible="false" id="limyteam">
+                        <a href="#">
+                            <i class="fa fa-user"></i><span>My Team</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserAdd.aspx"><i class="fa fa-angle-right"></i>Add User</a></li>
+                            <li><a href="UserDirectAssociates.aspx"><i class="fa fa-angle-right"></i>My Direct</a></li>
+                            <li><a href="DownlineReport.aspx"><i class="fa fa-angle-right"></i>My Downline</a></li>
+                            <li><a href="treeview.aspx"><i class="fa fa-angle-right"></i>My Treeview</a></li>
+                              <%--<li><a href="HericalViewofTree.aspx"><i class="fa fa-angle-right"></i>Treeview Chart </a></li>--%>
+                          <%--  <li><a href="BinaryReport.aspx"><i class="fa fa-angle-right"></i>My Genealogy</a></li>--%>
+                          <%--   <li><a href="ActivationIncentive.aspx"><i class="fa fa-angle-right"></i>Activation Incentive</a></li>
+                             <li><a href="SalesClosingREport.aspx"><i class="fa fa-angle-right"></i>Downline Sales Incentive</a></li>
+                            <li><a href="GiftBalanceReport.aspx"><i class="fa fa-angle-right"></i>Gift Balance Report</a></li>--%>
+                            
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-edit"></i><span>E-pin Management</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="EPinAdd.aspx"><i class="fa fa-angle-right"></i>Generate E-Pin</a></li>
+                            <li><a href="EPinReport.aspx"><i class="fa fa-angle-right"></i>E-Pin Report</a></li>
+                            <li><a href="EPinTransfer.aspx"><i class="fa fa-angle-right"></i>E-Pin Transfer</a></li>
+                       <li><a href="ActivateUserWithEpin.aspx"><i class="fa fa-angle-right"></i>User Activation</a></li>
+                                                          <li><a href="UpgradeUserWithEpin.aspx">Upgrade User With e-pin</a></li>
+                            <%--<li runat="server" id="JoinPackage"><a href="UserOwnActivation.aspx"><i class="fa fa-angle-right"></i>Joining Package Activation</a></li>--%>
+                    <%--    <li><a href="UpgradeUserWithEpin.aspx"><i class="fa fa-angle-right"></i>Upgrade User</a></li>--%>
+                        </ul>
+                    </li>
+
+                      <li class="treeview" Style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-usd"></i><span>FUNDS</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                           <%--   <li><a href="UserWallet.aspx"><i class="fa fa-angle-right"></i>Wallet Status</a></li> --%>
+                            
+                              <li><a href="DepositRequstAdd.aspx"><i class="fa fa-angle-right"></i><span>TOPUP FUND</span></a></li>
+							   
+                            
+							  <li><a href="WithdrawlRequstAdd.aspx"><i class="fa fa-angle-right"></i>WITHDRAWAL FUND</a></li>
+                             <li><a href="WithdrawlRequestReport.aspx"><i class="fa fa-angle-right"></i>WITHDRAWAL REPORT</a></li>
+                             <li><a href="transactionreport.aspx"><i class="fa fa-angle-right"></i>TRANSACTION HISTORY</a></li>
+                          <%--  <li><a href="Dailypayoutdetail.aspx"><i class="fa fa-angle-right"></i>Binary Summary</a></li>
+                              <li><a href="Dailypayoutdetail.aspx"><i class="fa fa-angle-right"></i>Royality Summary</a></li>
+                            <li><a href="AwardUserReport.aspx"><i class="fa fa-angle-right"></i>My award</a></li>--%>
+                        </ul>
+                    </li>
+                      <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-rupee"></i><span>My Repurchase</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="FranchiseeSearchnew.aspx"><i class="fa fa-angle-right"></i>Purchase Product</a></li>
+                            <li><a href="PurchaseReport.aspx"><i class="fa fa-angle-right"></i>Purchase Report</a></li>                             
+                              <li><a href="CouponAssignmentMaster.aspx"><i class="fa fa-angle-right"></i>Coupon Assigned</a></li>
+                              
+                        </ul>
+                    </li>
+                       <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-rupee"></i><span>PV Report</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                             <li><a href="UserPvReport.aspx"><i class="fa fa-angle-right"></i>Purchase PV Report</a></li>
+                             <li><a href="UserReferalPvReport.aspx"><i class="fa fa-angle-right"></i>Referal PV Report</a></li>
+                        </ul>
+                    </li>
+                       <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-rupee"></i><span>Payout Report</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                             <li><a href="ClosingREportSelfPurchase.aspx"><i class="fa fa-angle-right"></i>SelfPurchase Payout</a></li>
+                             <li><a href="ClosingReferalRepurchaseReport.aspx"><i class="fa fa-angle-right"></i>Referal/Repurchase Payout</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-credit-card"></i><span>Wallet Transfer</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">  
+                             
+                               <li id="transfertowallet" runat="server" visible="false"><a href="CashRequstAdd.aspx"><i class="fa fa-angle-right"></i>PV Transfer to Wallet</a></li>     
+                                   <li><a href="WalletTransfer.aspx"><i class="fa fa-angle-right"></i>Wallet Transfer</a></li>            
+                                
+                        </ul>
+                    </li>
+
+                      <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-rupee"></i><span>My Income</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                           <%--   <li><a href="UserWallet.aspx"><i class="fa fa-angle-right"></i>Wallet Status</a></li> --%>
+                            
+                            
+                              <li><a href="LuckyDrawClosingReport.aspx"><i class="fa fa-angle-right"></i>Group Income</a></li>
+                             <li><a href="LevelIncomeReport.aspx"><i class="fa fa-angle-right"></i>Level Income</a></li>
+							  <li><a href="AutoPoolIncomeReport.aspx"><i class="fa fa-angle-right"></i>Auto Pool Income</a></li>
+                              <li><a href="GiftBalanceReport.aspx"><i class="fa fa-angle-right"></i>ROI Income</a></li>
+                             
+                              <li><a href="LevelROIIncomeReport.aspx"><i class="fa fa-angle-right"></i>Level ROI Income</a></li>
+                           <%--   <li><a href="GiftBalanceReport.aspx"><i class="fa fa-angle-right"></i>ROI Income</a></li>
+                           <li><a href="Dailypayoutdetail.aspx"><i class="fa fa-angle-right"></i>Binary Summary</a></li>
+                              <li><a href="Dailypayoutdetail.aspx"><i class="fa fa-angle-right"></i>Royality Summary</a></li>
+                            <li><a href="AwardUserReport.aspx"><i class="fa fa-angle-right"></i>My award</a></li>--%>
+                        </ul>
+                    </li> 
+                  <%--   <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-gift"></i>
+                            <span>Award & Vacation</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="AwardReport.aspx"><i class="fa fa-angle-right"></i> Award Status</a></li> 
+                              <li><a href="VacationReport.aspx"><i class="fa fa-angle-right"></i>Vacation Status</a></li>                                    
+                        </ul>
+                    </li>--%>
+                  <%--  <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-files-o"></i><span>My Income</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="GroupMachingBonus.aspx"><i class="fa fa-angle-right"></i>Group Matching Bonus</a></li>
+                            <li><a href="RepurchaseMachingBonus.aspx"><i class="fa fa-angle-right"></i>Repurchase Bonus</a></li>
+                            <li><a href="#"><i class="fa fa-angle-right"></i>Life Style Bonus</a></li>
+                            <li><a href="#"><i class="fa fa-angle-right"></i>Travel Bonus</a></li>
+                            <li><a href="#"><i class="fa fa-angle-right"></i>Car Bonus</a></li>
+                            <li><a href="#"><i class="fa fa-angle-right"></i>Pending Bonus</a></li>
+                             <li><a href="AllMachingBonus.aspx"><i class="fa fa-angle-right"></i>All Bonus</a></li>
+                          
+                        </ul>
+                    </li>--%>
+                    <%-- <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-credit-card"></i><span>Money Transfer</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="MoneyTransfer.aspx"><i class="fa fa-angle-right"></i>Money Transfer</a></li>
+                            <li><a href="MoneyTransferReport.aspx"><i class="fa fa-angle-right"></i>Money Transfer Report </a></li>
+                           
+                        </ul>
+                    </li>--%>
+                   <%--   <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-television"></i><span>DTH Subscription</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="DTHBooking.aspx"><i class="fa fa-angle-right"></i>DTH Booking</a></li>
+                            <li><a href="DHTBookingdetailaspx.aspx"><i class="fa fa-angle-right"></i>DTH Booking Detail</a></li>
+                            
+                        </ul>
+                    </li>--%>
+                      <li class="treeview" style="display:none;">
+          <a href="#">
+            <i class="fa fa-mobile"></i> <span>Recharge</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">          
+          <li><a href="Recharge.aspx"><i class="fa fa-angle-right"></i>Recharge</a></li>
+                 <li><a href="RechargeReport.aspx"><i class="fa fa-angle-right"></i>Recharge Report</a></li>
+               <li><a href="DisputeRequest.aspx"><i class="fa fa-angle-right"></i>Dispute Report</a></li>
+               
+          </ul>
+        </li>
+                  <%--  <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-rupee"></i><span>My Repurchase</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="PurchaseItem.aspx"><i class="fa fa-angle-right"></i>Purchase Product</a></li>
+                            <li><a href="PurchaseReport.aspx"><i class="fa fa-angle-right"></i>Purchase Report</a></li>
+                        </ul>
+                    </li>--%>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-share"></i><span>Withdrawl</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="WithdrawlRequstAdd.aspx"><i class="fa fa-angle-right"></i>Withdrawl Request</a></li>
+                            <li><a href="WithdrawlRequestReport.aspx"><i class="fa fa-angle-right"></i>Withdrawl Request Report</a></li>
+
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-mail-reply"></i><span>Deposit</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="DepositRequstAdd.aspx"><i class="fa fa-angle-right"></i>Deposit Request</a></li>
+                            <li><a href="DepositRequestReport.aspx"><i class="fa fa-angle-right"></i>Deposit Request Report</a></li>
+                          <%--   <li><a href="fundTransferReceiveReport.aspx"><i class="fa fa-angle-right"></i>Fund Transfer & Request Report</a></li>--%>
+                        </ul>
+                    </li>
+                    <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-wrench"></i><span>Tools</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="UserDownload.aspx"><i class="fa fa-angle-right"></i>Download</a></li>
+                            <li><a href="BankDetail.aspx"><i class="fa fa-angle-right"></i>Company Bank Details</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview" style="display:none;">
+                        <a href="#">
+                            <i class="fa fa-comments"></i><span>Support</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="NewMessage.aspx"><i class="fa fa-angle-right"></i>Compose Mail</a></li>
+                            <li><a href="Inbox.aspx"><i class="fa fa-angle-right"></i>Inbox</a></li>
+                            <li><a href="Sentbox.aspx"><i class="fa fa-angle-right"></i>Sent Mail</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-comments"></i><span>Reports</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="account_Ledger.aspx"><i class="fa fa-angle-right"></i>Account Ledger</a></li>
+                               <li><a href="TransactionReport.aspx"><i class="fa fa-angle-right"></i>Transaction Report </a></li>   
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+        
+
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
+                </asp:ContentPlaceHolder>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <!-- Default box -->
+                <asp:ContentPlaceHolder ID="contentpageData" runat="server"></asp:ContentPlaceHolder>
+
+                <!-- /.box -->
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b><%= clsUtility.ProjectName %></b> 2.4.0
+            </div>
+            <strong>Copyright &copy; <%= clsUtility.Session %> <a href="#"><%= clsUtility.ProjectName %></a>.</strong> All rights
+    reserved.
+        </footer>
+        <div class="control-sidebar-bg"></div>
+
+        <!-- Control Sidebar -->
+
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+
+
+        <!-- ./wrapper -->
+
+        <!-- jQuery 3 -->
+        <%--<script src="../bower_components/jquery/dist/jquery.min.js"></script>--%>
+        
+      <style>
+          .spin-icon {
+        background: #222;
+    position: absolute;
+    padding: 7px 10px 7px 13px;
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+    top: 0;
+    left: -38px;
+    width: 40px;
+    color: #fff;
+    cursor: pointer;
+}
+              .spin-icon:hover, .spin-icon:focus {
+                  color:#fff;
+                  text-decoration:none;
+              }
+      </style>
+        
+       <aside class="control-sidebar control-sidebar-dark" style="display:none;">
+           <a href="#" data-toggle="control-sidebar" class="spin-icon" style="font-size:11px;">C<br>A<br>L<br>L<br>B<br>A<br>C<br>K </a>
+             <div class="tab-content">
+         
+        
+   <h3 class="control-sidebar-heading">Callback Request</h3>
+                 <div class="form-horizontal">
+                     <div class="form-group">
+                          <asp:TextBox ID="txtcallbackmobile" runat="server" CssClass="form-control" placeholder="Enter Mobile No" ></asp:TextBox>
+                     </div>
+                     <div class="form-group">
+                         <asp:LinkButton ID="btnCallbackSubmit"  CssClass="btn btn-primary" OnClick="btnCallbackSubmit_Click1"    runat="server">Submit</asp:LinkButton>
+                         </div>
+                 </div>
+   
+        
+      
+             
+           
+                 </div>
+  </aside>
+          
+        
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script type="text/javascript" src="../sarah/assets/plugins/jquery/jquery-2.1.4.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+	
+		<!-- JAVASCRIPT FILES -->
+		<script type="text/javascript">var plugin_path = 'assets/plugins/';</script>
+        <script type="text/javascript" src="../sarah/assets/js/sarah.js"></script>
+		<script type="text/javascript" src="../sarah/assets/js/app.js"></script>
+
+
+
+        <!-- Bootstrap 3.3.7 -->
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower_components/fastclick/lib/fastclick.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../dist/js/adminlte.min.js"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script src="../dist/js/demo.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('.sidebar-menu').tree()
+            })
+        </script>
+        <script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
+        <asp:ContentPlaceHolder ID="contentScript" runat="server">
+        </asp:ContentPlaceHolder>
+    </form>
+</body>
+</html>
