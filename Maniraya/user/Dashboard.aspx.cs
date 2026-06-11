@@ -64,6 +64,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadPV();
                 loadawardlist();
                 GetAllIncome();
+                SyncDashboardHero();
 
 
             }
@@ -332,11 +333,39 @@ public partial class user_Dashboard : System.Web.UI.Page
         DataTable dt = new DataTable();
         dt = objnews.getRecentNews();
         ltnews.Text += "<span style='color:red;'> ";
+        string ticker = string.Empty;
         foreach (DataRow r in dt.Rows)
         {
-            ltnews.Text += r["newsdetail"].ToString() + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            string detail = r["newsdetail"].ToString();
+            ltnews.Text += detail + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            ticker += detail + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         }
         ltnews.Text += "</span>";
+
+        if (dt.Rows.Count > 0)
+        {
+            string firstNews = dt.Rows[0]["newsdetail"].ToString();
+            ltWelcomeNews.Text = dt.Rows.Count > 1
+                ? firstNews + " and " + (dt.Rows.Count - 1) + " more updates today."
+                : firstNews;
+            ltnewsTicker.Text = "<span class=\"dash-news-item\">" + ticker + "</span>";
+        }
+        else
+        {
+            ltnewsTicker.Text = "<span class=\"dash-news-item dash-news-item--empty\">No updates at the moment.</span>";
+        }
+    }
+
+    void SyncDashboardHero()
+    {
+        lblWelcomeName.Text = lblusername.Text;
+        lblWelcomeId.Text = lbluserid.Text;
+        lblWelcomeRank.Text = string.IsNullOrWhiteSpace(lblrank.Text) ? "N/A" : lblrank.Text;
+
+        lblStatTeam.Text = LblDownline.Text;
+        lblStatActiveTeam.Text = LblActiveDownline.Text;
+        lblStatDirect.Text = LblDirect.Text;
+        lblStatWallet.Text = LblCurrentWallet.Text;
     }
 
     void TotalDownline()

@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -212,20 +212,20 @@ public partial class user_PurchaseInvoice : System.Web.UI.Page
             if (lblpstatus.Text == "0")
             {
                 Lblstatus.Text = "Pending";
+                Lblstatus.CssClass = "team-status-badge team-status-pending";
                 btnSuccess.Visible = false;
-               // btnFail.Visible = true;
             }
             if (lblpstatus.Text == "1")
             {
                 Lblstatus.Text = "Success";
+                Lblstatus.CssClass = "team-status-badge team-status-paid";
                 btnSuccess.Visible = true;
-               // btnFail.Visible = false;
             }
             if (lblpstatus.Text == "2")
             {
                 Lblstatus.Text = "Failed";
+                Lblstatus.CssClass = "team-status-badge team-status-unpaid";
                 btnSuccess.Visible = false;
-               // btnFail.Visible = false;
             }
         }
     }

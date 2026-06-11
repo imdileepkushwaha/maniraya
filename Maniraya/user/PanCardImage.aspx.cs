@@ -91,19 +91,19 @@ public partial class user_PanCardImage : System.Web.UI.Page
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Pending";
-                lblApprovalStatus.CssClass = "Pending";
+                lblApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-pending";
             }
             else if (dt.Rows[0]["PanImgStatus"].ToString() == "1")
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Approved";
-                lblApprovalStatus.CssClass = "Approved";
+                lblApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-approved";
             }
             else if (dt.Rows[0]["PanImgStatus"].ToString() == "2")
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Rejected";
-                lblApprovalStatus.CssClass = "Rejected";
+                lblApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-rejected";
             }
             else
                 divStatus.Visible = false;

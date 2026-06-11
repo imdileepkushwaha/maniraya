@@ -1,0 +1,380 @@
+/* Maniraya – box box-primary (form card reference style) */
+:root {
+    --box-accent: #e86b5a;
+    --box-accent-soft: #f0a898;
+    --box-accent-deep: #d95a49;
+    --box-bg: #ffffff;
+    --box-border: #e8ecf1;
+    --box-text: #1a1d21;
+    --box-label: #4b5563;
+    --box-muted: #6b7280;
+    --box-input-border: #dfe3ea;
+    --box-radius: 10px;
+}
+
+/* Fix legacy white text on rows inside page shell */
+body.main-body.app .maniraya-page-shell .row[style*="color:white"],
+body.main-body.app .maniraya-page-shell .row[style*="color: white"],
+body.main-body.app .maniraya-page-shell .row[style*="color:#fff"],
+body.main-body.app .maniraya-page-shell .row[style*="color: #fff"] {
+    color: var(--box-text) !important;
+}
+
+body.main-body.app .box.box-primary,
+body.main-body.app.dark-mode .box.box-primary,
+.content-wrapper .box.box-primary {
+    position: relative;
+    background: var(--box-bg) !important;
+    border: 1px solid var(--box-border) !important;
+    border-top: 1px solid var(--box-border) !important;
+    border-radius: var(--box-radius) !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+body.main-body.app .box.box-primary > .box-header,
+.content-wrapper .box.box-primary > .box-header {
+    padding: 18px 24px !important;
+    margin: 0 !important;
+    background: linear-gradient(135deg, #fafbfc 0%, #fcfcfd 48%, #ffffff 100%) !important;
+    color: var(--box-accent) !important;
+    border-bottom: 1px solid #eef1f5 !important;
+    position: relative;
+    overflow: hidden;
+}
+
+body.main-body.app .box.box-primary > .box-header::before,
+.content-wrapper .box.box-primary > .box-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(232, 107, 90, 0.04) 0%, transparent 40%);
+    pointer-events: none;
+}
+
+body.main-body.app .box.box-primary > .box-header.box-header-enhanced,
+.content-wrapper .box.box-primary > .box-header.box-header-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+body.main-body.app .box.box-primary > .box-header:empty,
+body.main-body.app .box.box-primary > .box-header:not(:has(.box-title)):not(:has(h3)) {
+    padding: 0 !important;
+    border-bottom: none !important;
+    min-height: 0;
+    background: transparent !important;
+}
+
+body.main-body.app .box-header-main,
+.content-wrapper .box-header-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1 1 auto;
+    position: relative;
+    z-index: 1;
+}
+
+body.main-body.app .box-header-icon,
+.content-wrapper .box-header-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.05rem;
+}
+
+/* Header color tones */
+body.main-body.app .box-header-tone-0,
+.content-wrapper .box-header-tone-0 { --bh-accent: #e86b5a; --bh-bg: #fff7f6; --bh-border: #f5e4e1; }
+body.main-body.app .box-header-tone-1,
+.content-wrapper .box-header-tone-1 { --bh-accent: #3b82f6; --bh-bg: #f5f9ff; --bh-border: #dbeafe; }
+body.main-body.app .box-header-tone-2,
+.content-wrapper .box-header-tone-2 { --bh-accent: #14b8a6; --bh-bg: #f0fdfa; --bh-border: #ccfbf1; }
+body.main-body.app .box-header-tone-3,
+.content-wrapper .box-header-tone-3 { --bh-accent: #8b5cf6; --bh-bg: #f8f6ff; --bh-border: #ede9fe; }
+body.main-body.app .box-header-tone-4,
+.content-wrapper .box-header-tone-4 { --bh-accent: #f59e0b; --bh-bg: #fffbeb; --bh-border: #fde68a; }
+body.main-body.app .box-header-tone-5,
+.content-wrapper .box-header-tone-5 { --bh-accent: #f43f5e; --bh-bg: #fff1f3; --bh-border: #fecdd3; }
+body.main-body.app .box-header-tone-6,
+.content-wrapper .box-header-tone-6 { --bh-accent: #6366f1; --bh-bg: #f5f6ff; --bh-border: #e0e7ff; }
+body.main-body.app .box-header-tone-7,
+.content-wrapper .box-header-tone-7 { --bh-accent: #22c55e; --bh-bg: #f0fdf4; --bh-border: #bbf7d0; }
+
+body.main-body.app .box.box-primary > .box-header[class*="box-header-tone-"],
+.content-wrapper .box.box-primary > .box-header[class*="box-header-tone-"] {
+    background: linear-gradient(135deg, var(--bh-bg) 0%, #ffffff 100%) !important;
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--bh-accent) 14%, #ffffff) 0%,
+        color-mix(in srgb, var(--bh-accent) 7%, #ffffff) 44%,
+        color-mix(in srgb, var(--bh-accent) 3%, #ffffff) 76%,
+        #ffffff 100%
+    ) !important;
+    border-bottom: 1px solid color-mix(in srgb, var(--bh-accent) 10%, #ffffff) !important;
+}
+
+body.main-body.app .box.box-primary > .box-header[class*="box-header-tone-"]::before,
+.content-wrapper .box.box-primary > .box-header[class*="box-header-tone-"]::before {
+    background: linear-gradient(
+        125deg,
+        color-mix(in srgb, var(--bh-accent) 9%, transparent) 0%,
+        transparent 50%
+    );
+}
+
+body.main-body.app .box.box-primary > .box-header[class*="box-header-tone-"] .box-header-icon,
+.content-wrapper .box.box-primary > .box-header[class*="box-header-tone-"] .box-header-icon {
+    color: var(--bh-accent);
+    background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--bh-accent) 18%, #ffffff) 0%,
+        color-mix(in srgb, var(--bh-accent) 8%, #ffffff) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--bh-accent) 14%, #ffffff);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--bh-accent) 10%, transparent);
+}
+
+body.main-body.app .box-header-text,
+.content-wrapper .box-header-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+body.main-body.app .box.box-primary .box-title,
+body.main-body.app .box.box-primary .box-header h3,
+.content-wrapper .box.box-primary .box-title,
+.content-wrapper .box.box-primary .box-header h3 {
+    margin: 0 !important;
+    float: none !important;
+    font-size: 1.08rem !important;
+    font-weight: 700 !important;
+    color: var(--box-text) !important;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+/* Title color matches header tone (icon badge color) */
+body.main-body.app .box.box-primary > .box-header.box-header-enhanced .box-title,
+body.main-body.app .box.box-primary > .box-header.box-header-enhanced h3.box-title,
+body.main-body.app .box.box-primary > .box-header.box-header-enhanced h3,
+.content-wrapper .box.box-primary > .box-header.box-header-enhanced .box-title,
+.content-wrapper .box.box-primary > .box-header.box-header-enhanced h3 {
+    color: var(--bh-accent) !important;
+}
+
+body.main-body.app .box-header-text .box-subtitle,
+.content-wrapper .box-header-text .box-subtitle {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--box-muted);
+    line-height: 1.3;
+}
+
+body.main-body.app .box.box-primary .box-header .box-tools,
+.content-wrapper .box.box-primary .box-header .box-tools {
+    position: static;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+body.main-body.app .box.box-primary > .box-body,
+.content-wrapper .box.box-primary > .box-body {
+    padding: 22px 24px !important;
+    background: var(--box-bg) !important;
+    color: var(--box-text) !important;
+}
+
+body.main-body.app .box.box-primary > .box-footer,
+.content-wrapper .box.box-primary > .box-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 24px 20px !important;
+    background: var(--box-bg) !important;
+    border-top: 1px solid #f1f3f6 !important;
+}
+
+/* Labels & fields */
+body.main-body.app .box.box-primary .form-group,
+.content-wrapper .box.box-primary .form-group {
+    margin-bottom: 18px;
+}
+
+body.main-body.app .box.box-primary label,
+.content-wrapper .box.box-primary label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--box-label) !important;
+}
+
+body.main-body.app .box.box-primary .form-control,
+body.main-body.app .box.box-primary select.form-control,
+.content-wrapper .box.box-primary .form-control {
+    min-height: 42px;
+    padding: 8px 14px !important;
+    font-size: 0.9rem;
+    color: var(--box-text) !important;
+    background: #fff !important;
+    border: 1px solid var(--box-input-border) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.main-body.app .box.box-primary textarea.form-control,
+.content-wrapper .box.box-primary textarea.form-control {
+    min-height: 88px;
+    resize: vertical;
+}
+
+body.main-body.app .box.box-primary .form-control:focus,
+.content-wrapper .box.box-primary .form-control:focus {
+    border-color: rgba(232, 107, 90, 0.55) !important;
+    box-shadow: 0 0 0 3px rgba(232, 107, 90, 0.12) !important;
+}
+
+body.main-body.app .box.box-primary .form-control:disabled,
+body.main-body.app .box.box-primary .form-control[readonly],
+.content-wrapper .box.box-primary .form-control:disabled {
+    background: #f8fafc !important;
+    color: var(--box-muted) !important;
+}
+
+/* Buttons inside box */
+body.main-body.app .box.box-primary .btn,
+.content-wrapper .box.box-primary .btn {
+    min-height: 40px;
+    padding: 8px 20px;
+    border-radius: 8px !important;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none !important;
+    transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+body.main-body.app .box.box-primary .btn:hover,
+.content-wrapper .box.box-primary .btn:hover {
+    transform: translateY(-1px);
+}
+
+body.main-body.app .box.box-primary .btn-primary,
+.content-wrapper .box.box-primary .btn-primary {
+    background: var(--box-accent) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(232, 107, 90, 0.28);
+}
+
+body.main-body.app .box.box-primary .btn-primary:hover,
+.content-wrapper .box.box-primary .btn-primary:hover {
+    background: var(--box-accent-deep) !important;
+    color: #fff !important;
+}
+
+body.main-body.app .box.box-primary .btn-default,
+body.main-body.app .box.box-primary .btn-secondary,
+.content-wrapper .box.box-primary .btn-default {
+    background: var(--box-accent-soft) !important;
+    color: #fff !important;
+}
+
+body.main-body.app .box.box-primary .btn-danger,
+.content-wrapper .box.box-primary .btn-danger {
+    background: #f1f5f9 !important;
+    color: var(--box-muted) !important;
+    box-shadow: none;
+}
+
+body.main-body.app .box.box-primary .btn-danger:hover,
+.content-wrapper .box.box-primary .btn-danger:hover {
+    background: #e2e8f0 !important;
+    color: var(--box-text) !important;
+}
+
+body.main-body.app .box.box-primary .btn-success,
+.content-wrapper .box.box-primary .btn-success {
+    background: var(--box-accent) !important;
+    border-color: var(--box-accent) !important;
+}
+
+/* Tables in box */
+body.main-body.app .box.box-primary .table,
+.content-wrapper .box.box-primary .table {
+    color: var(--box-text);
+    background: #fff;
+}
+
+body.main-body.app .box.box-primary .table > thead > tr > th,
+.content-wrapper .box.box-primary .table > thead > tr > th {
+    background: #f8fafc !important;
+    color: var(--box-label) !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--box-border) !important;
+    padding: 12px 14px !important;
+}
+
+body.main-body.app .box.box-primary .table > tbody > tr > td,
+.content-wrapper .box.box-primary .table > tbody > tr > td {
+    padding: 11px 14px !important;
+    border-top: 1px solid #f1f3f6 !important;
+    vertical-align: middle;
+}
+
+body.main-body.app .box.box-primary .table-responsive,
+.content-wrapper .box.box-primary .table-responsive {
+    border: 1px solid var(--box-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* GridView / dataTable */
+body.main-body.app .box.box-primary .dataTable,
+.content-wrapper .box.box-primary .dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+body.main-body.app .box.box-primary > .box-header:not(.box-header-enhanced) .box-tools,
+.content-wrapper .box.box-primary > .box-header:not(.box-header-enhanced) .box-tools {
+    position: absolute;
+    right: 20px;
+    top: 18px;
+}
+
+@media (max-width: 767px) {
+    body.main-body.app .box.box-primary > .box-header,
+    body.main-body.app .box.box-primary > .box-body,
+    body.main-body.app .box.box-primary > .box-footer,
+    .content-wrapper .box.box-primary > .box-header,
+    .content-wrapper .box.box-primary > .box-body,
+    .content-wrapper .box.box-primary > .box-footer {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    body.main-body.app .box.box-primary > .box-footer,
+    .content-wrapper .box.box-primary > .box-footer {
+        justify-content: stretch;
+    }
+
+    body.main-body.app .box.box-primary > .box-footer .btn,
+    .content-wrapper .box.box-primary > .box-footer .btn {
+        flex: 1 1 auto;
+    }
+}

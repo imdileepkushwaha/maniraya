@@ -86,6 +86,21 @@ public partial class UnityTreeOne : System.Web.UI.Page
         dt = objUser.getRightDataPlanWise2(objUser);
         return dt;
     }
+    string BuildOccupiedNodeHtml(string userId, string gender, string status)
+    {
+        string statusClass = status.ToUpper() == "ACTIVE" ? "is-active" : "is-inactive";
+        return string.Format(
+            "<a href='UnityTreeOne.aspx?SuperId={0}' class='binary-tree-node-link gridViewToolTip {1}'><span class='binary-tree-node-avatar'><img src=\"{2}\" alt=\"Member\" /></span></a>",
+            userId,
+            statusClass,
+            fetchimage(gender, status));
+    }
+
+    string BuildEmptyNodeHtml()
+    {
+        return "<span class='binary-tree-node-empty'><img src=\"img/available.png\" alt=\"Available position\" /></span>";
+    }
+
     public string  fetchimage(string Gender,string Status)
     {
         string imagepath = "";
@@ -147,7 +162,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             //divdata.Visible = true;
             lbluserid1.Text = dt.Rows[0]["Userid"].ToString();
             lblusername1.Text = dt.Rows[0]["username"].ToString();
-            ltuser1.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt.Rows[0]["Userid"].ToString() + @"'    class='gridViewToolTip' ><img src=""" + fetchimage(dt.Rows[0]["gender"].ToString(), dt.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+            ltuser1.Text = BuildOccupiedNodeHtml(dt.Rows[0]["Userid"].ToString(), dt.Rows[0]["gender"].ToString(), dt.Rows[0]["Status"].ToString());
             //LblUserID.Text = dt.Rows[0]["Userid"].ToString();
             //LblUserName.Text = dt.Rows[0]["username"].ToString();
             //LblSponserId.Text = dt.Rows[0]["SponserId"].ToString();
@@ -201,7 +216,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid2.Text = dt2.Rows[0]["Userid"].ToString();
                 lblusername2.Text = dt2.Rows[0]["username"].ToString();
-                ltuser2.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt2.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip' ><img src=""" + fetchimage(dt2.Rows[0]["gender"].ToString(), dt2.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser2.Text = BuildOccupiedNodeHtml(dt2.Rows[0]["Userid"].ToString(), dt2.Rows[0]["gender"].ToString(), dt2.Rows[0]["Status"].ToString());
                 ////LblUserID25.Text = dt2.Rows[0]["Userid"].ToString();
                 ////LblUserName25.Text = dt2.Rows[0]["username"].ToString();
                 ////LblSponserId1.Text = dt2.Rows[0]["SponserId"].ToString();
@@ -249,7 +264,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser2.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser2.Text = BuildEmptyNodeHtml();
             }
             //================ Second Child============
 
@@ -262,7 +277,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid3.Text = dt3.Rows[0]["Userid"].ToString();
                 lblusername3.Text = dt3.Rows[0]["username"].ToString();
-                ltuser3.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt3.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip' ><img src=""" + fetchimage(dt3.Rows[0]["gender"].ToString(), dt3.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser3.Text = BuildOccupiedNodeHtml(dt3.Rows[0]["Userid"].ToString(), dt3.Rows[0]["gender"].ToString(), dt3.Rows[0]["Status"].ToString());
                 //LblUserID26.Text = dt3.Rows[0]["Userid"].ToString();
                 //LblUserName26.Text = dt3.Rows[0]["username"].ToString();
                 //LblSponserId2.Text = dt3.Rows[0]["SponserId"].ToString();
@@ -314,7 +329,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser3.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser3.Text = BuildEmptyNodeHtml();
             }
 
 
@@ -328,7 +343,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid4.Text = dt4.Rows[0]["Userid"].ToString();
                 lblusername4.Text = dt4.Rows[0]["username"].ToString();
-                ltuser4.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt4.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip'  ><img src=""" + fetchimage(dt4.Rows[0]["gender"].ToString(), dt4.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser4.Text = BuildOccupiedNodeHtml(dt4.Rows[0]["Userid"].ToString(), dt4.Rows[0]["gender"].ToString(), dt4.Rows[0]["Status"].ToString());
                 //LblUserID27.Text = dt4.Rows[0]["Userid"].ToString();
                 //LblUserName27.Text = dt4.Rows[0]["username"].ToString();
                 //LblSponserId3.Text = dt4.Rows[0]["SponserId"].ToString();
@@ -376,7 +391,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser4.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser4.Text = BuildEmptyNodeHtml();
             }
 
 
@@ -391,7 +406,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid5.Text = dt5.Rows[0]["Userid"].ToString();
                 lblusername5.Text = dt5.Rows[0]["username"].ToString();
-                ltuser5.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt5.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip'  ><img src=""" + fetchimage(dt5.Rows[0]["gender"].ToString(), dt5.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser5.Text = BuildOccupiedNodeHtml(dt5.Rows[0]["Userid"].ToString(), dt5.Rows[0]["gender"].ToString(), dt5.Rows[0]["Status"].ToString());
                 //LblUserID28.Text = dt5.Rows[0]["Userid"].ToString();
                 //LblUserName28.Text = dt5.Rows[0]["username"].ToString();
                 //LblSponserId4.Text = dt5.Rows[0]["SponserId"].ToString();
@@ -443,7 +458,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             else
             {
 
-                ltuser5.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser5.Text = BuildEmptyNodeHtml();
             }
 
 
@@ -458,7 +473,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid6.Text = dt6.Rows[0]["Userid"].ToString();
                 lblusername6.Text = dt6.Rows[0]["username"].ToString();
-                ltuser6.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt6.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip' ><img src=""" + fetchimage(dt6.Rows[0]["gender"].ToString(), dt6.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser6.Text = BuildOccupiedNodeHtml(dt6.Rows[0]["Userid"].ToString(), dt6.Rows[0]["gender"].ToString(), dt6.Rows[0]["Status"].ToString());
 
                 //LblUserID29.Text = dt6.Rows[0]["Userid"].ToString();
                 //LblUserName29.Text = dt6.Rows[0]["username"].ToString();
@@ -511,7 +526,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             else
             {
 
-                ltuser6.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser6.Text = BuildEmptyNodeHtml();
             }
 
 
@@ -526,7 +541,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid7.Text = dt7.Rows[0]["Userid"].ToString();
                 lblusername7.Text = dt7.Rows[0]["username"].ToString();
-                ltuser7.Text = @"<a href='UnityTreeOne.aspx?SuperId=" + dt7.Rows[0]["Userid"].ToString() + @"'  class='gridViewToolTip' ><img src=""" + fetchimage(dt7.Rows[0]["gender"].ToString(), dt7.Rows[0]["Status"].ToString()) + @""" style=""height:40px;"" /></a>";
+                ltuser7.Text = BuildOccupiedNodeHtml(dt7.Rows[0]["Userid"].ToString(), dt7.Rows[0]["gender"].ToString(), dt7.Rows[0]["Status"].ToString());
 
                 //LblUserID30.Text = dt7.Rows[0]["Userid"].ToString();
                 //LblUserName30.Text = dt7.Rows[0]["username"].ToString();
@@ -574,7 +589,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser7.Text = @"<img src=""img/available.png"" style=""height:40px;"" />";
+                ltuser7.Text = BuildEmptyNodeHtml();
             }
 
 
@@ -651,10 +666,12 @@ public partial class UnityTreeOne : System.Web.UI.Page
             if (dt.Rows[0]["ActDate"].ToString() != "")
             {
                 LblStatus.Text = "ACTIVE";
+                LblStatus.CssClass = "binary-user-field-value binary-user-status binary-user-status--active";
             }
             else
             {
                 LblStatus.Text = "INACTIVE";
+                LblStatus.CssClass = "binary-user-field-value binary-user-status binary-user-status--inactive";
             }
             LblTodayREgLeft.Text = dt.Rows[0]["TodayRegLeft"].ToString();
             LblTodayREgRight.Text = dt.Rows[0]["TodayRegRight"].ToString();

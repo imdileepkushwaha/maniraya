@@ -20,6 +20,8 @@ public partial class admin_DownlineReport : System.Web.UI.Page
                 txtuserid.Text = Session["userid"].ToString();
                 txtuserid.Enabled = false;
                 filldashboard();
+                loadLeftuser();
+                loadRightuser();
             }
             else
             {
@@ -84,9 +86,25 @@ public partial class admin_DownlineReport : System.Web.UI.Page
     {
         loadLeftuser();
         loadRightuser();
+        LblTotalLeft.Text = GridView1.Rows.Count.ToString();
+        LblTotalright.Text = GridView2.Rows.Count.ToString();
     }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
+    }
+
+    protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            Label lblstatus = (Label)e.Row.FindControl("lblstatus");
+            if (lblstatus != null)
+            {
+                lblstatus.CssClass = lblstatus.Text == "Unpaid"
+                    ? "team-status-badge team-status-unpaid"
+                    : "team-status-badge team-status-paid";
+            }
+        }
     }
 }

@@ -63,7 +63,9 @@
 		<link rel="stylesheet" href="assets/switcher/demo.css">
 
 		<!-- Maniraya layout enhancements (must load after all theme CSS) -->
-		<link href="assets/css/sidebar-enhanced.css?v=5" rel="stylesheet">
+		<link href="assets/css/sidebar-enhanced.css?v=14" rel="stylesheet">
+		<link href="assets/css/content-header-modern.css?v=1" rel="stylesheet">
+		<link href="assets/css/box-modern.css?v=7" rel="stylesheet">
 
     	<!-- main-sidebar opened -->
 		
@@ -78,138 +80,16 @@
 
  
 
-<body   class="main-body app sidebar-mini dark-mode open sidebar-gone" style="background-image: url(img/mlmnetwork.jpg);">
+<body class="main-body app sidebar-mini dark-mode open sidebar-gone" >
 
-    <div class="switcher-wrapper ">
-			<!-- <div class="demo_changer">
-				<div class="demo-icon bg_dark"><i class="fa fa-cog fa-spin  text_primary"></i></div>
-				<div class="form_holder sidebar-right1">
-					<div class="row">
-                            <div class="swichermainleft border-bottom  text-center">
-                                <div class="p-3">
-                                    <a href="https://laravel.spruko.com/xino" class="btn btn-primary btn-block mt-0">View Demo</a>
-                                    <a href="https://themeforest.net/user/sprukosoft/portfolio" class="btn btn-danger btn-block">Buy Now</a>
-                                    <a href="https://themeforest.net/user/sprukosoft/portfolio" class="btn btn-info btn-block">Our Portfolio</a>
-                                </div>
-                            </div>
-							<div class="swichermainleft">
-								<h4>Versions</h4>
-								<div class="pl-3 pr-3">
-									<a class="btn btn-success btn-block" href="index.html">
-										LTR
-									</a>
-									<a class="btn btn-warning btn-block" href="https://laravel.spruko.com/xino/rtl/index">
-										RTL
-									</a>
-								</div>
-							</div>
-						    <div class="swichermainleft">
-								<h4>Navigation Style</h4>
-								<div class="pl-3 pr-3">
-									<a class="btn btn-primary btn-block" href="horizontal.html">
-										Horizontal
-									</a>
-									<a class="btn btn-secondary btn-block" href="index.html">
-										Left-menu
-									</a>
-								</div>
-							</div>
-                            <div class="swichermainleft">
-								<h4>Theme Styles</h4>
-								<div class="switch_section">
-									<div class="switch-toggle d-flex">
-										<span class="mr-auto">Light Theme</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch2" id="myonoffswitch2" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch2" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-                                    <div class="switch-toggle d-flex">
-										<span class="mr-auto"></span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch2" id="myonoffswitch" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-                                </div>
-                            </div>
-							<div class="swichermainleft">
-								<div class="skin-body dark-pattern">
-									<button type="button" id="background6" class="bg6 wscolorcode1 blackborder"></button>
-									<button type="button" id="background7" class="bg7 wscolorcode1 blackborder"></button>
-									<button type="button" id="background8" class="bg8 wscolorcode1 blackborder"></button>
-									<button type="button" id="background9" class="bg9 wscolorcode1 blackborder"></button>
-									<button type="button" id="background10" class="bg10 wscolorcode1 blackborder"></button>
-								</div>
-							</div>
-							<div class="swichermainleft">
-								<h4>vertical-menu Bg-Image</h4>
-								<div class="skin-body">
-									<button type="button" id="leftmenuimage1" class="bgimage1 wscolorcode1 blackborder"></button>
-									<button type="button" id="leftmenuimage2" class="bgimage2 wscolorcode1 blackborder"></button>
-									<button type="button" id="leftmenuimage3" class="bgimage3 wscolorcode1 blackborder"></button>
-									<button type="button" id="leftmenuimage4" class="bgimage4 wscolorcode1 blackborder"></button>
-									<button type="button" id="leftmenuimage5" class="bgimage5 wscolorcode1 blackborder"></button>
-								</div>
-							</div>
-							<div class="swichermainleft">
-								<h4>vertical-menu Styles</h4>
-								<div class="switch_section">
-									<div class="switch-toggle d-flex">
-										<span class="mr-auto">vertical-menu Light</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch9" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch9" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-									<div class="switch-toggle d-flex">
-										<span class="mr-auto">vertical-menu Color</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch10" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch10" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-									<div class="switch-toggle horizontal-Dark-switcher d-flex horizontal-light-switcher">
-										<span class="mr-auto">vertical-menu Dark</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch11" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch11" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-									<div class="switch-toggle d-flex">
-										<span class="mr-auto">vertical-menu Gradient Color</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch12" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch12" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-									<div class="switch-toggle d-flex  horizontal-light-switcher">
-										<span class="mr-auto">theme style</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch14" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch14" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-                                    <div class="switch-toggle d-flex horizontal-dark-switcher">
-										<span class="mr-auto">theme style</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch15" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch15" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-									<div class="switch-toggle d-flex">
-										<span class="mr-auto">Reset vertical-menu Styles</span>
-										<div class="onoffswitch2"><input type="radio" name="onoffswitch3" id="myonoffswitch13" class="onoffswitch2-checkbox">
-											<label for="myonoffswitch13" class="onoffswitch2-label"></label>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>              -->
-
-		<!-- End Switcher -->
+    
 
 		<!-- Page -->
 		<div class="page">
 
 			<!-- main-sidebar opened -->
 		<div class="app-sidebar__overlay" data-toggle="sidebar"></div>
-		<aside class="app-sidebar sidebar-scroll">
+		<aside class="app-sidebar">
 			<div class="main-sidebar-header">
 				<a class="desktop-logo logo-light" href="Dashboard.aspx" title="Maniraya Dashboard">
 					<img src="../user/img/logo.png" alt="Maniraya Logo">
@@ -218,7 +98,7 @@
 					<img src="../user/img/logo.png" class="logo-icon dark-theme" alt="Maniraya Logo">
 				</a>
 			</div>
-			<div class="main-sidebar-body circle-animation">
+			<div class="main-sidebar-body sidebar-menu-scroll circle-animation">
 
 				<ul class="side-menu circle">
 					<li><h3 class="h3color">Dashboard</h3></li>
@@ -390,11 +270,11 @@
 			<div class="main-header sticky side-header nav nav-item maniraya-header">
 				<div class="container-fluid maniraya-header-bar">
 					<div class="main-header-left">
-						<div class="app-sidebar__toggle mobile-toggle d-lg-none" data-toggle="sidebar">
-							<a class="open-toggle header-icon-btn" href="#" title="Open menu"><i class="header-icons" data-eva="menu-outline"></i></a>
-							<a class="close-toggle header-icon-btn" href="#" title="Close menu"><i class="header-icons" data-eva="close-outline"></i></a>
+						<div class="app-sidebar__toggle mobile-toggle d-md-none" data-toggle="sidebar">
+							<a class="open-toggle header-icon-btn" href="#" title="Open menu" aria-label="Open menu"><i class="fa fa-bars"></i></a>
+							<a class="close-toggle header-icon-btn" href="#" title="Close menu" aria-label="Close menu"><i class="fa fa-times"></i></a>
 						</div>
-						<div class="header-brand-block">
+						<!--<div class="header-brand-block">
 							<a href="Dashboard.aspx" class="header-brand-link d-none d-md-flex" title="Dashboard">
 								<img src="../user/img/logo.png" class="header-brand-logo" alt="Maniraya Logo">
 							</a>
@@ -403,7 +283,7 @@
 								<h2 class="header-welcome-name"><%= Session["username"] %></h2>
 								<span class="header-welcome-id">Member ID: <strong><%= Session["userid"] %></strong></span>
 							</div>
-						</div>
+						</div>-->
 					</div>
 					<div class="main-header-center d-md-none">
 						<div class="responsive-logo header-mobile-logo">
@@ -415,11 +295,11 @@
 					<div class="main-header-right">
 						<div class="nav nav-item navbar-nav-right ml-auto header-actions">
 							<div class="nav-item full-screen fullscreen-button d-none d-sm-flex">
-								<a class="new nav-link full-screen-link header-icon-btn" href="#" title="Fullscreen"><i class="ti-fullscreen"></i></a>
+								<a class="new nav-link full-screen-link header-icon-btn" href="#" title="Fullscreen" aria-label="Enter fullscreen" role="button"><i class="ti-fullscreen"></i></a>
 							</div>
 							<div class="header-action-divider d-none d-sm-flex"></div>
 							<div class="dropdown header-user-menu">
-								<a class="header-user-trigger" href="#" data-toggle="dropdown" title="Account menu">
+								<a class="header-user-trigger" href="#" data-toggle="dropdown" data-boundary="window" data-offset="0,10" title="Account menu">
 									<img id="imgHeaderUser" runat="server" src="~/user/img/default.png" class="header-user-avatar" alt="Profile" />
 									<span class="header-user-info d-none d-xl-flex">
 										<span class="header-user-info-name"><%= Session["username"] %></span>
@@ -427,7 +307,7 @@
 									</span>
 									<i class="fe fe-chevron-down header-user-chevron"></i>
 								</a>
-								<div class="dropdown-menu dropdown-menu-right maniraya-header-dropdown animated fadeInUp">
+								<div class="dropdown-menu dropdown-menu-right maniraya-header-dropdown">
 									<div class="maniraya-header-dropdown-head">
 										<img id="imgHeaderUserMenu" runat="server" src="~/user/img/default.png" class="header-user-avatar-lg" alt="Profile" />
 										<div>
@@ -614,10 +494,10 @@
 									</div>
 								</div>
 							</div>-->
-							<button class="navbar-toggler navresponsive-toggler d-sm-none" type="button" data-toggle="sidebar-right" data-target=".sidebar-right"
+							<!--<button class="navbar-toggler navresponsive-toggler d-sm-none" type="button" data-toggle="sidebar-right" data-target=".sidebar-right"
 								aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
 								<span class="navbar-toggler-icon fe fe-more-vertical "></span>
-							</button>
+							</button>-->
 							<!--<div class="dropdown main-profile-menu nav nav-item nav-link">
 								<a class="profile-user" href="#"><img alt="" src="../user/img/logo.png"></a>
 								<div class="dropdown-menu dropdown-menu-arrow animated fadeInUp">
@@ -1023,20 +903,16 @@
                 	
 
         
-    <div    style=" margin-left: 20px;">
-        	
-        <section class="content-header">
+    <div class="maniraya-page-shell">
                 <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
                 </asp:ContentPlaceHolder>
-            </section>
+
             <!-- Main content -->
             <section class="content">
-                <!-- Default box -->
                 <asp:ContentPlaceHolder ID="contentpageData" runat="server"></asp:ContentPlaceHolder>
-                <!-- /.box -->
             </section>
     </div>
-        <div class="main-footer ht-40">
+        <div class="main-footer">
 				<div class="container-fluid pd-t-0-f ht-100p">
 					<span>Copyright © <%= clsUtility.Session %>  <a href="#">    <b><%= clsUtility.ProjectName %></b></a>. All Rights Reserved.</span>
 				</div>
@@ -1076,7 +952,7 @@
 		<script src="assets/js/eva-icons.min.js"></script>
 
 		<!-- Sidebar js -->
-		<script src="assets/plugins/side-menu/sidemenu.js"></script>
+		<script src="assets/plugins/side-menu/sidemenu.js?v=3"></script>
 
 		<!-- Right-sidebar js -->
 		<script src="assets/plugins/sidebar/sidebar.js"></script>
@@ -1129,6 +1005,7 @@
 		<!-- Switcher js -->
 		<script src="assets/switcher/js/switcher.js"></script>
 		<script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
+		<script src="assets/js/box-header-enhance.js?v=2"></script>
 
 
 </body>

@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="UserEdit.aspx.cs" Inherits="admin_UserEdit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="assets/css/user-profile.css?v=2" rel="stylesheet" />
     <script type="text/javascript">
         function validate() {
             if (document.getElementById("<%=hdstatus.ClientID%>").value == "1") {
@@ -60,12 +61,11 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-        <h1 style="color:white;">User Edit    
-        </h1>
+        <h1>Edit Profile</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home > </a></li>
-        <li><a href="#">My Profile > </a></li>
-          <li class="active">Edit Profile</li>
+            <li><a href="Dashboard.aspx">Home</a></li>
+            <li><a href="UserProfile.aspx">My Profile</a></li>
+            <li class="active">Edit Profile</li>
         </ol>
     </section>
 </asp:Content>
@@ -82,9 +82,19 @@
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="row" style="color:white;">
-                <div class="col-md-12">
-                    <div >
+            <div class="profile-page">
+                <div class="profile-hero">
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-pencil"></i></div>
+                    <div class="profile-hero-info">
+                        <h2>Edit Profile</h2>
+                        <p class="profile-hero-meta">Member ID: <strong><%= Session["userid"] %></strong></p>
+                    </div>
+                    <div class="profile-hero-actions">
+                        <a href="UserProfile.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-user"></i> View Profile</a>
+                        <a href="PhotoUpload.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-camera"></i> Photo</a>
+                    </div>
+                </div>
+                <div class="profile-sections">
                       <asp:HiddenField ID="hdstatus" runat="server" />
                         <div style="display: none;" class="box box-primary">
                             <div class="box-header with-border">
@@ -130,12 +140,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Personal Details</h3>
                         </div>
-                        <div class="box-body">
+                        <div class="box-body profile-form-grid">
+                            <p class="profile-subsection-title"><i class="fa fa-id-card"></i> Basic Information</p>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -182,10 +192,11 @@
                                     </div>
                                 </div>
                             </div>
+                            <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Address &amp; Location</p>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>Address :</label>
+                                        <label><i class="fa fa-home"></i> Address</label>
                                         <asp:TextBox ID="txtaddress" TextMode="MultiLine" CssClass="form-control" runat="server"></asp:TextBox>
                                     </div>
                                 </div>
@@ -261,7 +272,7 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title">Nominee Details</h3>
                             </div>
-                            <div class="box-body">
+                            <div class="box-body profile-form-grid">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -288,10 +299,11 @@
                             <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
                             <asp:Button ID="btnCancel" OnClick="btnCancel_Click" CssClass="btn btn-danger" runat="server" Text="Cancel" />
                         </div>
-                          <div class="box-footer" id="div_noupdate" runat="server" visible="false"><span style="float:right;font-size:20px;color:red;"><i>You cannot update profile.Please contact admin.</i></span></div>
+                          <div class="box-footer" id="div_noupdate" runat="server" visible="false">
+                              <div class="profile-alert"><i class="fa fa-exclamation-circle"></i> You cannot update profile. Please contact admin.</div>
+                          </div>
                         </div>
                 </div>
-            </div>
             </div>
         </ContentTemplate>
     </asp:UpdatePanel>

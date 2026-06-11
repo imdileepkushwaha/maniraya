@@ -125,6 +125,7 @@ public partial class PhotoUpload : System.Web.UI.Page
                 if (rs == "t")
                 {
                   //  div_update.Visible = false;
+                    Session["UserImage"] = objUser.Photo;
                     Message.Show("Request Submitted Successfully...!!!");
                     loadsusername();
                 }

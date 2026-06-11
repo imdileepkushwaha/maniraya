@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -138,17 +138,12 @@ public partial class user_UserDirectAssociates : System.Web.UI.Page
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
             Label lblstatus = (Label)e.Row.FindControl("lblStatus");
-            if (lblstatus.Text == "Unpaid")
+            if (lblstatus != null)
             {
-                e.Row.BackColor = System.Drawing.Color.Red;
-                e.Row.ForeColor = System.Drawing.Color.White;
+                lblstatus.CssClass = lblstatus.Text == "Unpaid"
+                    ? "team-status-badge team-status-unpaid"
+                    : "team-status-badge team-status-paid";
             }
-            else
-            {
-                e.Row.BackColor = System.Drawing.Color.Green;
-                e.Row.ForeColor = System.Drawing.Color.White;
-            }
-
         }
     }
 
