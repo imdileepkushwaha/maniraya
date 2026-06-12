@@ -68,10 +68,11 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Account Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addBankAccountModal');", true);
             txtdepositbank.Text = "";
             txtaccountholdername.Text = "";
             txtdepositaccountno.Text = "";
-          
+            txtifsccode.Text = "";
             loaddata();
         }
         else if (res == "f")
@@ -108,7 +109,7 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
             txtdepositbankedit.Text = lblbankname.Text;
             ImageButton1.ImageUrl = "../ProductImage/" + lblimage.Text;
            
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
         }
         if (e.CommandName == "del")
         {
@@ -142,7 +143,7 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Bank Account Details Edited Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            string popupScript2 = "Closepopup();";
+            string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loaddata();
         }

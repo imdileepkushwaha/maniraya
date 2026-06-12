@@ -42,7 +42,7 @@ public partial class admin_CountryAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Country Edited Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            string popupScript2 = "Closepopup();";
+            string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loaddata();
         }
@@ -57,7 +57,9 @@ public partial class admin_CountryAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Country Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addCountryModal');", true);
             txtcountryname.Text = "";
+            txtcountrycode.Text = "";
             loaddata();
         }
         else
@@ -78,7 +80,7 @@ public partial class admin_CountryAdd : System.Web.UI.Page
             lblcountryid.Text = lblid.Text;
             txtcountrynameedit.Text = lblCountryname.Text;
             txtcountrycodeedit.Text = lblCountrycode.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -130,24 +130,66 @@ public partial class admin_Dashboard : System.Web.UI.Page
             string m = DateTime.Now.ToString("MMM", CultureInfo.InvariantCulture); ;
             dsChartData1 = objA.GetBindChartuser();
 
+            int totalJoins = 0;
+            foreach (DataRow row in dsChartData1.Rows)
+            {
+                if (row["JoinUser"] != DBNull.Value)
+                {
+                    totalJoins += Convert.ToInt32(row["JoinUser"]);
+                }
+            }
+
             strScript1.Append(@"<script type='text/javascript'>  
                     google.load('visualization', '1', {packages: ['corechart']});</script>  
   
                     <script type='text/javascript'>  
                     function drawVisualization() {         
                     var data = google.visualization.arrayToDataTable([  
-                    ['Date','JoinUser'],");
+                    ['Date','Joins','Trend'],");
 
             foreach (DataRow row in dsChartData1.Rows)
             {
-                strScript1.Append("['" + row["Date"] + "'," +
-                    row["JoinUser"] + "],");
+                int val = 0;
+                if (row["JoinUser"] != DBNull.Value)
+                {
+                    val = Convert.ToInt32(row["JoinUser"]);
+                }
+                strScript1.Append("['" + row["Date"] + "'," + val + "," + val + "],");
             }
             strScript1.Remove(strScript1.Length - 1, 1);
             strScript1.Append("]);");
 
-            strScript1.Append("var options1 = { title : 'User join weekwise', vAxis: {title: 'Number'},  hAxis: {title: '" + m + "'}, seriesType: 'bars', series: {3: {type: 'area'}} };");
-            strScript1.Append(" var chart1 = new google.visualization.ComboChart(document.getElementById('Div1'));  chart1.draw(data, options1); } google.setOnLoadCallback(drawVisualization);");
+            strScript1.Append(@"
+                var options1 = {
+                    legend: { position: 'none' },
+                    chartArea: { width: '92%', height: '80%', left: '6%', right: '2%', top: '6%', bottom: '14%' },
+                    bar: { groupWidth: '50%' },
+                    seriesType: 'bars',
+                    series: {
+                        0: { type: 'bars', color: '#e52d27' },
+                        1: { type: 'area', color: '#f1f5f9', areaOpacity: 0.7, lineWidth: 0, visibleInLegend: false }
+                    },
+                    vAxis: {
+                        gridlines: { color: '#f1f5f9', count: 6 },
+                        textStyle: { color: '#94a3b8', fontName: 'Segoe UI', fontSize: 11 },
+                        baselineColor: '#f1f5f9'
+                    },
+                    hAxis: {
+                        gridlines: { color: 'transparent' },
+                        textStyle: { color: '#94a3b8', fontName: 'Segoe UI', fontSize: 11 },
+                        baselineColor: '#e2e8f0'
+                    }
+                };
+                var chart1 = new google.visualization.ComboChart(document.getElementById('Div1'));
+                chart1.draw(data, options1);
+                
+                // Set total joins count dynamically
+                var badge = document.getElementById('lblTotalJoinsThisWeek');
+                if (badge) {
+                    badge.innerText = '" + totalJoins + @"';
+                }
+            }
+            google.setOnLoadCallback(drawVisualization);");
             strScript1.Append(" </script>");
 
             Literal1.Text = strScript1.ToString();

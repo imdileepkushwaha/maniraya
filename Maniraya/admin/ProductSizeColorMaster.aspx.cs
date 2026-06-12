@@ -92,15 +92,53 @@ public partial class admin_ProductSizeColorMaster : System.Web.UI.Page
     }
     void loadsize()
     {
-        ddlSize.Items.Clear();
-        DataTable dt = new DataTable();
-        dt = objProduct.getSizeMaster();
-        ddlSize.DataSource = dt;
-        ddlSize.DataTextField = "sizeName";
-        ddlSize.DataValueField = "ID";
-        ddlSize.DataBind();
-        ListItem li = new ListItem("Select size", "0");
-        ddlSize.Items.Insert(0, li);
+        cblSize.Items.Clear();
+        DataTable dt = objProduct.getSizeMaster();
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            cblSize.Visible = false;
+            lblNoSizes.Visible = true;
+            return;
+        }
+
+        cblSize.Visible = true;
+        lblNoSizes.Visible = false;
+        cblSize.DataSource = dt;
+        cblSize.DataTextField = GetColumnName(dt, "sizeName", "SizeName", "Sizename");
+        cblSize.DataValueField = GetColumnName(dt, "ID", "Id");
+        cblSize.DataBind();
+    }
+
+    string GetColumnName(DataTable dt, params string[] candidates)
+    {
+        foreach (string candidate in candidates)
+        {
+            if (dt.Columns.Contains(candidate))
+            {
+                return candidate;
+            }
+        }
+        return dt.Columns.Count > 0 ? dt.Columns[0].ColumnName : candidates[0];
+    }
+
+    void clearSizeSelection()
+    {
+        foreach (ListItem item in cblSize.Items)
+        {
+            item.Selected = false;
+        }
+    }
+
+    bool hasSizeSelection()
+    {
+        foreach (ListItem item in cblSize.Items)
+        {
+            if (item.Selected)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     void loadsizeedit()
     {
@@ -116,29 +154,80 @@ public partial class admin_ProductSizeColorMaster : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        objProduct.SubCategoryId = ddsubcategory.SelectedValue;
-        objProduct.colorId = ddlColor.SelectedValue;
-        objProduct.Sizeid = ddlSize.SelectedValue;
-        string res = objProduct.Product_ColorSizeSetting(objProduct);
-        if (res == "t")
+        if (ddsubcategory.SelectedValue == "0" || ddlColor.SelectedValue == "0" || !hasSizeSelection())
         {
-            string popupScript = "alert('Records Added Successfully');";
+            string popupScript = "alert('Please select sub-category, color and at least one size.');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ddlColor.SelectedIndex = 0;ddlSize.SelectedIndex = 0;
-          
-        }
-        else
-            if (res == "f")
-        {
-            string popupScript = "alert('Records Already Exists');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-        }
-        else
-        {
-            string popupScript = "alert('Unknow error occurred');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            return;
         }
 
+        objProduct.SubCategoryId = ddsubcategory.SelectedValue;
+        objProduct.colorId = ddlColor.SelectedValue;
+
+        int added = 0;
+        int duplicate = 0;
+        int failed = 0;
+
+        foreach (ListItem item in cblSize.Items)
+        {
+            if (!item.Selected)
+            {
+                continue;
+            }
+
+            objProduct.Sizeid = item.Value;
+            string res = objProduct.Product_ColorSizeSetting(objProduct);
+            if (res == "t")
+            {
+                added++;
+            }
+            else if (res == "f")
+            {
+                duplicate++;
+            }
+            else
+            {
+                failed++;
+            }
+        }
+
+        string message;
+        if (added > 0 && duplicate == 0 && failed == 0)
+        {
+            message = added == 1
+                ? "Record added successfully."
+                : added + " records added successfully.";
+        }
+        else if (added > 0)
+        {
+            message = added + " record(s) added.";
+            if (duplicate > 0)
+            {
+                message += " " + duplicate + " already existed.";
+            }
+            if (failed > 0)
+            {
+                message += " " + failed + " failed.";
+            }
+        }
+        else if (duplicate > 0 && failed == 0)
+        {
+            message = "All selected size combinations already exist.";
+        }
+        else
+        {
+            message = "Unable to save records. Please try again.";
+        }
+
+        string popupScriptResult = "alert('" + message.Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScriptResult, true);
+
+        if (added > 0)
+        {
+            ddlColor.SelectedIndex = 0;
+            clearSizeSelection();
+            loaddata();
+        }
     }
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {

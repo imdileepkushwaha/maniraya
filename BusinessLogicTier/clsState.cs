@@ -156,7 +156,7 @@ namespace BusinessLogicTier
 
         public DataTable getCityAll()
         {
-            string str_query = "select cm.*, sm.statename,cm2.countryname,cm2.countrycode from citymaster cm  left join statemaster sm on cm.stateid=sm.stateid  left join countrymaster cm2 on sm.countryid=cm2.countryid   order by sm.statename,cm.cityname,cm2.countryname";
+            string str_query = "select cm.*, sm.statename, cm2.countryname, cm2.countrycode from citymaster cm  left join statemaster sm on cm.stateid=sm.stateid  left join countrymaster cm2 on sm.countryid=cm2.countryid   order by sm.statename,cm.cityname,cm2.countryname";
 
             DataTable dt = null;
             ObjData.StartConnection();
@@ -170,6 +170,41 @@ namespace BusinessLogicTier
             }
             ObjData.EndConnection();
             return dt;
+        }
+
+        public string getCountryIdByStateId(string stateId)
+        {
+            if (string.IsNullOrEmpty(stateId))
+            {
+                return "";
+            }
+
+            string countryId = "";
+            string str_query = "select countryid from statemaster where stateid='" + stateId + "'";
+            DataTable dt = null;
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(str_query);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    DataRow row = dt.Rows[0];
+                    if (row.Table.Columns.Contains("countryid"))
+                    {
+                        countryId = row["countryid"].ToString();
+                    }
+                    else if (row.Table.Columns.Contains("CountryID"))
+                    {
+                        countryId = row["CountryID"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                countryId = "";
+            }
+            ObjData.EndConnection();
+            return countryId;
         }
         public DataTable getTehsilAll()
         {
@@ -399,7 +434,7 @@ namespace BusinessLogicTier
 
             try
             {
-                s2 = "update statemaster set statename='"+objState.StateName+"' where stateid='"+objState.StateId+"'";
+                s2 = "update statemaster set statename='"+objState.StateName+"', countryid='"+objState.CountryId+"' where stateid='"+objState.StateId+"'";
               
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
                 res = "t";
@@ -530,7 +565,7 @@ namespace BusinessLogicTier
 
             try
             {
-                s2 = "update citymaster set cityname='" + objState.CityName + "' where cityid='" + objState.CityId + "'";
+                s2 = "update citymaster set cityname='" + objState.CityName + "', stateid='" + objState.StateId + "' where cityid='" + objState.CityId + "'";
 
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
                 res = "t";

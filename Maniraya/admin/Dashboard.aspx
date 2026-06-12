@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="admin_Dashboard" %>
+<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="admin_Dashboard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
      <script type="text/javascript" src="https://www.google.com/jsapi"></script>  
@@ -292,13 +292,25 @@
                    <div class="row">
         <div class="col-md-12 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-aqua"><i class="fa fa-mail-reply"></i></span>
-
             <div class="info-box-content">
-              <span class="info-box-text">Deposit Request</span>
-              Total : <asp:Label ID="LblDepositlTotal" runat="server" Text="" Font-Bold="true"></asp:Label>    <br />      
-              Pending : <asp:Label ID="LblDepositPending" runat="server" Text="" Font-Bold="true"></asp:Label> <br /> 
-                 <a href="DepositRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              <div class="admin-ibox-head">
+                <div class="admin-ibox-head-main">
+                  <span class="admin-ibox-icon bg-aqua"><i class="fa fa-mail-reply"></i></span>
+                  <span class="info-box-text">Deposit Request</span>
+                </div>
+                <span class="admin-ibox-chip">Fund In</span>
+              </div>
+              <div class="admin-ibox-stats">
+                <div class="admin-ibox-stat">
+                  <span class="admin-ibox-stat-label">Total</span>
+                  <span class="admin-ibox-stat-value"><asp:Label ID="LblDepositlTotal" runat="server" Text="0"></asp:Label></span>
+                </div>
+                <div class="admin-ibox-stat is-pending">
+                  <span class="admin-ibox-stat-label">Pending</span>
+                  <span class="admin-ibox-stat-value"><asp:Label ID="LblDepositPending" runat="server" Text="0"></asp:Label></span>
+                </div>
+              </div>
+              <a href="DepositRequestReport.aspx" class="admin-ibox-action">View details <i class="fa fa-arrow-right"></i></a>
             </div>
           
           </div>
@@ -307,13 +319,25 @@
         <!-- /.col -->
         <div class="col-md-12 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-red"><i class="fa fa-share"></i></span>
-
             <div class="info-box-content">
-              <span class="info-box-text">Withdrawl Request</span>
-                 Total : <asp:Label ID="LblWithdrawlTotal" runat="server" Text="" Font-Bold="true"></asp:Label>      <br />         
-              Pending : <asp:Label ID="LblWithdrawlPending" runat="server" Text="" Font-Bold="true"></asp:Label>  <br />   
-                 <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              <div class="admin-ibox-head">
+                <div class="admin-ibox-head-main">
+                  <span class="admin-ibox-icon bg-red"><i class="fa fa-share"></i></span>
+                  <span class="info-box-text">Withdrawl Request</span>
+                </div>
+                <span class="admin-ibox-chip">Fund Out</span>
+              </div>
+              <div class="admin-ibox-stats">
+                <div class="admin-ibox-stat">
+                  <span class="admin-ibox-stat-label">Total</span>
+                  <span class="admin-ibox-stat-value"><asp:Label ID="LblWithdrawlTotal" runat="server" Text="0"></asp:Label></span>
+                </div>
+                <div class="admin-ibox-stat is-pending">
+                  <span class="admin-ibox-stat-label">Pending</span>
+                  <span class="admin-ibox-stat-value"><asp:Label ID="LblWithdrawlPending" runat="server" Text="0"></asp:Label></span>
+                </div>
+              </div>
+              <a href="WithdrawlRequestReport.aspx" class="admin-ibox-action">View details <i class="fa fa-arrow-right"></i></a>
             </div>
           
           </div>
@@ -326,12 +350,19 @@
 
         <div class="col-md-12 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-green"><i class="fa fa-envelope-o"></i></span>
-
             <div class="info-box-content">
-              <span class="info-box-text">News</span>
-              <span class="info-box-number"><asp:Label ID="LblNewsCount" runat="server" Text=""></asp:Label></span>
-                   <a href="NewsAdd.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              <div class="admin-ibox-head">
+                <div class="admin-ibox-head-main">
+                  <span class="admin-ibox-icon bg-green"><i class="fa fa-envelope-o"></i></span>
+                  <span class="info-box-text">News</span>
+                </div>
+                <span class="admin-ibox-chip">Updates</span>
+              </div>
+              <div class="admin-ibox-hero">
+                <span class="admin-ibox-hero-value"><asp:Label ID="LblNewsCount" runat="server" Text="0"></asp:Label></span>
+                <span class="admin-ibox-hero-caption">Published news items</span>
+              </div>
+              <a href="NewsAdd.aspx" class="admin-ibox-action">Manage news <i class="fa fa-arrow-right"></i></a>
             </div>
          
           </div>
@@ -340,12 +371,19 @@
         <!-- /.col -->
         <div class="col-md-12 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-yellow"><i class="fa fa-circle-o"></i></span>
-
             <div class="info-box-content">
-              <span class="info-box-text">Purchase Pending</span>
-              <span class="info-box-number"><asp:Label ID="LblPurchaseProductCount" runat="server" Text=""></asp:Label></span>
-                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              <div class="admin-ibox-head">
+                <div class="admin-ibox-head-main">
+                  <span class="admin-ibox-icon bg-yellow"><i class="fa fa-circle-o"></i></span>
+                  <span class="info-box-text">Purchase Pending</span>
+                </div>
+                <span class="admin-ibox-chip">Orders</span>
+              </div>
+              <div class="admin-ibox-hero">
+                <span class="admin-ibox-hero-value"><asp:Label ID="LblPurchaseProductCount" runat="server" Text="0"></asp:Label></span>
+                <span class="admin-ibox-hero-caption">Awaiting approval</span>
+              </div>
+              <a href="#" class="admin-ibox-action">View pending <i class="fa fa-arrow-right"></i></a>
             </div>
             <!-- /.info-box-content -->
           </div>
@@ -356,11 +394,33 @@
 
         </div>
           <div class="col-md-8">
-         <asp:Literal ID="Literal1" runat="server"></asp:Literal>  
-        <div id="Div1" style="height:500px;" >     
-     </div>  
-
-        </div>
+              <asp:Literal ID="Literal1" runat="server"></asp:Literal>  
+              <div class="admin-chart-card">
+                  <div class="admin-chart-card-header">
+                      <div class="admin-chart-card-title-wrap">
+                          <h2 class="admin-chart-card-title">Registration Analytics</h2>
+                          <div class="admin-chart-card-subtitle">
+                              <strong id="lblTotalJoinsThisWeek">--</strong>
+                              <span>Total Joins (This Week)</span>
+                          </div>
+                      </div>
+                      <div class="admin-chart-card-actions">
+                          <div class="admin-chart-pill-selector">
+                              <button type="button" class="admin-chart-pill-btn active">Weekly</button>
+                              <button type="button" class="admin-chart-pill-btn">Monthly</button>
+                              <button type="button" class="admin-chart-pill-btn">Yearly</button>
+                          </div>
+                          <div class="admin-chart-legends">
+                              <span class="admin-chart-legend-item"><span class="legend-dot bg-red-dot"></span> Joins</span>
+                              <span class="admin-chart-legend-item"><span class="legend-dot bg-gray-dot"></span> Trend</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="admin-chart-card-body">
+                      <div id="Div1" class="admin-chart-element"></div>
+                  </div>
+              </div>
+          </div>
       
         <!-- /.col (LEFT) -->
       
