@@ -12,6 +12,12 @@ public partial class admin_kycApprovalForUser : System.Web.UI.Page
     clsState objState = new clsState();
     clsUser objUser = new clsUser();
 
+    private DataTable KycData
+    {
+        get { return ViewState["KycData"] as DataTable; }
+        set { ViewState["KycData"] = value; }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -95,10 +101,25 @@ public partial class admin_kycApprovalForUser : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loaduser();
+        loaduser(true);
     }
-    void loaduser()
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
     {
+        GridView1.PageIndex = 0;
+        if (KycData != null)
+        {
+            BindGrid();
+        }
+    }
+
+    void loaduser(bool resetPage)
+    {
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
         objUser.UserName = string.Empty;
         objUser.Mobile = txtmobile.Text;
         objUser.Email = txtemail.Text;
@@ -121,10 +142,61 @@ public partial class admin_kycApprovalForUser : System.Web.UI.Page
             objUser.ToDate = DateTime.MinValue;
         }
         objUser.UserId = txtname.Text;
-        DataTable dt = new DataTable();
-        dt = objUser.getUserReport(objUser);
+        DataTable dt = objUser.getUserReport(objUser);
+        KycData = dt;
+        BindGrid();
+    }
+
+    void BindGrid()
+    {
+        DataTable dt = KycData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
     }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
@@ -186,35 +258,35 @@ public partial class admin_kycApprovalForUser : System.Web.UI.Page
         {
             objUser.changeKYCStatus("Sign Up", "Approve", userid);
             Message.Show("Sign Up Approved");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "approve_pan")
         {
             objUser.changeKYCStatus("PAN", "Approve", userid);
             Message.Show("PAN Card Approved");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "approve_cheque")
         {
             objUser.changeKYCStatus("Cheque", "Approve", userid);
             Message.Show("Cancel Cheque/Passbook Approved");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "approve_aadhaar")
         {
             objUser.changeKYCStatus("Aadhaar", "Approve", userid);
             Message.Show("Aadhaar Card Approved");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "approve_GST")
         {
             objUser.changeKYCStatus("GST", "Approve", userid);
             Message.Show("GST Approved");
-            loaduser();
+            loaduser(false);
         }
 
 
@@ -222,35 +294,35 @@ public partial class admin_kycApprovalForUser : System.Web.UI.Page
         {
             objUser.changeKYCStatus("Sign Up", "Reject", userid);
             Message.Show("Sign Up Rejected");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "reject_pan")
         {
             objUser.changeKYCStatus("PAN", "Reject", userid);
             Message.Show("PAN Card Rejected");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "reject_cheque")
         {
             objUser.changeKYCStatus("Cheque", "Reject", userid);
             Message.Show("Cancel Cheque/Passbook Rejected");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "reject_aadhaar")
         {
             objUser.changeKYCStatus("Aadhaar", "Reject", userid);
             Message.Show("Aadhaar Card Rejected");
-            loaduser();
+            loaduser(false);
         }
 
         else if (e.CommandName == "reject_GST")
         {
             objUser.changeKYCStatus("GST", "Reject", userid);
             Message.Show("GST Rejected");
-            loaduser();
+            loaduser(false);
         }
 
     }

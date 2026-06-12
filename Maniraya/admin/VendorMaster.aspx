@@ -28,6 +28,7 @@
           //      document.getElementById("<%=TxtGStNo.ClientID%>").focus();
           //      return false;
          //   }
+            return true;
         }
 
         function validate2() {
@@ -56,6 +57,7 @@
            //     document.getElementById("<%=TxtGstNoEdit.ClientID%>").focus();
            //     return false;
            // }
+            return true;
         }
     </script>
 </asp:Content>
@@ -199,54 +201,68 @@
           </div>
             </div>
 
-                  <div id="myModal" class="modal fade">
-                <div class="modal-dialog modal-lg">
+                  <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vendorEditModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg admin-vendor-edit-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title">Edit Vendor Details</h4>
+                            <h4 class="modal-title" id="vendorEditModalTitle">Edit Vendor Details</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         </div>
-                        <div class="modal-body">
-                           <div class="row">
-                                    <div class="col-sm-3">
-                                        <label for="exampleInputEmail1">Company Name :</label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <asp:Label ID="LblVendorId" runat="server" Visible="false" Text="0"></asp:Label>
-                                        <asp:TextBox ID="TxtCompanyNameEdit" onkeypress="return isNumber(event)" runat="server" CssClass="form-control" />
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label for="exampleInputEmail1">Owner Name :</label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <asp:TextBox ID="TxtOwnernameEdit" runat="server" CssClass="form-control" />
-                                    </div>
-                                </div>
+                        <div class="modal-body admin-product-form admin-vendor-edit-form">
+                            <asp:Label ID="LblVendorId" runat="server" Visible="false" Text="0"></asp:Label>
+                            <div class="admin-form-section admin-form-section-last">
                                 <div class="row">
-                                    <div class="col-sm-3">
-                                        <label for="exampleInputEmail1">ContactNo :</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= TxtCompanyNameEdit.ClientID %>">Company Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-building"></i></span>
+                                                <asp:TextBox ID="TxtCompanyNameEdit" runat="server" CssClass="form-control" placeholder="Enter company name" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <asp:TextBox ID="TxtConatctNoEdit" runat="server" CssClass="form-control" />
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= TxtOwnernameEdit.ClientID %>">Owner Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-user"></i></span>
+                                                <asp:TextBox ID="TxtOwnernameEdit" runat="server" CssClass="form-control" placeholder="Enter owner name" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <label for="exampleInputEmail1">Address :</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= TxtConatctNoEdit.ClientID %>">Contact No</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-phone"></i></span>
+                                                <asp:TextBox ID="TxtConatctNoEdit" runat="server" CssClass="form-control" placeholder="Enter contact number" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <asp:TextBox ID="TxtAddressEdit" runat="server" CssClass="form-control" />
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= TxtGstNoEdit.ClientID %>">GST No</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-file-text-o"></i></span>
+                                                <asp:TextBox ID="TxtGstNoEdit" runat="server" CssClass="form-control" placeholder="Enter GST number" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="<%= TxtAddressEdit.ClientID %>">Address</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-map-marker"></i></span>
+                                                <asp:TextBox ID="TxtAddressEdit" runat="server" CssClass="form-control" placeholder="Enter address" TextMode="MultiLine" Rows="3" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <label for="exampleInputEmail1">GST No :</label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <asp:TextBox ID="TxtGstNoEdit" runat="server" CssClass="form-control" />
-                                    </div>
-                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
-                            <asp:Button ID="btnUpdate" runat="server" Text="Update" OnClientClick="return validate2();" CssClass="btn green" OnClick="btnUpdate_Click" />
-                            <button type="button" class="btn red" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <asp:Button ID="btnUpdate" runat="server" Text="Update Vendor" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
                         </div>
                     </div>
                 </div>
@@ -257,17 +273,3 @@
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
-<asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
-    <script type="text/javascript">
-        function showModal() {
-            $('#myModal').modal({ backdrop: 'static', keyboard: false })
-        }
-        function Closepopup() {
-            $('#myModal').modal('hide');
-            $('body').removeClass('modal-open');
-            $('body').css('padding-right', '0');
-            $('.modal-backdrop').remove();
-        }
-    </script>
-</asp:Content>
-

@@ -14,14 +14,13 @@
                }
            }
            function validate2() {
-               // alert('sd');
                if (document.getElementById("<%=txtcountrynameedit.ClientID%>").value == "") {
 
                    alert('Enter Catogory Name');
-                   // alert("Enter Rank No"); 
                    document.getElementById("<%=txtcountrynameedit.ClientID%>").focus();
                    return false;
                }
+               return true;
            }
     </script>
 </asp:Content>
@@ -111,22 +110,26 @@
          
           </div>
             </div>
-                  <div id="myModal" class="modal fade">
-                  <div class="modal-dialog">
+                  <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="categoryEditModalTitle" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Edit Country</h4>
+                        <h4 class="modal-title" id="categoryEditModalTitle">Edit Category</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body admin-product-form">
+                        <asp:Label ID="lblcountryid" Visible="false" runat="server" Text=""></asp:Label>
                         <div class="form-group">
-                         Category Name
-                          <asp:Label ID="lblcountryid" Visible="false"  runat="server" Text=""></asp:Label>
-                    <asp:TextBox runat="server" class="form-control" ID="txtcountrynameedit" ></asp:TextBox>
+                            <label for="<%= txtcountrynameedit.ClientID %>">Category Name</label>
+                            <div class="admin-input-group">
+                                <span class="admin-input-icon"><i class="fa fa-folder-open"></i></span>
+                                <asp:TextBox runat="server" CssClass="form-control" ID="txtcountrynameedit" placeholder="Enter category name"></asp:TextBox>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                       <asp:Button ID="btnUpdate" runat="server" Text="Update"  OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click"  />
-                          <button type="button"  class="btn btn-danger"  data-dismiss="modal">Close</button>                  
+                       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                       <asp:Button ID="btnUpdate" runat="server" Text="Update Category" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
                     </div>
                 </div>
             </div>
@@ -140,24 +143,5 @@
     </asp:UpdatePanel>
     
 </asp:Content>
-<asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
-   
 
-      
-   
-     <script type="text/javascript">
-
-
-         function showModal() {
-             $('#myModal').modal({ backdrop: 'static', keyboard: false })
-         }
-         function Closepopup() {
-             $('#myModal').modal('hide');
-             $('body').removeClass('modal-open');
-             $('body').css('padding-right', '0');
-             $('.modal-backdrop').remove();
-
-         }
-        </script>
-</asp:Content>
 

@@ -185,9 +185,31 @@ public partial class admin_AddSlider : System.Web.UI.Page
                 btnSubmit.Visible = false;
                 btn_update.Visible = true;
                 btnCancel.Visible = true;
+                RegisterImagePreviewScript(HiddenField1.Value);
             }
         }
         catch { }
+    }
+
+    protected void btnReset_Click(object sender, EventArgs e)
+    {
+        cleardata();
+    }
+
+    void RegisterImagePreviewScript(string imageUrl)
+    {
+        string script = string.Format("syncSliderImagePreview('{0}');", JsEncode(imageUrl));
+        ClientScript.RegisterStartupScript(GetType(), "sliderPreview", script, true);
+    }
+
+    string JsEncode(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return string.Empty;
+        }
+
+        return value.Replace("\\", "\\\\").Replace("'", "\\'");
     }
 
     protected void btndelete_Click(object sender, EventArgs e)
@@ -234,6 +256,7 @@ public partial class admin_AddSlider : System.Web.UI.Page
             btn_update.Visible = false;
             btnCancel.Visible = false;
             BindGrid();
+            RegisterImagePreviewScript(string.Empty);
         }
         catch { }
     }

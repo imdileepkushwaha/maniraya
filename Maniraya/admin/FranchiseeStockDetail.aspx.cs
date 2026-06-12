@@ -18,12 +18,15 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
 {
 
     Data ObjData = new Data();
-    decimal total = 0;
-    decimal totaldp = 0;
-    private Decimal TotalBV = 0;
     clsAccount objaccount = new clsAccount();
     clsProduct objP = new clsProduct();
     clsvendor objV = new clsvendor();
+
+    private DataTable StockData
+    {
+        get { return ViewState["StockData"] as DataTable; }
+        set { ViewState["StockData"] = value; }
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -32,7 +35,7 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
             {
                 loadFranchisee();
                 loadProduct();
-                loaduser();
+                loaduser(false);
                 RDBtnTRecharge.Checked = true;
                 //txtuserid.Text = Session["userid"].ToString();
                 //txtuserid.Enabled = false;
@@ -122,10 +125,16 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loaduser();
+        loaduser(true);
     }
-    void loaduser()
+
+    void loaduser(bool resetPage)
     {
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
         objV.VendorId = string.Empty;
         objV.ProductId = string.Empty;
         if (DDLstProduct.SelectedIndex > 0)
@@ -136,11 +145,70 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
         {
             objV.VendorId = DDLstFranchisee.SelectedValue;
         }
-        
-        DataTable dt = new DataTable();
-        dt = getFranchiseeStock(objV);
+
+        StockData = getFranchiseeStock(objV);
+        BindGrid();
+    }
+
+    void BindGrid()
+    {
+        DataTable dt = StockData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GridView1.PageIndex = 0;
+        if (StockData != null)
+        {
+            BindGrid();
+        }
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
     }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
@@ -185,34 +253,25 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
     }
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-
-        if (e.Row.RowType == DataControlRowType.DataRow)
+        if (e.Row.RowType == DataControlRowType.Footer && StockData != null)
         {
-           // total += Convert.ToDecimal(DataBinder.Eval(e.Row.Cells, "lbluseridContactNo"));
+            decimal totalBv = 0;
+            decimal totalDp = 0;
 
-            var ttlbv = e.Row.FindControl("lblbvleft") as Label;
-            var ttldp = e.Row.FindControl("lbldpleft") as Label;
-
-            if (ttlbv != null)
+            foreach (DataRow row in StockData.Rows)
             {
-                total += decimal.Parse(ttlbv.Text);
-
+                if (row["BVLEFT"] != DBNull.Value)
+                {
+                    totalBv += Convert.ToDecimal(row["BVLEFT"]);
+                }
+                if (row["DPLEFT"] != DBNull.Value)
+                {
+                    totalDp += Convert.ToDecimal(row["DPLEFT"]);
+                }
             }
 
-            if (ttldp != null)
-            {
-                totaldp += decimal.Parse(ttldp.Text);
-
-            }
-
-          
+            e.Row.Cells[5].Text = String.Format("{0:N0}", totalBv);
+            e.Row.Cells[6].Text = String.Format("{0:N0}", totalDp);
         }
-        else if (e.Row.RowType == DataControlRowType.Footer)
-        {
-
-            e.Row.Cells[5].Text = String.Format("{0:N0}", total);
-            e.Row.Cells[6].Text = String.Format("{0:N0}", totaldp);
-        }
-
     }
 }

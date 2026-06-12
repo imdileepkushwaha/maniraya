@@ -508,9 +508,9 @@ namespace BusinessLogicTier
 
             try
             {
+                string subCategoryId = !string.IsNullOrEmpty(objState.SubCategoryId) ? objState.SubCategoryId : objState.CategoryId;
 
-
-                s2 = "update subCategoryMaster set subCategoryName='" + objState.CategoryName + "' where subCategoryId='" + objState.CategoryId + "'";
+                s2 = "update subCategoryMaster set subCategoryName='" + objState.CategoryName + "', categoryid='" + objState.CategoryId + "' where subCategoryId='" + subCategoryId + "'";
 
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
                 res = "t";

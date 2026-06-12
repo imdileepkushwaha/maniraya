@@ -8,16 +8,25 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+
 public partial class admin_UserReport : System.Web.UI.Page
 {
     clsAccount objaccount = new clsAccount();
+
+    private DataTable TransactionData
+    {
+        get { return ViewState["TransactionData"] as DataTable; }
+        set { ViewState["TransactionData"] = value; }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
             if (Session["useradmin"] != null)
             {
-
+                txtfromdate.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                txttodate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             }
             else
             {
@@ -26,22 +35,31 @@ public partial class admin_UserReport : System.Web.UI.Page
         }
     }
 
-
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-
     }
+
     protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
     {
-        loaduser();
+        GridView1.PageIndex = 0;
+        if (TransactionData != null)
+        {
+            BindGrid();
+        }
     }
+
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loaduser();
+        loaduser(true);
     }
-    void loaduser()
+
+    void loaduser(bool resetPage)
     {
-        string noOfRows = "";
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
         if (txtfromdate.Text != "")
         {
             objaccount.FromDate = Message.GetIndianDate(txtfromdate.Text);
@@ -50,6 +68,7 @@ public partial class admin_UserReport : System.Web.UI.Page
         {
             objaccount.FromDate = DateTime.MinValue;
         }
+
         if (txttodate.Text != "")
         {
             objaccount.ToDate = Message.GetIndianDate(txttodate.Text);
@@ -58,44 +77,92 @@ public partial class admin_UserReport : System.Web.UI.Page
         {
             objaccount.ToDate = DateTime.MinValue;
         }
-        if (ddlRecordFilter.SelectedItem.Text == "25")
-                noOfRows = "top 25";
 
-            else if (ddlRecordFilter.SelectedItem.Text == "50")
-                noOfRows = "top 50";
-
-            else if (ddlRecordFilter.SelectedItem.Text == "100")
-                noOfRows = "top 100";
-
-            else if (ddlRecordFilter.SelectedItem.Text == "500")
-                noOfRows = "top 500";
-
-
-        objaccount.NoOfRow = noOfRows;
+        objaccount.NoOfRow = "";
         objaccount.UserId = txtuserid.Text;
-        DataTable dt = new DataTable();
-        dt = objaccount.getTransactionReportnew(objaccount);
+
+        DataTable dt = objaccount.getTransactionReportnew(objaccount);
+        TransactionData = dt;
+        BindGrid();
+    }
+
+    void BindGrid()
+    {
+        DataTable dt = TransactionData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
     }
 
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
     }
+
     protected void ExportToExcel(object sender, EventArgs e)
     {
+        DataTable dt = TransactionData;
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
+
+        GridView1.AllowPaging = false;
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+
         Response.Clear();
         Response.Buffer = true;
-        Response.AddHeader("content-disposition", "attachment;filename=DownlineReport.xls");
+        Response.AddHeader("content-disposition", "attachment;filename=TransactionReport.xls");
         Response.Charset = "";
         Response.ContentType = "application/vnd.ms-excel";
         using (StringWriter sw = new StringWriter())
         {
             HtmlTextWriter hw = new HtmlTextWriter(sw);
-
-            //To Export all pages
-
 
             GridView1.HeaderRow.BackColor = Color.White;
             foreach (TableCell cell in GridView1.HeaderRow.Cells)
@@ -121,7 +188,6 @@ public partial class admin_UserReport : System.Web.UI.Page
 
             GridView1.RenderControl(hw);
 
-            //style to format numbers to string
             string style = @"<style> .textmode { } </style>";
             Response.Write(style);
             Response.Output.Write(sw.ToString());
@@ -132,11 +198,5 @@ public partial class admin_UserReport : System.Web.UI.Page
 
     public override void VerifyRenderingInServerForm(Control control)
     {
-        /* Verifies that the control is rendered */
-    }   
-    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
-    {
-        GridView1.PageIndex = e.NewPageIndex;
-        loaduser();
     }
 }

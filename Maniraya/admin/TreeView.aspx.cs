@@ -59,6 +59,7 @@ public partial class admin_DownlineReport : System.Web.UI.Page
             dattab = objuser.Find_UserDetail2(objuser).Tables[0];
             Open_Heads(dattab, Account_Chart.Nodes);
             pnllist.Visible = true;
+            treeEmptyState.Visible = false;
         }
         else
         {

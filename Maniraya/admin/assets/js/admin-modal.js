@@ -16,10 +16,8 @@
         window.setTimeout(function () {
             resetBackdrop();
 
-            // Close mobile sidebar so it does not compete with the modal layer
             document.body.classList.remove('admin-sidebar-open');
 
-            // Remove stale modal copies left on body from earlier opens
             $('body > #' + modalId).remove();
 
             var $modal = $('#' + modalId).last();
@@ -31,7 +29,6 @@
                 $modal.data('bs.modal', null);
             }
 
-            // Escape UpdatePanel stacking context — backdrop is on body
             if (!$modal.parent().is('body')) {
                 $modal.appendTo('body');
             }
@@ -70,7 +67,37 @@
         window.showAdminModal('myModal');
     };
 
+    window.showModal1 = function () {
+        window.showAdminModal('DivPhotolarge');
+    };
+
     window.Closepopup = function () {
         window.closeAdminModal('myModal');
     };
+
+    function hookUpdatePanelModals() {
+        if (typeof Sys === 'undefined' || !Sys.WebForms || !Sys.WebForms.PageRequestManager) {
+            return;
+        }
+
+        var prm = Sys.WebForms.PageRequestManager.getInstance();
+        if (prm._adminModalHooked) {
+            return;
+        }
+
+        prm._adminModalHooked = true;
+        prm.add_endRequest(function () {
+            $('.modal.in').each(function () {
+                var $modal = $(this);
+                if (!$modal.parent().is('body')) {
+                    $modal.appendTo('body');
+                }
+            });
+        });
+    }
+
+    $(hookUpdatePanelModals);
+    if (typeof Sys !== 'undefined' && Sys.Application) {
+        Sys.Application.add_load(hookUpdatePanelModals);
+    }
 })(jQuery);

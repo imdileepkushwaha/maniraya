@@ -1,2 +1,9 @@
 .vs/
 PrecompiledWeb/
+
+# Build output (rebuild locally / in CI)
+[Bb]in/[Dd]ebug/
+[Bb]in/[Rr]elease/
+[Oo]bj/
+*.pdb
+*.cache

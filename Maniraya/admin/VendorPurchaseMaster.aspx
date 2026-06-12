@@ -526,17 +526,6 @@
     </asp:UpdatePanel>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
-    <script type="text/javascript">
-        function showModal() {
-            $('#myModal').modal({ backdrop: 'static', keyboard: false })
-        }
-        function Closepopup() {
-            $('#myModal').modal('hide');
-            $('body').removeClass('modal-open');
-            $('body').css('padding-right', '0');
-            $('.modal-backdrop').remove();
-        }
-    </script>
      <script type="text/javascript">
          $('.form_date').datepicker({
              format: 'dd/MM/yyyy',

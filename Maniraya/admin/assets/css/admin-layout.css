@@ -34,6 +34,10 @@
     background: #555;
   }
 
+  .box{
+    padding: 0px!important;
+  }
+
 html,
 body.admin-app {
     margin: 0;
@@ -2304,21 +2308,42 @@ body.admin-app {
 }
 
 .admin-app .content .box .box-body .table>tbody>tr>td[colspan],
-.admin-app .content .table.dataTable>tbody>tr>td[colspan] {
+.admin-app .content .table.dataTable>tbody>tr>td[colspan],
+.admin-app .content .box .box-body .table>tfoot>tr>td,
+.admin-app .content .table.dataTable>tfoot>tr>td {
     padding: 14px 16px !important;
     background: #fafbfc !important;
     border-top: 1px solid #e8edf3 !important;
     text-align: center;
+    font-size: 14px !important;
+    font-weight: 400 !important;
 }
 
 .admin-app .content .box .box-body .table>tbody>tr>td[colspan] table,
-.admin-app .content .table.dataTable>tbody>tr>td[colspan] table {
+.admin-app .content .table.dataTable>tbody>tr>td[colspan] table,
+.admin-app .content .box .box-body .table>tfoot>tr>td table,
+.admin-app .content .table.dataTable>tfoot>tr>td table {
     margin: 0 auto;
     border: none !important;
 }
 
+.admin-app .content .box .box-body .table>tbody>tr>td[colspan] table td,
+.admin-app .content .table.dataTable>tbody>tr>td[colspan] table td,
+.admin-app .content .box .box-body .table>tfoot>tr>td table td,
+.admin-app .content .table.dataTable>tfoot>tr>td table td {
+    padding: 0 3px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    border: none !important;
+    background: transparent !important;
+    vertical-align: middle !important;
+}
+
 .admin-app .content .box .box-body .table>tbody>tr>td[colspan] a,
-.admin-app .content .table.dataTable>tbody>tr>td[colspan] a {
+.admin-app .content .table.dataTable>tbody>tr>td[colspan] a,
+.admin-app .content .box .box-body .table>tfoot>tr>td a,
+.admin-app .content .table.dataTable>tfoot>tr>td a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2327,8 +2352,9 @@ body.admin-app {
     padding: 0 10px;
     margin: 0 2px;
     border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
     color: var(--admin-muted) !important;
     text-decoration: none !important;
     background: #fff;
@@ -2337,14 +2363,19 @@ body.admin-app {
 }
 
 .admin-app .content .box .box-body .table>tbody>tr>td[colspan] a:hover,
-.admin-app .content .table.dataTable>tbody>tr>td[colspan] a:hover {
+.admin-app .content .table.dataTable>tbody>tr>td[colspan] a:hover,
+.admin-app .content .box .box-body .table>tfoot>tr>td a:hover,
+.admin-app .content .table.dataTable>tfoot>tr>td a:hover {
     color: var(--admin-accent) !important;
     border-color: var(--admin-accent-border);
     background: var(--admin-accent-soft);
+    text-decoration: none !important;
 }
 
 .admin-app .content .box .box-body .table>tbody>tr>td[colspan] span,
-.admin-app .content .table.dataTable>tbody>tr>td[colspan] span {
+.admin-app .content .table.dataTable>tbody>tr>td[colspan] span,
+.admin-app .content .box .box-body .table>tfoot>tr>td span,
+.admin-app .content .table.dataTable>tfoot>tr>td span {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2353,8 +2384,9 @@ body.admin-app {
     padding: 0 10px;
     margin: 0 2px;
     border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
     color: #fff !important;
     background: linear-gradient(135deg, #e52d27 0%, #c41e17 100%);
     box-shadow: 0 2px 8px rgba(229, 45, 39, 0.25);
@@ -2523,6 +2555,13 @@ body.admin-app .modal {
     opacity: 1 !important;
 }
 
+body.admin-app > .modal.in .modal-dialog,
+body.admin-app .modal.in .modal-dialog {
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+}
+
 .admin-app .modal.fade .modal-dialog {
     transform: translate(0, 0);
     -webkit-transform: translate(0, 0);
@@ -2663,7 +2702,7 @@ body.admin-app .modal-dialog.modal-lg {
     min-width: 96px;
     padding: 8px 20px;
     border-radius: 10px !important;
-    font-size: 0.9rem;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -3914,5 +3953,809 @@ body.admin-app.modal-open .content-wrapper {
 
     .admin-psc-size-tools {
         justify-content: flex-start;
+    }
+}
+
+/* ── Add User form ── */
+.admin-product-form .admin-input-group .form-control[disabled],
+.admin-product-form .admin-input-group .form-control:disabled {
+    color: #64748b !important;
+    background: #f8fafc !important;
+    cursor: not-allowed;
+}
+
+.admin-user-pin-section {
+    padding: 16px 16px 4px;
+    background: #fafbfc;
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+}
+
+.admin-user-pin-section .admin-form-section-title {
+    margin-top: 0;
+}
+
+.admin-dob-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.admin-dob-grid .admin-input-group .admin-input-icon {
+    display: none;
+}
+
+.admin-dob-grid .admin-input-group:first-child .admin-input-icon {
+    display: inline-flex;
+}
+
+.admin-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+.admin-loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 28px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+}
+
+.admin-loading-spinner span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.admin-otp-status {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    vertical-align: middle;
+}
+
+/* ── User Report page ── */
+.admin-record-filter-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0 !important;
+}
+
+.admin-record-filter-label,
+.admin-record-filter-suffix {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.admin-export-excel-btn {
+    margin-left: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #dfe3ea;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-export-excel-btn:hover {
+    border-color: rgba(21, 128, 61, 0.35);
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.12);
+}
+
+.admin-record-filter {
+    width: auto !important;
+    min-width: 88px;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 4px 10px !important;
+    font-size: 13px !important;
+    font-weight: 600;
+    border: 1px solid #dfe3ea !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+
+.admin-app a.Active,
+.admin-app span.Active,
+.admin-app a.Deactive,
+.admin-app span.Deactive {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    border: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.admin-app a.Active:hover,
+.admin-app a.Deactive:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+    color: #fff !important;
+}
+
+.admin-app a.Active,
+.admin-app span.Active {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.22);
+}
+
+.admin-app a.Deactive,
+.admin-app span.Deactive {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.22);
+}
+
+.admin-app .modal-body.admin-product-form {
+    padding: 18px 20px 8px !important;
+}
+
+.admin-app .modal-body.admin-product-form .form-group {
+    margin-bottom: 14px;
+}
+
+.admin-app .modal-body.admin-product-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Product edit modal — tall scrollable form */
+body.admin-app .modal.in.admin-modal-scrollable {
+    align-items: flex-start;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.admin-app .admin-product-edit-dialog {
+    max-width: 920px;
+    width: 100%;
+}
+
+.admin-app .admin-product-edit-dialog .modal-content {
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-app .admin-product-edit-dialog .modal-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1 1 auto;
+    max-height: calc(100vh - 170px);
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-app .admin-product-edit-dialog .admin-product-image-preview {
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+    background: #f8fafc;
+    display: inline-flex;
+}
+
+.admin-app .admin-product-edit-dialog .admin-product-images-grid--edit {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.admin-app .admin-product-edit-dialog .admin-product-image-slot {
+    padding: 10px;
+}
+
+.admin-app .admin-product-edit-dialog .admin-section-hint {
+    margin: 0 0 14px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.admin-app .admin-product-edit-dialog .admin-product-image-preview-img[style*="display: block"],
+.admin-app .admin-product-edit-dialog img.admin-product-image-preview-img:not([src=""]) {
+    display: block;
+}
+
+@media (max-width: 767px) {
+    .admin-app .admin-product-edit-dialog .admin-product-images-grid--edit {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Vendor edit modal */
+.admin-app .admin-vendor-edit-dialog {
+    max-width: 760px;
+}
+
+.admin-app .admin-vendor-edit-form {
+    font-size: 14px;
+}
+
+.admin-app .admin-vendor-edit-form .form-control {
+    font-size: 14px;
+}
+
+.admin-app .admin-vendor-edit-form .admin-input-group textarea.form-control {
+    min-height: 88px;
+    padding-top: 10px !important;
+    resize: vertical;
+}
+
+.admin-app .admin-vendor-edit-form .admin-input-group .admin-input-icon {
+    align-self: flex-start;
+    margin-top: 10px;
+}
+
+/* Gallery / Slider media upload pages */
+.admin-media-upload-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 320px);
+    gap: 14px;
+}
+
+.admin-app .admin-grid-thumb {
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e8edf3;
+    background: #f8fafc;
+}
+
+.admin-app .admin-grid-action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--admin-accent) !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    background: var(--admin-accent-soft);
+    border: 1px solid var(--admin-accent-border);
+}
+
+.admin-app .admin-grid-action-link:hover,
+.admin-app .admin-grid-action-link:focus {
+    color: #fff !important;
+    background: var(--admin-accent);
+    border-color: var(--admin-accent);
+}
+
+.admin-app .admin-grid-action-cell {
+    white-space: nowrap;
+}
+
+/* Franchisee type master inline edit grid */
+.admin-franchisee-type-form {
+    font-size: 14px;
+    padding-top: 4px !important;
+}
+
+.admin-franchisee-type-intro {
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-app .admin-inline-edit-grid .admin-grid-input {
+    min-height: 40px;
+    font-size: 14px;
+    border-radius: 10px !important;
+    border: 1px solid #dfe3ea !important;
+    box-shadow: none !important;
+}
+
+.admin-app .admin-inline-edit-grid .admin-grid-input:focus {
+    border-color: rgba(229, 45, 39, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(229, 45, 39, 0.1) !important;
+}
+
+.admin-app .admin-inline-edit-grid .admin-grid-index-cell {
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.admin-app .admin-product-edit-dialog .admin-product-editor-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.admin-app .admin-product-edit-dialog .admin-form-section {
+    margin-bottom: 18px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.admin-app .admin-product-edit-dialog .admin-form-section-last {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.admin-app .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+@media (max-width: 767px) {
+    .admin-record-filter-tools {
+        float: none !important;
+        width: 100%;
+        margin-top: 10px !important;
+        justify-content: flex-start;
+    }
+}
+
+/* ── KYC Approval page ── */
+.admin-app span.Approved,
+.admin-app span.Pending,
+.admin-app span.Rejected {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 78px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.admin-app span.Approved {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.22);
+}
+
+.admin-app span.Pending {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.22);
+}
+
+.admin-app span.Rejected {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.22);
+}
+
+.admin-kyc-grid-wrap {
+    overflow-x: auto;
+}
+
+.admin-kyc-grid>tbody>tr>td {
+    vertical-align: middle !important;
+}
+
+.admin-kyc-image-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+}
+
+.admin-kyc-image-cell-dual {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-kyc-thumb {
+    width: 72px !important;
+    height: 72px !important;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-kyc-thumb:hover {
+    transform: scale(1.04);
+    border-color: rgba(229, 45, 39, 0.35);
+    box-shadow: 0 4px 14px rgba(229, 45, 39, 0.14);
+}
+
+.admin-kyc-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 88px;
+}
+
+.admin-kyc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-radius: 8px;
+    border: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.admin-kyc-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    text-decoration: none !important;
+}
+
+.admin-kyc-btn-approve {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    color: #fff !important;
+}
+
+.admin-kyc-btn-reject {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #fff !important;
+}
+
+.admin-kyc-btn-edit {
+    background: #fff;
+    color: #475569 !important;
+    border: 1px solid #dfe3ea !important;
+}
+
+.admin-kyc-btn-edit:hover {
+    color: var(--admin-accent) !important;
+    border-color: rgba(229, 45, 39, 0.35) !important;
+    background: rgba(229, 45, 39, 0.04);
+}
+
+.admin-kyc-preview-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px !important;
+    background: #f8fafc;
+}
+
+.admin-kyc-preview-img {
+    display: block;
+    max-width: 100%;
+    max-height: 72vh;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+    background: #fff;
+}
+
+.admin-grid-subtext {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    line-height: 1.2;
+}
+
+.admin-amount-highlight {
+    font-weight: 700 !important;
+    color: #15803d !important;
+}
+
+/* ── Tree View page ── */
+.admin-tree-wrap {
+    padding: 18px 20px;
+    background: linear-gradient(145deg, #fafbfc 0%, #ffffff 100%);
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.admin-app .admin-treeview {
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #334155;
+}
+
+.admin-app .admin-treeview table {
+    border: none !important;
+}
+
+.admin-app .admin-treeview td {
+    padding: 4px 0 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    border: none !important;
+    background: transparent !important;
+    vertical-align: middle !important;
+}
+
+.admin-app .admin-treeview a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.admin-app .admin-treeview a:hover {
+    color: var(--admin-accent) !important;
+    background: var(--admin-accent-soft);
+    text-decoration: none !important;
+}
+
+.admin-tree-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 180px;
+    padding: 28px 20px;
+    text-align: center;
+    background: #fafbfc;
+    border: 1px dashed #d7dee8;
+    border-radius: 12px;
+}
+
+.admin-tree-empty i {
+    font-size: 36px;
+    color: #cbd5e1;
+}
+
+.admin-tree-empty p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Franchisee add wizard */
+.admin-franchisee-wizard-form {
+    font-size: 14px;
+}
+
+.admin-franchisee-wizard-form .admin-input-group textarea.form-control {
+    min-height: 88px;
+    padding-top: 10px !important;
+    resize: vertical;
+}
+
+.admin-franchisee-wizard-form .admin-input-group .admin-input-icon {
+    /* align-self: flex-start;
+    margin-top: 10px; */
+}
+
+.admin-franchisee-wizard-intro {
+    margin: 0 0 20px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-wizard-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.admin-wizard-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 150px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-wizard-step:hover {
+    border-color: rgba(229, 45, 39, 0.25);
+    color: #334155;
+}
+
+.admin-wizard-step.is-active {
+    color: #b91c1c;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+    border-color: rgba(229, 45, 39, 0.35);
+    box-shadow: 0 0 0 1px rgba(229, 45, 39, 0.06);
+}
+
+.admin-wizard-step.is-complete {
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.25);
+    background: #f6fff9;
+}
+
+.admin-wizard-step-no {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.admin-wizard-step.is-active .admin-wizard-step-no {
+    background: var(--admin-accent);
+    color: #fff;
+}
+
+.admin-wizard-step.is-complete .admin-wizard-step-no {
+    background: #15803d;
+    color: #fff;
+}
+
+.admin-wizard-step-label {
+    line-height: 1.3;
+}
+
+.admin-wizard-panel {
+    display: none;
+}
+
+.admin-wizard-panel.is-active {
+    display: block;
+}
+
+.admin-wizard-footer {
+    justify-content: flex-end;
+}
+
+.admin-doc-upload-card {
+    height: 100%;
+    padding: 14px;
+    background: #fafbfc;
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+}
+
+.admin-doc-upload-title {
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.admin-doc-preview-wrap {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.admin-doc-preview-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.admin-doc-preview-thumb {
+    width: 100px !important;
+    height: 100px !important;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e8edf3;
+    background: #fff;
+}
+
+.admin-doc-preview-large {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+.admin-app .admin-franchisee-edit-dialog {
+    max-width: 860px;
+}
+
+.admin-app .admin-franchisee-edit-dialog .modal-body {
+    max-height: calc(100vh - 170px);
+}
+
+@media (max-width: 767px) {
+    .admin-wizard-step {
+        flex: 1 1 100%;
+    }
+}
+
+/* Franchisee purchase master */
+.admin-purchase-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px 16px;
+}
+
+.admin-app .admin-purchase-edit-dialog {
+    max-width: 760px;
+}
+
+.admin-app .admin-purchase-edit-dialog .modal-body {
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+}
+
+@media (max-width: 991px) {
+    .admin-purchase-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575px) {
+    .admin-purchase-summary-grid {
+        grid-template-columns: 1fr;
     }
 }
