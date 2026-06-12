@@ -1,4 +1,5 @@
 ﻿using BusinessLogicTier;
+using DataTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,6 +11,7 @@ using System.Web.UI.WebControls;
 public partial class admin_StateAdd : System.Web.UI.Page
 {
     clsState objState = new clsState();
+    Data objData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -17,6 +19,7 @@ public partial class admin_StateAdd : System.Web.UI.Page
             if (Session["useradmin"] != null)
             {
                 loadcountry();
+                loadcountryedit();
                 loadstate();
             }
             else
@@ -37,6 +40,19 @@ public partial class admin_StateAdd : System.Web.UI.Page
         ListItem li = new ListItem("Select Country", "0");
         ddcountry.Items.Insert(0, li);
     }
+
+    void loadcountryedit()
+    {
+        ddcountryedit.Items.Clear();
+        DataTable dt = objState.getCountry();
+        ddcountryedit.DataSource = dt;
+        ddcountryedit.DataTextField = "CountryName";
+        ddcountryedit.DataValueField = "CountryID";
+        ddcountryedit.DataBind();
+        ListItem li = new ListItem("Select Country", "0");
+        ddcountryedit.Items.Insert(0, li);
+    }
+
     void loadstate()
     {
         DataTable dt = new DataTable();
@@ -54,7 +70,7 @@ public partial class admin_StateAdd : System.Web.UI.Page
         {
             string popupScript = "alert('State Edited Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            string popupScript2 = "Closepopup();";
+            string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loadstate();
         }
@@ -69,7 +85,9 @@ public partial class admin_StateAdd : System.Web.UI.Page
         {
             string popupScript = "alert('State Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            txtstatename.Text = ""; ddcountry.SelectedValue = "0";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addStateModal');", true);
+            txtstatename.Text = "";
+            ddcountry.SelectedIndex = 0;
             loadstate();
         }
         else
@@ -94,7 +112,56 @@ public partial class admin_StateAdd : System.Web.UI.Page
             Label lblstatename = (Label)GridView1.Rows[index].FindControl("lblstatename");
             lblstateid.Text = lblid.Text;
             txtstatenameedit.Text = lblstatename.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+
+            string countryId = GetCountryIdByStateId(lblid.Text);
+            if (!string.IsNullOrEmpty(countryId))
+            {
+                ListItem countryItem = ddcountryedit.Items.FindByValue(countryId);
+                if (countryItem != null)
+                {
+                    ddcountryedit.SelectedValue = countryId;
+                }
+            }
+
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
         }
+    }
+
+    string GetCountryIdByStateId(string stateId)
+    {
+        if (string.IsNullOrEmpty(stateId))
+        {
+            return "";
+        }
+
+        string countryId = "";
+        DataTable dt = null;
+        objData.StartConnection();
+        try
+        {
+            dt = objData.RunDataTable("select countryid from statemaster where stateid='" + stateId + "'");
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DataRow row = dt.Rows[0];
+                if (row.Table.Columns.Contains("countryid"))
+                {
+                    countryId = row["countryid"].ToString();
+                }
+                else if (row.Table.Columns.Contains("CountryID"))
+                {
+                    countryId = row["CountryID"].ToString();
+                }
+                else
+                {
+                    countryId = row[0].ToString();
+                }
+            }
+        }
+        catch
+        {
+            countryId = "";
+        }
+        objData.EndConnection();
+        return countryId;
     }
 }

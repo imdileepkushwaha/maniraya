@@ -41,7 +41,7 @@ public partial class admin_BankAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Bank Edited Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            string popupScript2 = "Closepopup();";
+            string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loaddata();
         }
@@ -55,6 +55,7 @@ public partial class admin_BankAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Bank Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addBankModal');", true);
             txtbankname.Text = "";
             loaddata();
         }
@@ -80,7 +81,7 @@ public partial class admin_BankAdd : System.Web.UI.Page
             Label lblbankname = (Label)GridView1.Rows[index].FindControl("lblbankname");
             lblbankid.Text = lblid.Text;
             txtbanknameedit.Text = lblbankname.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
         }
     }
 }

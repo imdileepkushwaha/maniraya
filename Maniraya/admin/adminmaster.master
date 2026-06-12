@@ -69,1376 +69,236 @@
     </style>
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=30" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
 <%--<body class="hold-transition skin-blue sidebar-mini" style="background-color: #278BCE;">--%>
     <%--<body class="hold-transition skin-blue sidebar-mini" style="background-color: #fff;">--%>
-    <body sarah-navigation-type="horizontal" sarah-nav-placement="left" theme-layout="wide-layout" theme-bg="bg1">
+        <body class="admin-app">
     <form id="form1" runat="server">
-        
-        <div id="sarahapp-wrapper" class="sarah-hide-lpanel compact-hmenu" sarah-device-type="desktop">
-
-        <%--<header class="main-header" id="sarah-header" sarah-lpanel-effect="shrink" style="z-index:99999 !important;" sarah-color-type="logo-bg7">--%>
-        <header id="sarah-header" sarah-lpanel-effect="shrink" style="z-index:99999 !important;" sarah-color-type="logo-bg7">
-            <div class="sarah-left-header hidden-xs">
-                <a href="#"><span><%= clsUtility.ProjectName %></span></a>
-                <%--<span class="sarah-sidebar-toggle"><a href="#"></a></span>--%>
-            </div>
-            <div class="sarah-left-header hidden-sm hidden-md hidden-lg">
-                
-
-                <%--<span class="sarah-sidebar-toggle"><a href="#"></a></span>--%>
-            </div>
-            <!-- Logo -->
-            <%--<a href="../index2.html" class="logo">
-                <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini"><b>U M</b></span>
-                <!-- logo for regular state and mobile devices -->
-                <span class="logo-lg"><b>Arsen Business Solutions</b></span>
-            </a>
-            <!-- Header Navbar: style can be found in header.less -->
-            <nav class="navbar navbar-static-top">
-                <!-- Sidebar toggle button-->
-                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a>
-
-            </nav>--%>
-            <div class="sarah-right-header" sarah-position-type="relative" >
-                <%--<span class="sarah-sidebar-toggle"><a href="#"></a></span>--%>
-
-                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a>
-
-                <ul class="right-navbar">
-					<li class="dropdown sarah-rheader-submenu sarah-header-profile">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span><img src="img/default.png" class="user-image img-circle" alt="User Image" /></span>
-                            <asp:Label ID="LblUsernameSideMenu" Font-Bold="true" runat="server" Text="" class="hidden-xs"></asp:Label> <i class=" fa fa-angle-down"></i></span>
-
-                            
-                                
-						</a> 
-						<ul class="dropdown-menu ">
-							<li><a href="CHangePassword.aspx"><i class="fa fa-key"></i>Change password</a></li>
-							<li><a href="logout.aspx"><i class="fa fa-power-off"></i>Logout</a></li>
-						</ul>
-					</li>
-				</ul>
-
-
-                    <%--<ul class="nav navbar-nav">
-
-
-
-
-
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="img/default.png" class="user-image" alt="User Image" />
-                                <asp:Label ID="LblUsernameSideMenu" runat="server" Text="" class="hidden-xs"></asp:Label>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <!-- User image -->
-                                <li class="user-header">
-                                    <img src="img/default.png" class="img-circle" alt="User Image" />
-
-                                    <p>
-                                        <asp:Label ID="LblFullname" runat="server" Text=""></asp:Label>
-                                        <small></small>
-                                    </p>
-                                </li>
-                                <!-- Menu Body -->
-
-                                <!-- Menu Footer-->
-                                <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="CHangePassword.aspx" class="btn btn-default btn-flat">Change password</a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="logout.aspx" class="btn btn-default btn-flat">Sign out</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <!-- Control Sidebar Toggle Button -->
-
-                    </ul>--%>
+        <div id="adminSidebarOverlay" class="admin-sidebar-overlay"></div>
+        <div class="admin-app-shell">
+            <aside class="admin-sidebar" id="adminSidebar">
+                <div class="admin-sidebar-brand">
+                    <a href="Dashboard.aspx">
+                        <img src="../user/img/logo.png" alt="" />
+                        <%--<span><%= clsUtility.ProjectName %></span>--%>
+                    </a>
                 </div>
-        </header>
-
-            
-
-        <div id="sarahapp-container" sarah-color-type="lpanel-bg2" sarah-lpanel-effect="shrink">
-            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+                <div class="admin-sidebar-user">
+                    <img src="img/default.png" alt="" />
+                    <div>
+                        <span class="admin-sidebar-user-label">Logged in as</span>
+                        <asp:Label ID="LblMainId" runat="server" CssClass="admin-sidebar-user-name" Text=""></asp:Label>
+                    </div>
                 </div>
-                <div class="collapse navbar-collapse">
+                <nav class="admin-sidebar-body">
+                    <div class="admin-sidebar-nav-head">
+                        <div class="admin-sidebar-nav-head-text">
+                            <span class="admin-sidebar-nav-eyebrow">Browse</span>
+                            <strong>Navigation</strong>
+                        </div>
+                        <span class="admin-sidebar-nav-chip">Admin</span>
+                    </div>
+                    <div class="admin-sidebar-menu-panel">
                     <asp:Panel ID="paneladmin2" runat="server">
-                    <ul class="nav navbar-nav">
+                        <ul class="admin-side-menu">
+                            <li class="admin-side-section">Main</li>
+                            <li><a href="Dashboard.aspx" class="admin-side-link"><i class="fa fa-tachometer admin-side-icon"></i> Dashboard</a></li>
 
-                        <li class="active"><a href="Dashboard.aspx">Dashboard</a></li>
-
-                         <%--<li class="dropdown dropdown-large">
-				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>				
-				            <ul class="dropdown-menu dropdown-menu-large row">
-					            <li class="col-sm-3">
-						            <ul>
-							            <li class="dropdown-header">Glyphicons</li>
-							            <li><a href="#">Available glyphs</a></li>
-							            <li class="disabled"><a href="#">How to use</a></li>
-							            <li><a href="#">Examples</a></li>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">Dropdowns</li>
-							            <li><a href="#">Example</a></li>
-							            <li><a href="#">Aligninment options</a></li>
-							            <li><a href="#">Headers</a></li>
-							            <li><a href="#">Disabled menu items</a></li>
-						            </ul>
-					            </li>
-					            <li class="col-sm-3">
-						            <ul>
-							            <li class="dropdown-header">Button groups</li>
-							            <li><a href="#">Basic example</a></li>
-							            <li><a href="#">Button toolbar</a></li>
-							            <li><a href="#">Sizing</a></li>
-							            <li><a href="#">Nesting</a></li>
-							            <li><a href="#">Vertical variation</a></li>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">Button dropdowns</li>
-							            <li><a href="#">Single button dropdowns</a></li>
-						            </ul>
-					            </li>
-					            <li class="col-sm-3">
-						            <ul>
-							            <li class="dropdown-header">Input groups</li>
-							            <li><a href="#">Basic example</a></li>
-							            <li><a href="#">Sizing</a></li>
-							            <li><a href="#">Checkboxes and radio addons</a></li>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">Navs</li>
-							            <li><a href="#">Tabs</a></li>
-							            <li><a href="#">Pills</a></li>
-							            <li><a href="#">Justified</a></li>
-						            </ul>
-					            </li>
-					            <li class="col-sm-3">
-						            <ul>
-							            <li class="dropdown-header">Navbar</li>
-							            <li><a href="#">Default navbar</a></li>
-							            <li><a href="#">Buttons</a></li>
-							            <li><a href="#">Text</a></li>
-							            <li><a href="#">Non-nav links</a></li>
-							            <li><a href="#">Component alignment</a></li>
-							            <li><a href="#">Fixed to top</a></li>
-							            <li><a href="#">Fixed to bottom</a></li>
-							            <li><a href="#">Static top</a></li>
-							            <li><a href="#">Inverted navbar</a></li>
-						            </ul>
-					            </li>
-				            </ul>				
-			            </li>--%>
-
-                        <li class="dropdown dropdown-large">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Utility Management <b class="caret"></b></a>
-
-                            <%--<ul class="dropdown-menu">
-                                <li><a href="CountryAdd.aspx">Add Country</a></li>
-                                <li class="divider"></li>
-                                <li><a href="StateAdd.aspx">Add State</a></li>
-                                <li class="divider"></li>
-                                <li><a href="CityAdd.aspx">Add City</a></li>
-                                <li class="divider"></li>
-                                <li><a href="BankAdd.aspx">Add Bank</a></li>
-                                <li class="divider"></li>
-                                <li><a href="BankAccountAdd.aspx">Add Account Add</a></li>
-                                <li class="divider"></li>
-                                <li><a href="LevelMaster.aspx">Level Master</a></li>
-                                <li class="divider"></li>
-                                <li><a href="JoiningPlanAdd.aspx">Plan Master</a></li>
-                                <li class="divider"></li>
-                                <li><a href="FranchiseeCommission.aspx">Franchisee Commission</a></li>
-                                <li class="divider"></li>
-                                <li><a href="mobileChangeChargeMaster.aspx">Mobile No. Change Charge Master</a></li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">News <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="NewsAdd.aspx">News Add</a></li>
-                                    </ul>
-                                </li>
-                            </ul>--%>
-                            <ul class="dropdown-menu dropdown-menu-large row">
-					            <li class="col-sm-12">
-						            <ul>
-							            <li class="dropdown-header">Utility Management</li>
-							            <li><a href="CountryAdd.aspx">Add Country</a></li>
-							            <li><a href="StateAdd.aspx">Add State</a></li>
-							            <li><a href="CityAdd.aspx">Add City</a></li>
-                                     <%--    <li><a href="TehsilAdd.aspx">Add Tehsil</a></li>
-                                         <li><a href="MarketAdd.aspx">Add Market</a></li>--%>
-							            <li><a href="BankAdd.aspx">Add Bank</a></li>
-							            <li><a href="BankAccountAdd.aspx">Bank Account Add</a></li>
-                                        <%-- <li><a href="JoiningPlanAdd.aspx">Plan Master</a></li>   --%> 
-                                          <%--   <li><a href="AwardMaster.aspx">Award Master</a></li>                             
-                                         <li><a href="SalesLevelMaster.aspx">Repurchase Bonus Master</a></li>  --%>
-                                          <li><a href="deductioncharge.aspx">Deduction Master</a></li>  
-                                     <li class="divider"></li>
-							            <li class="dropdown-header">News</li>
-							            <li><a href="NewsAdd.aspx">News Add</a></li>
-                                         <li class="divider"></li>
-                                      
-                                                                                  
-                                    </ul>
-                                </li>                             
-                            </ul>
-                        </li>
-
-                        <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Franchisee Master <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                  <li><a href="FranchiseetypeMaster.aspx">Franchisee Type Master</a></li>
-                               <li><a href="franchiseeAdd.aspx">Franchisee Add</a></li>
-                                <li><a href="FranchiseeReport.aspx">Franchisee Report</a></li>
-                              <%--  <li><a href="kycApprovalForFranchisee.aspx">Approve KYC</a></li>--%>
-							    <li><a href="FranchiseePurchaseMaster.aspx">Product Purchase</a></li>
-                                <li><a href="FranchiseePurchaseDetail.aspx">Product Purchase Report</a></li>
-                                <li><a href="FranchiseeStockDetail.aspx">Stock Details</a></li>
-                              <%--  <li><a href="PurchaseReport.aspx">Purchase Report</a></li>--%>
-                                 <%--  <li><a href="FranchiseePvReport.aspx">PV Report</a></li>--%>
-                            </ul>
-                        </li>
-                        <%--<li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Money Transfer <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="DMRCommissionAdd.aspx">DMR Commission</a></li>
-                                <li class="divider"></li>
-                                <li><a href="MoneyTransferReport.aspx">Money Transfer Report</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">DTH Subcription <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="SetTopBoxMaster.aspx">Settop Box Master</a></li>
-                                <li class="divider"></li>
-                                <li><a href="Packagemaster.aspx">Package Master</a></li>
-                                <li class="divider"></li>
-                                <li><a href="DTHBookingCommissionAdd.aspx">DTH Commission</a></li>
-                            </ul>
-                        </li>--%>
-
-                              <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Website Management <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="AddSlider.aspx">Add Slider</a></li>
-                                <li><a href="AddGalleryImage.aspx">Add Gallery Image</a></li>
-                            </ul>
-                        </li>
-
-                            <li stye="display:none;">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">All Income User Reports <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="UserLevelIncomeReport.aspx">Level Income Report</a></li>
-                                <li><a href="UserDirectIncomeReport.aspx">Direct Income Report</a></li>
-                                <li><a href="UserAutoPoolIncomeReport.aspx">AutoPool Income Report</a></li>                                
-                                <li><a href="UserDailyIncomeReport.aspx">Daily Income Report</a></li>                                
-                                <li><a href="UserDailyLevelIncomeReport.aspx">Daily Level Income Report</a></li>
-                            </ul>
-                        </li>
-
-                        <li style="display:none">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">E-Pin Management <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="EPinAdd.aspx">Generate E-Pin</a></li>                                
-                                <li><a href="EPinReport.aspx">E-Pin Report</a></li> 
-                                <li><a href="PinRequestReport.aspx">E-Pin Request Report</a></li>                              
-                                <li><a href="EPinTransfer.aspx">E-Pin Transfer</a></li>                               
-                                <li><a href="ActivateUserWithEpin.aspx">Activate User With e-pin</a></li>
-                             <%--   <li><a href="UpgradeUserWithEpin.aspx">Upgrade User With e-pin</a></li>--%>
-
-                                
-                            </ul>
-                        </li>
-
-                         <li style="display:none">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Topup Management <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="TopupRequestReport.aspx">Topup Request Report</a></li>                                
-                              <%--  <li><a href="EPinReport.aspx">E-Pin Report</a></li> 
-                                <li><a href="PinRequestReport.aspx">E-Pin Request Report</a></li>                              
-                                <li><a href="EPinTransfer.aspx">E-Pin Transfer</a></li>                               
-                                <li><a href="ActivateUserWithEpin.aspx">Activate User With e-pin</a></li>--%>
-                             <%--   <li><a href="UpgradeUserWithEpin.aspx">Upgrade User With e-pin</a></li>--%>
-
-                                
-                            </ul>
-                        </li>
-                        
-                       
-                        <li class="dropdown dropdown-large" style="display:none;">
-				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Recharge <b class="caret"></b></a>				
-				            <ul class="dropdown-menu dropdown-menu-large row">
-					            <li class="col-sm-12">
-						            <ul>
-							            <li class="dropdown-header">Recharge</li>
-							            <li><a href="RechargeCommission.aspx">Recharge Commission</a></li>
-							          <%--  <li><a href="Recharge.aspx">Recharge</a></li>--%>
-							            <li><a href="RechargeReport.aspx">Recharge Report</a></li>
-                                          <li><a href="PendingReport.aspx">Pending Report</a></li>
-						            </ul>
-					            </li>
-					         <%--   <li class="col-sm-4">
-						            <ul>
-							            <li class="dropdown-header">Money Transfer</li>
-							            <li><a href="DMRCommissionAdd.aspx">DMR Commission</a></li>
-							            <li><a href="MoneyTransferReport.aspx">Money Transfer Report</a></li>
-						            </ul>
-					            </li>--%>
-					          <%--  <li class="col-sm-4">
-						            <ul>
-							            <li class="dropdown-header">DTH Subscription</li>
-                                        <li><a href="DTHOperatorStatusEdit.aspx">Operator Status</a></li>
-							            <li><a href="SetTopBoxMaster.aspx">Settop Box Master</a></li>
-							            <li><a href="Packagemaster.aspx">Package Master</a></li>
-							            <li><a href="DTHBookingCommissionAdd.aspx">DTH Commission</a></li>
-                                          <li><a href="DHTBookingdetailaspx.aspx">DTH Booking Details</a></li>
-                                        <li><a href="DisputeRequest.aspx">Dispute Details</a></li>
-						            </ul>
-					            </li>--%>
-					           
-				            </ul>				
-			            </li>
-                         <li class="dropdown dropdown-large">
-				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product Management <b class="caret"></b></a>				
-				            
-                             <ul class="dropdown-menu dropdown-menu-large row">
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Product</li>
-							            <li><a href="CategoryAdd.aspx">Add Category</a></li>
-                                          <li><a href="SubcategoryAdd.aspx">Add Sub-Category</a></li>
-                                           <li><a href="SizeAdd.aspx">Add Size</a></li>
-                                           <li><a href="ColorAdd.aspx">Add Color</a></li>
-                                           <li><a href="#">Subcategory Setting</a></li>
-							            <li><a href="ProductAdd.aspx">Add Product</a></li>
-							            <li><a href="ProductDetails.aspx">Product Details</a></li>
-                                        <li><a href="ChangeProductStatus.aspx">Change Status</a></li>
-                                        <li><a href="StockReport.aspx">Stock Report</a></li>
-						                 <%-- <li class="divider"></li>
-                                         <li class="dropdown-header">Purchase</li>
-                               <li><a href="PurchaseReport.aspx">Purchase Report</a></li>
-							            <li><a href="PurchaseProductQuantity.aspx">Purchase Product</a></li>--%>
-                                   <li class="divider"></li>
-                                   
-							            <li class="dropdown-header">Vendor</li>
-							            <li><a href="VendorMaster.aspx">Vendor Master</a></li>
-                                        <li><a href="VendorPurchaseMaster.aspx">Stock Purchase</a></li>
-                                        <li><a href="VendorPurchaseDetail.aspx">Purchase Details</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-				
-			            </li>
-                          <li class="dropdown dropdown-large" style="display:none;">
-				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">E-Pin <b class="caret"></b></a>				
-				            <ul class="dropdown-menu dropdown-menu-large row">
-					            <li class="col-sm-12">
-						            <ul>							          
-							            <li><a href="EPinAdd.aspx">Generate E-Pin</a></li>
-							            <li><a href="EPinReport.aspx">E-Pin Report</a></li>
-							            <li><a href="EPinTransfer.aspx">E-Pin Transfer</a></li>
-						            </ul>
-					            </li>
-					           
-					           
-					           
-				            </ul>				
-			            </li>
-
-                        <li class="dropdown dropdown-large">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Network <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                <li><a href="UserAdd.aspx">Add User</a></li>
-                                <li><a href="UserReport.aspx">User Report</a></li>
-                                 <%--<li><a href="GroupReport.aspx">Group Report</a></li>--%>
-                                <li><a href="kycApprovalForUser.aspx">Approve KYC</a></li>
-                                <li><a href="DownlineReport.aspx">Downline Report</a></li>
-                               <%-- <li><a href="UserPermissiom.aspx">User Permission</a></li>
-                                <li><a href="account_ledger.aspx">Ledger Report</a></li>--%>
-                                <li><a href="treeview.aspx">Treeview Report</a></li>
-                               <%-- <li><a href="BinaryReport.aspx">Binary Chart</a></li>--%>
-                                 <%--   <li><a href="UserPvReport.aspx">Purchase PV Report</a></li>
-                                <li><a href="UserReferalPvReport.aspx">Referal PV Report</a></li>--%>
-                            </ul>
-                        </li>
-                        <li class="dropdown dropdown-large">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Accounts <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                  
-                                    <%--  <li><a href="LuckyDrawClosingReport.aspx">Group Closing Report</a></li>
-                                   <li><a href="GroupIncomeReport.aspx">Group Income Report</a></li>
-                                <li><a href="GiftBalanceReport.aspx.">ROI Income Report</a></li>
-                                   <li><a href="LevelIncomeReport.aspx">Level Report</a></li>--%>
-                                 <li><a href="TransactionReport.aspx">Transaction Report</a></li>
-                                  <li><a href="Dailypayoutdetail.aspx">Daily Closing Report</a></li>
-                           <%--     <li><a href="businessSummary.aspx">Buissness Summary</a></li>--%>
-                              <%--   <li><a href="SettlementReport.aspx">Settlement Report</a></li>--%>
-                            </ul>
-                        </li>
-                        <li class="dropdown dropdown-large" style="display:none;" >
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Fund Request <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                <li class="col-sm-6">
-                                    <ul>
-							            <li class="dropdown-header">User Deposit Request</li>
-							            <li><a href="DepositRequestReport.aspx">Deposit Request Report</a></li>
-							            <%--<li><a href="DepositRequstAdd.aspx">Direct Fund Request</a></li>--%>							      
-                                      <%--  <li class="dropdown-header">Franchisee Fund Request</li>
-                                        <li><a href="franchiseeDepositRequestReport.aspx">Fund Request Report</a></li>
-                                        <li><a href="franchiseeDepositRequstAdd.aspx">Direct Fund Request </a></li>
-                                        <li class="dropdown-header">All Fund Request</li>
-                                        <li><a href="fundTransferReceiveReport.aspx">All Fund Transfer & Receive Report</a></li>--%>
-						            </ul>
-                                </li>
-                                 
-                                <li class="col-sm-6">
-                                    <ul>
-							            <li class="dropdown-header">User Withdrawl Request</li>
-							            <li><a href="WithdrawlRequestReport.aspx">Withdrawl Request Report</a></li>
-							          <%--  <li><a href="WithdrawlRequstAdd.aspx">Direct Withdrawl Retailer</a></li>--%>
-							          <%--  <li class="dropdown-header">Franchisee Withdrawl Request</li>
-                                        <li><a href="franchiseeWithdrawlRequestReport.aspx">Withdrawl Request Report</a></li>
-							            <li><a href="DirectWithdrawlForFrachisee.aspx">Direct Withdrawl Request</a></li>--%>
-                                    </ul>
-                                </li>
-                                <%--<li class="col-sm-6">
-                                    <ul>
-                                        <li class="dropdown-header">Fund Request</li>
-							            <li><a href="DepositRequestReport.aspx">User Fund Request</a></li>
-							            <li><a href="franchiseeDepositRequestReport.aspx">Direct Fund Request Retailer</a></li>
-							            <li><a href="DepositRequstAdd.aspx">Direct Fund Request Retailer</a></li>
-							            <li><a href="franchiseeDepositRequstAdd.aspx">Direct Fund Request Franchisee</a></li>
-                                    </ul>
-                                    <%--<a href="#" class="dropdown-toggle" data-toggle="dropdown">Fund Request <b class="caret"></b></a>--%>
-                                    <%--<ul class="dropdown-menu dropdown-menu-large row">
-                                        <li><a href="DepositRequestReport.aspx">User Fund Request</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="franchiseeDepositRequestReport.aspx">Direct Fund Request Retailer</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="DepositRequstAdd.aspx">Direct Fund Request Retailer</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="franchiseeDepositRequstAdd.aspx">Direct Fund Request Franchisee</a></li>
-                                    </ul>--% >
-                                </li>
-                                <%--<li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Withdrawl <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="WithdrawlRequestReport.aspx">User Withdrawl Request</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="franchiseeWithdrawlRequestReport.aspx">Franchisee Withdrawl Request</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="WithdrawlRequstAdd.aspx">Direct Withdrawl Retailer</a></li>
-                                    </ul>
-                                </li>--%>
-                            </ul>
-                        </li>
-                        <li class="dropdown dropdown-large" style="display:none;">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Closing <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Closing</li>
-							            <li><a href="Dailypayoutdetail.aspx">Binary Closing </a></li>
-							           <%-- <li><a href="AwardUserReport.aspx">Award Closing </a></li>--%>
-                                         <li><a href="RoyalityincomeReport.aspx">Royality Closing</a></li>
-                                        
-						            </ul>
-                                </li>
-                                   <li class="divider"></li>
-                                   <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Corecommitte Closing</li>
-							            <li><a href="CoreCommitteeClosing.aspx">Generate Closing </a></li>
-							            <li><a href="CoreCommitteeClosingReport.aspx">Closing Report </a></li>
-                                          <li><a href="CoreCommitteePayout.aspx">Pay Payout </a></li>
-						            </ul>
-                                </li>
-                                <%--  <li class="divider"></li>
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Referal/Repurchase Closing</li>
-							            <li><a href="CalculateReferalClosing.aspx">Generate Closing </a></li>
-							            <li><a href="ClosingReferalRepurchaseReport.aspx">Closing Report </a></li>
-                                          <li><a href="TransferReferalRepurchase.aspx">Pay Payout </a></li>
-						            </ul>
-                                </li>--%>
-                                <%--   <li class="divider"></li>
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Repurchase Closing</li>
-							            <li><a href="CalculateRepurchaseClosing.aspx">Generate Closing </a></li>
-							            <li><a href="ClosingRepurchaseReport.aspx">Closing Report </a></li>
-                                      <li><a href="SalesBonusTransfer.aspx">Incentive Transfer</a></li>
-                                    </ul>
-                                </li>--%>
-                                 <%--  <li class="divider"></li>
-                                  <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Award Closing</li>
-							            <li><a href="ClosingAward.aspx">Closing Report </a></li>
-							         
-                                    </ul>
-                                </li>--%>
-                                
-                            </ul>
-
-                            <%--<ul class="dropdown-menu">
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Refer Closing <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="CalculateClosing.aspx">Generate Joining Closing </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="ClosingREport.aspx">Closing Report </a></li>
-                                    </ul>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sales Closing <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="CalculateRepurchaseClosing.aspx">Generate Repurchase Closing </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="ClosingRepurchaseReport.aspx">Closing Report </a></li>
-                                    </ul>
-                                </li>
-                            </ul>--%>
-                        </li>
-                        <li class="dropdown dropdown-large" style="display:none;">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Customer Care <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Customer Care</li>
-							            <li><a href="NewMessageAdmin.aspx">Compose Mail </a></li>
-							            <li><a href="InboxAdmin.aspx">Inbox </a></li>
-							            <li><a href="SentboxAdmin.aspx">Sent Mail </a></li>
-							         <%--   <li><a href="sendCustomMessage.aspx">Send Custom Message </a></li>--%>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">Tools</li>
-							            <li><a href="AdminDownload.aspx">Download </a></li>
-						            </ul>
-                                </li>
-                                <%--<li><a href="NewMessageAdmin.aspx">Compose Mail</a></li>
-                                <li class="divider"></li>
-                                <li><a href="InboxAdmin.aspx">Inbox</a></li>
-                                <li class="divider"></li>
-                                <li><a href="SentboxAdmin.aspx">Sent Mail</a></li>
-                                <li class="divider"></li>
-                                <li><a href="sendCustomMessage.aspx">Send Custom Message</a></li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="AdminDownload.aspx">Download </a></li>
-                                    </ul>
-                                </li>--%>
-                            </ul>
-                        </li>
-                        <li class="dropdown dropdown-large" style="display:none;">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Setting <b class="caret"></b></a>
-
-                             <ul class="dropdown-menu dropdown-menu-large row">
-                                <li class="col-sm-12">
-                                    <ul>
-							            <li class="dropdown-header">Operator Management</li>
-							            <li><a href="OperatorAdd.aspx">Add Operator </a></li>
-							            <li><a href="OperatorAPICodeEdit.aspx">Edit API Operator Code </a></li>
-							            <li><a href="OperatorAccountAdd.aspx">Add Operator Account </a></li>
-                                        <li><a href="NumberList.aspx">Operator Series </a></li>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">API Management</li>
-							            <li><a href="APISMS.aspx">SMS API </a></li>
-							            <li><a href="APIRecharge.aspx">Recharge API </a></li>
-							            <li><a href="APISwitching.aspx">API Switching </a></li>
-							            <li><a href="APIComission.aspx">API Commission </a></li>
-							            <li class="divider"></li>
-							            <li class="dropdown-header">Admin Setting</li>
-							            <li><a href="IPAdd.aspx">Add IP </a></li>
-							            <li><a href="SystemSetting.aspx">System Setting </a></li>
-							            <li><a href="MessageSetting.aspx">Message Setting </a></li>
-						            </ul>
-                                </li>
-                                <%--<li class="col-sm-4">
-                                    <ul>
-							            <li class="dropdown-header">API Management</li>
-							            <li><a href="APISMS.aspx">SMS API </a></li>
-							            <li><a href="APIRecharge.aspx">Recharge API </a></li>
-							            <li><a href="APISwitching.aspx">API Switching </a></li>
-							            <li><a href="APIComission.aspx">API Commission </a></li>
-						            </ul>
-                                </li>
-                                <li class="col-sm-4">
-                                    <ul>
-							            <li class="dropdown-header">Admin Setting</li>
-							            <li><a href="IPAdd.aspx">Add IP </a></li>
-							            <li><a href="SystemSetting.aspx">System Setting </a></li>
-							            <li><a href="MessageSetting.aspx">Message Setting </a></li>
-						            </ul>
-                                </li>--%>
-                             </ul>
-
-                            <%--<ul class="dropdown-menu">
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Operator Management <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="OperatorAdd.aspx">Add Operator </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="OperatorAPICodeEdit.aspx">Edit API Operator Code </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="OperatorAccountAdd.aspx">Add Operator Account </a></li>
-                                    </ul>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">API Management <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="APISMS.aspx">SMS API </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="APIRecharge.aspx">Recharge API </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="APISwitching.aspx">API Switching </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="APIComission.aspx">API Commission </a></li>
-                                    </ul>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin Setting <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="IPAdd.aspx">Add IP </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="SystemSetting.aspx">System Setting </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="MessageSetting.aspx">Message Setting </a></li>
-                                    </ul>
-                                </li>
-                            </ul>--%>
-                        </li>
-                        <%--<li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Recharge <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="RechargeCommission.aspx">Recharge Commission</a></li>
-                                <li class="divider"></li>
-                                <li><a href="Recharge.aspx">Recharge</a></li>
-                                <li class="divider"></li>
-                                <li><a href="RechargeReport.aspx">Recharge Report</a></li>
-                            </ul>
-                        </li>--%>
-                        <li class="dropdown dropdown-large" style="display:none">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin Requests <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu dropdown-menu-large row">
-                                <li><a href="DisputeRequest.aspx">Dispute Request</a></li>
-                                <%--<li class="divider"></li>--%>
-                             <%--   <li><a href="CallbackRequestReport.aspx">Callback Request Report</a></li>--%>
-                                <%--<li class="divider"></li>--%>
-                                <li><a href="mobileChangeRequests.aspx">Mobile No. Change Requests</a></li>
-                                   <li><a href="CashRequestReport.aspx">Prime Member Requests</a></li>
- <li><a href="TransferRequestReport.aspx">Transfer To wallet</a></li>
-                            </ul>
-                        </li>
-                        <%--<li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu 2 <b class="caret"></b></a>
-
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Action [Menu 2.1]</a></li>
-                                <li><a href="#">Another action [Menu 2.1]</a></li>
-                                <li><a href="#">Something else here [Menu 2.1]</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Separated link [Menu 2.1]</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">One more separated link [Menu 2.1]</a></li>
-                                <li>
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown [Menu 2.1] <b class="caret"></b></a>
-
-                                    <ul class="dropdown-menu">
-                                        <li><a href="#">Action [Menu 2.2]</a></li>
-                                        <li><a href="#">Another action [Menu 2.2]</a></li>
-                                        <li><a href="#">Something else here [Menu 2.2]</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link [Menu 2.2]</a></li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown [Menu 2.2] <b class="caret"></b></a>
-
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown [Menu 2.3] <b class="caret"></b></a>
-
-                                                    <ul class="dropdown-menu">
-                                                        <li><a href="#">Action [Menu 2.4]</a></li>
-                                                        <li><a href="#">Another action [Menu 2.4]</a></li>
-                                                        <li><a href="#">Something else here [Menu 2.4]</a></li>
-                                                        <li class="divider"></li>
-                                                        <li><a href="#">Separated link [Menu 2.4]</a></li>
-                                                        <li class="divider"></li>
-                                                        <li><a href="#">One more separated link [Menu 2.4]</a></li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>--%>
-                    </ul>
-                        </asp:Panel>
-                     <asp:Panel ID="panelsubadmin2" runat="server">
-                                <asp:Literal ID="Literal1" runat="server"></asp:Literal>
-                            </asp:Panel>
-                </div><!--/.nav-collapse -->
-            </div>
-        </div>
-        <!-- Left side column. contains the logo and sidebar -->
-        <%--<aside class="main-sidebar">--%>
-        <aside id="sarah-left-panel" sarah-position-type="absolute" style="display:none;">
-            <!-- sidebar: style can be found in sidebar.less -->
-            <%--<section class="sidebar">--%>
-                <!-- Sidebar user panel -->
-                <%--<div class="user-panel">
-                    <div class="pull-left image">
-                        <img src="img/default.png" class="img-circle" alt="User Image" />
+                            <li class="admin-side-section">Modules</li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-wrench admin-side-icon"></i> Utility Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="CountryAdd.aspx">Add Country</a></li>
+                                    <li><a href="StateAdd.aspx">Add State</a></li>
+                                    <li><a href="CityAdd.aspx">Add City</a></li>
+                                    <li><a href="BankAdd.aspx">Add Bank</a></li>
+                                    <li><a href="BankAccountAdd.aspx">Bank Account Add</a></li>
+                                    <li><a href="deductioncharge.aspx">Deduction Master</a></li>
+                                    <li><a href="NewsAdd.aspx">News Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-building admin-side-icon"></i> Franchisee Master <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="FranchiseetypeMaster.aspx">Franchisee Type Master</a></li>
+                                    <li><a href="franchiseeAdd.aspx">Franchisee Add</a></li>
+                                    <li><a href="FranchiseeReport.aspx">Franchisee Report</a></li>
+                                    <li><a href="FranchiseePurchaseMaster.aspx">Product Purchase</a></li>
+                                    <li><a href="FranchiseePurchaseDetail.aspx">Product Purchase Report</a></li>
+                                    <li><a href="FranchiseeStockDetail.aspx">Stock Details</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-globe admin-side-icon"></i> Website Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="AddSlider.aspx">Add Slider</a></li>
+                                    <li><a href="AddGalleryImage.aspx">Add Gallery Image</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-cube admin-side-icon"></i> Product Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="CategoryAdd.aspx">Add Category</a></li>
+                                    <li><a href="SubcategoryAdd.aspx">Add Sub-Category</a></li>
+                                    <li><a href="SizeAdd.aspx">Add Size</a></li>
+                                    <li><a href="ColorAdd.aspx">Add Color</a></li>
+                                    <li><a href="ProductSizeColorMaster.aspx">Subcategory Setting</a></li>
+                                    <li><a href="ProductAdd.aspx">Add Product</a></li>
+                                    <li><a href="ProductDetails.aspx">Product Details</a></li>
+                                    <li><a href="ChangeProductStatus.aspx">Change Status</a></li>
+                                    <li><a href="StockReport.aspx">Stock Report</a></li>
+                                    <li><a href="VendorMaster.aspx">Vendor Master</a></li>
+                                    <li><a href="VendorPurchaseMaster.aspx">Stock Purchase</a></li>
+                                    <li><a href="VendorPurchaseDetail.aspx">Purchase Details</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-sitemap admin-side-icon"></i> My Network <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="UserAdd.aspx">Add User</a></li>
+                                    <li><a href="UserReport.aspx">User Report</a></li>
+                                    <li><a href="kycApprovalForUser.aspx">Approve KYC</a></li>
+                                    <li><a href="DownlineReport.aspx">Downline Report</a></li>
+                                    <li><a href="treeview.aspx">Treeview Report</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-money admin-side-icon"></i> Accounts <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="TransactionReport.aspx">Transaction Report</a></li>
+                                    <li><a href="Dailypayoutdetail.aspx">Daily Closing Report</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </asp:Panel>
+                    <asp:Panel ID="panelsubadmin2" runat="server">
+                        <asp:Literal ID="Literal1" runat="server"></asp:Literal>
+                    </asp:Panel>
                     </div>
-                    <div class="pull-left info">
-                        <p>
-                            <asp:Label ID="LblMainId" runat="server" Text=""></asp:Label>
-                        </p>
-                        <%--<a href="#"><i class="fa fa-circle text-success"></i>Online</a>--% >
-                    </div>
-                </div>--%>
-            <div class="profile-box">
-                    <div class="media">
-                        <a class="pull-left" href="user-profile.html">
-                            <%--<img class="img-circle" src="assets/images/avatar-1.jpg">--%>
-                            <img src="img/default.png" class="img-circle" alt="User Image" />
+                    <div class="admin-sidebar-footer">
+                        <a href="logout.aspx" class="admin-sidebar-logout">
+                            <i class="fa fa-sign-out"></i>
+                            <span>Logout</span>
                         </a>
-                        <div class="media-body">
-                            <h4 class="media-heading" style="color:#fff;"><asp:Label ID="LblMainId" runat="server" Text="" ForeColor="white"></asp:Label></h4>
-                            <%--<small>UX Designer</small>--%>
+                    </div>
+                </nav>
+            </aside>
+            <div class="admin-main">
+                <header class="admin-topbar">
+                    <button type="button" class="admin-sidebar-toggle" aria-label="Toggle menu">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="admin-topbar-intro hidden-xs">
+                        <span class="admin-topbar-eyebrow">Welcome back</span>
+                        <!--<strong class="admin-topbar-greet">
+                            <asp:Label ID="LblTopbarGreet" runat="server" Text=""></asp:Label>
+                        </strong>-->
+                    </div>
+                    <div class="admin-topbar-spacer"></div>
+                    <div class="admin-topbar-actions">
+                        <button type="button" id="adminFullscreenBtn" class="admin-topbar-icon-btn" title="Fullscreen" aria-label="Enter fullscreen">
+                            <i class="fa fa-expand"></i>
+                        </button>
+                        <div class="dropdown admin-topbar-notify">
+                            <button type="button" class="admin-topbar-icon-btn dropdown-toggle" data-toggle="dropdown" aria-label="Notifications">
+                                <i class="fa fa-bell"></i>
+                                <asp:Panel ID="pnlNotifyBadge" runat="server" CssClass="admin-topbar-badge" Visible="false">
+                                    <asp:Literal ID="LitNotifyCount" runat="server"></asp:Literal>
+                                </asp:Panel>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right admin-notify-dropdown">
+                                <div class="admin-notify-dropdown-head">
+                                    <strong>Notifications</strong>
+                                    <span>Inbox messages</span>
+                                </div>
+                                <div class="admin-notify-dropdown-body">
+                                    <asp:Literal ID="LitNotifyList" runat="server"></asp:Literal>
+                                </div>
+                                <a href="InboxAdmin.aspx" class="admin-notify-dropdown-foot">
+                                    View all messages <i class="fa fa-angle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="dropdown admin-topbar-user">
+                            <a href="#" class="admin-user-trigger dropdown-toggle" data-toggle="dropdown" aria-label="User menu">
+                                <span class="admin-user-avatar">
+                                    <img src="img/default.png" alt="" />
+                                    <span class="admin-user-status"></span>
+                                </span>
+                                <span class="admin-user-meta hidden-xs">
+                                    <span class="admin-user-name">
+                                        <asp:Label ID="LblUsernameSideMenu" Font-Bold="true" runat="server" Text=""></asp:Label>
+                                    </span>
+                                    <span class="admin-user-role">
+                                        <asp:Label ID="LblUserRole" runat="server" Text="Administrator"></asp:Label>
+                                    </span>
+                                </span>
+                                <i class="fa fa-chevron-down admin-user-chevron hidden-xs"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right admin-user-menu">
+                                <li class="admin-user-menu-head">
+                                    <span class="admin-user-menu-avatar">
+                                        <img src="img/default.png" alt="" />
+                                    </span>
+                                    <span class="admin-user-menu-info">
+                                        <strong><asp:Label ID="LblUserMenuName" runat="server" Text=""></asp:Label></strong>
+                                        <small><asp:Label ID="LblUserMenuRole" runat="server" Text="Administrator"></asp:Label></small>
+                                    </span>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="Dashboard.aspx" class="admin-user-menu-link">
+                                        <span class="admin-user-menu-icon is-profile"><i class="fa fa-user"></i></span>
+                                        <span class="admin-user-menu-text">
+                                            <strong>My Profile</strong>
+                                            <small>Account overview</small>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="CHangePassword.aspx" class="admin-user-menu-link">
+                                        <span class="admin-user-menu-icon is-password"><i class="fa fa-key"></i></span>
+                                        <span class="admin-user-menu-text">
+                                            <strong>Change Password</strong>
+                                            <small>Update security</small>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="logout.aspx" class="admin-user-menu-link is-logout">
+                                        <span class="admin-user-menu-icon is-logout"><i class="fa fa-sign-out"></i></span>
+                                        <span class="admin-user-menu-text">
+                                            <strong>Logout</strong>
+                                            <small>Sign out safely</small>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
+                </header>
+
+                <div class="admin-content-wrapper content-wrapper">
+                    <div class="admin-page-header-slot">
+                        <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
+                        </asp:ContentPlaceHolder>
+                    </div>
+                    <section class="content">
+                        <asp:ContentPlaceHolder ID="contentpageData" runat="server"></asp:ContentPlaceHolder>
+                    </section>
                 </div>
-
-                <!-- search form -->
-             
-                <!-- /.search form -->
-                <!-- sidebar menu: : style can be found in sidebar.less -->
-                <ul class="nav panel-list" style="z-index:9999;display:none;">
-                    <li class="nav-level">Navigation</li>
-                    <li>
-                    <%--<li class="active">--%>
-                        <a href="Dashboard.aspx">
-                            <i class="fa fa-tachometer"></i>
-                            <span class="menu-text">Dashboard</span>
-                            <span class="selected"></span>
-                        </a>
-                    </li>
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Utility Management</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="CountryAdd.aspx">
-                                    <span class="menu-text">Add Country</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="StateAdd.aspx">
-                                    <span class="menu-text">Add State</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="CityAdd.aspx">
-                                    <span class="menu-text">Add City</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="BankAdd.aspx">
-                                    <span class="menu-text">Add Bank</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="BankAccountAdd.aspx">
-                                    <span class="menu-text">Bank Account Add</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="LevelMaster.aspx">
-                                    <span class="menu-text">Level Master</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="JoiningPlanAdd.aspx">
-                                    <span class="menu-text">Plan Master</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="FranchiseeCommission.aspx">
-                                    <span class="menu-text">Franchisee Commission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Award & Reward</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="AwardADD.aspx">
-                                    <span class="menu-text">Add Award</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="VacationADD.aspx">
-                                    <span class="menu-text">Add Vacation</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">News</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="NewsAdd.aspx">
-                                    <span class="menu-text">News Add</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Franchisee Master</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="franchiseeAdd.aspx">
-                                    <span class="menu-text">Franchisee Add</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="FranchiseeReport.aspx">
-                                    <span class="menu-text">Franchisee Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Money Transfer</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="DMRCommissionAdd.aspx">
-                                    <span class="menu-text">DMR Commission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="MoneyTransferReport.aspx">
-                                    <span class="menu-text">Money Transfer Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">DTH Subcription</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="SetTopBoxMaster.aspx">
-                                    <span class="menu-text">Settop Box Master</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="Packagemaster.aspx">
-                                    <span class="menu-text">Package Master</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="DTHBookingCommissionAdd.aspx">
-                                    <span class="menu-text">DTH Commission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">E-Pin Management</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="EPinAdd.aspx">
-                                    <span class="menu-text">Generate E-Pin</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="EPinReport.aspx">
-                                    <span class="menu-text">E-Pin Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="EPinTransfer.aspx">
-                                    <span class="menu-text">E-Pin Transfer</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="ActivateUserWithEpin.aspx">
-                                    <span class="menu-text">Activate User With e-pin</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">My Network</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="UserAdd.aspx">
-                                    <span class="menu-text">Add Retailer</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="UserReport.aspx">
-                                    <span class="menu-text">User Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="DownlineReport.aspx">
-                                    <span class="menu-text">Downline Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="UserPermissiom.aspx">
-                                    <span class="menu-text">User Permission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Accounts</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="TransactionReport.aspx">
-                                    <span class="menu-text">Transaction Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Withdrawl</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="WithdrawlRequestReport.aspx">
-                                    <span class="menu-text">User Withdrawl Request</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="franchiseeWithdrawlRequestReport.aspx">
-                                    <span class="menu-text">Franchisee Withdrawl Request</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="WithdrawlRequstAdd.aspx">
-                                    <span class="menu-text">Direct Withdrawl Retailer</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Fund Request</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="DepositRequestReport.aspx">
-                                    <span class="menu-text">User Fund Request</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="franchiseeDepositRequestReport.aspx">
-                                    <span class="menu-text">Direct Fund Request Retailer</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="DepositRequstAdd.aspx">
-                                    <span class="menu-text">Direct Fund Request Retailer</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="franchiseeDepositRequstAdd.aspx">
-                                    <span class="menu-text">Direct Fund Request Franchisee</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Refer Closing</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="CalculateClosing.aspx">
-                                    <span class="menu-text">Generate Joining Closing</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="ClosingREport.aspx">
-                                    <span class="menu-text">Closing Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Sales Closing</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="CalculateRepurchaseClosing.aspx">
-                                    <span class="menu-text">Generate Repurchase Closing</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="ClosingRepurchaseReport.aspx">
-                                    <span class="menu-text">Closing Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Tools</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="AdminDownload.aspx">
-                                    <span class="menu-text">Download</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Customer Care</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="NewMessageAdmin.aspx">
-                                    <span class="menu-text">Compose Mail</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="InboxAdmin.aspx">
-                                    <span class="menu-text">Inbox</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="SentboxAdmin.aspx">
-                                    <span class="menu-text">Sent Mail</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Operator Management</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="OperatorAdd.aspx">
-                                    <span class="menu-text">Add Operator</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="OperatorAPICodeEdit.aspx">
-                                    <span class="menu-text">Edit API Operator Code</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="OperatorAccountAdd.aspx">
-                                    <span class="menu-text">Add Operator Account</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">API Management</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="APISMS.aspx">
-                                    <span class="menu-text">SMS API</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="APIRecharge.aspx">
-                                    <span class="menu-text">Recharge API</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="APISwitching.aspx">
-                                    <span class="menu-text">API Switching</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="APIComission.aspx">
-                                    <span class="menu-text">API Commission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Admin Setting</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="IPAdd.aspx">
-                                    <span class="menu-text">Add IP</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="SystemSetting.aspx">
-                                    <span class="menu-text">System Setting</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="MessageSetting.aspx">
-                                    <span class="menu-text">Message Setting</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Recharge</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="RechargeCommission.aspx">
-                                    <span class="menu-text">Recharge Commission</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="Recharge.aspx">
-                                    <span class="menu-text">Recharge</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="RechargeReport.aspx">
-                                    <span class="menu-text">Recharge Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="sarah-has-menu">
-                        <a href="javascript:void(0)">
-                            <i class="fa fa-bar-chart"></i>
-                            <span class="menu-text">Admin Requests</span>
-                            <span class="selected"></span>
-                        </a>
-                        <ul class="sarah-sub-menu">
-                            <li>
-                                <a href="DisputeRequest.aspx">
-                                    <span class="menu-text">Dispute Request</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="CallbackRequestReport.aspx">
-                                    <span class="menu-text">Callback Request Report</span>
-                                    <span class="selected"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-
-
-                </ul>
-            <%--</section>--%>
-            <!-- /.sidebar -->
-        </aside>
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <asp:ContentPlaceHolder ID="contentPageHeading" runat="server">
-                </asp:ContentPlaceHolder>
-            </section>
-            <!-- Main content -->
-            <section class="content">
-                <!-- Default box -->
-                <asp:ContentPlaceHolder ID="contentpageData" runat="server"></asp:ContentPlaceHolder>
-                <!-- /.box -->
-            </section>
-            <!-- /.content -->
-        </div>
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <b><%= clsUtility.ProjectName %></b> 2.4.0
+                <footer class="admin-footer main-footer">
+                    <div class="pull-right hidden-xs">
+                        <b><%= clsUtility.ProjectName %></b> 2.4.0
+                    </div>
+                    <strong>Copyright &copy; <%= clsUtility.Session %><a href="#"><%= clsUtility.ProjectName %></a>.</strong> All rights reserved.
+                </footer>
             </div>
-            <strong>Copyright &copy; <%= clsUtility.Session %><a href="#"><%= clsUtility.ProjectName %></a>.</strong> All rights
-    reserved.
-        </footer>
+        </div>
         <%--<div class="control-sidebar-bg"></div>--%>
         <!-- Control Sidebar -->
         <!-- /.control-sidebar -->
@@ -1478,30 +338,12 @@
             })
         </script>
         <script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
+        <script src="assets/js/admin-sidebar.js?v=2"></script>
+        <script src="assets/js/admin-header-enhance.js?v=1"></script>
+        <script src="assets/js/admin-topbar.js?v=1"></script>
+        <script src="assets/js/admin-modal.js?v=3"></script>
         <asp:ContentPlaceHolder ID="contentScript" runat="server">
         </asp:ContentPlaceHolder>
-        
-        </div>
-
-            <!--<script type="text/javascript">
-                $(document).ready(function () {
-                    $('.navbar a.dropdown-toggle').on('click', function (e) {
-                        var $el = $(this);
-                        var $parent = $(this).offsetParent(".dropdown-menu");
-                        $(this).parent("li").toggleClass('open');
-
-                        if (!$parent.parent().hasClass('nav')) {
-                            $el.next().css({ "top": $el[0].offsetTop, "left": $parent.outerWidth() - 4 });
-                        }
-
-                        $('.nav li.open').not($(this).parents("li")).removeClass("open");
-
-                        return false;
-                    });
-                });
-
-	</script>-->
-        </div>
     </form>
 </body>
 </html>

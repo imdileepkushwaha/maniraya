@@ -52,7 +52,7 @@
     pointer-events: none;
 }
 
-.admin-login-brand > * {
+.admin-login-brand>* {
     position: relative;
     z-index: 1;
 }
@@ -77,7 +77,7 @@
 
 .admin-login-brand h1 {
     margin: 0;
-    font-size: 1.65rem;
+    /* font-size: 1.65rem; */
     font-weight: 700;
     letter-spacing: 0.04em;
     color: #fff;
@@ -85,7 +85,7 @@
 
 .admin-login-brand p {
     margin: 0;
-    font-size: 0.9rem;
+    /* font-size: 0.9rem; */
     color: rgba(255, 255, 255, 0.72);
 }
 
@@ -98,7 +98,7 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
-    font-size: 0.78rem;
+    /* font-size: 0.78rem; */
     font-weight: 600;
     color: #f6cf63;
 }
@@ -115,14 +115,14 @@
 
 .admin-login-form-head h2 {
     margin: 0 0 6px;
-    font-size: 1.45rem;
+    /* font-size: 1.45rem; */
     font-weight: 700;
     color: #0f172a;
 }
 
 .admin-login-form-head p {
     margin: 0;
-    font-size: 0.88rem;
+    /* font-size: 0.88rem; */
     color: #64748b;
     line-height: 1.5;
 }
@@ -136,14 +136,14 @@
     align-items: center;
     gap: 7px;
     margin-bottom: 7px;
-    font-size: 0.84rem;
+    /* font-size: 0.84rem; */
     font-weight: 600;
     color: #475569;
 }
 
 .admin-login-field label i {
     color: #b8860b;
-    font-size: 0.82rem;
+    /* font-size: 0.82rem; */
 }
 
 .admin-login-input-wrap {
@@ -156,7 +156,7 @@
     border-radius: 12px !important;
     border: 1px solid #dfe3ea !important;
     background: #f8fafc !important;
-    font-size: 0.92rem !important;
+    /* font-size: 0.92rem !important; */
     color: #1e293b !important;
     box-shadow: none !important;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
@@ -178,7 +178,7 @@
     top: 50%;
     transform: translateY(-50%);
     color: #94a3b8;
-    font-size: 0.92rem;
+    /* font-size: 0.92rem; */
     pointer-events: none;
 }
 
@@ -210,7 +210,7 @@
     border-radius: 12px;
     background: linear-gradient(135deg, #e5a906 0%, #c98f05 100%);
     color: #1a1d21 !important;
-    font-size: 0.95rem;
+    /* font-size: 0.95rem; */
     font-weight: 700;
     letter-spacing: 0.02em;
     box-shadow: 0 8px 22px rgba(229, 169, 6, 0.28);
@@ -230,7 +230,7 @@
     padding-top: 18px;
     border-top: 1px solid #eef1f5;
     text-align: center;
-    font-size: 0.8rem;
+    /* font-size: 0.8rem; */
     color: #94a3b8;
 }
 

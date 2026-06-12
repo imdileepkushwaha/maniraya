@@ -1,4 +1,5 @@
 ﻿using BusinessLogicTier;
+using DataTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,6 +11,7 @@ using System.Web.UI.WebControls;
 public partial class admin_CityAdd : System.Web.UI.Page
 {
     clsState objState = new clsState();
+    Data objData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -17,6 +19,7 @@ public partial class admin_CityAdd : System.Web.UI.Page
             if (Session["useradmin"] != null)
             {
                 loadcountry();
+                loadcountryedit();
                 loadcity();
             }
             else
@@ -43,13 +46,47 @@ public partial class admin_CityAdd : System.Web.UI.Page
         DataTable dt = new DataTable();
         objState.CountryId = ddcountry.SelectedValue.ToString();
         dt = objState.getState(objState);
-        
+
         ddstate.DataSource = dt;
         ddstate.DataTextField = "StateName";
         ddstate.DataValueField = "StateID";
         ddstate.DataBind();
         ListItem li = new ListItem("Select State", "0");
         ddstate.Items.Insert(0, li);
+    }
+
+    void loadcountryedit()
+    {
+        ddcountryedit.Items.Clear();
+        DataTable dt = objState.getCountry();
+        ddcountryedit.DataSource = dt;
+        ddcountryedit.DataTextField = "CountryName";
+        ddcountryedit.DataValueField = "CountryID";
+        ddcountryedit.DataBind();
+        ListItem li = new ListItem("Select Country", "0");
+        ddcountryedit.Items.Insert(0, li);
+    }
+
+    void loadstateedit(string selectedStateId)
+    {
+        ddstateedit.Items.Clear();
+        objState.CountryId = ddcountryedit.SelectedValue;
+        DataTable dt = objState.getState(objState);
+        ddstateedit.DataSource = dt;
+        ddstateedit.DataTextField = "StateName";
+        ddstateedit.DataValueField = "StateID";
+        ddstateedit.DataBind();
+        ListItem li = new ListItem("Select State", "0");
+        ddstateedit.Items.Insert(0, li);
+
+        if (!string.IsNullOrEmpty(selectedStateId))
+        {
+            ListItem stateItem = ddstateedit.Items.FindByValue(selectedStateId);
+            if (stateItem != null)
+            {
+                ddstateedit.SelectedValue = selectedStateId;
+            }
+        }
     }
     void loadcity()
     {
@@ -62,12 +99,13 @@ public partial class admin_CityAdd : System.Web.UI.Page
     {
         objState.CityName = txtcitynameedit.Text;
         objState.CityId = lblcityid.Text;
+        objState.StateId = ddstateedit.SelectedValue;
         string res = objState.Update_City(objState);
         if (res == "t")
         {
             string popupScript = "alert('City Edited Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            string popupScript2 = "Closepopup();";
+            string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loadcity();
         }
@@ -82,7 +120,10 @@ public partial class admin_CityAdd : System.Web.UI.Page
         {
             string popupScript = "alert('City Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            txtcityname.Text = ""; ddcountry.SelectedValue = "0"; ddstate.SelectedValue = "0";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addCityModal');", true);
+            txtcityname.Text = "";
+            ddcountry.SelectedIndex = 0;
+            ddstate.SelectedIndex = 0;
             loadcity();
         }
         else
@@ -104,14 +145,76 @@ public partial class admin_CityAdd : System.Web.UI.Page
         {
             int index = Convert.ToInt32(e.CommandArgument.ToString());
             Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
-            Label lblstatename = (Label)GridView1.Rows[index].FindControl("lblcityname");
+            Label lblcityname = (Label)GridView1.Rows[index].FindControl("lblcityname");
+            Label lblstateid = (Label)GridView1.Rows[index].FindControl("lblstateid");
+            string stateId = lblstateid != null ? lblstateid.Text : string.Empty;
+            string countryId = GetCountryIdByStateId(stateId);
+
             lblcityid.Text = lblid.Text;
-            txtcitynameedit.Text = lblstatename.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            txtcitynameedit.Text = lblcityname.Text;
+
+            if (!string.IsNullOrEmpty(countryId))
+            {
+                ListItem countryItem = ddcountryedit.Items.FindByValue(countryId);
+                if (countryItem != null)
+                {
+                    ddcountryedit.SelectedValue = countryId;
+                }
+            }
+
+            loadstateedit(stateId);
+
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
         }
     }
+
     protected void ddcountry_SelectedIndexChanged(object sender, EventArgs e)
     {
         loadstate();
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "showAdminModal('addCityModal');", true);
+    }
+
+    protected void ddcountryedit_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        loadstateedit(string.Empty);
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "showAdminModal('myModal');", true);
+    }
+
+    string GetCountryIdByStateId(string stateId)
+    {
+        if (string.IsNullOrEmpty(stateId))
+        {
+            return "";
+        }
+
+        string countryId = "";
+        DataTable dt = null;
+        objData.StartConnection();
+        try
+        {
+            dt = objData.RunDataTable("select countryid from statemaster where stateid='" + stateId + "'");
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DataRow row = dt.Rows[0];
+                if (row.Table.Columns.Contains("countryid"))
+                {
+                    countryId = row["countryid"].ToString();
+                }
+                else if (row.Table.Columns.Contains("CountryID"))
+                {
+                    countryId = row["CountryID"].ToString();
+                }
+                else
+                {
+                    countryId = row[0].ToString();
+                }
+            }
+        }
+        catch
+        {
+            countryId = "";
+        }
+        objData.EndConnection();
+        return countryId;
     }
 }

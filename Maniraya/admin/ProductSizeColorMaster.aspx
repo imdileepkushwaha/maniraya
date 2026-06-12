@@ -2,39 +2,60 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
      <script type="text/javascript">
-      function validate() {
+      function getSizePanel() {
+          return document.getElementById("adminPscSizePanel");
+      }
 
-      if (document.getElementById("<%=ddcountry.ClientID%>").value == "0") {
+      function getSizeCheckboxes() {
+          var panel = getSizePanel();
+          if (!panel) {
+              return [];
+          }
+          return panel.querySelectorAll("input[type='checkbox']");
+      }
 
-             alert('Select Category');
-             // alert("Enter Rank No"); 
-             document.getElementById("<%=ddcountry.ClientID%>").focus();
-             return false;
-         }
-         if (document.getElementById("<%=ddsubcategory.ClientID%>").value == "0") {
-
-             alert('Select SubCategory');
-             // alert("Enter Rank No"); 
-             document.getElementById("<%=ddsubcategory.ClientID%>").focus();
-             return false;
-         }
-          if (document.getElementById("<%=ddlColor.ClientID%>").value == "0") {
-
-      alert('Select Color');
-      // alert("Enter Rank No"); 
-           document.getElementById("<%=ddlColor.ClientID%>").focus();
-           return false;
-       }
-      
-     
-          if (document.getElementById("<%=ddlSize.ClientID%>").value == "0") {
-
-      alert('Select Size');
-      // alert("Enter Rank No"); 
-          document.getElementById("<%=ddlSize.ClientID%>").focus();
+      function hasSizeSelected() {
+          var boxes = getSizeCheckboxes();
+          for (var i = 0; i < boxes.length; i++) {
+              if (boxes[i].checked) {
+                  return true;
+              }
+          }
           return false;
       }
-         }
+
+      function selectAllSizes(selectAll) {
+          var boxes = getSizeCheckboxes();
+          for (var i = 0; i < boxes.length; i++) {
+              boxes[i].checked = !!selectAll;
+          }
+          if (typeof window.updateSizeSelectionCount === "function") {
+              window.updateSizeSelectionCount();
+          }
+      }
+
+      function validate() {
+          if (document.getElementById("<%=ddcountry.ClientID%>").value == "0") {
+              alert('Select Category');
+              document.getElementById("<%=ddcountry.ClientID%>").focus();
+              return false;
+          }
+          if (document.getElementById("<%=ddsubcategory.ClientID%>").value == "0") {
+              alert('Select SubCategory');
+              document.getElementById("<%=ddsubcategory.ClientID%>").focus();
+              return false;
+          }
+          if (document.getElementById("<%=ddlColor.ClientID%>").value == "0") {
+              alert('Select Color');
+              document.getElementById("<%=ddlColor.ClientID%>").focus();
+              return false;
+          }
+          if (!hasSizeSelected()) {
+              alert('Select at least one Size');
+              return false;
+          }
+          return true;
+      }
      </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
@@ -59,47 +80,69 @@
            <h3 class="box-title">Product Color Size Master</h3>
        </div>
 
-       <div class="box-body">
-            <div class="form-group">
-                <div class="col-md-3">
- <div class="form-group">
-   <label >Select Category</label>
-       <asp:DropDownList ID="ddcountry" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
-                   <asp:ListItem Value="0"> Select Category</asp:ListItem>
-               </asp:DropDownList>
- </div>             
-</div>
-     <div class="col-md-3">
- <div class="form-group">
-   <label >Subcategory</label>
-  <asp:DropDownList ID="ddsubcategory" CssClass="form-control" runat="server" >
-                  <asp:ListItem Value="0"> Select SubCategory</asp:ListItem>
-              </asp:DropDownList>
- </div>             
-</div>
-                     <div class="col-md-3">
- <div class="form-group">
-   <label >Color</label>
- <asp:DropDownList ID="ddlColor" CssClass="form-control"
-    runat="server"
-    />
- </div>             
-</div>
-                     <div class="col-md-3">
- <div class="form-group">
-   <label >Size</label>
-  <asp:DropDownList ID="ddlSize" CssClass="form-control"
-    runat="server"
-    />
- </div>             
-</div>
+       <div class="box-body admin-psc-form">
+            <p class="admin-psc-intro">Map color and size combinations for a sub-category. Select one color and multiple sizes, then submit.</p>
 
-           </div>
-           </div>
-                                 <div class="box-footer">
-    
-          <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                     <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Cancel" />
+            <div class="admin-form-section">
+                <h5 class="admin-form-section-title"><i class="fa fa-tags"></i> Category Details</h5>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="<%= ddcountry.ClientID %>">Category</label>
+                            <div class="admin-input-group">
+                                <span class="admin-input-icon"><i class="fa fa-folder-open"></i></span>
+                                <asp:DropDownList ID="ddcountry" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
+                                    <asp:ListItem Value="0">Select Category</asp:ListItem>
+                                </asp:DropDownList>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="<%= ddsubcategory.ClientID %>">Sub-Category</label>
+                            <div class="admin-input-group">
+                                <span class="admin-input-icon"><i class="fa fa-sitemap"></i></span>
+                                <asp:DropDownList ID="ddsubcategory" CssClass="form-control" runat="server">
+                                    <asp:ListItem Value="0">Select Sub-Category</asp:ListItem>
+                                </asp:DropDownList>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="<%= ddlColor.ClientID %>">Color</label>
+                            <div class="admin-input-group">
+                                <span class="admin-input-icon"><i class="fa fa-tint"></i></span>
+                                <asp:DropDownList ID="ddlColor" CssClass="form-control" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-form-section admin-form-section-last">
+                <div class="admin-psc-size-header">
+                    <div>
+                        <h5 class="admin-form-section-title admin-psc-size-title"><i class="fa fa-arrows-alt"></i> Select Sizes</h5>
+                        <p class="admin-psc-size-hint">Choose one or more sizes for the selected color.</p>
+                    </div>
+                    <div class="admin-psc-size-tools">
+                        <span id="sizeSelectionCount" class="admin-psc-size-count">0 selected</span>
+                        <button type="button" class="btn btn-default btn-xs admin-psc-size-btn" onclick="selectAllSizes(true);">Select All</button>
+                        <button type="button" class="btn btn-default btn-xs admin-psc-size-btn" onclick="selectAllSizes(false);">Clear</button>
+                    </div>
+                </div>
+                <div class="admin-size-select-panel" id="adminPscSizePanel">
+                    <asp:CheckBoxList ID="cblSize" CssClass="admin-size-chip-list" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow" />
+                    <asp:Label ID="lblNoSizes" runat="server" Visible="false" CssClass="admin-size-empty">
+                        <i class="fa fa-info-circle"></i> No sizes found. Please add sizes from <strong>Size Master</strong> first.
+                    </asp:Label>
+                </div>
+            </div>
+       </div>
+       <div class="box-footer admin-psc-footer">
+          <asp:Button ID="btnCancel" CssClass="btn btn-default" runat="server" Text="Cancel" />
+          <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Save Mapping" OnClick="btnSubmit_Click" />
    </div>
                               </div>
                          </div>
@@ -158,7 +201,7 @@
 
                                         <asp:TemplateField HeaderText="Size">
     <ItemTemplate>
-          <asp:Label ID="lblsizename" runat="server"  Text='<%# Eval("Sizename") %>'></asp:Label>
+          <asp:Label ID="lblsizename" runat="server"  Text='<%# Eval("SizeName") %>'></asp:Label>
         <asp:Label ID="lblcolorid" runat="server"  Text='<%# Eval("colorid") %>' Visible="false"></asp:Label>
         <asp:Label ID="lblsizeid" runat="server"  Text='<%# Eval("sizeid") %>' Visible="false"></asp:Label>
           
@@ -237,17 +280,46 @@
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
      <script type="text/javascript">
+         window.updateSizeSelectionCount = function () {
+             var $panel = $("#adminPscSizePanel");
+             var $countEl = $("#sizeSelectionCount");
+             if (!$panel.length || !$countEl.length) {
+                 return;
+             }
+             var count = $panel.find("input[type='checkbox']:checked").length;
+             $countEl.text(count + " selected");
+         };
 
+         function initPscSizeCounter() {
+             window.updateSizeSelectionCount();
+
+             $(document)
+                 .off("change.pscSize click.pscSize", "#adminPscSizePanel, #adminPscSizePanel input[type='checkbox'], #adminPscSizePanel label")
+                 .on("change.pscSize", "#adminPscSizePanel input[type='checkbox']", window.updateSizeSelectionCount)
+                 .on("click.pscSize", "#adminPscSizePanel", function () {
+                     window.setTimeout(window.updateSizeSelectionCount, 0);
+                 });
+         }
+
+         $(initPscSizeCounter);
+
+         if (typeof Sys !== "undefined" && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+             var pscPrm = Sys.WebForms.PageRequestManager.getInstance();
+             if (!pscPrm._pscSizeCounterHooked) {
+                 pscPrm._pscSizeCounterHooked = true;
+                 pscPrm.add_endRequest(initPscSizeCounter);
+             }
+         }
 
          function showModal() {
-             $('#myModal').modal({ backdrop: 'static', keyboard: false })
+             $('#myModal').modal({ backdrop: 'static', keyboard: false });
          }
+
          function Closepopup() {
              $('#myModal').modal('hide');
              $('body').removeClass('modal-open');
              $('body').css('padding-right', '0');
              $('.modal-backdrop').remove();
-
          }
      </script>
 </asp:Content>

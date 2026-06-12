@@ -23,22 +23,23 @@
         }
 
            function validate2() {
-               // alert('sd');
                if (document.getElementById("<%=txtcountrynameedit.ClientID%>").value == "") {
-
                    alert('Enter Country Name');
-                   // alert("Enter Rank No"); 
                    document.getElementById("<%=txtcountrynameedit.ClientID%>").focus();
                    return false;
                }
                if (document.getElementById("<%=txtcountrycodeedit.ClientID%>").value == "") {
-
                    alert('Enter Country Code');
-                   // alert("Enter Rank No"); 
                    document.getElementById("<%=txtcountrycodeedit.ClientID%>").focus();
                    return false;
                }
            }
+
+        function openAddCountryModal() {
+            document.getElementById("<%=txtcountryname.ClientID%>").value = "";
+            document.getElementById("<%=txtcountrycode.ClientID%>").value = "";
+            showAdminModal('addCountryModal');
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
@@ -58,40 +59,16 @@
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
             <div class="row">
-                <!-- left column -->
-                <div class="col-md-12">
-
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Add Country</h3>
-                        </div>
-                        <!-- /.box-header -->
-                        <!-- form start -->
-                        <div class="box-body">
-                            <div class="form-group">
-                                <label>Country Name</label>
-                                <asp:TextBox ID="txtcountryname" CssClass="form-control" runat="server"></asp:TextBox>
-                            </div>
-                        </div>
-                        <div class="box-body">
-                            <div class="form-group">
-                                <label>Country Code</label>
-                                <asp:TextBox ID="txtcountrycode" CssClass="form-control" runat="server"></asp:TextBox>
-                            </div>
-                        </div>
-                        <!-- /.box-body -->
-                        <div class="box-footer">
-                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                            <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Cancel" />
-                        </div>
-
-                    </div>
-                </div>
                 <div class="col-md-12">
 
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Details</h3>
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-primary btn-sm admin-box-header-btn" onclick="openAddCountryModal();">
+                                    <i class="fa fa-plus"></i> Add Country
+                                </button>
+                            </div>
                         </div>
                         <!-- /.box-header -->
                         <!-- form start -->
@@ -134,24 +111,48 @@
 
                     </div>
                 </div>
-                <div id="myModal" class="modal fade">
-                    <div class="modal-dialog">
+                <div id="addCountryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="countryAddModalTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title">Edit Country</h4>
+                                <h4 class="modal-title" id="countryAddModalTitle">Add Country</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    Country Name
-                          <asp:Label ID="lblcountryid" Visible="false" runat="server" Text=""></asp:Label>
-                                    <asp:TextBox runat="server" class="form-control" ID="txtcountrynameedit"></asp:TextBox>
+                                    <label for="<%= txtcountryname.ClientID %>">Country Name</label>
+                                    <asp:TextBox ID="txtcountryname" CssClass="form-control" runat="server"></asp:TextBox>
+                                </div>
+                                <div class="form-group">
+                                    <label for="<%= txtcountrycode.ClientID %>">Country Code</label>
+                                    <asp:TextBox ID="txtcountrycode" CssClass="form-control" runat="server"></asp:TextBox>
                                 </div>
                             </div>
+                            <div class="modal-footer">
+                                <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="countryEditModalTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="countryEditModalTitle">Edit Country</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
                             <div class="modal-body">
+                                <asp:Label ID="lblcountryid" Visible="false" runat="server" Text=""></asp:Label>
+                                <asp:Label ID="Label1" Visible="false" runat="server" Text=""></asp:Label>
                                 <div class="form-group">
-                                    Country code
-                          <asp:Label ID="Label1" Visible="false" runat="server" Text=""></asp:Label>
-                                    <asp:TextBox runat="server" class="form-control" ID="txtcountrycodeedit"></asp:TextBox>
+                                    <label for="<%= txtcountrynameedit.ClientID %>">Country Name</label>
+                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtcountrynameedit"></asp:TextBox>
+                                </div>
+                                <div class="form-group">
+                                    <label for="<%= txtcountrycodeedit.ClientID %>">Country Code</label>
+                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtcountrycodeedit"></asp:TextBox>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -175,19 +176,5 @@
 
 
 
-    <script type="text/javascript">
-
-
-        function showModal() {
-            $('#myModal').modal({ backdrop: 'static', keyboard: false })
-        }
-        function Closepopup() {
-            $('#myModal').modal('hide');
-            $('body').removeClass('modal-open');
-            $('body').css('padding-right', '0');
-            $('.modal-backdrop').remove();
-
-        }
-    </script>
 </asp:Content>
 

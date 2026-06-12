@@ -29,27 +29,36 @@ public partial class deductioncharge : System.Web.UI.Page
     {
         DataTable dt = new DataTable();
         dt = objD.Deductioncommission();
-        GridView1.DataSource = dt;
-        GridView1.DataBind();
+        if (dt.Rows.Count == 0)
+        {
+            return;
+        }
+
+        DataRow row = dt.Rows[0];
+        hfId.Value = row["id"].ToString();
+        TxtAdminCharge.Text = row["admincharge"].ToString();
+        TxtTdswithpam.Text = row["tdswithpan"].ToString();
+        TxtTdswithoutpan.Text = row["tdswithoutpan"].ToString();
+        TxtcashWallet.Text = row["CashWallet"].ToString();
+        TxtcashWalletPercentage.Text = row["CashWalletPercent"].ToString();
+        TxtCappingAmount.Text = row["CappingAmount"].ToString();
+        TxtMinAmt.Text = row["MinDepositAmount"].ToString();
+        TxtMaxAmt.Text = row["MaxDepositAmount"].ToString();
     }
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
-        foreach (GridViewRow r in GridView1.Rows)
-        {
-            Label lbllevel = (Label)r.FindControl("lblid");
-            TextBox TxtAdminCharge = (TextBox)r.FindControl("TxtAdminCharge");
-            TextBox TxtTdswithpam = (TextBox)r.FindControl("TxtTdswithpam");
-            TextBox TxtTdswithoutpan = (TextBox)r.FindControl("TxtTdswithoutpan");
-            TextBox TxtcashWallet = (TextBox)r.FindControl("TxtcashWallet");
-            TextBox TxtcashWalletPercent = (TextBox)r.FindControl("TxtcashWalletPercentage");
-            TextBox TxtCappingAmount = (TextBox)r.FindControl("TxtCappingAmount");
-            TextBox TxtMinAmt = (TextBox)r.FindControl("TxtMinAmt");
-            TextBox TxtMaxAmt = (TextBox)r.FindControl("TxtMaxAmt");
+        objaccount.Updatedeductioncommission(
+            hfId.Value,
+            TxtAdminCharge.Text,
+            TxtTdswithpam.Text,
+            TxtTdswithoutpan.Text,
+            TxtcashWallet.Text,
+            TxtcashWalletPercentage.Text,
+            TxtCappingAmount.Text,
+            TxtMinAmt.Text,
+            TxtMaxAmt.Text);
 
-            objaccount.Updatedeductioncommission(lbllevel.Text, TxtAdminCharge.Text, TxtTdswithpam.Text, TxtTdswithoutpan.Text, TxtcashWallet.Text, TxtcashWalletPercent.Text, TxtCappingAmount.Text, TxtMinAmt.Text, TxtMaxAmt.Text);
-        }
         string popupScript = "alert('Data Updated Successfully');";
         ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-           
     }
 }
