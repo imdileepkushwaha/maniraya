@@ -69,7 +69,7 @@
     </style>
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=30" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=48" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -341,7 +341,7 @@
         <script src="assets/js/admin-sidebar.js?v=2"></script>
         <script src="assets/js/admin-header-enhance.js?v=1"></script>
         <script src="assets/js/admin-topbar.js?v=1"></script>
-        <script src="assets/js/admin-modal.js?v=3"></script>
+        <script src="assets/js/admin-modal.js?v=4"></script>
         <asp:ContentPlaceHolder ID="contentScript" runat="server">
         </asp:ContentPlaceHolder>
     </form>

@@ -33,6 +33,17 @@
              <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Franchisee Customer Purchase Detail</h3>
+              <div class="box-tools admin-record-filter-tools">
+                  <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                  <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter" AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                      <asp:ListItem Selected="True">10</asp:ListItem>
+                      <asp:ListItem>25</asp:ListItem>
+                      <asp:ListItem>50</asp:ListItem>
+                      <asp:ListItem>100</asp:ListItem>
+                      <asp:ListItem>All</asp:ListItem>
+                  </asp:DropDownList>
+                  <span class="admin-record-filter-suffix">per page</span>
+              </div>
             </div>
             <!-- /.box-header -->
             <!-- form start -->
@@ -74,8 +85,9 @@
 
                           <div class="row">
                          <div class="col-md-12">
-                             <div class="form-group">
-                                <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
+                             <div class="form-group table-responsive">
+                                <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" AllowPaging="true" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
+                               <PagerSettings FirstPageText="First" LastPageText="Last" Mode="NumericFirstLast" Position="Bottom" />
                                <Columns>
                                     <asp:TemplateField>
             <ItemTemplate>
@@ -111,7 +123,7 @@
         </asp:TemplateField>
                                     <asp:TemplateField HeaderText="#">
                                         <ItemTemplate>
-                                            <%#Container.DataItemIndex+1 %>
+                                            <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
                                           
                                         </ItemTemplate>
                                     </asp:TemplateField>

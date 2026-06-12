@@ -130,6 +130,7 @@ public partial class franchiseeAdd : System.Web.UI.Page
     }
     protected void ddcity_SelectedIndexChanged(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "4";
         if (ddcity.SelectedIndex != 0)
         {
             if (ddcity.SelectedValue == "111111")
@@ -260,10 +261,12 @@ public partial class franchiseeAdd : System.Web.UI.Page
 
     protected void ddcountry_SelectedIndexChanged(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "4";
         loadstate();
     }
     protected void ddstate_SelectedIndexChanged(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "4";
         loadcity();
     }
     
@@ -297,6 +300,7 @@ public partial class franchiseeAdd : System.Web.UI.Page
 
     protected void btnPANUPload_Click(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "3";
         if (!filePAN.HasFile)
         {
             ScriptManager.RegisterStartupScript(Page, GetType(), "javascript", "alert('Select PAN File')", true);
@@ -310,6 +314,7 @@ public partial class franchiseeAdd : System.Web.UI.Page
 
     protected void btnGSTUpload_Click(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "3";
         if (!fileGST.HasFile)
         {
             ScriptManager.RegisterStartupScript(Page, GetType(), "javascript", "alert('Select GST File')", true);
@@ -334,6 +339,7 @@ public partial class franchiseeAdd : System.Web.UI.Page
     }
     protected void txtSponsorId_TextChanged(object sender, EventArgs e)
     {
+        hfWizardStep.Value = "1";
         loadsusername();
     }
 

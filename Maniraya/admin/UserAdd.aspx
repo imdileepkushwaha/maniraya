@@ -1,28 +1,6 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="UserAdd.aspx.cs" Inherits="admin_UserAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <style>
-        legend {
-            display: inline-block;
-            max-width: 100%;
-            margin-bottom: 5px;
-            font-weight: 700;
-            display: block;
-            width: 100%;
-            padding: 0;
-            margin-bottom: 8px;
-            font-size: 13px;
-            line-height: inherit;
-            color: #333;
-            border: 0;
-            border-bottom: 0px solid #e5e5e5;
-        }
-
-        .dvRow {
-            padding-left: 0px !important;
-            padding-right: 2px !important;
-        }
-    </style>
     <script type="text/javascript">
         function validate() {
             if (document.getElementById("<%=txtsponserid.ClientID%>").value == "") {
@@ -132,6 +110,7 @@
                 document.getElementById("<%=txtUserpassword.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
 
 
@@ -157,8 +136,6 @@
 
 
     </script>
-
-    <link href="../css/radio/style.css" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
@@ -174,8 +151,11 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdateProgress ID="updateProgress" runat="server">
         <ProgressTemplate>
-            <div style="position: fixed; text-align: center; height: 100%; width: 100%; top: 0; right: 0; left: 0; z-index: 9999999; background-color: #000000; opacity: 0.7;">
-                <asp:Image ID="imgUpdateProgress" runat="server" ImageUrl="~/img/ajax-loader.gif" AlternateText="Loading ..." ToolTip="Loading ..." Style="padding: 10px; position: fixed; top: 15%; left: 25%;" />
+            <div class="admin-loading-overlay">
+                <div class="admin-loading-spinner">
+                    <asp:Image ID="imgUpdateProgress" runat="server" ImageUrl="~/img/ajax-loader.gif" AlternateText="Loading..." ToolTip="Loading..." />
+                    <span>Please wait...</span>
+                </div>
             </div>
         </ProgressTemplate>
     </asp:UpdateProgress>
@@ -187,22 +167,29 @@
                         <div class="box-header with-border">
                             <h3 class="box-title">Add User</h3>
                         </div>
-                        <div class="box-body">
-                            <h4><b>Sponsor Detail</b></h4>
-                            <hr />
-                            <div class="row">
-                                <div class="form-group">
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Sponsor Id :</label>
-                                        <asp:TextBox ID="txtsponserid" AutoPostBack="true" OnTextChanged="txtsponserid_TextChanged" CssClass="form-control" runat="server"></asp:TextBox>
+                        <div class="box-body admin-product-form">
+                            <p class="admin-product-intro">Enter sponsor details and personal information to register a new user. Fields marked in each section are required for submission.</p>
+
+                            <div class="admin-form-section">
+                                <h5 class="admin-form-section-title"><i class="fa fa-user-plus"></i> Sponsor Details</h5>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtsponserid.ClientID %>">Sponsor ID</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-id-badge"></i></span>
+                                                <asp:TextBox ID="txtsponserid" AutoPostBack="true" OnTextChanged="txtsponserid_TextChanged" CssClass="form-control" runat="server" placeholder="Enter sponsor ID" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Sponsor name</label>
-                                        <asp:TextBox ID="txtsponsername" Enabled="false" CssClass="form-control" runat="server"></asp:TextBox>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtsponsername.ClientID %>">Sponsor Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-user"></i></span>
+                                                <asp:TextBox ID="txtsponsername" Enabled="false" CssClass="form-control" runat="server" placeholder="Auto-filled from sponsor ID" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -221,32 +208,39 @@
                                 <div class="col-md-6">
                                 </div>
                             </div>
+
                             <asp:Panel ID="pnlpin" runat="server">
-                                <h4><b>Pin Detail</b></h4>
-                                <hr />
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Select Plan :</label>
-                                            <asp:DropDownList ID="DDLstPlan" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="DDLstPlan_SelectedIndexChanged" runat="server"></asp:DropDownList>
+                                <div class="admin-form-section admin-user-pin-section">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-ticket"></i> Pin Details</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= DDLstPlan.ClientID %>">Select Plan</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-list-alt"></i></span>
+                                                    <asp:DropDownList ID="DDLstPlan" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="DDLstPlan_SelectedIndexChanged" runat="server"></asp:DropDownList>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= ddepin.ClientID %>">Select E-Pin</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-key"></i></span>
+                                                    <asp:DropDownList ID="ddepin" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddepin_SelectedIndexChanged" runat="server"></asp:DropDownList>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Select E-Pin :</label>
-                                            <asp:DropDownList ID="ddepin" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddepin_SelectedIndexChanged" runat="server"></asp:DropDownList>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Amount</label>
-                                            <asp:TextBox ID="txtamount" Enabled="false" CssClass="form-control" runat="server"></asp:TextBox>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtamount.ClientID %>">Amount</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-inr"></i></span>
+                                                    <asp:TextBox ID="txtamount" Enabled="false" CssClass="form-control" runat="server" placeholder="Auto-filled from E-Pin" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -266,227 +260,252 @@
                                 <div class="col-md-6">
                                 </div>
                             </div>
-                            <h4><b>Personal Information</b></h4>
-                            <hr />
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Name :</label>
-                                        <asp:TextBox ID="txtname" CssClass="form-control" runat="server"></asp:TextBox>
+
+                            <div class="admin-form-section">
+                                <h5 class="admin-form-section-title"><i class="fa fa-address-card-o"></i> Personal Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtname.ClientID %>">Full Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-user-circle"></i></span>
+                                                <asp:TextBox ID="txtname" CssClass="form-control" runat="server" placeholder="Enter full name" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtmobile.ClientID %>">Mobile</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-mobile"></i></span>
+                                                <asp:TextBox ID="txtmobile" MaxLength="10" placeholder="10 digit mobile number (no +91 or 0)" CssClass="form-control" runat="server" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Mobile</label>
-                                        <asp:TextBox ID="txtmobile" MaxLength="10" placeholder="Enter only 10 digit mobile number, do not use country code i.e (+91 or 0)" CssClass="form-control" runat="server"></asp:TextBox>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtemail.ClientID %>">Email</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-envelope-o"></i></span>
+                                                <asp:TextBox ID="txtemail" CssClass="form-control" runat="server" placeholder="Enter email address" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= ddgender.ClientID %>">Gender</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-venus-mars"></i></span>
+                                                <asp:DropDownList ID="ddgender" CssClass="form-control" runat="server">
+                                                    <asp:ListItem Value="0">Select Gender</asp:ListItem>
+                                                    <asp:ListItem Value="Male">Male</asp:ListItem>
+                                                    <asp:ListItem Value="Female">Female</asp:ListItem>
+                                                </asp:DropDownList>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Email :</label>
-                                        <asp:TextBox ID="txtemail" CssClass="form-control" runat="server"></asp:TextBox>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Gender :</label>
-                                        <asp:DropDownList ID="ddgender" CssClass="form-control" runat="server">
-                                            <asp:ListItem Value="0">Select Gender</asp:ListItem>
-                                            <asp:ListItem Value="Male">Male</asp:ListItem>
-                                            <asp:ListItem Value="Female">Female</asp:ListItem>
-                                        </asp:DropDownList>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="row" style="display: none;">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Date of Birth : Year-Month-Date</label>
-                                        <fieldset>
-
-                                            <%--<asp:TextBox ID="txtdateofbirth" CssClass="form-control form_date" runat="server"></asp:TextBox>--%>
-                                            <div class="col-md-4 dvRow">
+                                        <label>Date of Birth</label>
+                                        <div class="admin-dob-grid">
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-calendar"></i></span>
                                                 <asp:DropDownList ID="ddlYear" CssClass="form-control" ToolTip="Year" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddlYear_SelectedIndexChanged">
                                                 </asp:DropDownList>
                                             </div>
-                                            <div class="col-md-4 dvRow">
+                                            <div class="admin-input-group">
                                                 <asp:DropDownList ID="ddlMonth" CssClass="form-control" ToolTip="Month" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddlMonth_SelectedIndexChanged">
                                                 </asp:DropDownList>
                                             </div>
-                                            <div class="col-md-4 dvRow">
+                                            <div class="admin-input-group">
                                                 <asp:DropDownList ID="ddlDay" CssClass="form-control" ToolTip="Day" runat="server">
                                                 </asp:DropDownList>
                                             </div>
-                                        </fieldset>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <%-- <h4><b>Communication Information</b></h4>
-                     <hr />--%>
+
                             <div class="row" style="display: none;">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>Address :</label>
-                                        <asp:TextBox ID="txtaddress" TextMode="MultiLine" CssClass="form-control" runat="server"></asp:TextBox>
+                                        <label for="<%= txtaddress.ClientID %>">Address</label>
+                                        <div class="admin-input-group admin-textarea-group">
+                                            <span class="admin-input-icon"><i class="fa fa-map-marker"></i></span>
+                                            <asp:TextBox ID="txtaddress" TextMode="MultiLine" CssClass="form-control" runat="server" placeholder="Enter address" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row" style="display: none;">
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-sm-6">
                                     <div class="form-group">
-                                        <label>Select Country :</label>
-                                        <asp:DropDownList ID="ddcountry" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
-                                            <asp:ListItem Value="0"> Select Country</asp:ListItem>
-                                        </asp:DropDownList>
+                                        <label for="<%= ddcountry.ClientID %>">Country</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-globe"></i></span>
+                                            <asp:DropDownList ID="ddcountry" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
+                                                <asp:ListItem Value="0">Select Country</asp:ListItem>
+                                            </asp:DropDownList>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-sm-6">
                                     <div class="form-group">
-                                        <label>Select State</label>
-                                        <asp:DropDownList ID="ddstate" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddstate_SelectedIndexChanged">
-                                            <asp:ListItem Value="0"> Select State</asp:ListItem>
-                                        </asp:DropDownList>
+                                        <label for="<%= ddstate.ClientID %>">State</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-map"></i></span>
+                                            <asp:DropDownList ID="ddstate" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddstate_SelectedIndexChanged">
+                                                <asp:ListItem Value="0">Select State</asp:ListItem>
+                                            </asp:DropDownList>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row" style="display: none;">
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-sm-6">
                                     <div class="form-group">
-                                        <label>Select City :</label>
-                                        <asp:DropDownList ID="ddcity" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddcity_SelectedIndexChanged">
-                                            <asp:ListItem Value="0"> Select City</asp:ListItem>
-                                        </asp:DropDownList>
+                                        <label for="<%= ddcity.ClientID %>">City</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-building-o"></i></span>
+                                            <asp:DropDownList ID="ddcity" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddcity_SelectedIndexChanged">
+                                                <asp:ListItem Value="0">Select City</asp:ListItem>
+                                            </asp:DropDownList>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-sm-6">
                                     <div class="form-group">
-                                        <label>Area</label>
-                                        <asp:TextBox ID="txtareaname" CssClass="form-control" runat="server"></asp:TextBox>
+                                        <label for="<%= txtareaname.ClientID %>">Area</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-location-arrow"></i></span>
+                                            <asp:TextBox ID="txtareaname" CssClass="form-control" runat="server" placeholder="Enter area" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <asp:Panel ID="otherPnl" runat="server" Visible="false">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-sm-6">
                                         <div class="form-group">
-                                            <label>Other City :</label>
-                                            <asp:TextBox ID="TxtOtherCity" CssClass="form-control" runat="server"></asp:TextBox>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
+                                            <label for="<%= TxtOtherCity.ClientID %>">Other City</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-building"></i></span>
+                                                <asp:TextBox ID="TxtOtherCity" CssClass="form-control" runat="server" placeholder="Enter city name" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </asp:Panel>
                             <div class="row" style="display: none;">
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-sm-6">
                                     <div class="form-group">
-                                        <label>Pincode :</label>
-                                        <asp:TextBox ID="txtpincode" CssClass="form-control" runat="server"></asp:TextBox>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                    </div>
-                                </div>
-                            </div>
-                            <h4><b>Password Information</b></h4>
-                            <hr />
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Password :</label>
-                                        <asp:TextBox ID="txtUserpassword" TextMode="Password" CssClass="form-control" runat="server"></asp:TextBox>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Confirm Password</label>
-                                        <asp:TextBox ID="txtconfirmpassword" TextMode="Password" CssClass="form-control" runat="server"></asp:TextBox>
+                                        <label for="<%= txtpincode.ClientID %>">Pincode</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-map-pin"></i></span>
+                                            <asp:TextBox ID="txtpincode" CssClass="form-control" runat="server" placeholder="Enter pincode" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!----------------------------(Starts) For PAN Card <Not Mandatory>---------------------------------->
-                            <div style="display: none;">
-                                <h4><b>PAN Card Details</b></h4>
-                                <hr />
+                            <div class="admin-form-section admin-form-section-last">
+                                <h5 class="admin-form-section-title"><i class="fa fa-lock"></i> Password</h5>
+                                <p class="admin-section-hint">Set a secure login password for the new user account.</p>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-sm-6">
                                         <div class="form-group">
-                                            <label>PanCard from :</label>
-                                            <asp:FileUpload ID="panUpload" runat="server" />
+                                            <label for="<%= txtUserpassword.ClientID %>">Password</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-key"></i></span>
+                                                <asp:TextBox ID="txtUserpassword" TextMode="Password" CssClass="form-control" runat="server" placeholder="Enter password" />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-sm-6">
                                         <div class="form-group">
-                                            <label>PanCard Number :</label>
-                                            <asp:TextBox ID="txtPanNumber" runat="server" CssClass="form-control"></asp:TextBox>
+                                            <label for="<%= txtconfirmpassword.ClientID %>">Confirm Password</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-check-circle"></i></span>
+                                                <asp:TextBox ID="txtconfirmpassword" TextMode="Password" CssClass="form-control" runat="server" placeholder="Re-enter password" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!----------------------------(Ends) For PAN Card <Not Mandatory>---------------------------------->
+
+                            <div style="display: none;">
+                                <div class="admin-form-section">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-credit-card"></i> PAN Card Details</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= panUpload.ClientID %>">PAN Card Upload</label>
+                                                <asp:FileUpload ID="panUpload" runat="server" CssClass="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtPanNumber.ClientID %>">PAN Number</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-id-card"></i></span>
+                                                    <asp:TextBox ID="txtPanNumber" runat="server" CssClass="form-control" placeholder="Enter PAN number" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
-                        <div class="box-footer">
-                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                            <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Cancel" OnClick="btnCancel_Click" />
+                        <div class="box-footer admin-product-footer">
+                            <asp:Button ID="btnCancel" CssClass="btn btn-default" runat="server" Text="Cancel" OnClick="btnCancel_Click" />
+                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Register User" OnClick="btnSubmit_Click" />
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="Div_FDetails" class="modal fade">
-                <div class="modal-dialog" style="margin-top: 60px;">
+            <div id="Div_FDetails" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="userVerifyModalTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <div class="container-fluid">
-                                <h4 class="modal-title pull-left">Verify User</h4>
-                            </div>
+                            <h4 class="modal-title" id="userVerifyModalTitle">Verify User</h4>
+                            <button type="button" class="close" onclick="ClosesFranchiseepopup();" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="modal-body">
-                            <div class="container-fluid">
-                                <div class="product_item" style="width: 100%;">
-                                    <div class="row" id="divmob" runat="server">
-                                        <div class="form-group">
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Enter OTP Sent On Mobile</label>
-                                                <asp:TextBox ID="txtmobotp" CssClass="form-control" runat="server"></asp:TextBox>
-                                                <br />
-                                                <asp:Button ID="btnresendmobotp" CssClass="btn btn-primary" runat="server" Text="Resend OTP" OnClick="btnresendmobotp_Click" />&nbsp;<asp:Label ID="lblmobstatus" runat="server"></asp:Label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <br />
-                                                <asp:Button ID="btnverifymob" CssClass="btn btn-primary" Style="width: 100px;" runat="server" Text="Verify" OnClick="btnverifymob_Click" />
-                                            </div>
-                                        </div>
+                            <div class="row" id="divmob" runat="server">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="<%= txtmobotp.ClientID %>">Enter OTP sent on mobile</label>
+                                        <asp:TextBox ID="txtmobotp" CssClass="form-control" runat="server" placeholder="Enter mobile OTP" />
                                     </div>
-                                    <div class="row" id="divemail" runat="server">
-                                        <div class="form-group">
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Enter OTP Sent On Email</label>
-                                                <asp:TextBox ID="txtemailotp" CssClass="form-control" runat="server"></asp:TextBox>
-                                                <br />
-                                                <asp:Button ID="btnresendemailotp" CssClass="btn btn-primary" runat="server" Text="Resend OTP" OnClick="btnresendemailotpClick" />&nbsp;
-                                                <asp:Label ID="lblemailstatus" runat="server"></asp:Label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <br />
-                                                <asp:Button ID="btnverifyemail" CssClass="btn btn-primary" Style="width: 100px;" runat="server" Text="Verify" OnClick="btnverifyemail_Click" />
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="col-md-8 col-sm-7">
+                                    <asp:Button ID="btnresendmobotp" CssClass="btn btn-default btn-sm" runat="server" Text="Resend OTP" OnClick="btnresendmobotp_Click" />
+                                    <asp:Label ID="lblmobstatus" runat="server" CssClass="admin-otp-status"></asp:Label>
+                                </div>
+                                <div class="col-md-4 col-sm-5 text-right">
+                                    <asp:Button ID="btnverifymob" CssClass="btn btn-primary" runat="server" Text="Verify" OnClick="btnverifymob_Click" />
+                                </div>
+                            </div>
+                            <div class="row" id="divemail" runat="server" style="margin-top: 16px;">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="<%= txtemailotp.ClientID %>">Enter OTP sent on email</label>
+                                        <asp:TextBox ID="txtemailotp" CssClass="form-control" runat="server" placeholder="Enter email OTP" />
                                     </div>
+                                </div>
+                                <div class="col-md-8 col-sm-7">
+                                    <asp:Button ID="btnresendemailotp" CssClass="btn btn-default btn-sm" runat="server" Text="Resend OTP" OnClick="btnresendemailotpClick" />
+                                    <asp:Label ID="lblemailstatus" runat="server" CssClass="admin-otp-status"></asp:Label>
+                                </div>
+                                <div class="col-md-4 col-sm-5 text-right">
+                                    <asp:Button ID="btnverifyemail" CssClass="btn btn-primary" runat="server" Text="Verify" OnClick="btnverifyemail_Click" />
                                 </div>
                             </div>
                         </div>

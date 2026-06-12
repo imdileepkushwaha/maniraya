@@ -240,37 +240,33 @@
               </div>
              </div>
                          </div>
-                                 <div id="myModal" class="modal fade">
-              <div class="modal-dialog">
+                                 <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="pscEditModalTitle" aria-hidden="true">
+              <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Edit</h4>
+                    <h4 class="modal-title" id="pscEditModalTitle">Edit Mapping</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                     Name
+                        <label for="<%= lblsubcate.ClientID %>">Sub-Category</label>
                       <asp:Label ID="lblcountryid" Visible="false"  runat="server" Text=""></asp:Label>
                 <asp:Label ID="lblsubcate" CssClass="form-control"  runat="server" Text=""></asp:Label>
                     </div>
-                        <div class="form-group">
-                       Color
- 
+                    <div class="form-group">
+                        <label for="<%= Ddlstcoloredit.ClientID %>">Color</label>
                             <asp:DropDownList ID="Ddlstcoloredit"  CssClass="form-control" runat="server">
-                                 
                             </asp:DropDownList>
-</div>
-                </div>
-                                        <div class="form-group">
-                       Size
- 
+                    </div>
+                    <div class="form-group">
+                        <label for="<%= DDlstsizeedit.ClientID %>">Size</label>
                             <asp:DropDownList ID="DDlstsizeedit"  CssClass="form-control" runat="server">
-                              
                             </asp:DropDownList>
-</div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                    <asp:Button ID="btnUpdate" runat="server" Text="Update"  OnClientClick="return validate2();" CssClass="btn btn-primary" />
-                      <button type="button"  class="btn btn-danger"  data-dismiss="modal">Close</button>                  
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -309,17 +305,6 @@
                  pscPrm._pscSizeCounterHooked = true;
                  pscPrm.add_endRequest(initPscSizeCounter);
              }
-         }
-
-         function showModal() {
-             $('#myModal').modal({ backdrop: 'static', keyboard: false });
-         }
-
-         function Closepopup() {
-             $('#myModal').modal('hide');
-             $('body').removeClass('modal-open');
-             $('body').css('padding-right', '0');
-             $('.modal-backdrop').remove();
          }
      </script>
 </asp:Content>

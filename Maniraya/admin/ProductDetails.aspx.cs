@@ -14,14 +14,20 @@ public partial class admin_ProductDetails : System.Web.UI.Page
 {
     Data ObjData = new Data();
     clsProduct objState = new clsProduct();
+
+    private DataTable ProductData
+    {
+        get { return ViewState["ProductData"] as DataTable; }
+        set { ViewState["ProductData"] = value; }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
             if (Session["useradmin"] != null)
             {
-                
-                loadProduct();
+                loadProduct(false);
             }
             else
             {
@@ -29,10 +35,14 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             }
         }
     }
-    
-    void loadProduct()
+
+    void loadProduct(bool resetPage)
     {
-        DataTable dt = new DataTable();
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
         objState.ProductName = string.Empty;
         objState.Status = string.Empty;
         objState.PurchaseStatus = string.Empty;
@@ -45,14 +55,75 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         {
             objState.Status = ddstatus.SelectedValue;
         }
-       
+
         if (TxtProductCodeSearch.Text != string.Empty)
         {
             objState.ProductId = TxtProductCodeSearch.Text;
         }
-        dt = objState.getProductAll(objState);
+
+        ProductData = objState.getProductAll(objState);
+        BindGrid();
+    }
+
+    void BindGrid()
+    {
+        DataTable dt = ProductData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GridView1.PageIndex = 0;
+        if (ProductData != null)
+        {
+            BindGrid();
+        }
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
     }
     
     public string UploadImage()
@@ -118,7 +189,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             string popupScript2 = "Closepopup();";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
-            loadProduct();
+            loadProduct(false);
         }
     }
 
@@ -193,7 +264,10 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             Label lblstatename2 = (Label)GridView1.Rows[index].FindControl("lblstatename2");
             Label LblHSNcode = (Label)GridView1.Rows[index].FindControl("LblHSNcode");
             Label LBLBatchno = (Label)GridView1.Rows[index].FindControl("LBLBatchno");
-            DDLstStatusEdit.SelectedValue = LblStatus.Text;
+            if (!string.IsNullOrEmpty(LblStatus.Text) && DDLstStatusEdit.Items.FindByValue(LblStatus.Text) != null)
+            {
+                DDLstStatusEdit.SelectedValue = LblStatus.Text;
+            }
             lblstateid.Text = lblid.Text;
             txtstatenameedit.Text = lblstatename.Text;
             TxtAmountEdit.Text = lblAmount.Text;
@@ -204,33 +278,21 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             txtGst.Text = lblstatenameGST.Text;
             TxtHsncode.Text = LblHSNcode.Text;
             Txtbatchno.Text = LBLBatchno.Text;
-            if (LblImage.Text != "../ProductImage/" && LblImage.Text != "")
-            {
-                Image2.ImageUrl = LblImage.Text;
-            }
-            else
-            {
-                Image2.ImageUrl = "../ProductImage/images.png";
-            }
-            ////////////////////////////////////////////////////////////////////////
-            if (LblImage2.Text != "../ProductImage/" && LblImage2.Text != "")
-            {
-                Image3.ImageUrl = LblImage2.Text;
-            }
-            else
-            {
-                Image3.ImageUrl = "../ProductImage/images.png";
-            }
-            ////////////////////////////////////////////////////////////////////////
-            if (LblImage3.Text != "../ProductImage/" && LblImage3.Text != "")
-            {
-                Image4.ImageUrl = LblImage3.Text;
-            }
-            else
-            {
-                Image4.ImageUrl = "../ProductImage/images.png";
-            }
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+
+            string img1 = GetEditImageUrl(LblImage.Text);
+            string img2 = GetEditImageUrl(LblImage2.Text);
+            string img3 = GetEditImageUrl(LblImage3.Text);
+
+            Image2.ImageUrl = string.IsNullOrEmpty(img1) ? "../ProductImage/images.png" : img1;
+            Image3.ImageUrl = string.IsNullOrEmpty(img2) ? "../ProductImage/images.png" : img2;
+            Image4.ImageUrl = string.IsNullOrEmpty(img3) ? "../ProductImage/images.png" : img3;
+
+            string popupScript = string.Format(
+                "syncEditProductImages('{0}','{1}','{2}'); showModal();",
+                JsEncode(img1),
+                JsEncode(img2),
+                JsEncode(img3));
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", popupScript, true);
         }
         if (e.CommandName == "photolarge")
         {
@@ -268,7 +330,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
     }
     protected void BtnSearch_Click(object sender, EventArgs e)
     {
-        loadProduct();
+        loadProduct(true);
     }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
@@ -284,5 +346,25 @@ public partial class admin_ProductDetails : System.Web.UI.Page
                 image.ImageUrl = "../ProductImage/images.png";
             }
         }
+    }
+
+    string GetEditImageUrl(string url)
+    {
+        if (string.IsNullOrEmpty(url) || url == "../ProductImage/" || url.IndexOf("images.png", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return string.Empty;
+        }
+
+        return url;
+    }
+
+    string JsEncode(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return string.Empty;
+        }
+
+        return value.Replace("\\", "\\\\").Replace("'", "\\'");
     }
 }

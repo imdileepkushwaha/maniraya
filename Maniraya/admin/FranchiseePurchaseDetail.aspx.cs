@@ -15,6 +15,12 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
     clsAccount objaccount = new clsAccount();
     clsProduct objP = new clsProduct();
     clsvendor objV = new clsvendor();
+
+    private DataTable PurchaseData
+    {
+        get { return ViewState["PurchaseData"] as DataTable; }
+        set { ViewState["PurchaseData"] = value; }
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -39,10 +45,16 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loaduser();
+        loaduser(true);
     }
-    void loaduser()
+
+    void loaduser(bool resetPage)
     {
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
         objV.VendorId = string.Empty;
         if (txtfromdate.Text != "")
         {
@@ -60,14 +72,74 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
         {
             objV.Todate = DateTime.MinValue;
         }
-      
-            objV.VendorId = TxtFranchiseeId.Text;
-      
-        DataTable dt = new DataTable();
-        dt = getFranchiseePurchaseNew(objV);
+
+        objV.VendorId = TxtFranchiseeId.Text;
+
+        PurchaseData = getFranchiseePurchaseNew(objV);
+        BindGrid();
+    }
+
+    void BindGrid()
+    {
+        DataTable dt = PurchaseData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GridView1.PageIndex = 0;
+        if (PurchaseData != null)
+        {
+            BindGrid();
+        }
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
+    }
+
     public DataTable getFranchiseePurchaseNew(clsvendor objstate)
     {
        
@@ -190,7 +262,7 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
             {
                 string popupScript = "alert('" + dT.Rows[0][1].ToString() + "');";
                 ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                loaduser();
+                loaduser(false);
             }
             else
             {
@@ -219,7 +291,7 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
             {
                 string popupScript = "alert('" + dT.Rows[0][1].ToString() + "');";
                 ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                loaduser();
+                loaduser(false);
             }
             else
             {

@@ -223,6 +223,7 @@ public partial class FranchiseePurchaseMaster : System.Web.UI.Page
             PurchaseDt.Rows.Add(DR);
             ViewState["PDT"] = PurchaseDt;
             PnlDt.Visible = true;
+            ResetGridTotals();
             GridView1.DataSource = PurchaseDt;
             GridView1.DataBind();
             ClearValue();          
@@ -258,14 +259,45 @@ public partial class FranchiseePurchaseMaster : System.Web.UI.Page
     }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
+        ResetGridTotals();
         GridView1.DataSource = null;
-        GridView1.DataBind();       
+        GridView1.DataBind();
         if (ViewState["PDT"] != null)
         {
             ViewState["PDT"] = null;
         }
         PurchaseDt = null;
+        PnlDt.Visible = false;
         cleardatarefresh();
+        ClearSummaryFields();
+    }
+
+    void ClearSummaryFields()
+    {
+        TxtTotalPrice.Text = string.Empty;
+        TxtTotalTotalDP.Text = string.Empty;
+        TxtTotalBV.Text = string.Empty;
+        TxtTotalpurchase.Text = string.Empty;
+        TxtTotalCGST.Text = string.Empty;
+        TxtTotalSGST.Text = string.Empty;
+        TxtTotalIGST.Text = string.Empty;
+        TxtpaybleAmount.Text = string.Empty;
+        TxtRestAmount.Text = string.Empty;
+        TxtCash.Text = string.Empty;
+        HDTotal.Value = string.Empty;
+    }
+
+    void ResetGridTotals()
+    {
+        total = 0;
+        tt = 0;
+        totalPurchase = 0;
+        totalGST = 0;
+        totalCGST = 0;
+        totalSGST = 0;
+        totalIGST = 0;
+        totalDP = 0;
+        totalBV = 0;
     }
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
@@ -380,6 +412,7 @@ public partial class FranchiseePurchaseMaster : System.Web.UI.Page
             }
         }
         ViewState["PDT"] = PurchaseDt;
+        ResetGridTotals();
         GridView1.DataSource = PurchaseDt;
         GridView1.DataBind();
         ClearValue();
@@ -514,6 +547,7 @@ public partial class FranchiseePurchaseMaster : System.Web.UI.Page
         {
             string popupScript = "alert('Purchase Successfull');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            ResetGridTotals();
             GridView1.DataSource = null;
             GridView1.DataBind();
             PnlDt.Visible = false;
@@ -523,6 +557,7 @@ public partial class FranchiseePurchaseMaster : System.Web.UI.Page
             }
             PurchaseDt = null;
             ClearValue();
+            ClearSummaryFields();
 
         }
         else if (Dt == null)

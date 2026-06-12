@@ -264,6 +264,11 @@ public partial class FranchiseeReport : System.Web.UI.Page
         loaduser();
     }
 
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        loaduser();
+    }
+
     protected void ddltehsiledit_SelectedIndexChanged(object sender, EventArgs e)
     {
       
@@ -277,7 +282,7 @@ public partial class FranchiseeReport : System.Web.UI.Page
     {
         Response.Clear();
         Response.Buffer = true;
-        Response.AddHeader("content-disposition", "attachment;filename=UserReport.xls");
+        Response.AddHeader("content-disposition", "attachment;filename=FranchiseeReport.xls");
         Response.Charset = "";
         Response.ContentType = "application/vnd.ms-excel";
         using (StringWriter sw = new StringWriter())

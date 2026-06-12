@@ -14,14 +14,20 @@ public partial class Dailypayoutdetail : System.Web.UI.Page
     clsState objState = new clsState();
     clsUser objUser = new clsUser();
     clsClosing objCL = new clsClosing();
+
+    private DataTable PayoutData
+    {
+        get { return ViewState["PayoutData"] as DataTable; }
+        set { ViewState["PayoutData"] = value; }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
             if (Session["useradmin"] != null)
             {
-                //txtuserid.Text = Session["userid"].ToString();
-                loaduser();
+                loadClosingDates();
             }
             else
             {
@@ -29,11 +35,10 @@ public partial class Dailypayoutdetail : System.Web.UI.Page
             }
         }
     }
-    void loaduser()
+
+    void loadClosingDates()
     {
-      
-        DataTable dt = new DataTable();
-        dt = objCL.getdailyClosingDate();
+        DataTable dt = objCL.getdailyClosingDate();
         DDlstFromdate.DataSource = dt;
         DDlstFromdate.DataTextField = "ClosingDate";
         DDlstFromdate.DataValueField = "ClosingDate";
@@ -41,43 +46,119 @@ public partial class Dailypayoutdetail : System.Web.UI.Page
         ListItem li = new ListItem("Select Date", "0");
         DDlstFromdate.Items.Insert(0, li);
     }
-    void loaddata()
+
+    void loaddata(bool resetPage)
     {
-        string Fromdate = string.Empty;
-        string Todatedate= string.Empty;
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
+        string fromDate = string.Empty;
+        string toDate = string.Empty;
         if (DDlstFromdate.SelectedIndex != 0)
         {
             string[] str = DDlstFromdate.SelectedValue.Split('=');
-            Fromdate = str[0].ToString();
-            Todatedate = str[1].ToString();
+            fromDate = str[0].ToString();
+            toDate = str[1].ToString();
         }
 
-        DataTable Dt = objCL.getdailyClosingReport(Fromdate, Todatedate, txtuserid.Text);
-            GridView1.DataSource = Dt;
-            GridView1.DataBind();
-        
+        DataTable dt = objCL.getdailyClosingReport(fromDate, toDate, txtuserid.Text);
+        PayoutData = dt;
+        BindGrid();
     }
+
+    void BindGrid()
+    {
+        DataTable dt = PayoutData;
+        if (dt == null)
+        {
+            GridView1.DataSource = null;
+            GridView1.DataBind();
+            return;
+        }
+
+        int pageSize = GetPageSize();
+        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+
+            if (dt.Rows.Count > 0)
+            {
+                int totalPages = (int)Math.Ceiling(dt.Rows.Count / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                }
+            }
+        }
+
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+
+        return 10;
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindGrid();
+    }
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GridView1.PageIndex = 0;
+        if (PayoutData != null)
+        {
+            BindGrid();
+        }
+    }
+
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loaddata();
+        loaddata(true);
     }
+
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
-    }   
+    }
+
     protected void ExportToExcel(object sender, EventArgs e)
     {
+        DataTable dt = PayoutData;
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
+
+        GridView1.AllowPaging = false;
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+
         Response.Clear();
         Response.Buffer = true;
-        Response.AddHeader("content-disposition", "attachment;filename=DownlineReport.xls");
+        Response.AddHeader("content-disposition", "attachment;filename=DailyPayoutDetail.xls");
         Response.Charset = "";
         Response.ContentType = "application/vnd.ms-excel";
         using (StringWriter sw = new StringWriter())
         {
             HtmlTextWriter hw = new HtmlTextWriter(sw);
-
-            //To Export all pages
-           
 
             GridView1.HeaderRow.BackColor = Color.White;
             foreach (TableCell cell in GridView1.HeaderRow.Cells)
@@ -103,7 +184,6 @@ public partial class Dailypayoutdetail : System.Web.UI.Page
 
             GridView1.RenderControl(hw);
 
-            //style to format numbers to string
             string style = @"<style> .textmode { } </style>";
             Response.Write(style);
             Response.Output.Write(sw.ToString());
@@ -114,6 +194,5 @@ public partial class Dailypayoutdetail : System.Web.UI.Page
 
     public override void VerifyRenderingInServerForm(Control control)
     {
-        /* Verifies that the control is rendered */
     }
 }
