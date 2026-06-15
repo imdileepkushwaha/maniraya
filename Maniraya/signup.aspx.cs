@@ -477,7 +477,7 @@ public partial class signup : System.Web.UI.Page
         }
        else
         {
-            objUser.SponserId = "TW000001";
+            objUser.SponserId = "M000001";
         }
         objUser.EpinNo = ddepin.SelectedValue.ToString();
         objUser.ParentUserId = txtparentid.Text;
@@ -547,9 +547,9 @@ public partial class signup : System.Web.UI.Page
                 string useremail = txtemail.Text;
                 string number = txtmobile.Text;
 
-                //   userMail(username, userid, password, useremail);
+                  userMail(username, userid, password, useremail);
 
-                // smssending(number, username, userid, password);
+                 smssending(number, username, userid, password);
 
                 Response.Redirect("ConfirmRegistration.aspx");
             }

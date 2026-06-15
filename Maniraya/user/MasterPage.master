@@ -338,7 +338,7 @@
 							 <li><a class="slide-item" href="#">Level Income</a></li>
 						</ul>
 					</li>
-                     <li style="display:none"><h3>Topup Request</h3></li>
+                     <li ><h3>Topup Request</h3></li>
 					<li class="slide" style="display:none">
 						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">Topup Request</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
