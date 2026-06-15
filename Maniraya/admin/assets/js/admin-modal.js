@@ -1,6 +1,7 @@
 /**
  * Bootstrap 3 modals with ASP.NET UpdatePanel async postbacks.
- * Moves modal to <body> so it stacks above the backdrop.
+ * Moves modal inside the WebForms <form> so postback buttons keep working,
+ * while fixed positioning + z-index keep it above the backdrop.
  */
 (function ($) {
     'use strict';
@@ -8,6 +9,14 @@
     function resetBackdrop() {
         $('body').removeClass('modal-open').css('padding-right', '');
         $('.modal-backdrop').remove();
+    }
+
+    function getModalContainer() {
+        var $form = $('#form1');
+        if (!$form.length) {
+            $form = $('form').first();
+        }
+        return $form.length ? $form : $('body');
     }
 
     window.showAdminModal = function (modalId) {
@@ -18,6 +27,7 @@
 
             document.body.classList.remove('admin-sidebar-open');
 
+            var $container = getModalContainer();
             $('body > #' + modalId).remove();
 
             var $modal = $('#' + modalId).last();
@@ -29,8 +39,8 @@
                 $modal.data('bs.modal', null);
             }
 
-            if (!$modal.parent().is('body')) {
-                $modal.appendTo('body');
+            if (!$modal.parent().is($container)) {
+                $modal.appendTo($container);
             }
 
             $modal.off('shown.bs.modal.admin').on('shown.bs.modal.admin', function () {
@@ -87,10 +97,11 @@
 
         prm._adminModalHooked = true;
         prm.add_endRequest(function () {
+            var $container = getModalContainer();
             $('.modal.in').each(function () {
                 var $modal = $(this);
-                if (!$modal.parent().is('body')) {
-                    $modal.appendTo('body');
+                if (!$modal.parent().is($container)) {
+                    $modal.appendTo($container);
                 }
             });
         });

@@ -7,7 +7,7 @@
     <title></title>
      <meta property="og:title" content="Affiliate Link" />
     <meta property="og:description" content="" />
-  <meta property="og:url" content="http://arsenpay.in/user/Dashboard.aspx" />
+  <meta property="og:url" content="user/Dashboard.aspx" />
 </head>
 <body>
     <form id="form1" runat="server">

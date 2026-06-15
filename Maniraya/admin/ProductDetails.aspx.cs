@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -166,22 +167,68 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         }
         return Imagename;
     }
+
+    public string UploadImage4()
+    {
+        string Imagename = "";
+        if (ProductImageUpload4.HasFile)
+        {
+            string RandomNumber = DateTime.Now.Ticks.ToString();
+            string fileName = Path.GetFileName(ProductImageUpload4.PostedFile.FileName);
+            Imagename = RandomNumber + fileName;
+            ProductImageUpload4.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
+
+        }
+        return Imagename;
+    }
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
+        decimal amount;
+        decimal bv;
+        decimal mrp;
+        decimal dp;
+        decimal gst;
+
+        if (!TryParseProductDecimal(TxtAmountEdit.Text, "CP", out amount))
+        {
+            return;
+        }
+
+        if (!TryParseProductDecimal(TxtBV.Text, "Business Volume", out bv))
+        {
+            return;
+        }
+
+        if (!TryParseProductDecimal(TxtMrp.Text, "MRP", out mrp))
+        {
+            return;
+        }
+
+        if (!TryParseProductDecimal(TXTDP.Text, "DP", out dp))
+        {
+            return;
+        }
+
+        if (!TryParseProductDecimal(txtGst.Text, "GST", out gst))
+        {
+            return;
+        }
+
         objState.ProductImage = UploadImage();
         objState.ProductImage2 = UploadImage2();
         objState.ProductImage3 = UploadImage3();
+        objState.ProductImage4 = UploadImage4();
         objState.ProductName = txtstatenameedit.Text;
         objState.ProductId = lblstateid.Text;
         objState.Description = TxtDescription.Content;
-        objState.Amount = Convert.ToDecimal(TxtAmountEdit.Text);
+        objState.Amount = amount;
         objState.Status = DDLstStatusEdit.SelectedValue;
-        objState.BV = Convert.ToDecimal(TxtBV.Text);
-        objState.MRP = Convert.ToDecimal(TxtMrp.Text);
+        objState.BV = bv;
+        objState.MRP = mrp;
         objState.HSNCODE = TxtHsncode.Text;
         objState.BATCHNO = Txtbatchno.Text;
-        objState.CouponCode = Convert.ToString(Math.Round(Convert.ToDecimal(TXTDP.Text),0));
-        objState.GST = Convert.ToDecimal(txtGst.Text);
+        objState.CouponCode = Convert.ToString(Math.Round(dp, 0));
+        objState.GST = gst;
         string res = Update_Product(objState);
         if (res == "t")
         {
@@ -227,6 +274,11 @@ public partial class admin_ProductDetails : System.Web.UI.Page
                     s2 = "update ProductMaster set ProductImage3='" + objState.ProductImage3 + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
                     ObjData.RunInsUpDelQueryTrans(s2, tr);
                 }
+                if (objState.ProductImage4 != "")
+                {
+                    s2 = "update ProductMaster set ProductImage4='" + objState.ProductImage4 + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                    ObjData.RunInsUpDelQueryTrans(s2, tr);
+                }
 
                 res = "t";
                 tr.Commit();
@@ -256,6 +308,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             Label LblImage = (Label)GridView1.Rows[index].FindControl("LblImage");
             Label LblImage2 = (Label)GridView1.Rows[index].FindControl("LblImage2");
             Label LblImage3 = (Label)GridView1.Rows[index].FindControl("LblImage3");
+            Label LblImage4 = (Label)GridView1.Rows[index].FindControl("LblImage4");
             Label LblStatus = (Label)GridView1.Rows[index].FindControl("LblStatuschk");
             Label LblBV = (Label)GridView1.Rows[index].FindControl("lblbv");
             Label Lblmrp = (Label)GridView1.Rows[index].FindControl("lblMRP");
@@ -270,28 +323,31 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             }
             lblstateid.Text = lblid.Text;
             txtstatenameedit.Text = lblstatename.Text;
-            TxtAmountEdit.Text = lblAmount.Text;
-            TxtBV.Text = LblBV.Text;
+            TxtAmountEdit.Text = FormatDecimalInput(lblAmount.Text);
+            TxtBV.Text = FormatDecimalInput(LblBV.Text);
             TxtDescription.Content = LblDescription.Text;
-            TxtMrp.Text = Lblmrp.Text;
-            TXTDP.Text = lblstatename2.Text;
-            txtGst.Text = lblstatenameGST.Text;
+            TxtMrp.Text = FormatDecimalInput(Lblmrp.Text);
+            TXTDP.Text = FormatDecimalInput(lblstatename2.Text);
+            txtGst.Text = FormatDecimalInput(lblstatenameGST.Text);
             TxtHsncode.Text = LblHSNcode.Text;
             Txtbatchno.Text = LBLBatchno.Text;
 
             string img1 = GetEditImageUrl(LblImage.Text);
             string img2 = GetEditImageUrl(LblImage2.Text);
             string img3 = GetEditImageUrl(LblImage3.Text);
+            string img4 = GetEditImageUrl(LblImage4.Text);
 
             Image2.ImageUrl = string.IsNullOrEmpty(img1) ? "../ProductImage/images.png" : img1;
             Image3.ImageUrl = string.IsNullOrEmpty(img2) ? "../ProductImage/images.png" : img2;
             Image4.ImageUrl = string.IsNullOrEmpty(img3) ? "../ProductImage/images.png" : img3;
+            Image5.ImageUrl = string.IsNullOrEmpty(img4) ? "../ProductImage/images.png" : img4;
 
             string popupScript = string.Format(
-                "syncEditProductImages('{0}','{1}','{2}'); showModal();",
+                "syncEditProductImages('{0}','{1}','{2}','{3}'); showModal();",
                 JsEncode(img1),
                 JsEncode(img2),
-                JsEncode(img3));
+                JsEncode(img3),
+                JsEncode(img4));
             ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", popupScript, true);
         }
         if (e.CommandName == "photolarge")
@@ -301,6 +357,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             Label LblImage = (Label)GridView1.Rows[index].FindControl("LblImage");
             Label LblImage2 = (Label)GridView1.Rows[index].FindControl("LblImage2");
             Label LblImage3 = (Label)GridView1.Rows[index].FindControl("LblImage3");
+            Label LblImage4 = (Label)GridView1.Rows[index].FindControl("LblImage4");
             if (LblImage.Text != "../ProductImage/" && LblImage.Text != "")
             {
                 ImageLarge.ImageUrl = LblImage.Text;
@@ -324,6 +381,14 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             else
             {
                 ImageLarge3.ImageUrl = "../ProductImage/images.png";
+            }
+            if (LblImage4.Text != "../ProductImage/" && LblImage4.Text != "")
+            {
+                ImageLarge4.ImageUrl = LblImage4.Text;
+            }
+            else
+            {
+                ImageLarge4.ImageUrl = "../ProductImage/images.png";
             }
             ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
         }
@@ -366,5 +431,53 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         }
 
         return value.Replace("\\", "\\\\").Replace("'", "\\'");
+    }
+
+    private static decimal ParseGridDecimal(string value)
+    {
+        decimal amount;
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
+        {
+            return amount;
+        }
+
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.CurrentCulture, out amount))
+        {
+            return amount;
+        }
+
+        return 0;
+    }
+
+    private static string FormatDecimalInput(string value)
+    {
+        return ParseGridDecimal(value).ToString(CultureInfo.InvariantCulture);
+    }
+
+    private bool TryParseProductDecimal(string text, string fieldName, out decimal value)
+    {
+        value = 0;
+        string trimmed = (text ?? string.Empty).Trim();
+
+        if (string.IsNullOrEmpty(trimmed))
+        {
+            ShowAlert("Enter " + fieldName);
+            return false;
+        }
+
+        if (decimal.TryParse(trimmed, NumberStyles.Number, CultureInfo.InvariantCulture, out value)
+            || decimal.TryParse(trimmed, NumberStyles.Number, CultureInfo.CurrentCulture, out value))
+        {
+            return true;
+        }
+
+        ShowAlert("Enter valid " + fieldName);
+        return false;
+    }
+
+    private void ShowAlert(string message)
+    {
+        string popupScript = "alert('" + message.Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
     }
 }

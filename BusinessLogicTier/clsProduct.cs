@@ -19,6 +19,7 @@ namespace BusinessLogicTier
 
         public string SizeId { get; set; }
         public string CategoryName { get; set; }
+        public string CategoryImage { get; set; }
         public string ProductId { get; set; }
         public string purchasestatus { get; set; }
         public string ProductName { get; set; }
@@ -298,35 +299,138 @@ namespace BusinessLogicTier
 
         public string Insert_Category(clsProduct objState)
         {
-            string res = "";
-            string s2 = "";
-            SqlConnection cn;
+            SqlConnection cn = null;
             SqlTransaction tr = null;
-            DataSet ds = new DataSet();
-            cn = ObjData.StartConnectionInTransaction();
-            tr = cn.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-                s2 = "sp_add_CategoryMaster";
-                SqlParameter[] parameter = {  
-                new SqlParameter("@CategoryName",objState.CategoryName), 
-                new SqlParameter("@MentionBy",objState.MentionBy)
-                };
-                res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
+                cn = ObjData.StartConnectionInTransaction();
+                tr = cn.BeginTransaction(IsolationLevel.Serializable);
+
+                bool inserted = false;
+
+                if (TryInsertCategoryProc(tr, objState, false))
+                {
+                    inserted = true;
+                }
+                else if (!string.IsNullOrEmpty(objState.CategoryImage) && TryInsertCategoryProc(tr, objState, true))
+                {
+                    inserted = true;
+                }
+                else if (TryInsertCategoryDirect(tr, objState))
+                {
+                    inserted = true;
+                }
+
+                if (!inserted)
+                {
+                    tr.Rollback();
+                    return "0";
+                }
+
+                if (!string.IsNullOrEmpty(objState.CategoryImage))
+                {
+                    try
+                    {
+                        UpdateCategoryImageAfterInsert(tr, objState);
+                    }
+                    catch
+                    {
+                        // Keep category saved even if img column/SP image support is missing.
+                    }
+                }
+
                 tr.Commit();
+                return "t";
             }
-            catch (Exception ex)
+            catch
             {
-                res = "0";
-                tr.Rollback();
+                if (tr != null)
+                {
+                    tr.Rollback();
+                }
+                return "0";
             }
             finally
             {
                 ObjData.EndConnection();
-                tr.Dispose();
+                if (tr != null)
+                {
+                    tr.Dispose();
+                }
             }
-            return res;
+        }
+
+        private bool TryInsertCategoryProc(SqlTransaction tr, clsProduct objState, bool includeImage)
+        {
+            try
+            {
+                SqlParameter[] parameter;
+                if (includeImage)
+                {
+                    parameter = new SqlParameter[] {
+                        new SqlParameter("@CategoryName", objState.CategoryName),
+                        new SqlParameter("@MentionBy", objState.MentionBy),
+                        new SqlParameter("@img", objState.CategoryImage)
+                    };
+                }
+                else
+                {
+                    parameter = new SqlParameter[] {
+                        new SqlParameter("@CategoryName", objState.CategoryName),
+                        new SqlParameter("@MentionBy", objState.MentionBy)
+                    };
+                }
+
+                ObjData.RunInsUpDelQueryTransProc("sp_add_CategoryMaster", tr, parameter);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool TryInsertCategoryDirect(SqlTransaction tr, clsProduct objState)
+        {
+            string safeName = (objState.CategoryName ?? string.Empty).Replace("'", "''");
+            string safeMention = (objState.MentionBy ?? string.Empty).Replace("'", "''");
+
+            if (!string.IsNullOrEmpty(objState.CategoryImage))
+            {
+                try
+                {
+                    string safeImg = objState.CategoryImage.Replace("'", "''");
+                    string sqlWithImg = "INSERT INTO CategoryMaster (CategoryName, MentionBy, img) VALUES ('"
+                        + safeName + "','" + safeMention + "','" + safeImg + "')";
+                    ObjData.RunInsUpDelQueryTrans(sqlWithImg, tr);
+                    objState.CategoryImage = string.Empty;
+                    return true;
+                }
+                catch
+                {
+                }
+            }
+
+            try
+            {
+                string sql = "INSERT INTO CategoryMaster (CategoryName, MentionBy) VALUES ('" + safeName + "','" + safeMention + "')";
+                ObjData.RunInsUpDelQueryTrans(sql, tr);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void UpdateCategoryImageAfterInsert(SqlTransaction tr, clsProduct objState)
+        {
+            string safeImg = (objState.CategoryImage ?? string.Empty).Replace("'", "''");
+            string safeName = (objState.CategoryName ?? string.Empty).Replace("'", "''");
+            string sql = "UPDATE CategoryMaster SET img='" + safeImg
+                + "' WHERE CategoryId = (SELECT TOP 1 CategoryId FROM CategoryMaster WHERE CategoryName='" + safeName + "' ORDER BY CategoryId DESC)";
+            ObjData.RunInsUpDelQueryTrans(sql, tr);
         }
         public string Insert_subCategory(clsProduct objState)
         {
@@ -477,7 +581,9 @@ namespace BusinessLogicTier
             {
                
 
-                s2 = "update CategoryMaster set CategoryName='" + objState.CategoryName + "' where CategoryId='" + objState.CategoryId + "'";
+                s2 = "update CategoryMaster set CategoryName='" + objState.CategoryName.Replace("'", "''") + "'"
+                    + (string.IsNullOrEmpty(objState.CategoryImage) ? "" : ", img='" + objState.CategoryImage.Replace("'", "''") + "'")
+                    + " where CategoryId='" + objState.CategoryId + "'";
 
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
                 res = "t";
@@ -653,7 +759,7 @@ namespace BusinessLogicTier
         }
         public DataTable getProductnewnew(clsProduct objstate)
         {
-            string str_query = "select sm.*,cm.categoryname,('ProductImage/'+ sm.productimage) as Image,('ProductImage/'+ sm.productimage2) as Image2,('ProductImage/'+ sm.productimage3) as Image3  from ProductMaster sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId where sm.productId='" + objstate.ProductId + "'  order by ProductName,cm.categoryname";
+            string str_query = "select sm.*,cm.categoryname,CASE WHEN ISNULL(sm.productimage,'')='' THEN '' ELSE 'ProductImage/'+ sm.productimage END as Image,CASE WHEN ISNULL(sm.productimage2,'')='' THEN '' ELSE 'ProductImage/'+ sm.productimage2 END as Image2,CASE WHEN ISNULL(sm.productimage3,'')='' THEN '' ELSE 'ProductImage/'+ sm.productimage3 END as Image3  from ProductMaster sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId where sm.productId='" + objstate.ProductId + "'  order by ProductName,cm.categoryname";
 
             DataTable dt = null;
             ObjData.StartConnection();
@@ -670,7 +776,7 @@ namespace BusinessLogicTier
         }
         public DataTable getProductAll(clsProduct objP)
         {
-            string str_query = "select row_number() over(order by ProductName,cm.categoryname) as srno,sm.*,cm.categoryname,('../ProductImage/'+ sm.productimage) as Image,case when sm.status=1 then 'Active' else 'Deactive' end as status1,case when sm.purchasestatus=0 then 'Open' else 'Sold' end as purchaseStatus1,('../ProductImage/'+ sm.ProductImage2) as Image2,('../ProductImage/'+ sm.productimage3) as Image3,Bv     from ProductMaster sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId  where 1=1 ";
+            string str_query = "select row_number() over(order by ProductName,cm.categoryname) as srno,sm.*,cm.categoryname,('../ProductImage/'+ sm.productimage) as Image,case when sm.status=1 then 'Active' else 'Deactive' end as status1,case when sm.purchasestatus=0 then 'Open' else 'Sold' end as purchaseStatus1,('../ProductImage/'+ sm.ProductImage2) as Image2,('../ProductImage/'+ sm.productimage3) as Image3,('../ProductImage/'+ sm.ProductImage4) as Image4,Bv     from ProductMaster sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId  where 1=1 ";
 
             if (objP.ProductName != String.Empty)
             {
@@ -806,7 +912,7 @@ namespace BusinessLogicTier
         }
         public DataTable getProductByid(clsProduct objstate)
         {
-            string str_query = "SELECT ProductID,productname,p.Categoryid,p.Subcategoryid,p.Amount,p.Description,('img/'+ p.productimage) as productImage,('img/' + p.productimage2) as productImage2,('img/' + p.productimage3) as productImage3,('img/' + p.productimage4) as productImage4,BV,MRP,GST,DP,HSNCODE,Batchno,SV,c.CategoryName,s.SubCategoryName,'2' stock FROM ProductMaster p JOIN subcategorymaster s ON p.Subcategoryid = s.SubCategoryId JOIN categorymaster c ON s.CategoryId = c.CategoryId WHERE ProductId='" + objstate.ProductId+"'";
+            string str_query = "SELECT ProductID,productname,p.Categoryid,p.Subcategoryid,p.Amount,p.Description,CASE WHEN ISNULL(p.productimage,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage END as productImage,CASE WHEN ISNULL(p.productimage2,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage2 END as productImage2,CASE WHEN ISNULL(p.productimage3,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage3 END as productImage3,CASE WHEN ISNULL(p.productimage4,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage4 END as productImage4,BV,MRP,GST,DP,HSNCODE,Batchno,SV,c.CategoryName,s.SubCategoryName,'2' stock FROM ProductMaster p JOIN subcategorymaster s ON p.Subcategoryid = s.SubCategoryId JOIN categorymaster c ON s.CategoryId = c.CategoryId WHERE ProductId='" + objstate.ProductId+"'";
 
             DataTable dt = null;
             ObjData.StartConnection();

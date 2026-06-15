@@ -16,6 +16,7 @@ using System.IO;
 
 public partial class signup : System.Web.UI.Page
 {
+    const string CaptchaSessionKey = "SignupCaptcha";
     clsState objState = new clsState();
     clsUser objUser = new clsUser();
     clsEPin objepin = new clsEPin();
@@ -25,7 +26,8 @@ public partial class signup : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-            ddposition.SelectedValue = "Left";
+            GenerateCaptcha();
+            ApplyReferralPosition();
             if (Request.QueryString["UserId"] != null)
             {
                 loadcountry();
@@ -92,6 +94,34 @@ public partial class signup : System.Web.UI.Page
                 //Response.Redirect("http://raxtan.com");
             }
         }
+    }
+
+    void ApplyReferralPosition()
+    {
+        string standing = Request.QueryString["standingposition"];
+        if (string.IsNullOrEmpty(standing))
+        {
+            standing = Request.QueryString["Standingposition"];
+        }
+
+        if (standing == "2")
+        {
+            ddposition.SelectedValue = "Right";
+        }
+        else
+        {
+            ddposition.SelectedValue = "Left";
+        }
+    }
+
+    void SyncPositionPickerUi()
+    {
+        ScriptManager.RegisterStartupScript(
+            UpdatePanel1,
+            UpdatePanel1.GetType(),
+            "syncSignupPosition",
+            "if (typeof syncSignupPositionPicker === 'function') { syncSignupPositionPicker(true); }",
+            true);
     }
     public string ChkMonth(string Code)
     {
@@ -361,6 +391,18 @@ public partial class signup : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(txtCaptcha.Text))
+        {
+            ShowCaptchaError("Please enter the security code.");
+            return;
+        }
+
+        if (!ValidateCaptcha())
+        {
+            ShowCaptchaError("Invalid security code. Please try again.");
+            return;
+        }
+
         //if (txtsponsername.Text == "")
         //{
         //    string popupScript = "alert('Invalid Sponser Id');";
@@ -485,6 +527,7 @@ public partial class signup : System.Web.UI.Page
         string res = objUser.Insert_User(objUser);
         if (res == "f")
         {
+            ResetCaptcha();
             string popupScript = "alert('Mobile No Already Exists');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
@@ -492,23 +535,27 @@ public partial class signup : System.Web.UI.Page
 
             if (res == "0")
         {
+            ResetCaptcha();
             string popupScript = "alert('Unknow error occurred');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
         else if (res == "m")
         {
+            ResetCaptcha();
             string popupScript = "alert('this SponserId limit is full');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
 
         else if (res == "ext")
         {
+            ResetCaptcha();
             string popupScript = "alert('this Mobile Number Is Already Exist');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
 
         else if (res == "e")
         {
+            ResetCaptcha();
             string popupScript = "alert('this link is already used');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
@@ -516,12 +563,14 @@ public partial class signup : System.Web.UI.Page
 
         else if (res == "c")
         {
+            ResetCaptcha();
             string popupScript = "alert('User is not 10 years');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
 
         else if (res == "-2")
         {
+            ResetCaptcha();
             string popupScript = "alert('Email Already Exist');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
@@ -703,6 +752,54 @@ public partial class signup : System.Web.UI.Page
         }
         return res;
     }
+    protected void lnkRefreshCaptcha_Click(object sender, EventArgs e)
+    {
+        GenerateCaptcha();
+        txtCaptcha.Text = string.Empty;
+    }
+
+    void GenerateCaptcha()
+    {
+        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        var random = new Random(Guid.NewGuid().GetHashCode());
+        char[] code = new char[6];
+
+        for (int i = 0; i < code.Length; i++)
+        {
+            code[i] = chars[random.Next(chars.Length)];
+        }
+
+        string captcha = new string(code);
+        Session[CaptchaSessionKey] = captcha;
+        lblCaptchaCode.Text = captcha;
+    }
+
+    bool ValidateCaptcha()
+    {
+        string expected = Convert.ToString(Session[CaptchaSessionKey]);
+        string entered = txtCaptcha.Text.Trim();
+
+        if (string.IsNullOrEmpty(expected) || string.IsNullOrEmpty(entered))
+        {
+            return false;
+        }
+
+        return string.Equals(expected, entered, StringComparison.OrdinalIgnoreCase);
+    }
+
+    void ResetCaptcha()
+    {
+        GenerateCaptcha();
+        txtCaptcha.Text = string.Empty;
+    }
+
+    void ShowCaptchaError(string message)
+    {
+        ResetCaptcha();
+        string popupScript = "alert('" + message.Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+    }
+
     protected void ddcountry_SelectedIndexChanged(object sender, EventArgs e)
     {
         loadstate();
@@ -760,6 +857,7 @@ public partial class signup : System.Web.UI.Page
     {
         loadsusername();
         loadAmountepin();
+        SyncPositionPickerUi();
     }
     protected void txtparentid_TextChanged(object sender, EventArgs e)
     {

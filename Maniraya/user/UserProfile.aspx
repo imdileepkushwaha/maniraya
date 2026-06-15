@@ -128,7 +128,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
 
-    <section class="content-header">
+    <div class="content-header">
 
         <h1>View Profile</h1>
 

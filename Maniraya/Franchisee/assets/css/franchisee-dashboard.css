@@ -1,0 +1,152 @@
+/* Franchisee dashboard page */
+body.franchisee-app .img-thumbnail {
+    padding: 0;
+}
+
+body.franchisee-app .fr-user-detail-box {
+    margin-bottom: 0;
+}
+
+body.franchisee-app .fr-detail-card {
+    height: 100%;
+    border: 1px solid #dbece9;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(13, 148, 136, 0.06);
+    overflow: hidden;
+}
+
+body.franchisee-app .fr-detail-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f766e;
+    background: linear-gradient(135deg, #f0fdfa 0%, #fff 100%);
+    border-bottom: 1px solid #e3f2ef;
+}
+
+body.franchisee-app .fr-detail-card-head i {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.22);
+}
+
+body.franchisee-app .fr-detail-card-body {
+    padding: 16px;
+}
+
+body.franchisee-app .fr-detail-card-photo .fr-detail-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    min-height: 220px;
+}
+
+body.franchisee-app .fr-user-avatar {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #ccfbf1;
+    box-shadow: 0 10px 28px rgba(13, 148, 136, 0.18);
+    background: #f8fcfb;
+}
+
+body.franchisee-app .fr-photo-hint {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+body.franchisee-app .fr-info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+body.franchisee-app .fr-info-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid #eef5f3;
+}
+
+body.franchisee-app .fr-info-list li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+body.franchisee-app .fr-info-list li:first-child {
+    padding-top: 0;
+}
+
+body.franchisee-app .fr-info-label {
+    flex: 0 0 38%;
+    min-width: 120px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+body.franchisee-app .fr-info-label i {
+    width: 18px;
+    margin-right: 4px;
+    color: #0d9488;
+    text-align: center;
+}
+
+body.franchisee-app .fr-info-value {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+@media (max-width: 991px) {
+    body.franchisee-app .fr-user-photo-col {
+        margin-bottom: 18px;
+    }
+}
+
+body.franchisee-app .danger-table > tbody > tr > th {
+    background: #f5d7d4;
+    border: 1px solid #f5d7d4;
+}
+
+body.franchisee-app .danger-table > tbody > tr > td {
+    border: 1px solid #e6e3e3;
+}
+
+body.franchisee-app .sucess-table > tbody > tr > th {
+    background: #bce9bb;
+    border: 1px solid #bce9bb;
+}
+
+body.franchisee-app .sucess-table > tbody > tr > td {
+    border: 1px solid #e6e3e3;
+}
+
+body.franchisee-app .warning-table > tbody > tr > th {
+    background: #f8ffbb;
+    border: 1px solid #f8ffbb;
+}
+
+body.franchisee-app .warning-table > tbody > tr > td {
+    border: 1px solid #e6e3e3;
+}

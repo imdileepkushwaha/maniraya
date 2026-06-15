@@ -1,0 +1,356 @@
+/* Franchisee panel – same layout as admin, teal/emerald theme */
+body.franchisee-app {
+    --admin-accent: #0d9488;
+    --admin-accent-soft: #f0fdfa;
+    --admin-accent-border: #99f6e4;
+    --admin-accent-dark: #0f766e;
+    --admin-bg: #f3f8f7;
+    --fr-accent-rgb: 13, 148, 136;
+}
+
+body.franchisee-app .admin-sidebar-user {
+    display: flex;
+}
+
+body.franchisee-app .admin-sidebar-body {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(var(--fr-accent-rgb), 0.07) 0%, transparent 42%),
+        linear-gradient(180deg, #f8fbfa 0%, #ffffff 38%, #f7faf9 100%);
+}
+
+body.franchisee-app .admin-sidebar-nav-chip {
+    color: #fff;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(var(--fr-accent-rgb), 0.22);
+}
+
+body.franchisee-app .admin-sidebar-logout:hover,
+body.franchisee-app .admin-sidebar-logout:focus {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(var(--fr-accent-rgb), 0.22);
+}
+
+body.franchisee-app .admin-side-link.is-active,
+body.franchisee-app .admin-side-toggle.is-active {
+    background: linear-gradient(135deg, #f0fdfa 0%, #fff 100%);
+    border-color: #99f6e4;
+    box-shadow: 0 8px 22px rgba(var(--fr-accent-rgb), 0.08);
+}
+
+body.franchisee-app .admin-side-link.is-active::before,
+body.franchisee-app .admin-side-toggle.is-active::before {
+    background: linear-gradient(180deg, #2dd4bf 0%, var(--admin-accent) 100%);
+    box-shadow: 0 0 10px rgba(var(--fr-accent-rgb), 0.35);
+}
+
+body.franchisee-app .admin-side-link.is-active > i:first-child,
+body.franchisee-app .admin-side-toggle.is-active > i.admin-side-icon,
+body.franchisee-app .admin-side-toggle.is-active > i:first-child:not(.admin-side-chevron) {
+    background: linear-gradient(135deg, #2dd4bf 0%, var(--admin-accent) 100%);
+    box-shadow: 0 6px 14px rgba(var(--fr-accent-rgb), 0.28);
+}
+
+body.franchisee-app .admin-side-submenu a.is-active {
+    color: var(--admin-accent) !important;
+    background: var(--admin-accent-soft);
+    border-color: var(--admin-accent-border);
+}
+
+body.franchisee-app .admin-topbar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbfa 100%);
+    border-bottom-color: #dbece9;
+}
+
+body.franchisee-app .admin-topbar-icon-btn:hover,
+body.franchisee-app .admin-topbar-icon-btn:focus {
+    color: var(--admin-accent);
+    background: var(--admin-accent-soft);
+    border-color: var(--admin-accent-border);
+}
+
+body.franchisee-app .admin-user-status {
+    background: #14b8a6;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+body.franchisee-app .admin-user-trigger:hover .admin-user-name,
+body.franchisee-app .admin-user-trigger:focus .admin-user-name {
+    color: var(--admin-accent);
+}
+
+body.franchisee-app .admin-user-menu-icon.is-profile {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+body.franchisee-app .admin-user-menu-icon.is-password {
+    background: #ecfeff;
+    color: #0e7490;
+}
+
+body.franchisee-app .admin-user-menu-link:hover .admin-user-menu-icon.is-profile,
+body.franchisee-app .admin-user-menu-link:focus .admin-user-menu-icon.is-profile {
+    background: #99f6e4;
+    color: #115e59;
+}
+
+body.franchisee-app .content .box.box-primary > .box-header,
+body.franchisee-app .content .box.box-primary .box-header {
+    border-top-color: transparent !important;
+}
+
+body.franchisee-app .content .box > .box-header > .box-tools .admin-box-header-btn {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    box-shadow: 0 4px 12px rgba(var(--fr-accent-rgb), 0.22);
+}
+
+body.franchisee-app .content .box > .box-header > .box-tools .admin-box-header-btn:hover {
+    background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+}
+
+body.franchisee-app .btn-primary,
+body.franchisee-app .content .box .btn-primary {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    border-color: #0f766e !important;
+    box-shadow: 0 4px 12px rgba(var(--fr-accent-rgb), 0.22);
+}
+
+body.franchisee-app .btn-primary:hover,
+body.franchisee-app .btn-primary:focus,
+body.franchisee-app .content .box .btn-primary:hover,
+body.franchisee-app .content .box .btn-primary:focus {
+    background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+    border-color: #115e59 !important;
+}
+
+body.franchisee-app .content .box .form-control:focus,
+body.franchisee-app .content .box select.form-control:focus {
+    border-color: rgba(var(--fr-accent-rgb), 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(var(--fr-accent-rgb), 0.1) !important;
+}
+
+body.franchisee-app .content-header h1 {
+    color: #134e4a;
+}
+
+body.franchisee-app .breadcrumb > .active,
+body.franchisee-app .content-header .breadcrumb > li.active {
+    color: var(--admin-accent) !important;
+}
+
+body.franchisee-app .admin-grid-edit-btn {
+    color: var(--admin-accent);
+    border-color: var(--admin-accent-border);
+    background: var(--admin-accent-soft);
+}
+
+body.franchisee-app .admin-grid-edit-btn:hover,
+body.franchisee-app .admin-grid-edit-btn:focus {
+    color: #fff;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-color: transparent;
+}
+
+body.franchisee-app .admin-plan-package-icon {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+}
+
+body.franchisee-app .admin-plan-package-count {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+body.franchisee-app .admin-plan-package-header {
+    background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
+    border-bottom-color: #ccfbf1;
+}
+
+body.franchisee-app .admin-footer {
+    border-top-color: #dbece9;
+    background: #f8fbfa;
+}
+
+/* Page header – content wrapper tint only */
+body.franchisee-app .admin-content-wrapper {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(var(--fr-accent-rgb), 0.04) 0%, transparent 34%),
+        linear-gradient(180deg, #f4f9f8 0%, var(--admin-bg) 120px, var(--admin-bg) 100%);
+}
+
+/* Box header – green tone (match franchisee theme) */
+body.franchisee-app .content .box > .box-header {
+    background: linear-gradient(135deg, #f8fcfb 0%, #fbfdfd 52%, #ffffff 100%) !important;
+    border-bottom-color: #e3f2ef !important;
+}
+
+body.franchisee-app .content .box.box-primary > .box-header {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f4fdfa 48%, #ffffff 100%) !important;
+    border-bottom-color: #ccfbf1 !important;
+}
+
+body.franchisee-app .content .box > .box-header::before {
+    background: linear-gradient(120deg, rgba(var(--fr-accent-rgb), 0.07) 0%, transparent 42%);
+}
+
+body.franchisee-app .content .box.box-primary > .box-header::before {
+    background: linear-gradient(120deg, rgba(var(--fr-accent-rgb), 0.1) 0%, transparent 50%);
+}
+
+body.franchisee-app .content .box.box-primary .box-title,
+body.franchisee-app .content .box.box-primary .box-header h3 {
+    color: #0f766e !important;
+}
+
+body.franchisee-app .content .box > .box-header > .fa,
+body.franchisee-app .content .box > .box-header > .glyphicon,
+body.franchisee-app .content .box > .box-header > .ion,
+body.franchisee-app .content .box .box-title .fa,
+body.franchisee-app .content .box .box-header h3 .fa {
+    color: var(--admin-accent) !important;
+}
+
+body.franchisee-app .content .box.box-primary .box-title::before,
+body.franchisee-app .content .box.box-primary .box-header h3::before {
+    background: linear-gradient(180deg, #5eead4 0%, var(--admin-accent) 100%) !important;
+}
+
+body.franchisee-app .content .box.box-primary {
+    border-top-color: var(--admin-accent) !important;
+}
+
+body.franchisee-app .content .box > .box-header.with-border {
+    border-bottom-color: #d7efe9 !important;
+}
+
+body.franchisee-app .content .box > .box-footer {
+    background: #f8fcfb !important;
+    border-top-color: #e3f2ef !important;
+}
+
+/* Footer – franchisee portal */
+body.franchisee-app .admin-footer.main-footer,
+body.franchisee-app .fr-portal-footer {
+    position: relative;
+    z-index: 1;
+    margin-left: 0 !important;
+    margin-top: auto;
+    width: 100%;
+    clear: both;
+    padding: 0;
+    border-top: 1px solid #cfe9e4;
+    background: linear-gradient(180deg, #f8fcfb 0%, #fff 100%);
+    font-size: 13px;
+    color: #64748b;
+    box-shadow: 0 -4px 20px rgba(13, 148, 136, 0.04);
+}
+
+body.franchisee-app .fr-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 14px 22px;
+    max-width: 100%;
+}
+
+body.franchisee-app .fr-footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+body.franchisee-app .fr-footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f766e;
+    letter-spacing: 0.01em;
+}
+
+body.franchisee-app .fr-footer-brand i {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #fff;
+    background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.22);
+}
+
+body.franchisee-app .fr-footer-copy {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+body.franchisee-app .fr-footer-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+body.franchisee-app .fr-footer-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #0f766e;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+}
+
+body.franchisee-app .fr-footer-version {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+body.franchisee-app .admin-footer .pull-right {
+    float: none !important;
+}
+
+/* Dashboard stat cards – teal theme */
+body.franchisee-app .small-box.bg-green {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+}
+
+body.franchisee-app .small-box.bg-red {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+}
+
+body.franchisee-app .small-box.bg-aqua {
+    background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%) !important;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+    }
+
+    body.franchisee-app .fr-footer-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

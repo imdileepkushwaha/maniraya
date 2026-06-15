@@ -1,0 +1,32 @@
+/* Admin panel – master page overrides */
+body.admin-app .admin-sidebar-nav-chip {
+    color: #fff;
+    background: linear-gradient(135deg, #e52d27 0%, #c41e17 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(229, 45, 39, 0.22);
+}
+
+body.admin-app .content-wrapper,
+body.admin-app .main-footer {
+    margin-left: 0 !important;
+}
+
+body.admin-app #sarahapp-container {
+    min-height: 0;
+}
+
+@media screen and (max-width: 320px) {
+    body.admin-app .sarah-right-header {
+        margin-left: 0 !important;
+    }
+
+    body.admin-app .sarah-left-header {
+        width: 100% !important;
+    }
+}
+
+@media (min-width: 767px) {
+    body.admin-app .navbar-nav .dropdown-menu .caret {
+        transform: rotate(-90deg);
+    }
+}

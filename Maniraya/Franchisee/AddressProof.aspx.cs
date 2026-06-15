@@ -1,157 +1,183 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data;
+using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
 using BusinessLogicTier;
-using System.IO;
 
-public partial class user_AddressProof : System.Web.UI.Page
+public partial class franchisee_AddressProof : System.Web.UI.Page
 {
-
-    clsEPin objEPin = new clsEPin();
     clsfranchisee objUser = new clsfranchisee();
-    clsAccount objaccount = new clsAccount();
+
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["fuserid"] != null)
+        if (Session["fuserid"] == null)
         {
-            if (!IsPostBack)
+            Response.Redirect("index.aspx");
+            return;
+        }
+
+        if (!IsPostBack)
+        {
+            try
             {
                 txtuserid.Text = Session["fuserid"].ToString();
                 txtuserid.Enabled = false;
                 loadsusername();
                 loadnotification();
             }
-        }
-        else
-        {
-            Response.Redirect("index.aspx");
+            catch (Exception)
+            {
+                ImageShow.ImageUrl = "img/default.png";
+                ImageShow2.ImageUrl = "img/default.png";
+                ViewState["Image1"] = "img/default.png";
+                ViewState["Image2"] = "img/default.png";
+            }
         }
     }
 
     void loadnotification()
     {
         objUser.UserId = Session["fuserid"].ToString();
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
-        if (dt.Rows[0]["activestatus"].ToString() == "0")
+        DataTable dt = objUser.getUserDetail(objUser);
+        if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["activestatus"].ToString() == "0")
         {
             Response.Redirect("Dashboard.aspx");
         }
     }
+
     void loadsusername()
     {
-        DataTable dt = new DataTable();
+        if (string.IsNullOrWhiteSpace(txtuserid.Text))
+        {
+            return;
+        }
+
         objUser.UserId = txtuserid.Text;
-        dt = objUser.getUserName(objUser);
-        if (dt.Rows.Count > 0)
+        DataTable dt = objUser.getUserName(objUser);
+        if (dt != null && dt.Rows.Count > 0)
         {
             txtusername.Text = dt.Rows[0]["username"].ToString();
-            objaccount.UserId = txtuserid.Text;
-            ImageShow.ImageUrl = dt.Rows[0]["AadharImage"].ToString();
-            ImageShow2.ImageUrl = dt.Rows[0]["AadharImageBack"].ToString();
-            ViewState["Image1"] = dt.Rows[0]["AadharImage"].ToString();
-            ViewState["Image2"] = dt.Rows[0]["AadharImageBack"].ToString();
+            string front = dt.Rows[0]["AadharImage"].ToString();
+            string back = dt.Rows[0]["AadharImageBack"].ToString();
+            ImageShow.ImageUrl = string.IsNullOrWhiteSpace(front) ? "img/default.png" : front;
+            ImageShow2.ImageUrl = string.IsNullOrWhiteSpace(back) ? "img/default.png" : back;
+            ViewState["Image1"] = ImageShow.ImageUrl;
+            ViewState["Image2"] = ImageShow2.ImageUrl;
 
-            if (dt.Rows[0]["AadharImgStatus"].ToString() == "0")
+            if (dt.Columns.Contains("AadharNo") && dt.Rows[0]["AadharNo"] != DBNull.Value)
             {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Pending";
-                lblApprovalStatus.CssClass = "Pending";
+                txtAdharnumber.Text = dt.Rows[0]["AadharNo"].ToString();
             }
-            else if (dt.Rows[0]["AadharImgStatus"].ToString() == "1")
-            {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Approved";
-                lblApprovalStatus.CssClass = "Approved";
-            }
-            else if (dt.Rows[0]["AadharImgStatus"].ToString() == "2")
-            {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Rejected";
-                lblApprovalStatus.CssClass = "Rejected";
-            }
-            else
-                divStatus.Visible = false;
+
+            ApplyStatus(dt.Rows[0]["AadharImgStatus"].ToString());
         }
         else
         {
-            txtusername.Text = "";
-            txtuserid.Text = "";
+            txtusername.Text = string.Empty;
+            ImageShow.ImageUrl = "img/default.png";
+            ImageShow2.ImageUrl = "img/default.png";
+            divStatus.Visible = false;
             Message.Show("Invalid User Id...!!!");
         }
     }
+
+    void ApplyStatus(string status)
+    {
+        if (status == "0")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Pending";
+            lblApprovalStatus.CssClass = "fr-kyc-status Pending";
+        }
+        else if (status == "1")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Approved";
+            lblApprovalStatus.CssClass = "fr-kyc-status Approved";
+        }
+        else if (status == "2")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Rejected";
+            lblApprovalStatus.CssClass = "fr-kyc-status Rejected";
+        }
+        else
+        {
+            divStatus.Visible = false;
+        }
+    }
+
     public string UploadImage(FileUpload fileUpload)
     {
-        string Imagename = "";
-        if (ImageUpload.HasFile)
+        if (fileUpload == null || !fileUpload.HasFile)
         {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(fileUpload.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            fileUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
+            return string.Empty;
         }
-        return Imagename;
+
+        string randomNumber = DateTime.Now.Ticks.ToString();
+        string fileName = Path.GetFileName(fileUpload.PostedFile.FileName);
+        string imageName = randomNumber + fileName;
+        fileUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + imageName);
+        return imageName;
     }
 
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        if (txtuserid.Text != "")
+        if (string.IsNullOrWhiteSpace(txtuserid.Text))
         {
-            if (txtusername.Text != "")
-            {
-                if (ImageUpload.HasFile == false || ImageUpload2.HasFile == false)
-                {
-                    Message.Show("Upload Aadhaar Card Back and Front");
-                    return;
-                }
+            Message.Show("Enter User Id...!!!");
+            return;
+        }
 
-                objUser.Addressproof = UploadImage(ImageUpload);
-                objUser.AddressproofBack = UploadImage(ImageUpload2);
-                objUser.AdhaarNo = txtAdharnumber.Text;
-                objUser.MentionBy = Session["fuserid"].ToString();
-                objUser.UserId = Session["fuserid"].ToString();
-                string rs = objUser.Update_AddressProof(objUser);
-                if (rs == "t")
-                {
-                    Message.Show("Request Submitted Successfully...!!!");
-                    loadsusername();
-                }
-                else
-                {
-                    Message.Show("Unknown Error Occurred...!!!");
-                }
+        if (string.IsNullOrWhiteSpace(txtusername.Text))
+        {
+            Message.Show("Enter User Name...!!!");
+            return;
+        }
 
+        if (!ImageUpload.HasFile || !ImageUpload2.HasFile)
+        {
+            Message.Show("Upload Aadhaar Card front and back.");
+            return;
+        }
 
-            }
-            else
-            {
-                Message.Show("Enter User Name...!!!");
-            }
+        if (string.IsNullOrWhiteSpace(txtAdharnumber.Text))
+        {
+            Message.Show("Please enter Aadhar number.");
+            return;
+        }
+
+        objUser.Addressproof = UploadImage(ImageUpload);
+        objUser.AddressproofBack = UploadImage(ImageUpload2);
+        objUser.AdhaarNo = txtAdharnumber.Text.Trim();
+        objUser.UserId = Session["fuserid"].ToString();
+        string rs = objUser.Update_AddressProof(objUser);
+        if (rs == "t")
+        {
+            Message.Show("Request Submitted Successfully...!!!");
+            loadsusername();
         }
         else
         {
-            Message.Show("Enter User Id...!!!");
+            Message.Show("Unknown Error Occurred...!!!");
         }
     }
-
 
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
     }
+
     protected void ImageShow_Click(object sender, ImageClickEventArgs e)
     {
-        ImageLarge.ImageUrl = ViewState["Image1"].ToString();
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+        ImageLarge.ImageUrl = ViewState["Image1"] != null ? ViewState["Image1"].ToString() : "img/default.png";
+        ScriptManager.RegisterStartupScript(this, GetType(), "Pop", "showModal1();", true);
     }
 
     protected void ImageShow2_Click(object sender, ImageClickEventArgs e)
     {
-        ImageLarge.ImageUrl = ViewState["Image2"].ToString();
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+        ImageLarge.ImageUrl = ViewState["Image2"] != null ? ViewState["Image2"].ToString() : "img/default.png";
+        ScriptManager.RegisterStartupScript(this, GetType(), "Pop", "showModal1();", true);
     }
 }

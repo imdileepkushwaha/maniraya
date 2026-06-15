@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="franchiseemaster.master" AutoEventWireup="true" CodeFile="UserEdit.aspx.cs" Inherits="admin_UserEdit" %>
+﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="franchiseemaster.master" AutoEventWireup="true" CodeFile="UserEdit.aspx.cs" Inherits="franchisee_UserEdit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -43,18 +43,18 @@
                 document.getElementById("<%=txtareaname.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
-    <section class="content-header">
-        <h1>User Edit    
-        </h1>
-        <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
-            <li><a href="#">User Edit</a></li>
-        </ol>
-    </section>
+    <div class="content-header">
+        <h1>User Edit</h1>
+    <ol class="breadcrumb">
+        <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">User Edit</li>
+    </ol>
+    </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
@@ -69,11 +69,8 @@
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="row">
-                <div class="col-md-12">
-                    <div >
-                      
-                        <div style="display: none;" class="box box-primary">
+           
+                    <div style="display: none;" class="box box-primary">
                             <div class="box-header with-border">
                                 <h3 class="box-title">Bank Details</h3>
                             </div>
@@ -122,7 +119,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Personal Details</h3>
@@ -164,7 +160,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>Email :</label>
+                                        <label>Address :</label>
                                         <asp:TextBox ID="txtaddress" TextMode="MultiLine" CssClass="form-control" runat="server"></asp:TextBox>
                                     </div>
                                 </div>
@@ -245,9 +241,7 @@
                             <asp:Button ID="btnCancel" OnClick="btnCancel_Click" CssClass="btn btn-danger" runat="server" Text="Cancel" />
                         </div>
                         </div>
-                </div>
-            </div>
-            </div>
+                
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>

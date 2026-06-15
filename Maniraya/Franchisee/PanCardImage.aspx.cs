@@ -1,146 +1,167 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data;
+using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
 using BusinessLogicTier;
-using System.IO;
-public partial class user_PanCardImage : System.Web.UI.Page
-{
 
-    clsEPin objEPin = new clsEPin();
+public partial class franchisee_PanCardImage : System.Web.UI.Page
+{
     clsfranchisee objUser = new clsfranchisee();
-    clsAccount objaccount = new clsAccount();
+
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["fuserid"] != null)
+        if (Session["fuserid"] == null)
         {
-            if (!IsPostBack)
+            Response.Redirect("index.aspx");
+            return;
+        }
+
+        if (!IsPostBack)
+        {
+            try
             {
                 txtuserid.Text = Session["fuserid"].ToString();
                 txtuserid.Enabled = false;
                 loadsusername();
                 loadnotification();
             }
-        }
-        else
-        {
-            Response.Redirect("index.aspx");
+            catch (Exception)
+            {
+                ImageShow.ImageUrl = "img/default.png";
+                ViewState["Image"] = "img/default.png";
+            }
         }
     }
 
     void loadnotification()
     {
         objUser.UserId = Session["fuserid"].ToString();
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
-        if (dt.Rows[0]["activestatus"].ToString() == "0")
+        DataTable dt = objUser.getUserDetail(objUser);
+        if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["activestatus"].ToString() == "0")
         {
             Response.Redirect("Dashboard.aspx");
         }
     }
+
     void loadsusername()
     {
-        DataTable dt = new DataTable();
+        if (string.IsNullOrWhiteSpace(txtuserid.Text))
+        {
+            return;
+        }
+
         objUser.UserId = txtuserid.Text;
-        dt = objUser.getUserName(objUser);
-        if (dt.Rows.Count > 0)
+        DataTable dt = objUser.getUserName(objUser);
+        if (dt != null && dt.Rows.Count > 0)
         {
             txtusername.Text = dt.Rows[0]["username"].ToString();
             txtPanNumber.Text = dt.Rows[0]["PanNumber"].ToString();
-            objaccount.UserId = txtuserid.Text;
-            ImageShow.ImageUrl = dt.Rows[0]["PanImage"].ToString();
-            ViewState["Image"] = dt.Rows[0]["PanImage"].ToString();
-
-            if (dt.Rows[0]["PanImgStatus"].ToString() == "0")
-            {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Pending";
-                lblApprovalStatus.CssClass = "Pending";
-            }
-            else if (dt.Rows[0]["PanImgStatus"].ToString() == "1")
-            {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Approved";
-                lblApprovalStatus.CssClass = "Approved";
-            }
-            else if (dt.Rows[0]["PanImgStatus"].ToString() == "2")
-            {
-                divStatus.Visible = true;
-                lblApprovalStatus.Text = "Rejected";
-                lblApprovalStatus.CssClass = "Rejected";
-            }
-            else
-                divStatus.Visible = false;
-
+            string panImage = dt.Rows[0]["PanImage"].ToString();
+            ImageShow.ImageUrl = string.IsNullOrWhiteSpace(panImage) ? "img/default.png" : panImage;
+            ViewState["Image"] = ImageShow.ImageUrl;
+            ApplyStatus(dt.Rows[0]["PanImgStatus"].ToString());
         }
         else
         {
-            txtusername.Text = "";
-            txtuserid.Text = "";
+            txtusername.Text = string.Empty;
+            ImageShow.ImageUrl = "img/default.png";
+            ViewState["Image"] = "img/default.png";
+            divStatus.Visible = false;
             Message.Show("Invalid User Id...!!!");
         }
     }
+
+    void ApplyStatus(string status)
+    {
+        if (status == "0")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Pending";
+            lblApprovalStatus.CssClass = "fr-kyc-status Pending";
+        }
+        else if (status == "1")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Approved";
+            lblApprovalStatus.CssClass = "fr-kyc-status Approved";
+        }
+        else if (status == "2")
+        {
+            divStatus.Visible = true;
+            lblApprovalStatus.Text = "Rejected";
+            lblApprovalStatus.CssClass = "fr-kyc-status Rejected";
+        }
+        else
+        {
+            divStatus.Visible = false;
+        }
+    }
+
     public string UploadImage()
     {
-        string Imagename = "";
-        if (ImageUpload.HasFile)
+        if (!ImageUpload.HasFile)
         {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ImageUpload.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
+            return string.Empty;
         }
-        return Imagename;
+
+        string randomNumber = DateTime.Now.Ticks.ToString();
+        string fileName = Path.GetFileName(ImageUpload.PostedFile.FileName);
+        string imageName = randomNumber + fileName;
+        ImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + imageName);
+        return imageName;
     }
 
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        if (txtuserid.Text != "")
+        if (string.IsNullOrWhiteSpace(txtuserid.Text))
         {
-            if (txtusername.Text != "")
-            {
+            Message.Show("Enter User Id...!!!");
+            return;
+        }
 
-                objUser.PanImage = UploadImage();
-                objUser.PanCardNo = txtPanNumber.Text;
-                objUser.MentionBy = Session["fuserid"].ToString();
-                objUser.UserId = Session["fuserid"].ToString();
-                string rs = objUser.Update_UserPanForm(objUser);
-                if (rs == "t")
-                {
-                    Message.Show("Request Submitted Successfully...!!!");
-                    loadsusername();
-                }
-                else
-                {
-                    Message.Show("Unknown Error Occurred...!!!");
-                }
+        if (string.IsNullOrWhiteSpace(txtusername.Text))
+        {
+            Message.Show("Enter User Name...!!!");
+            return;
+        }
 
+        if (!ImageUpload.HasFile)
+        {
+            Message.Show("Please select PAN card image.");
+            return;
+        }
 
-            }
-            else
-            {
-                Message.Show("Enter User Name...!!!");
-            }
+        if (string.IsNullOrWhiteSpace(txtPanNumber.Text))
+        {
+            Message.Show("Please enter PAN number.");
+            return;
+        }
+
+        objUser.PanImage = UploadImage();
+        objUser.PanCardNo = txtPanNumber.Text.Trim().ToUpper();
+        objUser.MentionBy = Session["fuserid"].ToString();
+        objUser.UserId = Session["fuserid"].ToString();
+        string rs = objUser.Update_UserPanForm(objUser);
+        if (rs == "t")
+        {
+            Message.Show("Request Submitted Successfully...!!!");
+            loadsusername();
         }
         else
         {
-            Message.Show("Enter User Id...!!!");
+            Message.Show("Unknown Error Occurred...!!!");
         }
     }
-
 
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
     }
+
     protected void ImageShow_Click(object sender, ImageClickEventArgs e)
     {
-        ImageLarge.ImageUrl = ViewState["Image"].ToString();
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+        ImageLarge.ImageUrl = ViewState["Image"] != null ? ViewState["Image"].ToString() : "img/default.png";
+        ScriptManager.RegisterStartupScript(this, GetType(), "Pop", "showModal1();", true);
     }
-
 }

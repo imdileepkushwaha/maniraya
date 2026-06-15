@@ -1,122 +1,144 @@
-﻿using BusinessLogicTier;
-using DataTier;
-using System;
-using System.Data;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-
-public partial class ColorAdd : System.Web.UI.Page
-{
-    clsProduct objState = new clsProduct();
-    Data objData = new Data();
-
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (!IsPostBack)
-        {
-            if (Session["useradmin"] != null)
-            {
-                loaddata();
-            }
-            else
-            {
-                Response.Redirect("logout.aspx");
-            }
-        }
-    }
-
-    void loaddata()
-    {
-        DataTable dt = objState.getColorMaster();
-        GridView1.DataSource = dt;
-        GridView1.DataBind();
-    }
-
-    protected void btnUpdate_Click(object sender, EventArgs e)
-    {
-        string colorId = lblcountryid.Text.Replace("'", "''");
-        string colorName = txtcountrynameedit.Text.Trim().Replace("'", "''");
-        string colorCode = Txtcolorcodeedit.Text.Trim().Replace("'", "''");
-        string status = Ddlststatus.SelectedValue.Replace("'", "''");
-
-        objData.StartConnection();
-        try
-        {
-            string checkSql = "select Id from ColorMaster where ColorName='" + colorName + "' and Id !='" + colorId + "'";
-            DataTable dt = objData.RunDataTable(checkSql);
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                string popupScript = "alert('Color already exists');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                return;
-            }
-
-            string sql = "update ColorMaster set ColorName='" + colorName + "', colorcode='" + colorCode + "', Status='" + status + "' where Id='" + colorId + "'";
-            objData.RunInsUpDelQuery(sql);
-
-            string successScript = "alert('Color updated successfully');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), successScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "Closepopup();", true);
-            loaddata();
-        }
-        catch
-        {
-            string popupScript = "alert('Unable to update color');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-        }
-        finally
-        {
-            objData.EndConnection();
-        }
-    }
-
-    protected void btnSubmit_Click(object sender, EventArgs e)
-    {
-        objState.colorname = txtcountryname.Text;
-        objState.colorcode = txtcolorcode.Text;
-        objState.MentionBy = Session["useradmin"].ToString();
-        string res = objState.Insert_Color(objState);
-        if (res == "t")
-        {
-            string popupScript = "alert('Color added successfully');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            txtcountryname.Text = "";
-            txtcolorcode.Text = "";
-            loaddata();
-        }
-        else if (res == "f")
-        {
-            string popupScript = "alert('Color already exists');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-        }
-        else
-        {
-            string popupScript = "alert('Unknown error occurred');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-        }
-    }
-
-    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
-        if (e.CommandName == "edt")
-        {
-            int index = Convert.ToInt32(e.CommandArgument.ToString());
-            Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
-            Label lblCountryname = (Label)GridView1.Rows[index].FindControl("lblCountryname");
-            Label lblColorcode = (Label)GridView1.Rows[index].FindControl("lblColorcode");
-            Label lblsize = (Label)GridView1.Rows[index].FindControl("lblsize");
-
-            lblcountryid.Text = lblid.Text;
-            txtcountrynameedit.Text = lblCountryname.Text;
-            Txtcolorcodeedit.Text = lblColorcode.Text;
-
-            if (!string.IsNullOrEmpty(lblsize.Text) && Ddlststatus.Items.FindByValue(lblsize.Text) != null)
-            {
-                Ddlststatus.SelectedValue = lblsize.Text;
-            }
-
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
-        }
-    }
-}
-
+﻿using BusinessLogicTier;
+using DataTier;
+using System;
+using System.Data;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class ColorAdd : System.Web.UI.Page
+{
+    clsProduct objState = new clsProduct();
+    Data objData = new Data();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Session["useradmin"] != null)
+            {
+                loaddata();
+            }
+            else
+            {
+                Response.Redirect("logout.aspx");
+            }
+        }
+    }
+
+    void loaddata()
+    {
+        DataTable dt = objState.getColorMaster();
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+
+    protected void btnUpdate_Click(object sender, EventArgs e)
+    {
+        string colorId = lblcountryid.Text.Replace("'", "''");
+        string colorName = txtcountrynameedit.Text.Trim().Replace("'", "''");
+        string colorCode = NormalizeColorCode(Txtcolorcodeedit.Text).Replace("'", "''");
+        string status = Ddlststatus.SelectedValue.Replace("'", "''");
+
+        objData.StartConnection();
+        try
+        {
+            string checkSql = "select Id from ColorMaster where ColorName='" + colorName + "' and Id !='" + colorId + "'";
+            DataTable dt = objData.RunDataTable(checkSql);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                string popupScript = "alert('Color already exists');";
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                return;
+            }
+
+            string sql = "update ColorMaster set ColorName='" + colorName + "', colorcode='" + colorCode + "', Status='" + status + "' where Id='" + colorId + "'";
+            objData.RunInsUpDelQuery(sql);
+
+            string successScript = "alert('Color updated successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), successScript, true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "Closepopup();", true);
+            loaddata();
+        }
+        catch
+        {
+            string popupScript = "alert('Unable to update color');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
+        finally
+        {
+            objData.EndConnection();
+        }
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        objState.colorname = txtcountryname.Text.Trim();
+        objState.colorcode = NormalizeColorCode(txtcolorcode.Text);
+        objState.MentionBy = Session["useradmin"].ToString();
+        string res = objState.Insert_Color(objState);
+        if (res == "t")
+        {
+            string popupScript = "alert('Color added successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            txtcountryname.Text = "";
+            txtcolorcode.Text = "";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "if(window.initAdminColorPickers){initAdminColorPickers();}", true);
+            loaddata();
+        }
+        else if (res == "f")
+        {
+            string popupScript = "alert('Color already exists');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
+        else
+        {
+            string popupScript = "alert('Unknown error occurred');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
+    }
+
+    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "edt")
+        {
+            int index = Convert.ToInt32(e.CommandArgument.ToString());
+            Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
+            Label lblCountryname = (Label)GridView1.Rows[index].FindControl("lblCountryname");
+            Label lblColorcode = (Label)GridView1.Rows[index].FindControl("lblColorcode");
+            Label lblsize = (Label)GridView1.Rows[index].FindControl("lblsize");
+
+            lblcountryid.Text = lblid.Text;
+            txtcountrynameedit.Text = lblCountryname.Text;
+            Txtcolorcodeedit.Text = NormalizeColorCode(lblColorcode.Text);
+
+            if (!string.IsNullOrEmpty(lblsize.Text) && Ddlststatus.Items.FindByValue(lblsize.Text) != null)
+            {
+                Ddlststatus.SelectedValue = lblsize.Text;
+            }
+
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+        }
+    }
+
+    string NormalizeColorCode(string colorCode)
+    {
+        if (string.IsNullOrWhiteSpace(colorCode))
+        {
+            return string.Empty;
+        }
+
+        string normalized = colorCode.Trim();
+        if (!normalized.StartsWith("#"))
+        {
+            normalized = "#" + normalized;
+        }
+
+        if (normalized.Length == 4)
+        {
+            normalized = "#" + normalized[1] + normalized[1] + normalized[2] + normalized[2] + normalized[3] + normalized[3];
+        }
+
+        return normalized.ToUpperInvariant();
+    }
+}
+

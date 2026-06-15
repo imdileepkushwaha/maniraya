@@ -46,7 +46,7 @@
 
         var eyebrow = document.createElement('span');
         eyebrow.className = 'admin-ch-eyebrow';
-        eyebrow.textContent = 'Admin Panel';
+        eyebrow.textContent = document.body.classList.contains('franchisee-app') ? 'Franchisee Panel' : 'Admin Panel';
 
         copy.appendChild(eyebrow);
         copy.appendChild(h1);
@@ -66,8 +66,9 @@
     }
 
     function initAdminHeaders() {
-        document.querySelectorAll('.admin-app .admin-page-header-slot > .content-header').forEach(enhanceHeader);
-        document.querySelectorAll('.admin-app .content-header').forEach(function (header) {
+        document.querySelectorAll('.admin-app .admin-page-header-slot.content-header, .admin-app .admin-page-header-slot > .content-header, .franchisee-app .admin-page-header-slot.content-header, .franchisee-app .admin-page-header-slot > .content-header').forEach(enhanceHeader);
+        document.querySelectorAll('.admin-app .content-header, .franchisee-app .content-header').forEach(function (header) {
+            if (header.classList.contains('admin-page-header-slot')) return;
             if (header.parentElement && header.parentElement.classList.contains('content-header')) return;
             if (!header.closest('.admin-page-header-slot')) {
                 enhanceHeader(header);

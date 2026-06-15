@@ -34,37 +34,107 @@ public partial class UserProfile : System.Web.UI.Page
     void loaddata()
     {
         objUser.UserId = Session["userid"].ToString();
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
-        if (dt.Rows.Count > 0)
+        DataTable dt = objUser.getUserDetail(objUser);
+        if (dt == null || dt.Rows.Count == 0)
         {
-            txtsponserid.Text = dt.Rows[0]["sponserid"].ToString();
-            loadsusername();
-            txtname.Text = dt.Rows[0]["username"].ToString();
-            txtmobile.Text = dt.Rows[0]["mobile"].ToString();
-            txtemail.Text = dt.Rows[0]["email"].ToString();
-            ddgender.SelectedValue = dt.Rows[0]["gender"].ToString();
-            txtaddress.Text = dt.Rows[0]["address"].ToString();
-            ddcountry.SelectedValue = dt.Rows[0]["countryid"].ToString();
-            loadstate();
-            ddstate.SelectedValue = dt.Rows[0]["stateid"].ToString();
-            loadcity();
-            ddcity.SelectedValue = dt.Rows[0]["cityid"].ToString();
-            txtareaname.Text = dt.Rows[0]["areaname"].ToString();
-            txtpincode.Text = dt.Rows[0]["pincode"].ToString();
-            try
+            txtname.Text = Convert.ToString(Session["username"]);
+            return;
+        }
+
+        DataRow row = dt.Rows[0];
+        txtsponserid.Text = GetRowValue(row, "sponserid");
+        loadsusername();
+        txtname.Text = GetRowValue(row, "username");
+        txtmobile.Text = GetRowValue(row, "mobile");
+        txtemail.Text = GetRowValue(row, "email");
+        SelectListValue(ddgender, GetRowValue(row, "gender"));
+        txtaddress.Text = GetRowValue(row, "address");
+        SelectListValue(ddcountry, GetRowValue(row, "countryid"));
+        loadstate();
+        SelectListValue(ddstate, GetRowValue(row, "stateid"));
+        loadcity();
+        SelectListValue(ddcity, GetRowValue(row, "cityid"));
+        txtareaname.Text = GetRowValue(row, "areaname");
+        txtpincode.Text = GetRowValue(row, "pincode");
+        try
+        {
+            string dob = GetRowValue(row, "dateofbirth");
+            if (!string.IsNullOrWhiteSpace(dob))
             {
-                txtdateofbirth.Text = Convert.ToDateTime(dt.Rows[0]["dateofbirth"].ToString()).ToString("dd/MM/yyyy");
+                txtdateofbirth.Text = Convert.ToDateTime(dob).ToString("dd/MM/yyyy");
             }
-            catch { }
-            txtnomineename.Text = dt.Rows[0]["nomineename"].ToString(); ;
-            txtnomineerelation.Text = dt.Rows[0]["nomineerelation"].ToString(); ;
-            txtaccountholdername.Text = dt.Rows[0]["accountholdername"].ToString(); ;
-            txtaccountno.Text = dt.Rows[0]["accountno"].ToString(); ;
-            txtpan.Text = dt.Rows[0]["pannumber"].ToString(); ;
-            txtifsccode.Text = dt.Rows[0]["ifsccode"].ToString(); ;
-            txtbranchname.Text = dt.Rows[0]["branchname"].ToString(); ;
-            ddbank.SelectedValue = dt.Rows[0]["bankname"].ToString(); ;
+        }
+        catch { }
+        txtnomineename.Text = GetRowValue(row, "nomineename");
+        txtnomineerelation.Text = GetRowValue(row, "nomineerelation");
+        txtaccountholdername.Text = GetRowValue(row, "accountholdername", "AccountHolderName");
+        txtaccountno.Text = GetRowValue(row, "accountno", "AccountNo");
+        txtpan.Text = GetRowValue(row, "pannumber", "PanNumber");
+        txtifsccode.Text = GetRowValue(row, "ifsccode", "IFSCCode");
+        txtbranchname.Text = GetRowValue(row, "branchname", "BranchName");
+        SelectListValue(ddbank, GetRowValue(row, "bankname", "BankName", "BankID"));
+    }
+
+    static string GetRowValue(DataRow row, params string[] columnNames)
+    {
+        if (row == null || row.Table == null)
+        {
+            return string.Empty;
+        }
+
+        foreach (string columnName in columnNames)
+        {
+            string actualColumn = FindColumnName(row.Table, columnName);
+            if (actualColumn == null)
+            {
+                continue;
+            }
+
+            object value = row[actualColumn];
+            if (value != null && value != DBNull.Value)
+            {
+                return Convert.ToString(value).Trim();
+            }
+        }
+
+        return string.Empty;
+    }
+
+    static string FindColumnName(DataTable table, string columnName)
+    {
+        if (table == null || string.IsNullOrWhiteSpace(columnName))
+        {
+            return null;
+        }
+
+        if (table.Columns.Contains(columnName))
+        {
+            return columnName;
+        }
+
+        foreach (DataColumn column in table.Columns)
+        {
+            if (string.Equals(column.ColumnName, columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return column.ColumnName;
+            }
+        }
+
+        return null;
+    }
+
+    static void SelectListValue(ListControl list, string value)
+    {
+        if (list == null || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        ListItem item = list.Items.FindByValue(value);
+        if (item != null)
+        {
+            list.ClearSelection();
+            item.Selected = true;
         }
     }
     void loadbank()
@@ -177,7 +247,7 @@ public partial class UserProfile : System.Web.UI.Page
         DataTable dt = new DataTable();
         objUser.UserId = txtsponserid.Text;
         dt = objUser.getUserName(objUser);
-        if (dt.Rows.Count > 0)
+        if (dt != null && dt.Rows.Count > 0)
         {
             txtsponsername.Text = dt.Rows[0]["username"].ToString();
         }

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Callback Request Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CallbackRequestReport.aspx.cs" Inherits="admin_UserReport" %>
+<%@ Page Title="Callback Request Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CallbackRequestReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -150,7 +150,7 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                            <asp:LinkButton ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                            <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                         </ItemTemplate>
 
                                     </asp:TemplateField>

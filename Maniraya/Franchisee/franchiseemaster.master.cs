@@ -1,41 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 public partial class franchiseemaster : System.Web.UI.MasterPage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["fuserid"] != null )
+        if (Session["fuserid"] == null)
         {
-            LblUsernameSideMenu.Text = Session["username"].ToString() + "(" + Session["fuserid"].ToString() + ")";
-            LblMainId.Text = Session["username"].ToString() + "(" + Session["fuserid"].ToString() + ")";
-            //LblFullname.Text = Session["username"].ToString() + "(" + Session["fuserid"].ToString() + ")";
-            String UserImage = Session["UserImage"].ToString();
-            if (UserImage.ToString() != "")
-            {
-                dvUserImage1.Src = "~/ProductImage/" + UserImage.ToString();
-                //dvUserImage2.Src = "~/ProductImage/" + UserImage.ToString();
-                dvUserImage3.Src = "~/ProductImage/" + UserImage.ToString();
-            }
-            else
-            {
-                dvUserImage1.Src = "~/ProductImage/636549111447865966default.png";
-                //dvUserImage2.Src = "~/ProductImage/636549111447865966default.png";
-                dvUserImage3.Src = "~/ProductImage/636549111447865966default.png";
+            Response.Redirect("logout.aspx");
+            return;
+        }
 
-            }
-            if (Session["status"].ToString()=="1")
-            {
-                //JoinPackage.Visible=false;
-            }
+        string displayName = Session["username"] + " (" + Session["fuserid"] + ")";
+        LblUsernameSideMenu.Text = displayName;
+        LblMainId.Text = displayName;
+        LblUserMenuName.Text = displayName;
+        LblUserRole.Text = "Franchisee";
+        LblUserMenuRole.Text = "Franchisee";
+
+        string userImage = Session["UserImage"] != null ? Session["UserImage"].ToString() : string.Empty;
+        string imagePath;
+
+        if (!string.IsNullOrWhiteSpace(userImage))
+        {
+            imagePath = ResolveUrl("~/ProductImage/" + userImage);
         }
         else
         {
-            Response.Redirect("logout.aspx");
+            imagePath = ResolveUrl("~/ProductImage/636549111447865966default.png");
         }
+
+        dvUserImage1.Src = imagePath;
+        dvUserImage3.Src = imagePath;
+        dvUserImageMenu.Src = imagePath;
     }
 }

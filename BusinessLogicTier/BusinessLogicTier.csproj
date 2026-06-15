@@ -75,6 +75,7 @@
     <Compile Include="clsnewmail.cs" />
     <Compile Include="clsNews.cs" />
     <Compile Include="clsOperator.cs" />
+    <Compile Include="clsPackagePlan.cs" />
     <Compile Include="clsplan.cs" />
     <Compile Include="clsProduct.cs" />
     <Compile Include="clsRecharge.cs" />

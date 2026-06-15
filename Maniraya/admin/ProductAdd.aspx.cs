@@ -63,7 +63,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             string RandomNumber = DateTime.Now.Ticks.ToString();
             string fileName = Path.GetFileName(ProductImageUpload.PostedFile.FileName);
             Imagename = RandomNumber+ fileName;
-            ProductImageUpload.PostedFile.SaveAs(Server.MapPath("~/img/") + Imagename);
+            ProductImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
             
         }
         return Imagename;
@@ -76,7 +76,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             string RandomNumber = DateTime.Now.Ticks.ToString();
             string fileName = Path.GetFileName(ProductImageUpload2.PostedFile.FileName);
             Imagename = RandomNumber + fileName;
-            ProductImageUpload2.PostedFile.SaveAs(Server.MapPath("~/img/") + Imagename);
+            ProductImageUpload2.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
 
         }
         return Imagename;
@@ -89,7 +89,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             string RandomNumber = DateTime.Now.Ticks.ToString();
             string fileName = Path.GetFileName(ProductImageUpload3.PostedFile.FileName);
             Imagename = RandomNumber + fileName;
-            ProductImageUpload3.PostedFile.SaveAs(Server.MapPath("~/img/") + Imagename);
+            ProductImageUpload3.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
 
         }
         return Imagename;
@@ -97,12 +97,12 @@ public partial class admin_ProductAdd : System.Web.UI.Page
     public string UploadImage4()
     {
         string Imagename = "";
-        if (ProductImageUpload3.HasFile)
+        if (ProductImageUpload4.HasFile)
         {
             string RandomNumber = DateTime.Now.Ticks.ToString();
             string fileName = Path.GetFileName(ProductImageUpload4.PostedFile.FileName);
             Imagename = RandomNumber + fileName;
-            ProductImageUpload3.PostedFile.SaveAs(Server.MapPath("~/img/") + Imagename);
+            ProductImageUpload4.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
 
         }
         return Imagename;

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="BankAccountAdd.aspx.cs" Inherits="admin_BankAccountAdd" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="BankAccountAdd.aspx.cs" Inherits="admin_BankAccountAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <script type="text/javascript">
@@ -18,6 +18,7 @@
                 document.getElementById("<%=txtdepositbank.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
 
         function validate2() {
@@ -36,102 +37,13 @@
                 document.getElementById("<%=txtdepositbankedit.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
 
-        function updateQrFileName(file) {
-            var nameEl = document.getElementById("qrFileName");
-            if (!nameEl) {
-                return;
+        function syncEditBankQrPreview(imageUrl) {
+            if (window.AdminImageUpload) {
+                AdminImageUpload.setUrlPreview("editQrUploadCard", imageUrl, "Current QR image");
             }
-            nameEl.textContent = file ? file.name : "No file selected";
-            nameEl.classList.toggle("has-file", !!file);
-        }
-
-        function resetQrPreview() {
-            var img = document.getElementById("<%=ImageShow.ClientID%>");
-            var placeholder = document.getElementById("qrPreviewPlaceholder");
-            var upload = document.getElementById("<%=ProductImageUpload.ClientID%>");
-            var dropzone = document.getElementById("qrDropzone");
-            if (img) {
-                img.src = "";
-                img.style.display = "none";
-            }
-            if (placeholder) {
-                placeholder.style.display = "flex";
-            }
-            if (upload) {
-                upload.value = "";
-            }
-            if (dropzone) {
-                dropzone.classList.remove("is-dragover", "has-file");
-            }
-            updateQrFileName(null);
-        }
-
-        function previewQrFile(file) {
-            var img = document.getElementById("<%=ImageShow.ClientID%>");
-            var placeholder = document.getElementById("qrPreviewPlaceholder");
-            var dropzone = document.getElementById("qrDropzone");
-            if (!file || !file.type || file.type.indexOf("image/") !== 0) {
-                resetQrPreview();
-                return;
-            }
-            var reader = new FileReader();
-            reader.onload = function (ev) {
-                img.src = ev.target.result;
-                img.style.display = "block";
-                if (placeholder) {
-                    placeholder.style.display = "none";
-                }
-                if (dropzone) {
-                    dropzone.classList.add("has-file");
-                }
-            };
-            reader.readAsDataURL(file);
-            updateQrFileName(file);
-        }
-
-        function bindQrPreview() {
-            var upload = document.getElementById("<%=ProductImageUpload.ClientID%>");
-            var dropzone = document.getElementById("qrDropzone");
-            if (!upload || upload._qrBound) {
-                return;
-            }
-            upload._qrBound = true;
-            upload.addEventListener("change", function (e) {
-                previewQrFile(e.target.files[0]);
-            });
-
-            if (!dropzone || dropzone._dragBound) {
-                return;
-            }
-            dropzone._dragBound = true;
-            ["dragenter", "dragover"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.add("is-dragover");
-                });
-            });
-            ["dragleave", "drop"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.remove("is-dragover");
-                });
-            });
-            dropzone.addEventListener("drop", function (e) {
-                var file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
-                if (!file) {
-                    return;
-                }
-                try {
-                    var dt = new DataTransfer();
-                    dt.items.add(file);
-                    upload.files = dt.files;
-                } catch (ex) {
-                    return;
-                }
-                previewQrFile(file);
-            });
         }
 
         function openAddBankAccountModal() {
@@ -139,11 +51,11 @@
             document.getElementById("<%=txtdepositaccountno.ClientID%>").value = "";
             document.getElementById("<%=txtifsccode.ClientID%>").value = "";
             document.getElementById("<%=txtaccountholdername.ClientID%>").value = "";
-            resetQrPreview();
+            if (window.AdminImageUpload) {
+                AdminImageUpload.reset(document.querySelector(".admin-qr-upload-card"));
+            }
             showAdminModal('addBankAccountModal');
         }
-
-        Sys.Application.add_load(bindQrPreview);
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
@@ -208,8 +120,8 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Action">
                                             <ItemTemplate>
-                                                <asp:LinkButton style="display:none;" ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
-                                                <asp:LinkButton ID="lnkDel" CommandName="del" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lnkDel" CssClass="admin-grid-delete-btn" CommandName="del" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" OnClientClick="return confirm('Are you sure you want to delete this bank account?');" ToolTip="Delete account"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                     </Columns>
@@ -315,51 +227,92 @@
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title" id="bankAccountEditModalTitle">Edit Bank Account</h4>
+                                <h4 class="modal-title" id="bankAccountEditModalTitle"><i class="fa fa-pencil-square-o"></i> Edit Bank Account</h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body admin-modal-form admin-bank-account-form admin-bank-account-form--edit">
+                                <p class="admin-modal-form-intro admin-modal-form-intro--visible">Update bank account details. Leave QR upload empty to keep the current image.</p>
+
                                 <asp:Label ID="lblbankaccountid" runat="server" Visible="false" Text="0"></asp:Label>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= txtaccountnoedit.ClientID %>">Account Number</label>
-                                            <asp:TextBox ID="txtaccountnoedit" onkeypress="return isNumber(event)" runat="server" CssClass="form-control" />
+                                <asp:HiddenField ID="hfEditQrImage" runat="server" />
+
+                                <div class="admin-form-section">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-university"></i> Bank Details</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtdepositbankedit.ClientID %>">Bank Name</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-building"></i></span>
+                                                    <asp:TextBox ID="txtdepositbankedit" runat="server" CssClass="form-control" placeholder="e.g. State Bank of India" />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= txtaccholdernameedit.ClientID %>">Account Holder Name</label>
-                                            <asp:TextBox ID="txtaccholdernameedit" runat="server" CssClass="form-control" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= txtdepositbankedit.ClientID %>">Bank Name</label>
-                                            <asp:TextBox ID="txtdepositbankedit" runat="server" CssClass="form-control" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>QR Code</label>
-                                            <asp:Image ID="ImageButton1" runat="server" Width="50px" Height="50px" />
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtifsccodeedit.ClientID %>">IFSC Code</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-barcode"></i></span>
+                                                    <asp:TextBox ID="txtifsccodeedit" runat="server" CssClass="form-control" placeholder="e.g. SBIN0001234" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= FileUpload1.ClientID %>">Image Upload</label>
-                                            <asp:FileUpload ID="FileUpload1" runat="server" CssClass="form-control" />
+
+                                <div class="admin-form-section">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-credit-card"></i> Account Details</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtaccountnoedit.ClientID %>">Account Number</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
+                                                    <asp:TextBox ID="txtaccountnoedit" onkeypress="return isNumber(event)" runat="server" CssClass="form-control" placeholder="Enter account number" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtaccholdernameedit.ClientID %>">Account Holder Name</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-user"></i></span>
+                                                    <asp:TextBox ID="txtaccholdernameedit" runat="server" CssClass="form-control" placeholder="Name as per bank records" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="admin-form-section admin-form-section-last">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-qrcode"></i> Payment QR Code</h5>
+                                    <div class="admin-qr-upload-card" id="editQrUploadCard">
+                                        <div class="admin-qr-preview-box">
+                                            <div id="editQrPreviewPlaceholder" class="admin-qr-placeholder">
+                                                <i class="fa fa-qrcode"></i>
+                                                <span>QR preview</span>
+                                            </div>
+                                            <asp:Image ID="ImageButton1" runat="server" CssClass="admin-qr-preview-img" AlternateText="Current QR code" />
+                                        </div>
+                                        <div class="admin-qr-upload-side">
+                                            <p class="admin-qr-upload-title">Replace QR Image</p>
+                                            <p class="admin-qr-upload-hint">Upload a new QR only if you want to change the existing payment code.</p>
+                                            <div class="admin-qr-dropzone" id="editQrDropzone">
+                                                <asp:FileUpload ID="FileUpload1" runat="server" CssClass="admin-file-input-hidden" accept="image/*" />
+                                                <label class="admin-qr-dropzone-label" for="<%= FileUpload1.ClientID %>">
+                                                    <span class="admin-qr-dropzone-icon"><i class="fa fa-cloud-upload"></i></span>
+                                                    <span class="admin-qr-dropzone-text"><strong>Browse file</strong> or drag image here</span>
+                                                    <span class="admin-qr-dropzone-meta">PNG, JPG, WEBP</span>
+                                                </label>
+                                            </div>
+                                            <span class="admin-qr-filename" id="editQrFileName" data-empty-text="Keep current QR image">Keep current QR image</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <asp:Button ID="btnUpdate" runat="server" Text="Update" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            <div class="modal-footer admin-modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <asp:Button ID="btnUpdate" runat="server" Text="Save Changes" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
                             </div>
                         </div>
                     </div>

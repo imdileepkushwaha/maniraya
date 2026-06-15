@@ -1,6 +1,157 @@
 <%@ Page Title="" Language="C#" MasterPageFile="~/WebMasterPage.master" AutoEventWireup="true" CodeFile="signup.aspx.cs" Inherits="signup" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <script type="text/javascript">
+        function validate() {
+            if (document.getElementById("<%=txtsponserid.ClientID%>").value == "") {
+   
+                alert('Enter Sponser Id');
+                document.getElementById("<%=txtsponserid.ClientID%>").focus();
+                   return false;
+               }
+               
+            
+            
+            
+               if (document.getElementById("<%=txtname.ClientID%>").value == "") {
+   
+                alert('Enter First Name');
+                document.getElementById("<%=txtname.ClientID%>").focus();
+                   return false;
+               }
+               if (document.getElementById("<%=txtmobile.ClientID%>").value == "") {
+   
+                alert('Enter Mobile');
+                document.getElementById("<%=txtmobile.ClientID%>").focus();
+                return false;
+            }
+   
+            // if (validatephonenumber(document.getElementById("<%=txtmobile.ClientID%>").value) == false) {
+            //alert('Invalid Mobile No');
+            // document.getElementById("<%=txtmobile.ClientID%>").focus();
+            // return false;
+            // }
+            if (document.getElementById("<%=txtemail.ClientID%>").value == "") {
+   
+                alert('Enter Email');
+                document.getElementById("<%=txtemail.ClientID%>").focus();
+                   return false;
+               }
+   
+               if (validateemail(document.getElementById("<%=txtemail.ClientID%>").value) == false) {
+   
+                alert('Invalid Email ID');
+                document.getElementById("<%=txtemail.ClientID%>").focus();
+                   return false;
+               }
+               if (document.getElementById("<%=ddgender.ClientID%>").value == "0") {
+   
+   
+                //    if (document.getElementById("<%=ddcountry.ClientID%>").value == "0") {
+                   //  alert('Select Country');
+                   //  document.getElementById("<%=ddcountry.ClientID%>").focus();
+                   //  return false;
+                   //   }
+   
+                   //   if (document.getElementById("<%=ddstate.ClientID%>").value == "0") {
+                   // alert('Select State');
+                   // document.getElementById("<%=ddstate.ClientID%>").focus();
+                   // return false;
+                   // }
+   
+                   // if (document.getElementById("<%=ddcity.ClientID%>").value == "0") {
+   
+                   // alert('Select City');
+                   // document.getElementById("<%=ddcity.ClientID%>").focus();
+                   //  return false;
+                   //  }
+                   //     if (document.getElementById("<%=ddcity.ClientID%>").value == "") {
+   
+                   //          alert('Select City');
+                   //         document.getElementById("<%=ddcity.ClientID%>").focus();
+                   //         return false;
+                   // }
+                   //      if (document.getElementById("<%=txtareaname.ClientID%>").value == "") {
+   
+                   //        alert('Enter Area');
+                   //      document.getElementById("<%=txtareaname.ClientID%>").focus();
+                   //           return false;
+                   //  }
+   
+   
+   
+                   //      if (document.getElementById("<%=txtpincode.ClientID%>").value == "") {
+   
+                   //         alert('Enter Pincode');
+                   //         document.getElementById("<%=txtpincode.ClientID%>").focus();
+                   //              return false;
+                   //     } 
+                   if (document.getElementById("<%=txtuserpassword.ClientID%>").value == "") {
+   
+                       alert('Enter Password');
+                       document.getElementById("<%=txtuserpassword.ClientID%>").focus();
+                       return false;
+                   }
+                   if (document.getElementById("<%=txtconfirmpassword.ClientID%>").value == "") {
+   
+                       alert('Enter Confirm Password');
+                       document.getElementById("<%=txtconfirmpassword.ClientID%>").focus();
+                       return false;
+                   }
+                   if (document.getElementById("<%=txtuserpassword.ClientID%>").value != document.getElementById("<%=txtconfirmpassword.ClientID%>").value) {
+   
+                       alert('Password Not Match');
+                       document.getElementById("<%=txtuserpassword.ClientID%>").focus();
+                       return false;
+                   }
+                   if (document.getElementById("<%=txtCaptcha.ClientID%>").value == "") {
+                       alert('Please enter the security code');
+                       document.getElementById("<%=txtCaptcha.ClientID%>").focus();
+                       return false;
+                   }
+               }
+   
+   
+               function validatephonenumber(inputtxt) {
+                   var phoneno = /^([6-9]{1})([0-9]{9})$/;
+                   if (inputtxt.match(phoneno)) {
+                       return true;
+                   }
+                   else {
+                       return false;
+                   }
+               }
+   
+               function validateemail(inputtxt) {
+                   var email = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+                   if (inputtxt.match(email)) {
+                       return true;
+                   }
+                   else {
+                       return false;
+                   }
+               }
+                function allowEnglishOnly(e) {
+           var charCode = e.which || e.keyCode;
+           var charStr = String.fromCharCode(charCode);
+   
+           // Allow backspace
+           if (charCode == 8) {
+               return true;
+           }
+   
+           // Allow only English letters and space
+           var regex = /^[A-Za-z ]+$/;
+   
+           if (regex.test(charStr)) {
+               return true;
+           }
+   
+           return false;
+       }
+           }
+   
+    </script>
     <script>
         function signupTogglePassword(fieldId, btn, label) {
             var input = document.getElementById(fieldId);
@@ -11,7 +162,66 @@
             btn.classList.toggle("is-password-visible", show);
             btn.setAttribute("aria-label", show ? ("Hide " + label) : ("Show " + label));
         }
+
+        function syncSignupPositionPicker(forceDefaultLeft) {
+            var select = document.getElementById("<%= ddposition.ClientID %>");
+            var picker = document.querySelector(".signup-position-picker");
+            if (!select || !picker) return;
+
+            var value = select.value;
+            if ((!value || value === "0") && forceDefaultLeft !== false) {
+                value = "Left";
+                select.value = value;
+            }
+
+            var options = picker.querySelectorAll(".signup-position-option");
+            for (var i = 0; i < options.length; i++) {
+                var btn = options[i];
+                var isSelected = value && btn.getAttribute("data-position") === value;
+                btn.classList.toggle("is-selected", isSelected);
+                btn.setAttribute("aria-pressed", isSelected ? "true" : "false");
+            }
+        }
+
+        function initSignupPositionPicker() {
+            syncSignupPositionPicker(true);
+        }
+
+        if (!window._signupPositionPickerBound) {
+            window._signupPositionPickerBound = true;
+            document.addEventListener("click", function (event) {
+                var btn = event.target.closest(".signup-position-option");
+                if (!btn) return;
+
+                var select = document.getElementById("<%= ddposition.ClientID %>");
+                if (!select) return;
+
+                var value = btn.getAttribute("data-position");
+                if (!value) return;
+
+                event.preventDefault();
+                select.value = value;
+                syncSignupPositionPicker(false);
+            });
+        }
+
+        if (window.Sys && Sys.Application) {
+            Sys.Application.add_load(initSignupPositionPicker);
+            if (Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                var signupPositionPrm = Sys.WebForms.PageRequestManager.getInstance();
+                if (!signupPositionPrm._signupPositionPickerHooked) {
+                    signupPositionPrm._signupPositionPickerHooked = true;
+                    signupPositionPrm.add_endRequest(function () {
+                        syncSignupPositionPicker(true);
+                    });
+                }
+            }
+        } else {
+            document.addEventListener("DOMContentLoaded", initSignupPositionPicker);
+        }
     </script>
+
+    
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     <div class="signup-page-shell">
@@ -92,7 +302,49 @@
                                                 </div>
                                             </div>
                                         </div>
+                                            <div class="signup-position-block">
+                                                <label class="signup-label">Select Position</label>
+                                                <p class="signup-position-hint">Choose your placement in the sponsor's team structure.</p>
+                                                <div class="signup-position-picker" role="group" aria-label="Select Position">
+                                                    <button type="button" class="signup-position-option" data-position="Left" aria-pressed="false">
+                                                        <span class="signup-position-icon" aria-hidden="true">
+                                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M14 7L9 12L14 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <circle cx="17" cy="12" r="3" fill="currentColor" opacity="0.35"/>
+                                                                <circle cx="6" cy="12" r="3" fill="currentColor"/>
+                                                            </svg>
+                                                        </span>
+                                                        <span class="signup-position-copy">
+                                                            <strong>Left</strong>
+                                                            <small>Left leg of the tree</small>
+                                                        </span>
+                                                        <span class="signup-position-check" aria-hidden="true">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12.5L10 17.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="signup-position-option" data-position="Right" aria-pressed="false">
+                                                        <span class="signup-position-icon" aria-hidden="true">
+                                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M10 7L15 12L10 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <circle cx="7" cy="12" r="3" fill="currentColor" opacity="0.35"/>
+                                                                <circle cx="18" cy="12" r="3" fill="currentColor"/>
+                                                            </svg>
+                                                        </span>
+                                                        <span class="signup-position-copy">
+                                                            <strong>Right</strong>
+                                                            <small>Right leg of the tree</small>
+                                                        </span>
+                                                        <span class="signup-position-check" aria-hidden="true">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12.5L10 17.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <asp:DropDownList ID="ddposition" CssClass="signup-position-native" runat="server" aria-hidden="true" tabindex="-1">
+                                                    <asp:ListItem Value="Left" Selected="True">Left</asp:ListItem>
+                                                    <asp:ListItem Value="Right">Right</asp:ListItem>
+                                                </asp:DropDownList>
                                             </div>
+                                        </div>
                                         </div>
                                         <div class="col-md-6" style="display: none">
                                             <div class="form-group">
@@ -184,22 +436,6 @@
                                             </div>
                                         </div>
 
-
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label class="text-start">Select Position :</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-addon bg-light"><i class="fa fa-user text-primary"></i></div>
-                                                        <asp:DropDownList ID="ddposition" CssClass="form-control" runat="server">
-                                                            <asp:ListItem Value="0">Select Position</asp:ListItem>
-                                                            <asp:ListItem Value="Left">Left</asp:ListItem>
-                                                            <asp:ListItem Value="Right">Right</asp:ListItem>
-                                                        </asp:DropDownList>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="signup-step-card">
                                             <div class="signup-step-head">
@@ -640,6 +876,25 @@
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-12" style="margin-bottom: 0 !important;">
+                                            </div>
+                                        </div>
+
+                                        <div class="signup-field">
+                                            <label for="<%= txtCaptcha.ClientID %>">Security Code</label>
+                                            <div class="auth-captcha-row">
+                                                <div class="auth-captcha-display" aria-label="Captcha code">
+                                                    <asp:Label ID="lblCaptchaCode" runat="server" CssClass="auth-captcha-code" />
+                                                </div>
+                                                <asp:LinkButton ID="lnkRefreshCaptcha" runat="server" CssClass="auth-captcha-refresh" CausesValidation="false" OnClick="lnkRefreshCaptcha_Click" ToolTip="Refresh code">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                        <path d="M20 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Refresh</span>
+                                                </asp:LinkButton>
+                                                <div class="auth-input-wrap auth-input-wrap--plain auth-captcha-input-wrap">
+                                                    <asp:TextBox ID="txtCaptcha" runat="server" CssClass="form-control auth-input auth-captcha-input" placeholder="Type code" autocomplete="off" MaxLength="6" />
+                                                </div>
                                             </div>
                                         </div>
 

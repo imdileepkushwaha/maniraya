@@ -1,0 +1,51 @@
+/* Franchisee panel – master page layout overrides */
+body.franchisee-app .content-wrapper,
+body.franchisee-app .main-footer {
+    margin-left: 0 !important;
+}
+
+body.franchisee-app .admin-main {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+
+body.franchisee-app .admin-content-wrapper {
+    display: block !important;
+    flex: 1 1 auto;
+    width: 100% !important;
+    min-height: 300px;
+    overflow: visible !important;
+}
+
+body.franchisee-app section.content-header,
+body.franchisee-app section.content {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+    position: relative;
+    z-index: 2;
+    overflow: visible !important;
+}
+
+body.franchisee-app section.content {
+    padding: 15px !important;
+    min-height: 200px;
+}
+
+body.franchisee-app section.content .row,
+body.franchisee-app section.content .box,
+body.franchisee-app section.content .small-box {
+    visibility: visible !important;
+}
+
+body.franchisee-app .fr-dash-content {
+    display: block !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 3;
+}

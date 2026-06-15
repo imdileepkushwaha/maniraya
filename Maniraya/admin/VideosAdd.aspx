@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Add Product" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="VideosAdd.aspx.cs" Inherits="VideosAdd" %>
+<%@ Page Title="Add Product" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="VideosAdd.aspx.cs" Inherits="VideosAdd" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit.HTMLEditor" TagPrefix="cc1" %>
 
@@ -127,8 +127,8 @@
                            </asp:TemplateField>
                                           <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                            <asp:LinkButton ID="lbEdit" OnClick="lnkedit"   CommandArgument='<%# Eval("id") %>'  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton> | 
-                                             <asp:LinkButton ID="lblDel" OnClick="lnkdel"   CommandArgument='<%# Eval("id") %>'  runat="server"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
+                                            <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" OnClick="lnkedit"   CommandArgument='<%# Eval("id") %>'  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton> | 
+                                             <asp:LinkButton ID="lbldel" CssClass="admin-grid-delete-btn" OnClick="lnkdel"   CommandArgument='<%# Eval("id") %>'  runat="server"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
                                         </ItemTemplate>
                                        
                                     </asp:TemplateField>

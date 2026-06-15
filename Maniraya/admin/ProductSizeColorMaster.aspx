@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="ProductSizeColorMaster.aspx.cs" Inherits="admin_ProductSizeColorMaster" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="ProductSizeColorMaster.aspx.cs" Inherits="admin_ProductSizeColorMaster" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
      <script type="text/javascript">
@@ -219,7 +219,7 @@
       <asp:TemplateField HeaderText="Action">
     <ItemTemplate>
 
-        <asp:LinkButton ID="lbEdit" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+        <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
        
     </ItemTemplate>
    
