@@ -1,0 +1,244 @@
+/* Franchisee – KYC document upload (PAN, Aadhar, etc.) */
+body.franchisee-app .fr-kyc-page .box {
+    margin-bottom: 0;
+}
+
+body.franchisee-app .fr-kyc-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+body.franchisee-app .fr-kyc-preview-col {
+    flex: 0 0 300px;
+    max-width: 100%;
+}
+
+body.franchisee-app .fr-kyc-form-col {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+body.franchisee-app .fr-kyc-preview-card {
+    border: 1px solid #dbece9;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fcfb 0%, #fff 100%);
+    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.08);
+    padding: 20px 18px;
+    text-align: center;
+    height: 100%;
+}
+
+body.franchisee-app .fr-kyc-preview-title {
+    margin: 0 0 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f766e;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+body.franchisee-app .fr-kyc-preview-wrap {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+body.franchisee-app .fr-kyc-doc-thumb {
+    width: 100%;
+    max-width: 260px;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 2px solid #ccfbf1;
+    background: #f1f5f9;
+    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.12);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.franchisee-app .fr-kyc-doc-thumb:hover {
+    transform: scale(1.01);
+    box-shadow: 0 12px 28px rgba(13, 148, 136, 0.2);
+}
+
+body.franchisee-app .fr-kyc-zoom-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+body.franchisee-app .fr-kyc-zoom-hint i {
+    color: #0d9488;
+}
+
+body.franchisee-app .fr-kyc-dual-preview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-kyc-dual-preview {
+        grid-template-columns: 1fr;
+    }
+
+    body.franchisee-app .fr-kyc-preview-col {
+        flex: 1 1 100%;
+    }
+}
+
+body.franchisee-app .fr-kyc-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-kyc-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+body.franchisee-app .fr-kyc-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+body.franchisee-app .fr-kyc-field .form-control {
+    background: #f8fcfb;
+    border-color: #dbece9;
+}
+
+body.franchisee-app .fr-kyc-status-row {
+    margin-bottom: 16px;
+}
+
+body.franchisee-app .fr-kyc-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+body.franchisee-app .fr-kyc-status.Approved {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+body.franchisee-app .fr-kyc-status.Pending {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+}
+
+body.franchisee-app .fr-kyc-status.Rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
+body.franchisee-app .fr-kyc-upload-zone {
+    border: 2px dashed #99f6e4;
+    border-radius: 14px;
+    background: #f0fdfa;
+    padding: 18px 16px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+body.franchisee-app .fr-kyc-upload-zone i {
+    font-size: 28px;
+    color: #0d9488;
+    margin-bottom: 8px;
+}
+
+body.franchisee-app .fr-kyc-upload-zone p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #134e4a;
+}
+
+body.franchisee-app .fr-kyc-upload-zone small {
+    display: block;
+    margin-top: 8px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+body.franchisee-app .fr-kyc-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-kyc-upload-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+body.franchisee-app .fr-kyc-tips {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+body.franchisee-app .fr-kyc-tips strong {
+    color: #b45309;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dbece9;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-header {
+    background: linear-gradient(135deg, #f0fdfa 0%, #fff 100%);
+    border-bottom: 1px solid #e3f2ef;
+    padding: 14px 18px;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-title {
+    font-weight: 700;
+    color: #0f766e;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-body {
+    padding: 0;
+    background: #0f172a;
+    text-align: center;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+body.franchisee-app .fr-kyc-modal .modal-footer {
+    border-top: 1px solid #e3f2ef;
+    background: #f8fcfb;
+}

@@ -38,38 +38,9 @@
 		<link href="../sarah/assets/css/essentials.css" rel="stylesheet" type="text/css" />
 		<%--<link href="../sarah/assets/css/layout.css" rel="stylesheet" type="text/css" />--%>
 
-    <style type="text/css">
-
-        .content-wrapper, .main-footer {
-            /*margin-left: 230px;*/
-            margin-left: 0px;
-        }
-
-        #sarahapp-container {
-            min-height: 0px;
-        }
-
-        @media screen and (max-width:320px) {
-            .sarah-right-header {
-                margin-left:0px !important;
-            }
-            .sarah-left-header {
-                width:100% !important;
-            }
-        }
-
-    </style>
-    <style type="text/css">
-    @media (min-width: 767px) {
-    .navbar-nav .dropdown-menu .caret {
-	transform: rotate(-90deg);
-    }
-}
-
-    </style>
-
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=48" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=60" />
+    <link rel="stylesheet" href="assets/css/admin-theme.css?v=2" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -118,6 +89,8 @@
                                     <li><a href="BankAccountAdd.aspx">Bank Account Add</a></li>
                                     <li><a href="deductioncharge.aspx">Deduction Master</a></li>
                                     <li><a href="NewsAdd.aspx">News Add</a></li>
+                                    <li><a href="PlanAdd.aspx">Add Plan</a></li>
+                                    <li><a href="PackagePlanMaster.aspx">Package Plan Master</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
@@ -339,9 +312,10 @@
         </script>
         <script src="../myassets/assets/js/maniraya-loader.js?v=1"></script>
         <script src="assets/js/admin-sidebar.js?v=2"></script>
-        <script src="assets/js/admin-header-enhance.js?v=1"></script>
+        <script src="assets/js/admin-header-enhance.js?v=2"></script>
         <script src="assets/js/admin-topbar.js?v=1"></script>
-        <script src="assets/js/admin-modal.js?v=4"></script>
+        <script src="assets/js/admin-modal.js?v=5"></script>
+        <script src="assets/js/admin-image-upload.js?v=1"></script>
         <asp:ContentPlaceHolder ID="contentScript" runat="server">
         </asp:ContentPlaceHolder>
     </form>

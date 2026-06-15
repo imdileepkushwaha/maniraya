@@ -527,7 +527,7 @@ public DataTable getFranchiseetype()
                                 CASE WHEN isnull(ud.PanImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PanImage END AS PanImage  , PanImgStatus, 
                                 CASE WHEN isnull(ud.CancelCheque,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.CancelCheque END AS CancelCheque, ChequeImgStatus, 
                                 CASE WHEN isnull(ud.AadharImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImage END AS AadharImage, AadharImgStatus, 
-                                CASE WHEN isnull(ud.AadharImageBack,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImageBack END AS AadharImageBack,ud.gender   
+                                CASE WHEN isnull(ud.AadharImageBack,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImageBack END AS AadharImageBack, isnull(ud.AadharNo,'') AS AadharNo, ud.gender   
                                 FROM FranchiseeDetail  ud where ud.UserId = '" + objUser.UserId + "' ";
             DataTable dt = null;
             ObjData.StartConnection();

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Deposit Request Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="JoiningRequestReport.aspx.cs" Inherits="JoiningRequestReport" %>
+<%@ Page Title="Deposit Request Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="JoiningRequestReport.aspx.cs" Inherits="JoiningRequestReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -179,7 +179,7 @@
                                     </asp:TemplateField>
                                       <asp:TemplateField HeaderText="Product Detail">
                                         <ItemTemplate>
-                                             <asp:LinkButton ID="lbEdit" CommandName="photolarge"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                             <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="photolarge"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                          
                                         </ItemTemplate>
                                     </asp:TemplateField>

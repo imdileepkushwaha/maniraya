@@ -1,43 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Data;
 using BusinessLogicTier;
 
 public partial class user_ConfirmRegistration : System.Web.UI.Page
 {
-    clsUser objuser = new clsUser();
-    Documet_Upload_class ObjDUc = new Documet_Upload_class();
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
+            if (!HasRegistrationSession())
+            {
+                Response.Redirect("signup.aspx");
+                return;
+            }
+
             laoddata();
-            //ImageUrl();
         }
     }
+
+    bool HasRegistrationSession()
+    {
+        return Session["LoginId1"] != null
+            && Session["Password1"] != null
+            && Session["UserName2"] != null;
+    }
+
+    string GetSessionText(string key)
+    {
+        object value = Session[key];
+        return value == null ? string.Empty : value.ToString();
+    }
+
     void laoddata()
     {
-
-        LblLoginId.Text = Session["LoginId1"].ToString();
-        LblPassword.Text = Session["Password1"].ToString();
+        LblLoginId.Text = GetSessionText("LoginId1");
+        LblPassword.Text = GetSessionText("Password1");
         LblSponsorName.Text = "Necta Network";
-        LblSponsorId.Text = Session["SponserId1"].ToString();
-        lblName.Text = Session["UserName2"].ToString();
-        }
-   // public void ImageUrl()
-   // {
-    //    ObjDUc.CreatedBy = "1";
-    //    ObjDUc.Doc_Name = "Logo";
-     //   DataSet ds = ObjDUc.GetUpload_Document(ObjDUc);
-     //   if (ds.Tables[0].Rows.Count > 0)
-      //  {
-
-      //  Image1.ImageUrl = ds.Tables[0].Rows[0]["Path"].ToString();
-
-      //  }
-    //}
+        LblSponsorId.Text = GetSessionText("SponserId1");
+        lblName.Text = GetSessionText("UserName2");
     }
+}

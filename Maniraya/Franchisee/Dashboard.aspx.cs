@@ -15,50 +15,60 @@ public partial class Dashboard : System.Web.UI.Page
     clsNews objnews = new clsNews();
     clsaward objAward = new clsaward();
     ClsVacation objvac = new ClsVacation();
+
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["fuserid"] != null)
-        {
-            if (!IsPostBack)
-            {
-                TxtLeftLinkLink.Attributes.Add("readonly", "readonly");
-                TxtRightLink.Attributes.Add("readonly", "readonly");
-                loadnotification();
-                laoddata();
-               // TxtLeftLinkLink.Text = "http://raxtan.com/user/Registration.aspx/?UserId=" + Session["userid"].ToString() + "&Standingposition=" + 1;
-               // TxtRightLink.Text = "http://raxtan.com/user/Registration.aspx/?UserId=" + Session["userid"].ToString() + "&Standingposition=" + 2;
-               // loadaward();
-               // loadvacation();
-                loadnews();
-              //  loadTodayPerformance();
-               // loadweeklyPerformance();
-              //  loadmonthlyPerformance();
-              //  loadtotalPerformance();
-                loadwallet();
-            }
-        }
-        else
+        if (Session["fuserid"] == null)
         {
             Response.Redirect("logout.aspx");
+            return;
+        }
+
+        if (!IsPostBack)
+        {
+            try
+            {
+                if (TxtLeftLinkLink != null)
+                {
+                    TxtLeftLinkLink.Attributes.Add("readonly", "readonly");
+                }
+                if (TxtRightLink != null)
+                {
+                    TxtRightLink.Attributes.Add("readonly", "readonly");
+                }
+                loadnotification();
+                laoddata();
+                loadnews();
+                loadwallet();
+            }
+            catch (Exception)
+            {
+                // Keep dashboard visible even if a data call fails.
+                pnlnotification.Visible = false;
+            }
         }
     }
+
     void loadwallet()
     {
-
         objaccount.UserId = Session["fuserid"].ToString();
-        DataTable dt = new DataTable();
-        dt = objaccount.getUserWalletBalanceReport(objaccount);
-        if (dt.Rows.Count > 0)
+        DataTable dt = objaccount.getUserWalletBalanceReport(objaccount);
+        if (dt != null && dt.Rows.Count > 0)
         {
             LblCredited.Text = dt.Rows[0]["sumCr"].ToString();
             LblDebited.Text = dt.Rows[0]["sumdr"].ToString();
             LblCurrentWallet.Text = dt.Rows[0]["bal"].ToString();
         }
     }
+
     void loadnews()
     {
-        DataTable dt = new DataTable();
-        dt = objnews.getRecentNews();
+        DataTable dt = objnews.getRecentNews();
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
+
         ltnews.Text += "<span style='color:red;'>* ";
         foreach (DataRow r in dt.Rows)
         {
@@ -66,73 +76,106 @@ public partial class Dashboard : System.Web.UI.Page
         }
         ltnews.Text += "</span>";
     }
+
     void loadnotification()
     {
+        pnlnotification.Visible = false;
         objuserf.UserId = Session["fuserid"].ToString();
-        DataTable dt = new DataTable();
+        DataTable dt = objuserf.getUserDetail(objuserf);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
 
-        dt = objuserf.getUserDetail(objuserf);
-        if (dt.Rows[0]["AccountHolderName"].ToString() == "" || dt.Rows[0]["AccountNo"].ToString() == "" || dt.Rows[0]["IFSCCode"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "0" || dt.Rows[0]["BranchName"].ToString() == "" || dt.Rows[0]["PanNumber"].ToString() == "")
+        DataRow row = dt.Rows[0];
+        string accountHolder = GetRowValue(row, "AccountHolderName", "accountholdername");
+        string accountNo = GetRowValue(row, "AccountNo", "accountno");
+        string ifsc = GetRowValue(row, "IFSCCode", "ifsccode");
+        string bankName = GetRowValue(row, "BankName", "bankname");
+        string branchName = GetRowValue(row, "BranchName", "branchname");
+        string panNumber = GetRowValue(row, "PanNumber", "pannumber");
+
+        if (string.IsNullOrWhiteSpace(accountHolder)
+            || string.IsNullOrWhiteSpace(accountNo)
+            || string.IsNullOrWhiteSpace(ifsc)
+            || string.IsNullOrWhiteSpace(bankName)
+            || bankName == "0"
+            || string.IsNullOrWhiteSpace(branchName)
+            || string.IsNullOrWhiteSpace(panNumber))
         {
             pnlnotification.Visible = true;
-
         }
-        else
-        {
-            pnlnotification.Visible = false;
-        }
-
     }
+
     void laoddata()
     {
         objuserf.UserId = Session["fuserid"].ToString();
-        DataTable dt = new DataTable();
-        dt = objuserf.getUserDetail(objuserf);
-        if (dt.Rows.Count > 0)
+        DataTable dt = objuserf.getUserDetail(objuserf);
+        if (dt == null || dt.Rows.Count == 0)
         {
-            //lbluserid.Text = dt.Rows[0]["userid"].ToString();
-            //lblusername.Text = dt.Rows[0]["username"].ToString();
-           // LblSponserId.Text = dt.Rows[0]["sponserId"].ToString();
-           // LblParentId.Text = dt.Rows[0]["parentuserid"].ToString();
-            if (dt.Rows[0]["PhotoImage"].ToString() != "")
-            {
-                ImgMyPhoto.ImageUrl = "../ProductImage/" + dt.Rows[0]["PhotoImage"].ToString();
-            }
-            else
-            {
-                ImgMyPhoto.ImageUrl = "img/default.png";
-            }
-            lbljoiningdate.Text = dt.Rows[0]["parentuserid"].ToString();
-          //  LblParentName.Text = dt.Rows[0]["parentname"].ToString();
-          //  LblSponserName.Text = dt.Rows[0]["sponsername"].ToString();
-            lbljoiningdate.Text = dt.Rows[0]["regdate"].ToString();
-            lbladdress.Text = dt.Rows[0]["address"].ToString();
-            lblmobile.Text = dt.Rows[0]["mobile"].ToString();
-            lblemail.Text = dt.Rows[0]["email"].ToString();
-            lblaccountholdername.Text = dt.Rows[0]["accountholdername"].ToString();
-            lblaccountno.Text = dt.Rows[0]["accountno"].ToString();
-            lblbank.Text = dt.Rows[0]["branchname"].ToString();
-            lblifsc.Text = dt.Rows[0]["ifsccode"].ToString();
-            lblpan.Text = dt.Rows[0]["pannumber"].ToString();
-
+            ImgMyPhoto.ImageUrl = "img/default.png";
+            return;
         }
 
+        DataRow row = dt.Rows[0];
+        string photo = GetRowValue(row, "PhotoImage", "photoimage");
+        if (!string.IsNullOrWhiteSpace(photo) && photo.IndexOf("default.png", StringComparison.OrdinalIgnoreCase) < 0)
+        {
+            ImgMyPhoto.ImageUrl = photo.StartsWith("../", StringComparison.Ordinal) ? photo : "../ProductImage/" + photo;
+        }
+        else
+        {
+            ImgMyPhoto.ImageUrl = "img/default.png";
+        }
+
+        lbljoiningdate.Text = GetRowValue(row, "regdate");
+        lbladdress.Text = GetRowValue(row, "address");
+        lblmobile.Text = GetRowValue(row, "mobile");
+        lblemail.Text = GetRowValue(row, "email");
+        lblaccountholdername.Text = GetRowValue(row, "AccountHolderName", "accountholdername");
+        lblaccountno.Text = GetRowValue(row, "AccountNo", "accountno");
+        lblbank.Text = GetRowValue(row, "BranchName", "branchname", "BankName", "bankname");
+        lblifsc.Text = GetRowValue(row, "IFSCCode", "ifsccode");
+        lblpan.Text = GetRowValue(row, "PanNumber", "pannumber");
     }
+
+    static string GetRowValue(DataRow row, params string[] columnNames)
+    {
+        if (row == null || row.Table == null)
+        {
+            return string.Empty;
+        }
+
+        foreach (string columnName in columnNames)
+        {
+            if (string.IsNullOrWhiteSpace(columnName) || !row.Table.Columns.Contains(columnName))
+            {
+                continue;
+            }
+
+            object value = row[columnName];
+            if (value != null && value != DBNull.Value)
+            {
+                return Convert.ToString(value);
+            }
+        }
+
+        return string.Empty;
+    }
+
     void loadaward()
     {
-        DataTable dt = new DataTable();
-        dt = objAward.getawardDetailfromdashboard();
+        DataTable dt = objAward.getawardDetailfromdashboard();
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
+
     void loadvacation()
     {
-        DataTable dt = new DataTable();
-        dt = objvac.getvacationDetailfromdashboard();
+        DataTable dt = objvac.getvacationDetailfromdashboard();
         GridView2.DataSource = dt;
         GridView2.DataBind();
     }
-
 
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
     {
@@ -231,29 +274,25 @@ public partial class Dashboard : System.Web.UI.Page
     }
     void loadTodayPerformance()
     {
-        DataTable dt = new DataTable();
-        dt = objuser.getTodayPerformance(Session["fuserid"].ToString());
+        DataTable dt = objuser.getTodayPerformance(Session["fuserid"].ToString());
         GridViewToday.DataSource = dt;
         GridViewToday.DataBind();
     }
     void loadweeklyPerformance()
     {
-        DataTable dt = new DataTable();
-        dt = objuser.getweeklyPerformance(Session["fuserid"].ToString());
+        DataTable dt = objuser.getweeklyPerformance(Session["fuserid"].ToString());
         GrvVwWeek.DataSource = dt;
         GrvVwWeek.DataBind();
     }
     void loadmonthlyPerformance()
     {
-        DataTable dt = new DataTable();
-        dt = objuser.getmonthlyPerformance(Session["fuserid"].ToString());
+        DataTable dt = objuser.getmonthlyPerformance(Session["fuserid"].ToString());
         GrdVwMonth.DataSource = dt;
         GrdVwMonth.DataBind();
     }
     void loadtotalPerformance()
     {
-        DataTable dt = new DataTable();
-        dt = objuser.getTotalyPerformance(Session["fuserid"].ToString());
+        DataTable dt = objuser.getTotalyPerformance(Session["fuserid"].ToString());
         GrdVwTotal.DataSource = dt;
         GrdVwTotal.DataBind();
     }

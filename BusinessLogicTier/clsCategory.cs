@@ -14,6 +14,7 @@ namespace BusinessLogicTier
         Data ObjData = new Data();
         public string CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public string CategoryImage { get; set; }
         public string SubcategoryId { get; set; }
         public string SubcategoryName { get; set; }
         public string SubcategorySecondId { get; set; }
@@ -110,35 +111,137 @@ namespace BusinessLogicTier
 
         public string Insert_Category(clsCategory objCategory)
         {
-            string res = "";
-            string s2 = "";
-            SqlConnection cn;
+            SqlConnection cn = null;
             SqlTransaction tr = null;
-            DataSet ds = new DataSet();
-            cn = ObjData.StartConnectionInTransaction();
-            tr = cn.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-                s2 = "sp_add_CategoryMaster";
-                SqlParameter[] parameter = {  
-                new SqlParameter("@CategoryName",objCategory.CategoryName), 
-                new SqlParameter("@MentionBy",objCategory.MentionBy)
-                };
-                res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
+                cn = ObjData.StartConnectionInTransaction();
+                tr = cn.BeginTransaction(IsolationLevel.Serializable);
+
+                bool inserted = false;
+
+                if (TryInsertCategoryProc(tr, objCategory, false))
+                {
+                    inserted = true;
+                }
+                else if (!string.IsNullOrEmpty(objCategory.CategoryImage) && TryInsertCategoryProc(tr, objCategory, true))
+                {
+                    inserted = true;
+                }
+                else if (TryInsertCategoryDirect(tr, objCategory))
+                {
+                    inserted = true;
+                }
+
+                if (!inserted)
+                {
+                    tr.Rollback();
+                    return "0";
+                }
+
+                if (!string.IsNullOrEmpty(objCategory.CategoryImage))
+                {
+                    try
+                    {
+                        UpdateCategoryImageAfterInsert(tr, objCategory);
+                    }
+                    catch
+                    {
+                    }
+                }
+
                 tr.Commit();
+                return "t";
             }
-            catch (Exception ex)
+            catch
             {
-                res = "0";
-                tr.Rollback();
+                if (tr != null)
+                {
+                    tr.Rollback();
+                }
+                return "0";
             }
             finally
             {
                 ObjData.EndConnection();
-                tr.Dispose();
+                if (tr != null)
+                {
+                    tr.Dispose();
+                }
             }
-            return res;
+        }
+
+        private bool TryInsertCategoryProc(SqlTransaction tr, clsCategory objCategory, bool includeImage)
+        {
+            try
+            {
+                SqlParameter[] parameter;
+                if (includeImage)
+                {
+                    parameter = new SqlParameter[] {
+                        new SqlParameter("@CategoryName", objCategory.CategoryName),
+                        new SqlParameter("@MentionBy", objCategory.MentionBy),
+                        new SqlParameter("@img", objCategory.CategoryImage)
+                    };
+                }
+                else
+                {
+                    parameter = new SqlParameter[] {
+                        new SqlParameter("@CategoryName", objCategory.CategoryName),
+                        new SqlParameter("@MentionBy", objCategory.MentionBy)
+                    };
+                }
+
+                ObjData.RunInsUpDelQueryTransProc("sp_add_CategoryMaster", tr, parameter);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool TryInsertCategoryDirect(SqlTransaction tr, clsCategory objCategory)
+        {
+            string safeName = (objCategory.CategoryName ?? string.Empty).Replace("'", "''");
+            string safeMention = (objCategory.MentionBy ?? string.Empty).Replace("'", "''");
+
+            if (!string.IsNullOrEmpty(objCategory.CategoryImage))
+            {
+                try
+                {
+                    string safeImg = objCategory.CategoryImage.Replace("'", "''");
+                    string sqlWithImg = "INSERT INTO CategoryMaster (CategoryName, MentionBy, img) VALUES ('"
+                        + safeName + "','" + safeMention + "','" + safeImg + "')";
+                    ObjData.RunInsUpDelQueryTrans(sqlWithImg, tr);
+                    objCategory.CategoryImage = string.Empty;
+                    return true;
+                }
+                catch
+                {
+                }
+            }
+
+            try
+            {
+                string sql = "INSERT INTO CategoryMaster (CategoryName, MentionBy) VALUES ('" + safeName + "','" + safeMention + "')";
+                ObjData.RunInsUpDelQueryTrans(sql, tr);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void UpdateCategoryImageAfterInsert(SqlTransaction tr, clsCategory objCategory)
+        {
+            string safeImg = (objCategory.CategoryImage ?? string.Empty).Replace("'", "''");
+            string safeName = (objCategory.CategoryName ?? string.Empty).Replace("'", "''");
+            string sql = "UPDATE CategoryMaster SET img='" + safeImg
+                + "' WHERE CategoryId = (SELECT TOP 1 CategoryId FROM CategoryMaster WHERE CategoryName='" + safeName + "' ORDER BY CategoryId DESC)";
+            ObjData.RunInsUpDelQueryTrans(sql, tr);
         }
         public string Update_Category(clsCategory objCategory)
         {
@@ -152,7 +255,9 @@ namespace BusinessLogicTier
 
             try
             {
-                s2 = "update CategoryMaster set Categoryname='" + objCategory.CategoryName + "' where Categoryid='" + objCategory.CategoryId + "'";
+                s2 = "update CategoryMaster set Categoryname='" + objCategory.CategoryName.Replace("'", "''") + "'"
+                    + (string.IsNullOrEmpty(objCategory.CategoryImage) ? "" : ", img='" + objCategory.CategoryImage.Replace("'", "''") + "'")
+                    + " where Categoryid='" + objCategory.CategoryId + "'";
 
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
                 res = "t";

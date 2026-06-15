@@ -130,8 +130,8 @@ namespace DataTier
             {
                 command.Parameters.Add(sqlparam[i]);
             }
-            string s = command.ExecuteScalar().ToString();
-            return s;
+            object s = command.ExecuteScalar();
+            return s == null ? string.Empty : s.ToString();
 
         }
         public DataTable RunDataTableProcedureTRans(string sql, SqlTransaction transaction, SqlParameter[] sqlparam)

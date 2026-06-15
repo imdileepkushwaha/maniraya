@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Franchisee Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseeReport.aspx.cs" Inherits="FranchiseeReport" EnableEventValidation="false" %>
+<%@ Page Title="Franchisee Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseeReport.aspx.cs" Inherits="FranchiseeReport" EnableEventValidation="false" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -292,7 +292,7 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Edit">
                                             <ItemTemplate>
-                                                <asp:LinkButton ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" ToolTip="Edit franchisee"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" ToolTip="Edit franchisee"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Center" CssClass="admin-grid-action-cell" />
                                         </asp:TemplateField>

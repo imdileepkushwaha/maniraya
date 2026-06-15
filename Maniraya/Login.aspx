@@ -45,6 +45,8 @@
 
                 if (!userId || !password) return;
                 if (!userId.value.trim() || !password.value.trim()) return;
+                var captcha = document.getElementById("<%=txtCaptcha.ClientID%>");
+                if (!captcha || !captcha.value.trim()) return;
                 if (submitter && submitter.id === "<%=btnLogin.ClientID%>") {
                     showLoginLoader();
                 }
@@ -179,6 +181,25 @@
 <!-- MESSAGE -->
 
 
+                                </div>
+                            </div>
+
+                            <div class="auth-field">
+                                <label for="<%= txtCaptcha.ClientID %>">Security Code</label>
+                                <div class="auth-captcha-row">
+                                    <div class="auth-captcha-display" aria-label="Captcha code">
+                                        <asp:Label ID="lblCaptchaCode" runat="server" CssClass="auth-captcha-code" />
+                                    </div>
+                                    <asp:LinkButton ID="lnkRefreshCaptcha" runat="server" CssClass="auth-captcha-refresh" CausesValidation="false" OnClick="lnkRefreshCaptcha_Click" ToolTip="Refresh code">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <path d="M20 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span>Refresh</span>
+                                    </asp:LinkButton>
+                                    <div class="auth-input-wrap auth-input-wrap--plain auth-captcha-input-wrap">
+                                        <asp:TextBox ID="txtCaptcha" runat="server" CssClass="form-control auth-input auth-captcha-input" placeholder="Type code" autocomplete="off" MaxLength="6" />
+                                    </div>
                                 </div>
                             </div>
 

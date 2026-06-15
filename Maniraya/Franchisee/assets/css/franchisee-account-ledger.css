@@ -1,0 +1,262 @@
+/* Franchisee – Account Ledger report */
+body.franchisee-app .fr-ledger-page .box {
+    margin-bottom: 0;
+}
+
+body.franchisee-app .fr-ledger-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-ledger-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+body.franchisee-app .fr-ledger-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid #dbece9;
+    background: linear-gradient(135deg, #f8fcfb 0%, #fff 100%);
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.06);
+}
+
+body.franchisee-app .fr-ledger-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+body.franchisee-app .fr-ledger-stat.debit .fr-ledger-stat-icon {
+    background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+body.franchisee-app .fr-ledger-stat.credit .fr-ledger-stat-icon {
+    background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+body.franchisee-app .fr-ledger-stat.balance .fr-ledger-stat-icon {
+    background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+body.franchisee-app .fr-ledger-stat-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+}
+
+body.franchisee-app .fr-ledger-stat-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+body.franchisee-app .fr-ledger-stat.debit .fr-ledger-stat-value {
+    color: #b91c1c;
+}
+
+body.franchisee-app .fr-ledger-stat.credit .fr-ledger-stat-value {
+    color: #15803d;
+}
+
+body.franchisee-app .fr-ledger-stat.balance .fr-ledger-stat-value {
+    color: #0f766e;
+}
+
+body.franchisee-app .fr-ledger-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    border: 1px solid #dbece9;
+    background: #f8fcfb;
+}
+
+body.franchisee-app .fr-ledger-field {
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+body.franchisee-app .fr-ledger-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+body.franchisee-app .fr-ledger-field .form-control {
+    background: #fff;
+    border-color: #dbece9;
+    height: 38px;
+}
+
+body.franchisee-app .fr-ledger-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+body.franchisee-app .fr-ledger-actions .btn-primary {
+    background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+    border-color: #0d9488;
+    min-width: 100px;
+}
+
+body.franchisee-app .fr-ledger-actions .btn-primary:hover,
+body.franchisee-app .fr-ledger-actions .btn-primary:focus {
+    background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+    border-color: #0f766e;
+}
+
+body.franchisee-app .fr-ledger-excel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #86efac;
+    background: #f0fdf4;
+    color: #15803d;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+    text-decoration: none;
+}
+
+body.franchisee-app .fr-ledger-excel-btn:hover {
+    background: #dcfce7;
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+body.franchisee-app .fr-ledger-excel-btn img {
+    width: 22px;
+    height: 22px;
+}
+
+body.franchisee-app .fr-ledger-table-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+body.franchisee-app .fr-ledger-table-bar .fr-ledger-record-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0;
+}
+
+body.franchisee-app .fr-ledger-record-select {
+    width: auto;
+    min-width: 90px;
+    display: inline-block;
+    background: #fff;
+    border-color: #dbece9;
+}
+
+body.franchisee-app .fr-ledger-table-wrap {
+    border: 1px solid #dbece9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.05);
+}
+
+body.franchisee-app .fr-ledger-table-wrap .table {
+    margin-bottom: 0;
+    border: 0;
+}
+
+body.franchisee-app .fr-ledger-table-wrap .table > thead > tr > th {
+    background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-color: #dbece9 !important;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 12px 10px;
+}
+
+body.franchisee-app .fr-ledger-table-wrap .table > tbody > tr > td {
+    font-size: 13px;
+    color: #334155;
+    border-color: #eef5f3 !important;
+    vertical-align: middle;
+    padding: 10px;
+}
+
+body.franchisee-app .fr-ledger-table-wrap .table > tbody > tr:hover > td {
+    background: #f8fcfb;
+}
+
+body.franchisee-app .fr-ledger-table-wrap .table > tfoot > tr > td {
+    background: #f0fdfa;
+    border-color: #dbece9 !important;
+    font-weight: 700;
+    color: #0f766e;
+    padding: 12px 10px;
+}
+
+body.franchisee-app .fr-amount-debit {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+body.franchisee-app .fr-amount-credit {
+    color: #15803d;
+    font-weight: 600;
+}
+
+body.franchisee-app .fr-amount-balance {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+body.franchisee-app .fr-ledger-empty {
+    text-align: center;
+    padding: 40px 16px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+body.franchisee-app .fr-ledger-empty i {
+    display: block;
+    font-size: 32px;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+}

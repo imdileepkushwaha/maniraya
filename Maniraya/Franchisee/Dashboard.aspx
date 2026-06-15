@@ -1,55 +1,23 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="franchiseemaster.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="Dashboard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <style>
-        .img-thumbnail {
-            padding: 0;
-        }
-         .danger-table > tbody > tr > th
-         {
-              background: #f5d7d4;
-              border:1px solid #f5d7d4;
-             }
-          .danger-table > tbody > tr > td {   
-             border: 1px solid #e6e3e3;
-          }
-          .sucess-table > tbody > tr > th
-          {
-                  background: #bce9bb;
-    border: 1px solid #bce9bb;
-          }
-          .sucess-table > tbody > tr > td
-          {
-              border: 1px solid #e6e3e3;
-          }
-          .warning-table > tbody > tr > th
-          {
-              background: #f8ffbb;
-    border: 1px solid #f8ffbb;
-              }
-               .warning-table > tbody > tr > td
-          {
-               border: 1px solid #e6e3e3;
-              }
-    </style>
+    <link rel="stylesheet" href="assets/css/franchisee-dashboard.css?v=1" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
-    <section class="content-header">
-        <h1>Dashboard        
-        </h1>
-        <ol class="breadcrumb">
-            <li><a href="#"><i class="fa fa-dashboard"></i>Dashboard</a></li>
-        </ol>
-    </section>
+   <div class="content-header">
+    <h1>Dashboard</h1>
+    <ol class="breadcrumb">
+        <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+   </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
 
-
-    <div class="row">
-        <div class="col-md-12">
+    
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title"></h3>
+                    <h3 class="box-title">Dashboard</h3>
                 </div>
                 <div class="box-body">
                     <div class="row">
@@ -311,55 +279,79 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">User Detail</div>
-                                <div class="panel-body">
-                                    <div class="container-fluid">
-                                        <div class="col-md-9">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <h2 class="no-margins">My Profile </h2>
-                                                    <b>Joining Date :</b>
-                                                    <asp:Label ID="lbljoiningdate" runat="server" Text=""></asp:Label>                                                
-                                                    <br />
-                                                    <b>Mobile :</b>
-                                                    <asp:Label ID="lblmobile" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>Email :</b>
-                                                    <asp:Label ID="lblemail" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>Address :</b>
-                                                    <asp:Label ID="lbladdress" runat="server" Text=""></asp:Label>
-                                                    <br />
+                            <div class="box box-primary fr-user-detail-box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title"><i class="fa fa-id-card-o"></i> User Details</h3>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 col-sm-12 fr-user-photo-col">
+                                            <div class="fr-detail-card fr-detail-card-photo">
+                                                <div class="fr-detail-card-head">
+                                                    <i class="fa fa-camera"></i> My Photo
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <h2 class="no-margins">Bank Details </h2>
-                                                    <b>A/c Holder Name :</b>
-                                                    <asp:Label ID="lblaccountholdername" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>A/c No :</b>
-                                                    <asp:Label ID="lblaccountno" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>Bank :</b>
-                                                    <asp:Label ID="lblbank" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>IFSC Code :</b>
-                                                    <asp:Label ID="lblifsc" runat="server" Text=""></asp:Label>
-                                                    <br />
-                                                    <b>Pan No :</b>
-                                                    <asp:Label ID="lblpan" runat="server" Text=""></asp:Label>
-                                                    <br />
+                                                <div class="fr-detail-card-body">
+                                                    <asp:Image ID="ImgMyPhoto" runat="server" CssClass="fr-user-avatar img-responsive" />
+                                                    <p class="fr-photo-hint">Your profile picture</p>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <h2 class="no-margins">My Photo  </h2>
-                                                <asp:Image ID="ImgMyPhoto" runat="server" CssClass="img-thumbnail img-responsive" Width="56%" Height="40%" />
+                                        <div class="col-lg-5 col-md-4 col-sm-12" style="margin-bottom:18px;">
+                                            <div class="fr-detail-card">
+                                                <div class="fr-detail-card-head">
+                                                    <i class="fa fa-user"></i> My Profile
+                                                </div>
+                                                <div class="fr-detail-card-body">
+                                                    <ul class="fr-info-list">
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-calendar"></i> Joining Date</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lbljoiningdate" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-mobile"></i> Mobile</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblmobile" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-envelope"></i> Email</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblemail" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-map-marker"></i> Address</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lbladdress" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12" style="margin-bottom:18px;">
+                                            <div class="fr-detail-card">
+                                                <div class="fr-detail-card-head">
+                                                    <i class="fa fa-university"></i> Bank Details
+                                                </div>
+                                                <div class="fr-detail-card-body">
+                                                    <ul class="fr-info-list">
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-user"></i> A/c Holder</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblaccountholdername" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-credit-card"></i> A/c No</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblaccountno" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-building"></i> Bank</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblbank" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-barcode"></i> IFSC Code</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblifsc" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="fr-info-label"><i class="fa fa-id-card"></i> Pan No</span>
+                                                            <span class="fr-info-value"><asp:Label ID="lblpan" runat="server" Text=""></asp:Label></span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -528,9 +520,8 @@
                    
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- /.box-body -->
+        
+
 </asp:Content>
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">

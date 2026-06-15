@@ -17,7 +17,17 @@
             GetStock();
 
         });      
+    });
 
+    $(document).ready(function () {
+        $(".pd-thumb").on("click", function () {
+            $(".pd-thumb").removeClass("is-active");
+            $(this).addClass("is-active");
+            var thumbSrc = $(this).find("img").attr("src");
+            if (thumbSrc) {
+                $("#<%= Image5.ClientID %>").attr("src", thumbSrc);
+            }
+        });
     });
 
     $(document).ready(function () {
@@ -65,7 +75,7 @@
              </button>
            </div>
            <div class="pd-main-image-wrap">
-                <asp:Image ID="Image5" runat="server" alt="Full Sleeve Hoodie Jacket" class="pd-main-image"/>
+                <asp:Image ID="Image5" runat="server" alt="Full Sleeve Hoodie Jacket" CssClass="pd-main-image" />
             
            </div>
          </div>

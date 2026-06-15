@@ -57,16 +57,14 @@
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
-      <section class="content-header">
-      <h1>
-       View Profile    
-      </h1>
-      <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">View Profile</a></li>
-      
-      </ol>
-    </section>   
+    <div class="content-header">
+        <h1>View Profile</h1>
+        <ol class="breadcrumb">
+            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="#">My Profile</a></li>
+            <li class="active">View Profile</li>
+        </ol>
+    </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" Runat="Server">
      <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>

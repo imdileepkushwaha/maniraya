@@ -94,11 +94,24 @@ public partial class Productdetail : System.Web.UI.Page
         lblDescription.Text = row["Description"].ToString();
         LblBV.Text = row["BV"].ToString();
         Lblcategory.Text = row["CategoryName"].ToString();
-        Image1.ImageUrl = row["productImage"].ToString();
-        Image2.ImageUrl = row["productImage2"].ToString();
-        Image3.ImageUrl = row["productImage3"].ToString();
-        Image4.ImageUrl = row["productImage4"].ToString();
-        Image5.ImageUrl = row["productImage"].ToString();
+        string productName = row["productname"].ToString();
+        string mainImage = CatalogHelper.ResolveProductImageUrl(row["productImage"].ToString(), productName);
+        Image1.ImageUrl = mainImage;
+        Image2.ImageUrl = ResolveDetailImage(row["productImage2"].ToString(), mainImage, productName);
+        Image3.ImageUrl = ResolveDetailImage(row["productImage3"].ToString(), mainImage, productName);
+        Image4.ImageUrl = ResolveDetailImage(row["productImage4"].ToString(), mainImage, productName);
+        Image5.ImageUrl = mainImage;
+        Image5.CssClass = "pd-main-image";
+    }
+
+    string ResolveDetailImage(string imagePath, string fallbackImage, string productName)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return fallbackImage;
+        }
+
+        return CatalogHelper.ResolveProductImageUrl(imagePath, productName);
     }
 
     DataTable GetStaticProductDetail(string id)

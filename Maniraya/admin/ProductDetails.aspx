@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Product Detail" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ProductDetails.aspx.cs" Inherits="admin_ProductDetails" %>
+<%@ Page Title="Product Detail" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ProductDetails.aspx.cs" Inherits="admin_ProductDetails" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit.HTMLEditor" TagPrefix="cc1" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
 
@@ -7,234 +7,44 @@
     <script type="text/javascript">
 
        
-           function validate2() {
-               // alert('sd');
-               if (document.getElementById("<%=txtstatenameedit.ClientID%>").value == "") {
+           function isValidDecimal(value) {
+               if (value === "") return false;
+               return !isNaN(value) && Number(value) >= 0;
+           }
 
+           function validate2() {
+               if (document.getElementById("<%=txtstatenameedit.ClientID%>").value == "") {
                    alert('Enter State Name');
-                   // alert("Enter Rank No"); 
                    document.getElementById("<%=txtstatenameedit.ClientID%>").focus();
                    return false;                  
                }
-               if (document.getElementById("<%=TxtAmountEdit.ClientID%>").value == "") {
-
-                   alert('Enter Amount');
-                   // alert("Enter Rank No"); 
+               if (!isValidDecimal(document.getElementById("<%=TxtAmountEdit.ClientID%>").value)) {
+                   alert('Enter valid CP');
                    document.getElementById("<%=TxtAmountEdit.ClientID%>").focus();
                    return false;
                }
-               if (document.getElementById("<%=TxtDescription.ClientID%>").value == "") {
-
-                   alert('Enter Description');
-                   // alert("Enter Rank No"); 
-                   document.getElementById("<%=TxtDescription.ClientID%>").focus();
+               if (!isValidDecimal(document.getElementById("<%=TXTDP.ClientID%>").value)) {
+                   alert('Enter valid DP');
+                   document.getElementById("<%=TXTDP.ClientID%>").focus();
                    return false;
                }
-               if (document.getElementById("<%=TxtBV.ClientID%>").value == "") {
-
-                   alert('Enter Buissness Volume');
-                   // alert("Enter Rank No"); 
+               if (!isValidDecimal(document.getElementById("<%=txtGst.ClientID%>").value)) {
+                   alert('Enter valid GST');
+                   document.getElementById("<%=txtGst.ClientID%>").focus();
+                   return false;
+               }
+               if (!isValidDecimal(document.getElementById("<%=TxtBV.ClientID%>").value)) {
+                   alert('Enter valid Business Volume');
                    document.getElementById("<%=TxtBV.ClientID%>").focus();
                    return false;
                }
-               if (document.getElementById("<%=TxtMrp.ClientID%>").value == "") {
-
-                   alert('Enter MRP');
+               if (!isValidDecimal(document.getElementById("<%=TxtMrp.ClientID%>").value)) {
+                   alert('Enter valid MRP');
                    document.getElementById("<%=TxtMrp.ClientID%>").focus();
                    return false;
                }
                return true;
            }
-
-        var editProductImageSlots = [
-            { uploadId: "<%= ProductImageUpload.ClientID %>", previewId: "<%= Image2.ClientID %>", placeholderId: "editImgPlaceholder1", dropzoneId: "editDropzone1", filenameId: "editFileName1", slotId: "editImageSlot1" },
-            { uploadId: "<%= ProductImageUpload2.ClientID %>", previewId: "<%= Image3.ClientID %>", placeholderId: "editImgPlaceholder2", dropzoneId: "editDropzone2", filenameId: "editFileName2", slotId: "editImageSlot2" },
-            { uploadId: "<%= ProductImageUpload3.ClientID %>", previewId: "<%= Image4.ClientID %>", placeholderId: "editImgPlaceholder3", dropzoneId: "editDropzone3", filenameId: "editFileName3", slotId: "editImageSlot3" }
-        ];
-
-        function updateEditFileName(filenameId, file, currentLabel) {
-            var nameEl = document.getElementById(filenameId);
-            if (!nameEl) {
-                return;
-            }
-            if (file) {
-                nameEl.textContent = file.name;
-                nameEl.classList.add("has-file");
-            } else if (currentLabel) {
-                nameEl.textContent = currentLabel;
-                nameEl.classList.add("has-file");
-            } else {
-                nameEl.textContent = "No file selected";
-                nameEl.classList.remove("has-file");
-            }
-        }
-
-        function resetEditProductImagePreview(slot) {
-            var img = document.getElementById(slot.previewId);
-            var placeholder = document.getElementById(slot.placeholderId);
-            var upload = document.getElementById(slot.uploadId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            var card = document.getElementById(slot.slotId);
-            if (img) {
-                img.src = "";
-                img.style.display = "none";
-            }
-            if (placeholder) {
-                placeholder.style.display = "flex";
-            }
-            if (upload) {
-                upload.value = "";
-            }
-            if (dropzone) {
-                dropzone.classList.remove("is-dragover", "has-file");
-            }
-            if (card) {
-                card.classList.remove("has-file");
-            }
-            updateEditFileName(slot.filenameId, null, null);
-        }
-
-        function isEditPlaceholderImage(url) {
-            return !url || url === "../ProductImage/" || url.indexOf("images.png") !== -1;
-        }
-
-        function syncEditProductImageSlot(slot, imageUrl) {
-            if (isEditPlaceholderImage(imageUrl)) {
-                resetEditProductImagePreview(slot);
-                return;
-            }
-            var img = document.getElementById(slot.previewId);
-            var placeholder = document.getElementById(slot.placeholderId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            var card = document.getElementById(slot.slotId);
-            var upload = document.getElementById(slot.uploadId);
-            if (upload) {
-                upload.value = "";
-            }
-            if (img) {
-                img.src = imageUrl;
-                img.style.display = "block";
-            }
-            if (placeholder) {
-                placeholder.style.display = "none";
-            }
-            if (dropzone) {
-                dropzone.classList.add("has-file");
-            }
-            if (card) {
-                card.classList.add("has-file");
-            }
-            updateEditFileName(slot.filenameId, null, "Current image");
-        }
-
-        function syncEditProductImages(url1, url2, url3) {
-            var urls = [url1, url2, url3];
-            for (var i = 0; i < editProductImageSlots.length; i++) {
-                syncEditProductImageSlot(editProductImageSlots[i], urls[i] || "");
-            }
-        }
-
-        function previewEditProductImage(slot, file) {
-            var img = document.getElementById(slot.previewId);
-            var placeholder = document.getElementById(slot.placeholderId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            var card = document.getElementById(slot.slotId);
-            if (!file || !file.type || file.type.indexOf("image/") !== 0) {
-                return;
-            }
-            var reader = new FileReader();
-            reader.onload = function (ev) {
-                img.src = ev.target.result;
-                img.style.display = "block";
-                if (placeholder) {
-                    placeholder.style.display = "none";
-                }
-                if (dropzone) {
-                    dropzone.classList.add("has-file");
-                }
-                if (card) {
-                    card.classList.add("has-file");
-                }
-            };
-            reader.readAsDataURL(file);
-            updateEditFileName(slot.filenameId, file, null);
-        }
-
-        function bindEditProductImageSlot(slot) {
-            var upload = document.getElementById(slot.uploadId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            if (!upload || upload._editImgBound) {
-                return;
-            }
-            upload._editImgBound = true;
-            upload.addEventListener("change", function (e) {
-                previewEditProductImage(slot, e.target.files[0]);
-            });
-
-            if (!dropzone || dropzone._dragBound) {
-                return;
-            }
-            dropzone._dragBound = true;
-            ["dragenter", "dragover"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.add("is-dragover");
-                });
-            });
-            ["dragleave", "drop"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.remove("is-dragover");
-                });
-            });
-            dropzone.addEventListener("drop", function (e) {
-                var file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
-                if (!file) {
-                    return;
-                }
-                try {
-                    var dt = new DataTransfer();
-                    dt.items.add(file);
-                    upload.files = dt.files;
-                } catch (ex) {
-                    return;
-                }
-                previewEditProductImage(slot, file);
-            });
-        }
-
-        function bindEditProductImageSlots() {
-            for (var i = 0; i < editProductImageSlots.length; i++) {
-                bindEditProductImageSlot(editProductImageSlots[i]);
-            }
-        }
-
-        function initEditProductImageUploads() {
-            bindEditProductImageSlots();
-        }
-
-        Sys.Application.add_load(initEditProductImageUploads);
-
-        if (typeof Sys !== "undefined" && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-            var editImgPrm = Sys.WebForms.PageRequestManager.getInstance();
-            if (editImgPrm && !editImgPrm._editImgUploadBound) {
-                editImgPrm._editImgUploadBound = true;
-                editImgPrm.add_endRequest(function () {
-                    for (var i = 0; i < editProductImageSlots.length; i++) {
-                        var upload = document.getElementById(editProductImageSlots[i].uploadId);
-                        if (upload) {
-                            upload._editImgBound = false;
-                        }
-                        var dropzone = document.getElementById(editProductImageSlots[i].dropzoneId);
-                        if (dropzone) {
-                            dropzone._dragBound = false;
-                        }
-                    }
-                    bindEditProductImageSlots();
-                });
-            }
-        }
-        
     </script>
 
     
@@ -344,6 +154,7 @@
                                           <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("Image") %>'></asp:Label>
                                           <asp:Label ID="LblImage2" runat="server" Visible="false" Text='<%#Eval("Image2") %>'></asp:Label>
                                                 <asp:Label ID="LblImage3" runat="server" Visible="false" Text='<%#Eval("Image3") %>'></asp:Label>
+                                                <asp:Label ID="LblImage4" runat="server" Visible="false" Text='<%#Eval("Image4") %>'></asp:Label>
                                          <asp:Label ID="LblStatuschk" runat="server" Visible="false" Text='<%#Eval("Status") %>'></asp:Label>
                                             <asp:Label ID="LblHSNcode" runat="server" Visible="false" Text='<%#Eval("HSNCODE") %>'></asp:Label>
                                           <asp:Label ID="LBLBatchno" runat="server" Visible="false" Text='<%#Eval("BATCHNO") %>'></asp:Label>
@@ -415,7 +226,7 @@
                                           <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
 
-                                            <asp:LinkButton ID="lbEdit" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                            <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                         </ItemTemplate>
                                        
                                     </asp:TemplateField>
@@ -601,6 +412,27 @@
                                                 <span id="editFileName3" class="admin-product-image-filename">No file selected</span>
                                             </div>
                                         </div>
+
+                                        <div class="admin-product-image-slot" id="editImageSlot4">
+                                            <div class="admin-product-image-slot-head">
+                                                <p class="admin-product-image-slot-title">Image 4</p>
+                                            </div>
+                                            <div class="admin-product-image-preview-box">
+                                                <div id="editImgPlaceholder4" class="admin-product-image-placeholder">
+                                                    <i class="fa fa-image"></i>
+                                                    <span>No image</span>
+                                                </div>
+                                                <asp:Image ID="Image5" runat="server" CssClass="admin-product-image-preview-img" AlternateText="Product image 4" />
+                                            </div>
+                                            <div class="admin-product-image-dropzone" id="editDropzone4">
+                                                <asp:FileUpload ID="ProductImageUpload4" runat="server" CssClass="admin-file-input-hidden" accept="image/*" />
+                                                <label class="admin-product-image-dropzone-label" for="<%= ProductImageUpload4.ClientID %>">
+                                                    <i class="fa fa-cloud-upload"></i>
+                                                    <span>Browse or drop</span>
+                                                </label>
+                                                <span id="editFileName4" class="admin-product-image-filename">No file selected</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -635,6 +467,7 @@
                                         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
                                         <li data-target="#myCarousel" data-slide-to="1"></li>
                                         <li data-target="#myCarousel" data-slide-to="2"></li>
+                                        <li data-target="#myCarousel" data-slide-to="3"></li>
                                     </ol>
 
                                     <!-- Wrapper for slides -->
@@ -652,6 +485,10 @@
                                         <div class="item">
                                               <asp:Image ID="ImageLarge3" runat="server" Width="570px" Height="400px" />
                                             
+                                        </div>
+
+                                        <div class="item">
+                                              <asp:Image ID="ImageLarge4" runat="server" Width="570px" Height="400px" />
                                         </div>
                                     </div>
 

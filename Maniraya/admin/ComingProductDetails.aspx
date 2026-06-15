@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Product Detail" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ComingProductDetails.aspx.cs" Inherits="ComingProductDetails" %>
+<%@ Page Title="Product Detail" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ComingProductDetails.aspx.cs" Inherits="ComingProductDetails" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit.HTMLEditor" TagPrefix="cc1" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
 
@@ -200,8 +200,8 @@
                                           <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
 
-                                            <asp:LinkButton ID="lbEdit" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>|
-                                            <asp:LinkButton ID="lbldel" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
+                                            <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>|
+                                            <asp:LinkButton ID="lbldel" CssClass="admin-grid-delete-btn" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
                                         </ItemTemplate>
                                        
                                     </asp:TemplateField>

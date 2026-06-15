@@ -148,30 +148,105 @@ public static class CatalogHelper
         return dt;
     }
 
+    public static string ResolveProductImageUrl(string imagePath, string productName = null)
+    {
+        string resolved = NormalizeProductImagePath(imagePath);
+        if (!string.IsNullOrWhiteSpace(resolved))
+        {
+            return resolved;
+        }
+
+        if (!string.IsNullOrWhiteSpace(productName))
+        {
+            foreach (object[] item in StaticProducts)
+            {
+                if (string.Equals(Convert.ToString(item[1]), productName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Convert.ToString(item[5]);
+                }
+            }
+        }
+
+        return DefaultProductImage;
+    }
+
+    static string NormalizeProductImagePath(string imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return string.Empty;
+        }
+
+        string value = imagePath.Trim().Replace("\\", "/");
+
+        if (value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return value;
+        }
+
+        if (value.StartsWith("//", StringComparison.Ordinal))
+        {
+            return "https:" + value;
+        }
+
+        if (value.StartsWith("../ProductImage/", StringComparison.OrdinalIgnoreCase))
+        {
+            value = value.Substring(3);
+        }
+        else if (value.StartsWith("../img/", StringComparison.OrdinalIgnoreCase))
+        {
+            value = "ProductImage/" + value.Substring("../img/".Length);
+        }
+        else if (value.StartsWith("img/", StringComparison.OrdinalIgnoreCase))
+        {
+            value = "ProductImage/" + value.Substring("img/".Length);
+        }
+        else if (!value.StartsWith("ProductImage/", StringComparison.OrdinalIgnoreCase) && !value.Contains("/"))
+        {
+            value = "ProductImage/" + value;
+        }
+
+        if (value.StartsWith("ProductImage/", StringComparison.OrdinalIgnoreCase))
+        {
+            string fileName = value.Substring("ProductImage/".Length);
+            if (string.IsNullOrWhiteSpace(fileName) ||
+                fileName.Equals("images.png", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            return "ProductImage/" + fileName.TrimStart('/');
+        }
+
+        if (value.IndexOf("images.png", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return string.Empty;
+        }
+
+        if (value.Contains("/"))
+        {
+            return value.TrimStart('/');
+        }
+
+        return "ProductImage/" + value;
+    }
+
+    public const string DefaultProductImage = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
+
     public static DataTable EnrichProductImages(DataTable dt)
     {
-        if (dt == null || !dt.Columns.Contains("Image") || !dt.Columns.Contains("ProductName"))
+        if (dt == null || !dt.Columns.Contains("Image"))
         {
             return dt;
         }
 
+        bool hasProductName = dt.Columns.Contains("ProductName");
+
         foreach (DataRow row in dt.Rows)
         {
-            string image = Convert.ToString(row["Image"]);
-            if (!string.IsNullOrWhiteSpace(image) && image.IndexOf("images.png", StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                continue;
-            }
-
-            string name = Convert.ToString(row["ProductName"]);
-            foreach (object[] item in StaticProducts)
-            {
-                if (string.Equals(Convert.ToString(item[1]), name, StringComparison.OrdinalIgnoreCase))
-                {
-                    row["Image"] = item[5];
-                    break;
-                }
-            }
+            string productName = hasProductName ? Convert.ToString(row["ProductName"]) : null;
+            row["Image"] = ResolveProductImageUrl(Convert.ToString(row["Image"]), productName);
         }
 
         return dt;

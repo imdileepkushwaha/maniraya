@@ -293,8 +293,8 @@
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
-                                                    <asp:LinkButton ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" CssClass="admin-grid-action-link" ToolTip="Edit item"><i class="fa fa-pencil"></i></asp:LinkButton>
-                                                    <asp:LinkButton ID="lbDelete" CommandName="del" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" CssClass="admin-grid-action-link" ToolTip="Remove item" Style="margin-left:6px;"><i class="fa fa-trash-o"></i></asp:LinkButton>
+                                                    <asp:LinkButton ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" CssClass="admin-grid-edit-btn" ToolTip="Edit item"><i class="fa fa-pencil" aria-hidden="true"></i></asp:LinkButton>
+                                                    <asp:LinkButton ID="lbDelete" CommandName="del" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" CssClass="admin-grid-delete-btn" ToolTip="Remove item"><i class="fa fa-trash-o" aria-hidden="true"></i></asp:LinkButton>
                                                 </ItemTemplate>
                                                 <ItemStyle HorizontalAlign="Center" CssClass="admin-grid-action-cell" />
                                             </asp:TemplateField>

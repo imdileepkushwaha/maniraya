@@ -13,7 +13,8 @@ public partial class logout : System.Web.UI.Page
 
         Session.Clear();
         Session.Abandon();
-        
-        Response.Redirect("index.aspx");
+
+        Response.Redirect(ResolveUrl("~/Login.aspx"), false);
+        Context.ApplicationInstance.CompleteRequest();
     }
 }

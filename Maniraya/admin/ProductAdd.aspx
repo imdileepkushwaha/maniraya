@@ -40,123 +40,6 @@
             return true;
         }
 
-        var productImageSlots = [
-            { uploadId: "<%= ProductImageUpload.ClientID %>", previewId: "prodImgPreview1", placeholderId: "prodImgPlaceholder1", dropzoneId: "prodDropzone1", filenameId: "prodFileName1", slotId: "prodImageSlot1" },
-            { uploadId: "<%= ProductImageUpload2.ClientID %>", previewId: "prodImgPreview2", placeholderId: "prodImgPlaceholder2", dropzoneId: "prodDropzone2", filenameId: "prodFileName2", slotId: "prodImageSlot2" },
-            { uploadId: "<%= ProductImageUpload3.ClientID %>", previewId: "prodImgPreview3", placeholderId: "prodImgPlaceholder3", dropzoneId: "prodDropzone3", filenameId: "prodFileName3", slotId: "prodImageSlot3" },
-            { uploadId: "<%= ProductImageUpload4.ClientID %>", previewId: "prodImgPreview4", placeholderId: "prodImgPlaceholder4", dropzoneId: "prodDropzone4", filenameId: "prodFileName4", slotId: "prodImageSlot4" }
-        ];
-
-        function updateProductFileName(filenameId, file) {
-            var nameEl = document.getElementById(filenameId);
-            if (!nameEl) {
-                return;
-            }
-            nameEl.textContent = file ? file.name : "No file selected";
-            nameEl.classList.toggle("has-file", !!file);
-        }
-
-        function resetProductImagePreview(slot) {
-            var img = document.getElementById(slot.previewId);
-            var placeholder = document.getElementById(slot.placeholderId);
-            var upload = document.getElementById(slot.uploadId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            var card = document.getElementById(slot.slotId);
-            if (img) {
-                img.src = "";
-                img.style.display = "none";
-            }
-            if (placeholder) {
-                placeholder.style.display = "flex";
-            }
-            if (upload) {
-                upload.value = "";
-            }
-            if (dropzone) {
-                dropzone.classList.remove("is-dragover", "has-file");
-            }
-            if (card) {
-                card.classList.remove("has-file");
-            }
-            updateProductFileName(slot.filenameId, null);
-        }
-
-        function previewProductImage(slot, file) {
-            var img = document.getElementById(slot.previewId);
-            var placeholder = document.getElementById(slot.placeholderId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            var card = document.getElementById(slot.slotId);
-            if (!file || !file.type || file.type.indexOf("image/") !== 0) {
-                resetProductImagePreview(slot);
-                return;
-            }
-            var reader = new FileReader();
-            reader.onload = function (ev) {
-                img.src = ev.target.result;
-                img.style.display = "block";
-                if (placeholder) {
-                    placeholder.style.display = "none";
-                }
-                if (dropzone) {
-                    dropzone.classList.add("has-file");
-                }
-                if (card) {
-                    card.classList.add("has-file");
-                }
-            };
-            reader.readAsDataURL(file);
-            updateProductFileName(slot.filenameId, file);
-        }
-
-        function bindProductImageSlot(slot) {
-            var upload = document.getElementById(slot.uploadId);
-            var dropzone = document.getElementById(slot.dropzoneId);
-            if (!upload || upload._productImgBound) {
-                return;
-            }
-            upload._productImgBound = true;
-            upload.addEventListener("change", function (e) {
-                previewProductImage(slot, e.target.files[0]);
-            });
-
-            if (!dropzone || dropzone._dragBound) {
-                return;
-            }
-            dropzone._dragBound = true;
-            ["dragenter", "dragover"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.add("is-dragover");
-                });
-            });
-            ["dragleave", "drop"].forEach(function (evtName) {
-                dropzone.addEventListener(evtName, function (e) {
-                    e.preventDefault();
-                    dropzone.classList.remove("is-dragover");
-                });
-            });
-            dropzone.addEventListener("drop", function (e) {
-                var file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
-                if (!file) {
-                    return;
-                }
-                try {
-                    var dt = new DataTransfer();
-                    dt.items.add(file);
-                    upload.files = dt.files;
-                } catch (ex) {
-                    return;
-                }
-                previewProductImage(slot, file);
-            });
-        }
-
-        function bindProductImageSlots() {
-            for (var i = 0; i < productImageSlots.length; i++) {
-                bindProductImageSlot(productImageSlots[i]);
-            }
-        }
-
         function setVariantRowState(row, checked) {
             if (!row) {
                 return;
@@ -189,8 +72,6 @@
                 }
             }
         }
-
-        Sys.Application.add_load(bindProductImageSlots);
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">

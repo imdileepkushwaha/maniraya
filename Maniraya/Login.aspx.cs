@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using BusinessLogicTier;
-using System.Data.SqlClient;
-using System.Data;
-using System.Web.UI.HtmlControls;
-using System.Net.Mail;
-using System.Net.Mime;
 using DataTier;
-using ARA_StringHunt;
 
 public partial class Login : System.Web.UI.Page
 {
+    const string CaptchaSessionKey = "LoginCaptcha";
     clsLogin objlogin = new clsLogin();
     clsUser objuser = new clsUser();
     Data ObjData = new Data();
@@ -24,6 +18,7 @@ public partial class Login : System.Web.UI.Page
         if (!IsPostBack)
         {
             ClearLoginError();
+            GenerateCaptcha();
         }
     }
 
@@ -45,6 +40,21 @@ public partial class Login : System.Web.UI.Page
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(password))
         {
             ShowLoginError("Please enter your User ID and password.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtCaptcha.Text))
+        {
+            ShowLoginError("Please enter the security code.");
+            txtCaptcha.Focus();
+            return;
+        }
+
+        if (!ValidateCaptcha())
+        {
+            ShowLoginError("Invalid security code. Please try again.");
+            GenerateCaptcha();
+            txtCaptcha.Text = string.Empty;
             return;
         }
 
@@ -98,10 +108,50 @@ public partial class Login : System.Web.UI.Page
             }
 
             ShowLoginError("Invalid login details. Please check your User ID and password.");
+            GenerateCaptcha();
+            txtCaptcha.Text = string.Empty;
             return;
         }
 
         ShowLoginError("Invalid login details. Please check your User ID and password.");
+        GenerateCaptcha();
+        txtCaptcha.Text = string.Empty;
+    }
+
+    protected void lnkRefreshCaptcha_Click(object sender, EventArgs e)
+    {
+        ClearLoginError();
+        GenerateCaptcha();
+        txtCaptcha.Text = string.Empty;
+    }
+
+    void GenerateCaptcha()
+    {
+        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        var random = new Random(Guid.NewGuid().GetHashCode());
+        char[] code = new char[6];
+
+        for (int i = 0; i < code.Length; i++)
+        {
+            code[i] = chars[random.Next(chars.Length)];
+        }
+
+        string captcha = new string(code);
+        Session[CaptchaSessionKey] = captcha;
+        lblCaptchaCode.Text = captcha;
+    }
+
+    bool ValidateCaptcha()
+    {
+        string expected = Convert.ToString(Session[CaptchaSessionKey]);
+        string entered = txtCaptcha.Text.Trim();
+
+        if (string.IsNullOrEmpty(expected) || string.IsNullOrEmpty(entered))
+        {
+            return false;
+        }
+
+        return string.Equals(expected, entered, StringComparison.OrdinalIgnoreCase);
     }
 
     void RedirectAfterLogin(string redirectUrl)

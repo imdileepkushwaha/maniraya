@@ -1465,14 +1465,47 @@ FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid  WHERE MyCTE.
 
         public DataTable getUserDetail(clsUser objUser)
         {
-            string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+            string userId = (objUser.UserId ?? string.Empty).Trim().Replace("'", "''");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return null;
+            }
+
+            DataTable dt = RunGetUserDetailQuery(BuildGetUserDetailQuery(userId));
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return dt;
+            }
+
+            return RunGetUserDetailQuery("SELECT * FROM userdetail WHERE UserId = '" + userId + "'");
+        }
+
+        static string BuildGetUserDetailQuery(string userId)
+        {
+            return @"SELECT ud.UserId, ud.UserName, ud.Mobile, ud.Email, ud.Gender, ud.Address, ud.CityId, ud.AreaName, ud.Pincode,
+                ud.DateOfBirth, ud.RegDate, ud.NomineeName, ud.NomineeRelation, ud.NomineeDateofBirt,
+                ud.AccountHolderName, ud.AccountNo, ud.IFSCCode, ud.PanNumber, ud.BranchName, ud.BankName, ud.adharnumber,
+                ud.PhotoImage, ud.SponserId, ud.ParentUserId, ud.Status, ud.BalanceAmount, ud.UtilityBalance,
+                ISNULL(cm.StateId, 0) AS stateid, ISNULL(sm.CountryId, 0) AS countryid, ISNULL(sm.StateName, '') AS statename,
+                (SELECT UserName FROM userdetail WHERE UserId = ud.SponserId) AS Sponsername,
+                (SELECT UserName FROM userdetail WHERE UserId = ud.ParentUserId) AS parentname,
+                CONVERT(char, ud.ActivateDate, 103) AS activationdate,
+                (SELECT TOP 1 planamount FROM UserTopupTb WHERE userid = ud.userid AND type = 'A') AS planamount
+                FROM userdetail ud
+                LEFT JOIN citymaster cm ON ud.CityId = cm.CityId
+                LEFT JOIN statemaster sm ON cm.StateId = sm.StateId
+                WHERE ud.UserId = '" + userId + "'";
+        }
+
+        DataTable RunGetUserDetailQuery(string str_query)
+        {
             DataTable dt = null;
             ObjData.StartConnection();
             try
             {
                 dt = ObjData.RunDataTable(str_query);
             }
-            catch (Exception ex)
+            catch
             {
                 dt = null;
             }
@@ -1481,7 +1514,7 @@ FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid  WHERE MyCTE.
         }
         public DataTable getUserChild(clsUser objUser)
         {
-            string str_query = "select ud.username,ud.userid,SponserId, (Select Username from UserDetail where UserId=ud.SponserId) as SponserName,convert(nvarchar(50),ud.RegDate,106) as DOJ,case when Status=1 then 'Active' else 'Deactive' end as Status,ud.gender  from userdetail ud   where ud.parentuserid='" + objUser.ParentUserId + "'  and ud.StandingPosition='" + objUser.StandingPosition + "' ";
+            string str_query = "select ud.username,ud.userid,SponserId, (Select Username from UserDetail where UserId=ud.SponserId) as SponserName,convert(nvarchar(50),ud.RegDate,106) as DOJ,case when Status=1 then 'Active' else 'Deactive' end as Status,ud.gender  from userdetail ud   where ud.parentuserid='" + objUser.ParentUserId + "'  and ud.StandingPosition='" + objUser.StandingPosition + "' order by ud.RegDate asc, ud.id asc";
             DataTable dt = null;
             ObjData.StartConnection();
             try

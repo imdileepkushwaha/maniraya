@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseePurchaseMasterDP.aspx.cs" Inherits="FranchiseePurchaseMasterDP" %>
+<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseePurchaseMasterDP.aspx.cs" Inherits="FranchiseePurchaseMasterDP" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
    <%-- <script type="text/javascript">
@@ -352,14 +352,14 @@
                            </asp:TemplateField>  
                                           <asp:TemplateField HeaderText="">
                                         <ItemTemplate>
-                                           <asp:LinkButton ID="lbEdit" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                           <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                             
                                         </ItemTemplate>
                                        
                                     </asp:TemplateField>
                                      <asp:TemplateField HeaderText="">
                                         <ItemTemplate>
-                                         <asp:LinkButton ID="lbDelete" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-remove" aria-hidden="true"></i></asp:LinkButton>
+                                         <asp:LinkButton ID="lbDelete" CssClass="admin-grid-delete-btn" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-remove" aria-hidden="true"></i></asp:LinkButton>
                                             
                                         </ItemTemplate>
                                        

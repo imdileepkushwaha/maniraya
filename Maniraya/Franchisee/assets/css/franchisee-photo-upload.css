@@ -1,0 +1,189 @@
+/* Franchisee – Photo Upload page */
+body.franchisee-app .fr-photo-page .box {
+    margin-bottom: 0;
+}
+
+body.franchisee-app .fr-photo-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+body.franchisee-app .fr-photo-preview-col {
+    flex: 0 0 280px;
+    max-width: 100%;
+}
+
+body.franchisee-app .fr-photo-form-col {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+body.franchisee-app .fr-photo-preview-card {
+    border: 1px solid #dbece9;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fcfb 0%, #fff 100%);
+    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.08);
+    padding: 24px 20px;
+    text-align: center;
+}
+
+body.franchisee-app .fr-photo-preview-title {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f766e;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+body.franchisee-app .fr-photo-preview-wrap {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+body.franchisee-app .fr-photo-preview-wrap .fr-photo-thumb {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #ccfbf1;
+    box-shadow: 0 12px 32px rgba(13, 148, 136, 0.2);
+    background: #f1f5f9;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.franchisee-app .fr-photo-preview-wrap .fr-photo-thumb:hover {
+    transform: scale(1.02);
+    box-shadow: 0 16px 36px rgba(13, 148, 136, 0.28);
+}
+
+body.franchisee-app .fr-photo-zoom-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+body.franchisee-app .fr-photo-zoom-hint i {
+    color: #0d9488;
+}
+
+body.franchisee-app .fr-photo-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+    body.franchisee-app .fr-photo-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body.franchisee-app .fr-photo-preview-col {
+        flex: 1 1 100%;
+    }
+}
+
+body.franchisee-app .fr-photo-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+body.franchisee-app .fr-photo-field .form-control {
+    background: #f8fcfb;
+    border-color: #dbece9;
+}
+
+body.franchisee-app .fr-photo-upload-zone {
+    border: 2px dashed #99f6e4;
+    border-radius: 14px;
+    background: #f0fdfa;
+    padding: 22px 18px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+body.franchisee-app .fr-photo-upload-zone i.fa-cloud-upload {
+    font-size: 32px;
+    color: #0d9488;
+    margin-bottom: 10px;
+}
+
+body.franchisee-app .fr-photo-upload-zone p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #134e4a;
+}
+
+body.franchisee-app .fr-photo-upload-zone small {
+    display: block;
+    margin-top: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+body.franchisee-app .fr-photo-upload-zone input[type="file"] {
+    display: inline-block;
+    max-width: 100%;
+    font-size: 13px;
+}
+
+body.franchisee-app .fr-photo-tips {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+body.franchisee-app .fr-photo-tips strong {
+    color: #b45309;
+}
+
+body.franchisee-app .fr-photo-modal .modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dbece9;
+}
+
+body.franchisee-app .fr-photo-modal .modal-header {
+    background: linear-gradient(135deg, #f0fdfa 0%, #fff 100%);
+    border-bottom: 1px solid #e3f2ef;
+    padding: 14px 18px;
+}
+
+body.franchisee-app .fr-photo-modal .modal-title {
+    font-weight: 700;
+    color: #0f766e;
+}
+
+body.franchisee-app .fr-photo-modal .modal-body {
+    padding: 0;
+    background: #0f172a;
+    text-align: center;
+}
+
+body.franchisee-app .fr-photo-modal .modal-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+body.franchisee-app .fr-photo-modal .modal-footer {
+    border-top: 1px solid #e3f2ef;
+    background: #f8fcfb;
+}

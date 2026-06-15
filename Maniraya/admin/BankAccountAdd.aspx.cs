@@ -100,16 +100,22 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
             Label lblaccountholdername = (Label)GridView1.Rows[index].FindControl("lblaccountholdername");
             Label lblaccountno = (Label)GridView1.Rows[index].FindControl("lblaccountno");
             Label lblbankname = (Label)GridView1.Rows[index].FindControl("lblbankname");
-          //  Label lblifsccode = (Label)GridView1.Rows[index].FindControl("lblifsccode");
-          //  Label lblbranchname = (Label)GridView1.Rows[index].FindControl("lblbranchname");
-            Label lblimage = (Label)GridView1.Rows[index].FindControl("lblimage");
+            Label lblifsccode = (Label)GridView1.Rows[index].FindControl("lblimage");
+            Image qrImage = (Image)GridView1.Rows[index].FindControl("lblbranchname");
+
             lblbankaccountid.Text = lblid.Text;
             txtaccholdernameedit.Text = lblaccountholdername.Text;
             txtaccountnoedit.Text = lblaccountno.Text;
             txtdepositbankedit.Text = lblbankname.Text;
-            ImageButton1.ImageUrl = "../ProductImage/" + lblimage.Text;
-           
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('myModal');", true);
+            txtifsccodeedit.Text = lblifsccode.Text;
+
+            string qrFile = qrImage != null ? qrImage.ImageUrl.Replace("../ProductImage/", "") : "";
+            hfEditQrImage.Value = qrFile;
+            ImageButton1.ImageUrl = "../ProductImage/" + qrFile;
+
+            string previewUrl = "../ProductImage/" + qrFile.Replace("'", "\\'");
+            string popupScript = "showAdminModal('myModal'); syncEditBankQrPreview('" + previewUrl + "');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", popupScript, true);
         }
         if (e.CommandName == "del")
         {
@@ -136,8 +142,9 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
         objbank.BankName = txtdepositbankedit.Text;
         objbank.AccHolderName = txtaccholdernameedit.Text;
         objbank.AccNo = txtaccountnoedit.Text;
-        objbank.IFSCCode = UploadImageedit();
-        objbank.BranchName = "";
+        objbank.IFSCCode = txtifsccodeedit.Text;
+        string newQrImage = UploadImageedit();
+        objbank.BranchName = string.IsNullOrEmpty(newQrImage) ? hfEditQrImage.Value : newQrImage;
         string res = objbank.Update_BankAccount(objbank);
         if (res == "t")
         {
