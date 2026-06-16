@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using DataTier;
 using BusinessLogicTier;
 using System.Web.UI.HtmlControls;
 using System.Web.Services;
@@ -17,7 +18,7 @@ public partial class user_Dashboard : System.Web.UI.Page
     clsaward objAward = new clsaward();
     ClsVacation objvac = new ClsVacation();
     clsClosing objCL = new clsClosing();
-
+    Data ObjData = new Data();
     public string LoginId = "";
     public string WhiteLabelId = "";
     clsRecharge objrecharge = new clsRecharge();
@@ -165,7 +166,7 @@ public partial class user_Dashboard : System.Web.UI.Page
         Lblleftbv.Text = dt.Rows[0]["LeftBv"].ToString();
         lblgoldirector.Text = dt.Rows[0]["GoldDIrector1"].ToString();
         lblleadership.Text = dt.Rows[0]["leadershipincome1"].ToString();
-        lblDIrectorIncome.Text = dt.Rows[0]["directorincome1"].ToString();
+      //  lblDIrectorIncome.Text = dt.Rows[0]["directorincome1"].ToString();
         lblselfincome.Text = dt.Rows[0]["selfincome"].ToString();
         Lblrightbv.Text = dt.Rows[0]["RightBv"].ToString();
         lblMatching.Text = dt.Rows[0]["Binaryincome"].ToString();
@@ -374,11 +375,13 @@ public partial class user_Dashboard : System.Web.UI.Page
     {
         objuser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
-        dt = objuser.getUserDetail(objuser);
+        dt = getUserDetail(objuser);
         if (dt.Rows.Count > 0)
         {
             lbluserid.Text = dt.Rows[0]["userid"].ToString();
+            lblWelcomeId.Text = dt.Rows[0]["userid"].ToString();
             lblusername.Text = dt.Rows[0]["username"].ToString();
+            lblWelcomeName.Text = dt.Rows[0]["username"].ToString();
             LblSponserId.Text = dt.Rows[0]["sponserId"].ToString();
             LblParentId.Text = dt.Rows[0]["parentuserid"].ToString();
             ImgMyPhoto.ImageUrl = "../ProductImage/" + dt.Rows[0]["PhotoImage"].ToString();
@@ -411,6 +414,23 @@ public partial class user_Dashboard : System.Web.UI.Page
 
         }
 
+    }
+
+    public DataTable getUserDetail(clsUser objUser)
+    {
+        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
     }
     void loadaward()
     {
