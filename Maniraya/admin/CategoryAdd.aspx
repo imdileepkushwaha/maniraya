@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CategoryAdd.aspx.cs" Inherits="admin_CategoryAdd" %>
+<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CategoryAdd.aspx.cs" Inherits="admin_CategoryAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -106,6 +106,20 @@
     </section>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-md-12">
+            <div class="box box-solid" style="margin-bottom: 0;">
+                <div class="box-body text-center">
+                    <a href="CategoryAdd.aspx" class="btn btn-primary"><i class="fa fa-sitemap"></i> Add Category</a>
+                    <a href="SubcategoryAdd.aspx" class="btn btn-default"><i class="fa fa-code-fork"></i> Add Subcategory</a>
+                    <a href="SizeAdd.aspx" class="btn btn-default"><i class="fa fa-arrows-v"></i> Add Size</a>
+                    <a href="ColorAdd.aspx" class="btn btn-default"><i class="fa fa-paint-brush"></i> Add Color</a>
+                    <a href="ProductSizeColorMaster.aspx" class="btn btn-default"><i class="fa fa-cogs"></i> Subcategory Setting</a>
+                    <a href="ProductAdd.aspx" class="btn btn-default"><i class="fa fa-cube"></i> Add Product</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
@@ -275,5 +289,6 @@
             <asp:PostBackTrigger ControlID="btnUpdate" />
         </Triggers>
     </asp:UpdatePanel>
+
 </asp:Content>
 

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Add Product" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ProductAdd.aspx.cs" Inherits="admin_ProductAdd" %>
+<%@ Page Title="Add Product" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ProductAdd.aspx.cs" Inherits="admin_ProductAdd" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit.HTMLEditor" TagPrefix="cc1" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
@@ -85,6 +85,20 @@
     </section>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" Runat="Server">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-md-12">
+            <div class="box box-solid" style="margin-bottom: 0;">
+                <div class="box-body text-center">
+                    <a href="CategoryAdd.aspx" class="btn btn-default"><i class="fa fa-sitemap"></i> Add Category</a>
+                    <a href="SubcategoryAdd.aspx" class="btn btn-default"><i class="fa fa-code-fork"></i> Add Subcategory</a>
+                    <a href="SizeAdd.aspx" class="btn btn-default"><i class="fa fa-arrows-v"></i> Add Size</a>
+                    <a href="ColorAdd.aspx" class="btn btn-default"><i class="fa fa-paint-brush"></i> Add Color</a>
+                    <a href="ProductSizeColorMaster.aspx" class="btn btn-default"><i class="fa fa-cogs"></i> Subcategory Setting</a>
+                    <a href="ProductAdd.aspx" class="btn btn-primary"><i class="fa fa-cube"></i> Add Product</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
@@ -377,7 +391,8 @@
             <asp:PostBackTrigger ControlID="btnSubmit" />
         </Triggers>
     </asp:UpdatePanel>
-</asp:Content>
+
+    </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
     <script src="../bower_components/ckeditor/ckeditor.js"></script>
     <script src="../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
