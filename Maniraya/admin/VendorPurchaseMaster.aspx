@@ -1,4 +1,4 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="VendorPurchaseMaster.aspx.cs" Inherits="VendorPurchaseMaster" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="VendorPurchaseMaster.aspx.cs" Inherits="VendorPurchaseMaster" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <script type="text/javascript">
@@ -183,7 +183,7 @@
                      </div>
                   <hr />
                     <div class="row">
-                         <div class="col-md-4">
+                         <div class="col-md-3">
                              <div class="form-group">
                                  <label>Product :</label>
                                <asp:DropDownList ID="DDLstProduct" CssClass="form-control"  runat="server" AutoPostBack="true"  OnSelectedIndexChanged="DDLstProduct_SelectedIndexChanged"></asp:DropDownList>
@@ -191,13 +191,19 @@
                                  
                              </div>
                          </div>
-                         <div class="col-md-4">
+                           <div class="col-md-3">
+       <div class="form-group">
+           <label>SubProduct :</label>
+   <asp:DropDownList ID="DDLstSubProduct" CssClass="form-control"  runat="server"  ></asp:DropDownList>
+       </div>
+   </div>
+                         <div class="col-md-3">
                              <div class="form-group">
                                  <label>AvailableStock :</label>
                              <asp:TextBox ID="TxtAvailableStock" runat="server" Enabled="false" CssClass="form-control" />
                              </div>
                          </div>
-                         <div class="col-md-4">
+                         <div class="col-md-3">
                              <div class="form-group">
                                  <label>Purchase Quantity :</label>
                                     <asp:TextBox ID="TxtPurchaseStock" runat="server" CssClass="form-control" />
@@ -269,12 +275,23 @@
                                  
                                </ItemTemplate>
                            </asp:TemplateField>
+                                                                                    <asp:TemplateField HeaderText="Sub Product Code">
+    <ItemTemplate>
+       
+         <asp:Label ID="LblSubProductCodeG" runat="server"  Text='<%#Eval("SubProductId") %>'></asp:Label>
+      
+    </ItemTemplate>
+</asp:TemplateField>
                                     <asp:TemplateField HeaderText="Product Name">
                                <ItemTemplate>
                                     <asp:Label ID="LblProductNameG" runat="server"  Text='<%#Eval("ProductName") %>'></asp:Label>
                                </ItemTemplate>
                            </asp:TemplateField>
-                                    
+                                                                                 <asp:TemplateField HeaderText="SubProduct Name">
+    <ItemTemplate>
+         <asp:Label ID="LblSubProductNameG" runat="server"  Text='<%#Eval("SubProductName") %>'></asp:Label>
+    </ItemTemplate>
+</asp:TemplateField>
                                       <asp:TemplateField HeaderText="Amount/Peices">
                                <ItemTemplate>
                                     <asp:Label ID="LblProductAmountG" runat="server" Text='<%#Eval("Amount") %>'></asp:Label>
@@ -311,14 +328,14 @@
                                     
                                           <asp:TemplateField HeaderText="">
                                         <ItemTemplate>
-                                           <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                           <asp:LinkButton ID="lbEdit" CommandName="edt"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                             
                                         </ItemTemplate>
                                        
                                     </asp:TemplateField>
                                      <asp:TemplateField HeaderText="">
                                         <ItemTemplate>
-                                         <asp:LinkButton ID="lbDelete" CssClass="admin-grid-delete-btn" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-remove" aria-hidden="true"></i></asp:LinkButton>
+                                         <asp:LinkButton ID="lbDelete" CommandName="del"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"  runat="server"><i class="icon fa fa-remove" aria-hidden="true"></i></asp:LinkButton>
                                             
                                         </ItemTemplate>
                                        
@@ -526,6 +543,17 @@
     </asp:UpdatePanel>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
+    <script type="text/javascript">
+        function showModal() {
+            $('#myModal').modal({ backdrop: 'static', keyboard: false })
+        }
+        function Closepopup() {
+            $('#myModal').modal('hide');
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '0');
+            $('.modal-backdrop').remove();
+        }
+    </script>
      <script type="text/javascript">
          $('.form_date').datepicker({
              format: 'dd/MM/yyyy',

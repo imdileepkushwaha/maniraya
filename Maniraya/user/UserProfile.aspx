@@ -4,7 +4,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 
-    <link href="assets/css/user-profile.css?v=2" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=3" rel="stylesheet" />
 
     <script type="text/javascript">
 
@@ -127,23 +127,14 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
-
-    <div class="content-header">
-
+    <section class="content-header">
         <h1>View Profile</h1>
-
         <ol class="breadcrumb">
-
             <li><a href="Dashboard.aspx">Home</a></li>
-
             <li><a href="UserProfile.aspx">My Profile</a></li>
-
             <li class="active">View Profile</li>
-
         </ol>
-
     </section>
-
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" Runat="Server">

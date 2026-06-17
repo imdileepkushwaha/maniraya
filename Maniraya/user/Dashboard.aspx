@@ -1,6 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="user_Dashboard" %>
 
-
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 
 
@@ -272,7 +271,7 @@
                         </div>
                     </div>
 
-                    <div class="row dash-stats-grid">
+                    <div class="row dash-stats-grid" style="display:none">
                         <div class="col-sm-6 col-xl-3">
                             <div class="card dash-income-card dash-income-compact tone-indigo">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
@@ -286,7 +285,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-xl-3">
+                        <div class="col-sm-6 col-xl-3" style="display:none">
                             <div class="card dash-income-card dash-income-compact tone-green">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-briefcase"></i></span>
                                 <div class="card-body">
@@ -299,7 +298,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-xl-3">
+                        <div class="col-sm-6 col-xl-3" style="display:none">
                             <div class="card dash-income-card dash-income-compact tone-gold">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-user-plus"></i></span>
                                 <div class="card-body">
@@ -312,7 +311,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-xl-3">
+                        <div class="col-sm-6 col-xl-3" style="display:none">
                             <div class="card dash-income-card dash-income-compact tone-teal">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-wallet"></i></span>
                                 <div class="card-body">
@@ -327,7 +326,7 @@
                         </div>
                     </div>
 
-                    <div class="dash-tools-panel">
+                    <div class="dash-tools-panel" style="display:none">
                         <asp:Panel ID="pnlnotification" runat="server" CssClass="dash-tools-alert-wrap">
                             <div class="dash-tools-alert" role="alert">
                                 <span class="dash-tools-alert-icon" aria-hidden="true"><i class="fa fa-exclamation-triangle"></i></span>
@@ -402,7 +401,7 @@
 						<div class="card dash-income-card dash-income-compact tone-red">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-money"></i></span>
 							<div class="card-body">
-								<p class="dash-income-label">Reimburse Income</p>
+								<p class="dash-income-label">Saving Income</p>
 								<h3 class="dash-income-value"><asp:Label ID="lblselfincome" runat="server" Text="Label"></asp:Label></h3>
 								<div class="dash-income-meta">
 									<span class="dash-income-tag">Total</span>
@@ -424,7 +423,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Matching Income</p><br>
 										<div class="" style="display:none">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblDirectincome" runat="server" Text="00.00" Visible="false"></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblDirddectincome" runat="server" Text="00.00" Visible="false"></asp:Label></h3>
 										</div>
                                         <div class="">
 											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblMatching11" runat="server" Text="00.00" Visible="false"></asp:Label>
@@ -455,25 +454,25 @@
 						</div>
 					</div>
 
-                               <div class="col-sm-12 col-lg-6 col-xl-4">
+                               <div class="col-sm-12 col-lg-6 col-xl-4" >
 						<div class="card dash-income-card dash-income-compact tone-pink">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-gift"></i></span>
 							<div class="card-body">
-								<p class="dash-income-label">Bonus Income</p>
+								<p class="dash-income-label">Direct Income</p>
 								<h3 class="dash-income-value" style="display:none"><asp:Label ID="lbldailyincome" runat="server" Text="0.00"></asp:Label></h3>
-								<h3 class="dash-income-value"><asp:Label ID="lblDIrectorIncome" runat="server" Text="0.00"></asp:Label></h3>
+								<h3 class="dash-income-value"><asp:Label ID="lblDirectincome" runat="server" Text="0.00"></asp:Label></h3>
 								<div class="dash-income-meta">
 									<span class="dash-income-tag">Total</span>
-									<a href="BonusIncomeReport.aspx" class="dash-income-meta-link">View report</a>
+									<a href="DirectIncomeReport.aspx" class="dash-income-meta-link">View report</a>
 								</div>
 							</div>
 						</div>
 					</div>
-                              <div class="col-sm-12 col-lg-6 col-xl-4">
+                              <div class="col-sm-12 col-lg-6 col-xl-4" >
 						<div class="card dash-income-card dash-income-compact tone-orange">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-graduation-cap"></i></span>
 							<div class="card-body">
-								<p class="dash-income-label">Child Education Income</p>
+								<p class="dash-income-label">Cashback Wallet</p>
 								<h3 class="dash-income-value"><asp:Label ID="lblgoldirector" runat="server" Text="0"></asp:Label></h3>
 								<div class="dash-income-meta">
 									<span class="dash-income-tag">Total</span>
@@ -487,7 +486,7 @@
 						<div class="card dash-income-card dash-income-compact tone-purple">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-book"></i></span>
 							<div class="card-body">
-								<p class="dash-income-label">Self Education Income</p>
+								<p class="dash-income-label">Purchase Wallet</p>
 								<h3 class="dash-income-value"><asp:Label ID="lblleadership" runat="server" Text="0.00"></asp:Label></h3>
 								<div class="dash-income-meta">
 									<span class="dash-income-tag">Total</span>
@@ -861,7 +860,7 @@
 						</div>
 					</div>
 
-                                     <div class="col-sm-12 col-lg-6 col-xl-4">
+                                     <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-blue">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
@@ -874,7 +873,7 @@
 						</div>
 					</div>
 
-                            <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-blue">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-certificate"></i></span>
 							<div class="card-body">
@@ -1061,7 +1060,7 @@
 						</div>
 					</div>
                           </div>
-                        <div class="row dash-metrics-grid">
+                        <div class="row dash-metrics-grid" style="display:none">
 
                              <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-blue">
@@ -3171,6 +3170,4 @@ Profit Share Budget</p>
     <!--(Ends) For User Performance-->
 
 </asp:Content>
-
-
 

@@ -455,50 +455,53 @@ namespace BusinessLogicTier
             return dt;
         }
 
-        public string VendorPurchase(clsvendor objV,DataTable Dt)
+           public string VendorPurchase(clsvendor objV,DataTable Dt)
+    {
+        
+        string res = "";
+        string s2 = "";
+        SqlConnection cn;
+        SqlTransaction tr = null;
+        DataSet ds = new DataSet();
+        cn = ObjData.StartConnectionInTransaction();
+        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+
+        try
         {
-            
-            string res = "";
-            string s2 = "";
-            SqlConnection cn;
-            SqlTransaction tr = null;
-            DataSet ds = new DataSet();
-            cn = ObjData.StartConnectionInTransaction();
-            tr = cn.BeginTransaction(IsolationLevel.Serializable);
+            s2="Select isnull(max(Purchaseid),0)+ 1 as Id from VendorPurchaseMaster";
+            DataSet Ds=ObjData.RunSelectQueryTrans(s2,tr);
+            string Id=Ds.Tables[0].Rows[0][0].ToString();
 
-            try
+            s2 = "insert into VendorPurchaseMaster(PurchaseId, VendorID, PurchaseAmount, CGST,SGST,IGST,CGSTPER,SGSTPER,IGSTPER,TotalAmount,Purchasedate,Entrydate)values('" + Id + "','" + objV.VendorId + "','" + objV.PurchaseAmount + "','" + objV.CGSTAmt + "','" + objV.SGSTAmt + "','" + objV.IGSTAmt + "','" + objV.CGST + "','" + objV.SGST + "','" + objV.IGST + "','" + objV.PaybleAmountAmount + "','" + objV.Purchasedate + "',getdate())";
+                ObjData.RunInsUpDelQueryTrans(s2,tr);
+
+            foreach(DataRow Dr in Dt.Rows)
             {
-                s2="Select isnull(max(Purchaseid),0)+ 1 as Id from VendorPurchaseMaster";
-                DataSet Ds=ObjData.RunSelectQueryTrans(s2,tr);
-                string Id=Ds.Tables[0].Rows[0][0].ToString();
+              //  ObjData.RunInsUpDelQueryTrans(s2,tr);
 
-                s2 = "insert into VendorPurchaseMaster(PurchaseId, VendorID, PurchaseAmount, CGST,SGST,IGST,CGSTPER,SGSTPER,IGSTPER,TotalAmount,Purchasedate,Entrydate)values('" + Id + "','" + objV.VendorId + "','" + objV.PurchaseAmount + "','" + objV.CGSTAmt + "','" + objV.SGSTAmt + "','" + objV.IGSTAmt + "','" + objV.CGST + "','" + objV.SGST + "','" + objV.IGST + "','" + objV.PaybleAmountAmount + "','" + objV.Purchasedate + "',getdate())";
-                    ObjData.RunInsUpDelQueryTrans(s2,tr);
-
-                foreach(DataRow Dr in Dt.Rows)
-                {
-                  //  ObjData.RunInsUpDelQueryTrans(s2,tr);
-
-                    s2 = "insert into StockMaster(VendorPurchaseID,ProductId, Transactiondate, CrQuantity,DrQuantity,Entrydate,BatchNumber)values('" + Id + "','" + Dr["ProductId"].ToString() + "','" + objV.Purchasedate + "','" + Dr["Quantity"].ToString() + "','0',getdate(),'" + Dr["BatchNumber"].ToString() + "')";
-                    ObjData.RunInsUpDelQueryTrans(s2, tr);
-                }
-
-                res = "t";
-                tr.Commit();
+                s2 = "insert into StockMaster(VendorPurchaseID,ProductId,Subproductid, Transactiondate, CrQuantity,DrQuantity,Entrydate,BatchNumber)values('" + Id + "','" + Dr["ProductId"].ToString() + "','"+Dr["subProductId"].ToString()+"','" + objV.Purchasedate + "','" + Dr["Quantity"].ToString() + "','0',getdate(),'" + Dr["BatchNumber"].ToString() + "')";
+                ObjData.RunInsUpDelQueryTrans(s2, tr);
             }
-            catch (Exception ex)
-            {
-                res = "f";
-                tr.Rollback();
-            }
-            finally
-            {
-                ObjData.EndConnection();
-                tr.Dispose();
-            }
-            return res;
-      
-    }
+
+            res = "t";
+            tr.Commit();
+        }
+        catch (Exception ex)
+        {
+            res = "f";
+            tr.Rollback();
+        }
+        finally
+        {
+            ObjData.EndConnection();
+            tr.Dispose();
+        }
+        return res;
+  
+}
+
+
+//replace the function
 
         public string FranchiseePurchase(clsvendor objV, DataTable Dt)
         {
