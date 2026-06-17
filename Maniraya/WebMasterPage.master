@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="WebMasterPage.master.cs" Inherits="WebMasterPage" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="WebMasterPage.master.cs" Inherits="WebMasterPage" %>
 
 <!DOCTYPE html>
 
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
  
-  <link rel="stylesheet" href="myassets/assets/css/style.css?v=41" />
+  <link rel="stylesheet" href="myassets/assets/css/style.css?v=42" />
   <link rel="stylesheet" href="myassets/assets/css/maniraya-loader.css?v=1" />
     <asp:ContentPlaceHolder id="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -56,15 +56,15 @@
                 Weekend Offer: Up to 60% OFF on selected products
                 <span class="flash-text">FLASH SALE</span>
                 &nbsp;&bull;&nbsp;
-                Use code <strong>MANIRAYA20</strong> for extra savings
+                Use code <strong>MPremium</strong> for extra savings
             </p>
         </div>
 
         <div class="top-strip-right">
             <nav class="top-quick-menu" aria-label="Quick links">
                 <a href="Login.aspx">Track Order</a>
-                <a href="index.aspx#about">Help</a>
-                <a href="mailto:info@mpremium.in">Contact</a>
+                <a href="FAQ.aspx">Help</a>
+                <a href="Contact.aspx">Contact</a>
             </nav>
         </div>
     </div>
@@ -81,17 +81,9 @@
         </a>
 
         <div class="header-search-wrap">
-            <select class="header-category-select" aria-label="All categories">
-                <option>All categories</option>
-                <option>Electronics</option>
-                <option>Fashion</option>
-                <option>Beauty</option>
-                <option>Home &amp; Living</option>
-                <option>Accessories</option>
-                <option>Sports &amp; Fitness</option>
-                <option>Groceries</option>
-                <option>Health &amp; Wellness</option>
-            </select>
+            <asp:DropDownList ID="ddlHeaderCategory" runat="server" CssClass="header-category-select" aria-label="All categories">
+                <asp:ListItem Value="0">All categories</asp:ListItem>
+            </asp:DropDownList>
             <input type="text" class="header-search-input" placeholder="Search products, brands &amp; more..." />
             <button type="button" class="header-search-btn" aria-label="Search">
                 <svg
@@ -259,31 +251,23 @@
                             Shop <span class="menu-arrow" aria-hidden="true"></span>
                         </a>
                         <div class="mega-menu">
-                            <div class="mega-col">
-                                <h4>Electronics</h4>
-                                <a href="index.aspx#products">Mobiles</a>
-                                <a href="index.aspx#products">Laptops</a>
-                                <a href="index.aspx#products">Smart Watches</a>
-                                <a href="index.aspx#products">Accessories</a>
-                            </div>
-                            <div class="mega-col">
-                                <h4>Fashion</h4>
-                                <a href="index.aspx#products">Men Clothing</a>
-                                <a href="index.aspx#products">Women Clothing</a>
-                                <a href="index.aspx#products">Footwear</a>
-                                <a href="index.aspx#products">Bags</a>
-                            </div>
-                            <div class="mega-col">
-                                <h4>Home & Living</h4>
-                                <a href="index.aspx#products">Kitchen</a>
-                                <a href="index.aspx#products">Furniture</a>
-                                <a href="index.aspx#products">Decor</a>
-                                <a href="index.aspx#products">Storage</a>
-                            </div>
+                            <asp:Repeater ID="rptShopCategories" runat="server">
+                                <HeaderTemplate>
+                                    <div class="mega-col">
+                                        <h4>Categories</h4>
+                                </HeaderTemplate>
+                                <ItemTemplate>
+                                    <a href='<%# "products.aspx?category=" + Eval("CategoryId") %>'><%# Eval("CategoryName") %></a>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                        <a class="mega-view-all" href="categories.aspx">View All Categories</a>
+                                    </div>
+                                </FooterTemplate>
+                            </asp:Repeater>
                             <div class="mega-promo">
                                 <p>Special Offer</p>
                                 <h5>Get extra 20% off with code</h5>
-                                <strong>MANIRAYA20</strong>
+                                <strong>MPremium</strong>
                                 <a href="index.aspx#products">Shop Deals</a>
                             </div>
                         </div>
@@ -292,19 +276,27 @@
                         <a class="menu-link" href="index.aspx#products">Deals <span class="menu-badge">Hot</span></a>
                     </li>
                     <li class="menu-item"><a class="menu-link" href="index.aspx#about">About</a></li>
+                    <li class="menu-item"><a class="menu-link" href="FAQ.aspx">FAQ</a></li>
+                    <li class="menu-item"><a class="menu-link" href="Contact.aspx">Contact</a></li>
                     <li class="menu-item has-dropdown">
                         <a class="menu-link" href="#" data-menu-toggle="dropdown" aria-expanded="false">
-                            Pages <span class="menu-arrow" aria-hidden="true"></span>
+                            Gallery <span class="menu-arrow" aria-hidden="true"></span>
                         </a>
                         <div class="dropdown-panel">
-                            <a href="index.aspx#about">About Us</a>
-                            <a href="Productdetail.aspx">Product Details</a>
-                            <a href="index.aspx#about">FAQ</a>
-                            <a href="index.aspx#about">Privacy Policy</a>
-                            <a href="mailto:info@mpremium.in">Contact Us</a>
+                            <a href="ImageGallery.aspx">Image Gallery</a>
+                            <a href="VideoGallery.aspx">Video Gallery</a>
                         </div>
                     </li>
-                    <li class="menu-item" id="liMenuLogin" runat="server"><a class="menu-link" href="Login.aspx">Login</a></li>
+                    <li class="menu-item has-dropdown" id="liMenuLogin" runat="server">
+                        <a class="menu-link" href="#" data-menu-toggle="dropdown" aria-expanded="false">
+                            Login <span class="menu-arrow" aria-hidden="true"></span>
+                        </a>
+                        <div class="dropdown-panel">
+                            <a href="Login.aspx">User Login</a>
+                            <a href="admin/index.aspx">Admin Login</a>
+                            <a href="Franchisee/index.aspx">Franchisee Login</a>
+                        </div>
+                    </li>
                     <li class="menu-item" id="liMenuSignup" runat="server"><a class="menu-link" href="signup.aspx">Sign Up</a></li>
                     <li class="menu-item" id="liMenuDashboard" runat="server" visible="false"><a class="menu-link" href="user/dashboard.aspx">Dashboard</a></li>
                     <li class="menu-item" id="liMenuLogout" runat="server" visible="false"><a class="menu-link" href="logout.aspx">Logout</a></li>
@@ -366,9 +358,11 @@
                    <h4>Quick Links</h4>
                    <ul class="footer-links">
                        <li><a href="index.aspx">Home</a></li>
-                       <li><a href="index.aspx#products">Shop</a></li>
+                       <li><a href="products.aspx">Shop</a></li>
+                       <li><a href="categories.aspx">All Categories</a></li>
                        <li><a href="index.aspx#products">Deals</a></li>
                        <li><a href="index.aspx#about">About Us</a></li>
+                       <li><a href="FAQ.aspx">FAQ</a></li>
                        <li><a href="Login.aspx">Login</a></li>
                        <li><a href="signup.aspx">Sign Up</a></li>
                    </ul>
@@ -377,14 +371,12 @@
                <div class="footer-column">
                    <h4>Categories</h4>
                    <ul class="footer-links">
-                       <li><a href="index.aspx#products">Electronics</a></li>
-                       <li><a href="index.aspx#products">Fashion</a></li>
-                       <li><a href="index.aspx#products">Home &amp; Living</a></li>
-                       <li><a href="index.aspx#products">Beauty</a></li>
-                       <li><a href="index.aspx#products">Accessories</a></li>
-                       <li><a href="index.aspx#products">Sports &amp; Fitness</a></li>
-                       <li><a href="index.aspx#products">Groceries</a></li>
-                       <li><a href="index.aspx#products">Health &amp; Wellness</a></li>
+                       <asp:Repeater ID="rptFooterCategories" runat="server">
+                           <ItemTemplate>
+                               <li><a href='<%# "products.aspx?category=" + Eval("CategoryId") %>'><%# Eval("CategoryName") %></a></li>
+                           </ItemTemplate>
+                       </asp:Repeater>
+                       <li><a href="categories.aspx">View All</a></li>
                    </ul>
                </div>
 
@@ -394,8 +386,10 @@
                        <li><a href="user/dashboard.aspx">My Account</a></li>
                        <li><a href="addtocart.aspx">My Cart</a></li>
                        <li><a href="Login.aspx">Track Order</a></li>
-                       <li><a href="index.aspx#about">Help &amp; FAQ</a></li>
-                       <li><a href="mailto:info@mpremium.in">Contact Us</a></li>
+                       <li><a href="FAQ.aspx">Help &amp; FAQ</a></li>
+                       <li><a href="Contact.aspx">Contact Us</a></li>
+                       <li><a href="ImageGallery.aspx">Image Gallery</a></li>
+                       <li><a href="VideoGallery.aspx">Video Gallery</a></li>
                    </ul>
                </div>
 

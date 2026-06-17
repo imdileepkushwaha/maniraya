@@ -77,7 +77,9 @@ namespace BusinessLogicTier
 
         public DataTable getCategory()
         {
-            string str_query = "select *,CASE WHEN img='' THEN '../img/images.png' ELSE  '../img/'+ img END AS [Image] from CategoryMaster order by CategoryName";
+            string str_query = @"SELECT CategoryId, CategoryName,
+                CASE WHEN ISNULL(img,'') = '' THEN '../img/images.png' ELSE '../img/' + img END AS [Image]
+                FROM CategoryMaster ORDER BY CategoryName";
 
             DataTable dt = null;
             ObjData.StartConnection();
@@ -2051,12 +2053,12 @@ namespace BusinessLogicTier
 
                 s2 = "sp_AddVideos";
                 SqlParameter[] parameter = {                                              
-                new SqlParameter("@id",objState.CategoryId), 
-                new SqlParameter("@VideoUrl",objState.ProductImage), 
-                 new SqlParameter("@title",objState.ProductName), 
-                 new SqlParameter("@description",objState.Description), 
-                  new SqlParameter("@status",objState.Status), 
-                 new SqlParameter("@query",query)
+                new SqlParameter("@id", (object)objState.CategoryId ?? DBNull.Value), 
+                new SqlParameter("@VideoUrl", (object)objState.ProductImage ?? DBNull.Value), 
+                 new SqlParameter("@title", (object)objState.ProductName ?? DBNull.Value), 
+                 new SqlParameter("@description", (object)objState.Description ?? DBNull.Value), 
+                  new SqlParameter("@status", (object)objState.Status ?? DBNull.Value), 
+                 new SqlParameter("@query", query)
                 };
                 res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
                 tr.Commit();
@@ -2064,7 +2066,11 @@ namespace BusinessLogicTier
             catch (Exception ex)
             {
                 res = "0";
-                tr.Rollback();
+                if (tr.Connection != null)
+                {
+                    try { tr.Rollback(); } catch { }
+                }
+                throw new Exception("Error in sp_AddVideos: " + ex.Message);
             }
             finally
             {
@@ -2089,12 +2095,12 @@ namespace BusinessLogicTier
 
                 s2 = "sp_AddVideos";
                 SqlParameter[] parameter = {                                              
-                new SqlParameter("@id",objState.CategoryId), 
-                new SqlParameter("@VideoUrl",objState.ProductImage), 
-                 new SqlParameter("@title",objState.ProductName), 
-                 new SqlParameter("@description",objState.Description), 
-                  new SqlParameter("@status",objState.Status), 
-                 new SqlParameter("@query","Select")
+                new SqlParameter("@id", (object)objState.CategoryId ?? DBNull.Value), 
+                new SqlParameter("@VideoUrl", (object)objState.ProductImage ?? DBNull.Value), 
+                 new SqlParameter("@title", (object)objState.ProductName ?? DBNull.Value), 
+                 new SqlParameter("@description", (object)objState.Description ?? DBNull.Value), 
+                  new SqlParameter("@status", (object)objState.Status ?? DBNull.Value), 
+                 new SqlParameter("@query", "Select")
                 };
                 ds = ObjData.RunDataTableProcedureTRans(s2, tr, parameter);
                 tr.Commit();
@@ -2103,7 +2109,8 @@ namespace BusinessLogicTier
             {
                 res = "0";
                 ds = null;
-                tr.Rollback();
+                if (tr.Connection != null) { try { tr.Rollback(); } catch { } }
+                throw new Exception("Error in GetVideos: " + ex.Message);
             }
             finally
             {
