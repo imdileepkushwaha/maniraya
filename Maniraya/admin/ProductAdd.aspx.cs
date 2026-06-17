@@ -1,4 +1,4 @@
-﻿using BusinessLogicTier;
+using BusinessLogicTier;
 using DataTier;
 using System;
 using System.Collections.Generic;
@@ -127,7 +127,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             s2 = "sp_add_Product";
             SqlParameter[] parameter = {                                              
                 new SqlParameter("@CategoryID",objState.CategoryId),
-                 new SqlParameter("@SubCategoryID",objState.CategoryId),
+                 new SqlParameter("@SubCategoryID",objState.SubCategoryId),
                 new SqlParameter("@ProductName",objState.ProductName), 
                  new SqlParameter("@Amount",objState.Amount), 
                   new SqlParameter("@Description",objState.Description), 
@@ -142,7 +142,8 @@ public partial class admin_ProductAdd : System.Web.UI.Page
                             new SqlParameter("@BATCHNO",objState.BATCHNO),
                         new SqlParameter("@DP",objState.DP),
                        new SqlParameter("@MRP",objState.MRP),
-                        new SqlParameter("@SubcategoryArray",objState.SubproductArray)
+                        new SqlParameter("@SubcategoryArray",objState.SubproductArray),
+                        new SqlParameter("@AdditionalInfo", TxtDescription.Content)
                 };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
@@ -191,6 +192,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             return;
         }
         objState.CategoryId = ddcountry.SelectedValue.ToString();
+        objState.SubCategoryId = ddsubcategory.SelectedValue.ToString();
         objState.ProductName = txtstatename.Text;
         objState.HSNCODE = txtHSN.Text;
         objState.BATCHNO = txtBatch.Text;

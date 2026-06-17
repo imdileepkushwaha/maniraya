@@ -1,4 +1,4 @@
-﻿using DataTier;
+using DataTier;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -912,7 +912,7 @@ namespace BusinessLogicTier
         }
         public DataTable getProductByid(clsProduct objstate)
         {
-            string str_query = "SELECT ProductID,productname,p.Categoryid,p.Subcategoryid,p.Amount,p.Description,CASE WHEN ISNULL(p.productimage,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage END as productImage,CASE WHEN ISNULL(p.productimage2,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage2 END as productImage2,CASE WHEN ISNULL(p.productimage3,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage3 END as productImage3,CASE WHEN ISNULL(p.productimage4,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage4 END as productImage4,BV,MRP,GST,DP,HSNCODE,Batchno,SV,c.CategoryName,s.SubCategoryName,'2' stock FROM ProductMaster p JOIN subcategorymaster s ON p.Subcategoryid = s.SubCategoryId JOIN categorymaster c ON s.CategoryId = c.CategoryId WHERE ProductId='" + objstate.ProductId+"'";
+            string str_query = "SELECT ProductID,productname,p.Categoryid,p.Subcategoryid,p.Amount,p.Description,p.additionalinfo,CASE WHEN ISNULL(p.productimage,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage END as productImage,CASE WHEN ISNULL(p.productimage2,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage2 END as productImage2,CASE WHEN ISNULL(p.productimage3,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage3 END as productImage3,CASE WHEN ISNULL(p.productimage4,'')='' THEN '' ELSE 'ProductImage/'+ p.productimage4 END as productImage4,BV,MRP,GST,DP,HSNCODE,Batchno,SV,c.CategoryName,s.SubCategoryName,'2' stock FROM ProductMaster p JOIN subcategorymaster s ON p.Subcategoryid = s.SubCategoryId JOIN categorymaster c ON s.CategoryId = c.CategoryId WHERE ProductId='" + objstate.ProductId+"'";
 
             DataTable dt = null;
             ObjData.StartConnection();

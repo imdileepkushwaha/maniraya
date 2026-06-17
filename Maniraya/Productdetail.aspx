@@ -207,33 +207,15 @@ class='pd-size <%# Container.ItemIndex == 0 ? "is-active" : "" %>' title='<%# Ev
          <div class="pd-tabs-wrap">
            <div class="pd-tabs">
              <button type="button" class="pd-tab is-active">Description</button>
-             <button type="button" class="pd-tab">Additional info</button>
-             <button type="button" class="pd-tab">Vendor</button>
-             <button type="button" class="pd-tab">Reviews</button>
+             <button type="button" class="pd-tab" style="display:none;">Additional info</button>
+             <button type="button" class="pd-tab" style="display:none;">Vendor</button>
+             <button type="button" class="pd-tab" style="display:none;">Reviews</button>
            </div>
            <article class="pd-tab-panel is-active">
              <h3>Description</h3>
-             <p>
-               Uninhibited quality and modern design make this product a reliable choice for your daily lifestyle needs.
-               Crafted for comfort and built for long-term use.
-             </p>
-             <ul>
-               <li>Premium finish with durable fabric quality.</li>
-               <li>Comfort fit for regular and casual wear.</li>
-               <li>Easy to maintain and wash-friendly material.</li>
-             </ul>
-             <h4>Packaging & Delivery</h4>
-             <p>
-               Ships in secure packaging with full tracking support and doorstep delivery in most cities within the
-               committed timeline.
-             </p>
-             <h4>Suggested Use</h4>
-             <ul>
-               <li>Suitable for casual wear and travel.</li>
-               <li>Pair with jeans or joggers for everyday styling.</li>
-             </ul>
+             <asp:Literal ID="litFullDescription" runat="server"></asp:Literal>
            </article>
-           <article class="pd-tab-panel">
+           <article class="pd-tab-panel" style="display:none;">
              <h3>Additional Information</h3>
              <ul>
                <li><strong>Material:</strong> 80% Cotton, 20% Polyester</li>
@@ -243,7 +225,7 @@ class='pd-size <%# Container.ItemIndex == 0 ? "is-active" : "" %>' title='<%# Ev
                <li><strong>Care:</strong> Machine wash cold, tumble dry low</li>
              </ul>
            </article>
-           <article class="pd-tab-panel">
+           <article class="pd-tab-panel" style="display:none;">
              <h3>Vendor</h3>
              <p>
                Sold and fulfilled by <strong>Maniraya Store</strong>, known for quality fashion essentials and fast
@@ -255,7 +237,7 @@ class='pd-size <%# Container.ItemIndex == 0 ? "is-active" : "" %>' title='<%# Ev
                <li>Response rate: 98%</li>
              </ul>
            </article>
-           <article class="pd-tab-panel">
+           <article class="pd-tab-panel" style="display:none;">
              <h3>Reviews</h3>
              <p><strong>Overall rating:</strong> 4.5 / 5 (320 reviews)</p>
              <ul>
@@ -266,7 +248,7 @@ class='pd-size <%# Container.ItemIndex == 0 ? "is-active" : "" %>' title='<%# Ev
            </article>
          </div>
 
-         <aside class="pd-side-rating-card">
+         <aside class="pd-side-rating-card" style="display:none;">
            <p><strong>4.5</strong> (320)</p>
            <p>Ship on Time: 100%</p>
            <p>Chat Response Rate: 98%</p>

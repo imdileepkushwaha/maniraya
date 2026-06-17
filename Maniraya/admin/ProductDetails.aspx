@@ -151,6 +151,7 @@
                                         <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
                                     
                                           <asp:Label ID="LblDescription" runat="server" Visible="false" Text='<%#Eval("Description") %>'></asp:Label>
+                                          <asp:Label ID="LblAdditionalInfo" runat="server" Visible="false" Text='<%#Eval("additionalinfo") %>'></asp:Label>
                                           <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("Image") %>'></asp:Label>
                                           <asp:Label ID="LblImage2" runat="server" Visible="false" Text='<%#Eval("Image2") %>'></asp:Label>
                                                 <asp:Label ID="LblImage3" runat="server" Visible="false" Text='<%#Eval("Image3") %>'></asp:Label>
@@ -246,7 +247,7 @@
           </div>
             </div>
         <div id="myModal" class="modal fade admin-modal-scrollable" tabindex="-1" role="dialog" aria-labelledby="productEditModalTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-lg admin-product-edit-dialog" role="document">
+                      <div class="modal-dialog modal-lg admin-product-edit-dialog" role="document" style="max-width: 80%;">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h4 class="modal-title" id="productEditModalTitle">Edit Product Details</h4>
@@ -436,12 +437,20 @@
                                     </div>
                                 </div>
 
-                                <div class="admin-form-section admin-form-section-last">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-align-left"></i> Description</h5>
-                                    <div class="form-group admin-product-editor-wrap">
-                                        <cc1:Editor ID="TxtDescription" runat="server" />
-                                    </div>
-                                </div>
+                                  <div class="admin-form-section admin-form-section-last">
+                                      <h5 class="admin-form-section-title"><i class="fa fa-align-left"></i> Description</h5>
+                                      <div class="form-group">
+                                          <label for="<%= Txtshortdiscription.ClientID %>">Short Description</label>
+                                          <div class="admin-input-group admin-textarea-group">
+                                              <span class="admin-input-icon"><i class="fa fa-comment-o"></i></span>
+                                              <asp:TextBox ID="Txtshortdiscription" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="3" placeholder="Brief summary of the product..."></asp:TextBox>
+                                          </div>
+                                      </div>
+                                      <div class="form-group admin-product-editor-wrap">
+                                          <label for="<%= TxtDescription.ClientID %>">Full Description</label>
+                                          <cc1:Editor ID="TxtDescription" runat="server" />
+                                      </div>
+                                  </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

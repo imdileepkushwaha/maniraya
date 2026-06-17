@@ -1,4 +1,4 @@
-﻿using BusinessLogicTier;
+using BusinessLogicTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -220,7 +220,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         objState.ProductImage4 = UploadImage4();
         objState.ProductName = txtstatenameedit.Text;
         objState.ProductId = lblstateid.Text;
-        objState.Description = TxtDescription.Content;
+        objState.Description = Txtshortdiscription.Text;
         objState.Amount = amount;
         objState.Status = DDLstStatusEdit.SelectedValue;
         objState.BV = bv;
@@ -230,6 +230,17 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         objState.CouponCode = Convert.ToString(Math.Round(dp, 0));
         objState.GST = gst;
         string res = Update_Product(objState);
+
+        // Update Full Description (additionalinfo) directly
+        string fullDesc = TxtDescription.Content.Replace("'", "''");
+        string sqlUpdateAddInfo = "update ProductMaster set additionalinfo='" + fullDesc + "' where ProductId='" + objState.ProductId + "'";
+        ObjData.StartConnection();
+        try {
+            ObjData.RunInsUpDelQuery(sqlUpdateAddInfo);
+        } finally {
+            ObjData.EndConnection();
+        }
+
         if (res == "t")
         {
             string popupScript = "alert('Product Edited Successfully');";
@@ -305,6 +316,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             Label lblstatename = (Label)GridView1.Rows[index].FindControl("lblstatename");
             Label lblAmount = (Label)GridView1.Rows[index].FindControl("lblstatename1");
             Label LblDescription = (Label)GridView1.Rows[index].FindControl("LblDescription");
+            Label LblAdditionalInfo = (Label)GridView1.Rows[index].FindControl("LblAdditionalInfo");
             Label LblImage = (Label)GridView1.Rows[index].FindControl("LblImage");
             Label LblImage2 = (Label)GridView1.Rows[index].FindControl("LblImage2");
             Label LblImage3 = (Label)GridView1.Rows[index].FindControl("LblImage3");
@@ -325,7 +337,8 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             txtstatenameedit.Text = lblstatename.Text;
             TxtAmountEdit.Text = FormatDecimalInput(lblAmount.Text);
             TxtBV.Text = FormatDecimalInput(LblBV.Text);
-            TxtDescription.Content = LblDescription.Text;
+            Txtshortdiscription.Text = LblDescription.Text;
+            TxtDescription.Content = LblAdditionalInfo.Text;
             TxtMrp.Text = FormatDecimalInput(Lblmrp.Text);
             TXTDP.Text = FormatDecimalInput(lblstatename2.Text);
             txtGst.Text = FormatDecimalInput(lblstatenameGST.Text);
