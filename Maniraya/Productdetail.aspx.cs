@@ -1,4 +1,4 @@
-﻿using BusinessLogicTier;
+using BusinessLogicTier;
 using DataTier;
 using System;
 using System.Collections.Generic;
@@ -92,6 +92,7 @@ public partial class Productdetail : System.Web.UI.Page
         lblPrice.Text = row["Amount"].ToString();
         lblMRP.Text = row["MRP"].ToString();
         lblDescription.Text = row["Description"].ToString();
+        litFullDescription.Text = row["additionalinfo"].ToString();
         LblBV.Text = row["BV"].ToString();
         Lblcategory.Text = row["CategoryName"].ToString();
         string productName = row["productname"].ToString();
@@ -138,6 +139,7 @@ public partial class Productdetail : System.Web.UI.Page
             dt.Columns.Add("Amount", typeof(string));
             dt.Columns.Add("MRP", typeof(string));
             dt.Columns.Add("Description", typeof(string));
+            dt.Columns.Add("additionalinfo", typeof(string));
             dt.Columns.Add("BV", typeof(string));
             dt.Columns.Add("CategoryName", typeof(string));
             dt.Columns.Add("productImage", typeof(string));
@@ -152,6 +154,7 @@ public partial class Productdetail : System.Web.UI.Page
             row["Amount"] = item[3].ToString();
             row["MRP"] = item[4].ToString();
             row["Description"] = "Premium quality product from Maniraya with fast delivery and easy returns.";
+            row["additionalinfo"] = "Premium quality product from Maniraya with fast delivery and easy returns.";
             row["BV"] = "100";
             row["CategoryName"] = category;
             row["productImage"] = image;

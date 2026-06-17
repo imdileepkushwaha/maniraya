@@ -409,7 +409,6 @@ c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Debug\DataTier.dll
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Debug\DataTier.pdb
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Debug\DataTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Debug\DataTier.pdb
-c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csproj.AssemblyReference.cache
-c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csproj.CoreCompileInputs.cache
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.pdb
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csprojResolveAssemblyReference.cache
