@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using DataTier;
 using BusinessLogicTier;
 using System.Web.UI.HtmlControls;
 using System.Web.Services;
@@ -17,7 +18,7 @@ public partial class user_Dashboard : System.Web.UI.Page
     clsaward objAward = new clsaward();
     ClsVacation objvac = new ClsVacation();
     clsClosing objCL = new clsClosing();
-
+    Data ObjData = new Data();
     public string LoginId = "";
     public string WhiteLabelId = "";
     clsRecharge objrecharge = new clsRecharge();
@@ -64,7 +65,6 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadPV();
                 loadawardlist();
                 GetAllIncome();
-                SyncDashboardHero();
 
 
             }
@@ -124,9 +124,11 @@ public partial class user_Dashboard : System.Web.UI.Page
 
     void loadwallet()
     {
-        objaccount.UserId = Session["userid"].ToString();
-        DataTable dt = objaccount.getUserWalletBalanceReport(objaccount);
-        if (dt != null && dt.Rows.Count > 0)
+
+        objaccount.UserId = Session["userId"].ToString();
+        DataTable dt = new DataTable();
+        dt = objaccount.getUserWalletBalanceReport(objaccount);
+        if (dt.Rows.Count > 0)
         {
             LblCredited.Text = dt.Rows[0]["sumCr"].ToString();
             LblDebited.Text = dt.Rows[0]["sumdr"].ToString();
@@ -158,16 +160,13 @@ public partial class user_Dashboard : System.Web.UI.Page
 
     void loadTotalpayout()
     {
-        DataTable dt = objuser.getTotalincome(Session["userid"].ToString());
-        if (dt == null || dt.Rows.Count == 0)
-        {
-            return;
-        }
-
+        DataTable dt = new DataTable();
+        dt = objuser.getTotalincome(Session["userid"].ToString());
+        //LblBinaryIncome.Text = dt.Rows[0]["Binaryincome"].ToString();
         Lblleftbv.Text = dt.Rows[0]["LeftBv"].ToString();
         lblgoldirector.Text = dt.Rows[0]["GoldDIrector1"].ToString();
         lblleadership.Text = dt.Rows[0]["leadershipincome1"].ToString();
-        lblDIrectorIncome.Text = dt.Rows[0]["directorincome1"].ToString();
+      //  lblDIrectorIncome.Text = dt.Rows[0]["directorincome1"].ToString();
         lblselfincome.Text = dt.Rows[0]["selfincome"].ToString();
         Lblrightbv.Text = dt.Rows[0]["RightBv"].ToString();
         lblMatching.Text = dt.Rows[0]["Binaryincome"].ToString();
@@ -197,143 +196,37 @@ public partial class user_Dashboard : System.Web.UI.Page
     void filldashboard()
     {
         objuser.UserId = Session["userid"].ToString();
-        DataTable leftDt = objuser.getUserDownlineLeft(objuser);
-        DataTable rightDt = objuser.getUserDownlineRight(objuser);
+        DataTable LeftDt = objuser.getUserDownlineLeft(objuser);
+        DataTable RightDt = objuser.getUserDownlineRight(objuser);
+        LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
+        LblTotalright.Text = RightDt.Rows.Count.ToString();
+        DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
+        DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
+        DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
+        DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
+        Lblactiveleft.Text = Sactiveusers.Length.ToString();
+        LblActiveRight.Text = Sdeactiveusers.Length.ToString();
+        LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
+        LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
+        DataTable LeftDirectt = objuser.getUserleftDirect(objuser);
+        DataTable RightDirectt = objuser.getUserrightDirect(objuser);
+        LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
+        LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
+        string Fromdate = string.Empty;
+        string Todatedate = string.Empty;
 
-        if (leftDt == null)
-        {
-            leftDt = new DataTable();
-        }
+        DataTable Dt = objCL.getdailyClosingReport(Fromdate, Todatedate, Session["UserId"].ToString());
+        //lblleftbv.Text = Dt.Rows[0]["leftbv"].ToString();
+        //lblrightbv.Text = Dt.Rows[0]["rightbv"].ToString();
 
-        if (rightDt == null)
-        {
-            rightDt = new DataTable();
-        }
 
-        int totalLeft = leftDt.Rows.Count;
-        int totalRight = rightDt.Rows.Count;
-        int activeLeft = CountActiveMembers(leftDt);
-        int activeRight = CountActiveMembers(rightDt);
-        int totalTeam = totalLeft + totalRight;
-        int activeTeam = activeLeft + activeRight;
+        //  DataSet Ds = objuser.getTotalamount(objuser);
+        //  LblBinaryIncome.Text = Ds.Tables[0].Rows[0][0].ToString();
+        // LblDirectIncome.Text = Ds.Tables[1].Rows[0][0].ToString();
+        //  LblSponserIncome.Text = Ds.Tables[2].Rows[0][0].ToString();
+        // LblRoinIncome.Text = Ds.Tables[3].Rows[0][0].ToString();
+        //lblTotalincome.Text = Convert.ToString(Convert.ToDecimal(LblBinaryIncome.Text)
 
-        LblTotalLeft.Text = totalLeft.ToString();
-        LblTotalright.Text = totalRight.ToString();
-        Lblactiveleft.Text = activeLeft.ToString();
-        LblActiveRight.Text = activeRight.ToString();
-        LblInactiveleft.Text = Math.Max(0, totalLeft - activeLeft).ToString();
-        LblInActiveRight.Text = Math.Max(0, totalRight - activeRight).ToString();
-        LblDownline.Text = totalTeam.ToString();
-        LblActiveDownline.Text = activeTeam.ToString();
-        lblStatTeam.Text = totalTeam.ToString();
-        lblStatActiveTeam.Text = activeTeam.ToString();
-
-        DataTable leftDirect = objuser.getUserleftDirect(objuser);
-        DataTable rightDirect = objuser.getUserrightDirect(objuser);
-        LblLeftDirect.Text = GetFirstCellValue(leftDirect, "0");
-        LblRightDirect.Text = GetFirstCellValue(rightDirect, "0");
-
-        string fromDate = string.Empty;
-        string toDate = string.Empty;
-        objCL.getdailyClosingReport(fromDate, toDate, Session["userid"].ToString());
-    }
-
-    static int CountActiveMembers(DataTable table)
-    {
-        if (table == null || table.Rows.Count == 0)
-        {
-            return 0;
-        }
-
-        string statusColumn = FindColumnName(table, "Status");
-        if (statusColumn == null)
-        {
-            return table.Rows.Count;
-        }
-
-        int activeCount = 0;
-        foreach (DataRow row in table.Rows)
-        {
-            if (IsActiveStatus(Convert.ToString(row[statusColumn])))
-            {
-                activeCount++;
-            }
-        }
-
-        return activeCount;
-    }
-
-    static bool IsActiveStatus(string status)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            return false;
-        }
-
-        status = status.Trim();
-        return string.Equals(status, "active", StringComparison.OrdinalIgnoreCase)
-            || status == "1"
-            || string.Equals(status, "true", StringComparison.OrdinalIgnoreCase);
-    }
-
-    static string GetFirstCellValue(DataTable table, string defaultValue)
-    {
-        if (table == null || table.Rows.Count == 0 || table.Columns.Count == 0)
-        {
-            return defaultValue;
-        }
-
-        object value = table.Rows[0][0];
-        if (value == null || value == DBNull.Value)
-        {
-            return defaultValue;
-        }
-
-        return Convert.ToString(value).Trim();
-    }
-
-    static string SumCountValues(params string[] values)
-    {
-        int total = 0;
-        foreach (string value in values)
-        {
-            int number;
-            if (int.TryParse(GetDisplayValue(value, "0", "0"), out number))
-            {
-                total += number;
-            }
-        }
-
-        return total.ToString();
-    }
-
-    static bool IsZeroOrEmpty(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return true;
-        }
-
-        decimal number;
-        if (decimal.TryParse(value, out number))
-        {
-            return number == 0;
-        }
-
-        return false;
-    }
-
-    static string PreferNonZeroValue(params string[] values)
-    {
-        foreach (string value in values)
-        {
-            if (!IsZeroOrEmpty(value))
-            {
-                return value.Trim();
-            }
-        }
-
-        return "0";
     }
 
     public void Getsalary()
@@ -364,8 +257,8 @@ public partial class user_Dashboard : System.Web.UI.Page
         //    LblLevelNo.Text = Dt.Rows[0]["LevelNo"].ToString();
         //    LblBoostPFS.Text = Dt.Rows[0]["BoostStatus"].ToString();
         //}
-        DataTable Dt = objuser.getUserDasboardproc(Session["userid"].ToString());
-        if (Dt != null && Dt.Rows.Count > 0)
+        DataTable Dt = objuser.getUserDasboardproc(Session["Userid"].ToString());
+        if (Dt.Rows.Count > 0)
         {
             LblDirect.Text = Dt.Rows[0]["TotalDirect"].ToString();
             LblActiveDirect.Text = Dt.Rows[0]["ActiveDirect"].ToString();
@@ -373,13 +266,23 @@ public partial class user_Dashboard : System.Web.UI.Page
             LblActiveDownline.Text = Dt.Rows[0]["TotalActiveTeam"].ToString();
 
             LblPoolIncome.Text = Dt.Rows[0]["AutoPoolIncome"].ToString();
+            //Lbllevelincome.Text = Dt.Rows[0]["LevelIncome"].ToString();
             LblCurrentpackage.Text = Dt.Rows[0]["Planname"].ToString();
             LblGroup.Text = Dt.Rows[0]["CurrentGroup"].ToString();
             Lblactivatedate2.Text = Dt.Rows[0]["Activatedate"].ToString();
             LBlGroupIncome.Text = Dt.Rows[0]["GroupIncome"].ToString();
+
+            // LblROiIncome.Text = Dt.Rows[0]["ROIIncome"].ToString();
             LbllevelROiIncome.Text = Dt.Rows[0]["LevelRoiIncome"].ToString();
             lblpaydate.Text = Dt.Rows[0]["LuckyDate"].ToString();
             lblincome.Text = Dt.Rows[0]["CommissionPer"].ToString();
+            //lblTotalincome.Text = Dt.Rows[0]["TotalIncome"].ToString();
+
+
+
+            // LblGroup.Text = Dt.Rows[0]["CurrentGroup"].ToString();
+            //  Lblactivatedate2.Text = Dt.Rows[0]["Activatedate"].ToString();
+            //   LBlGroupIncome.Text = Dt.Rows[0]["GroupIncome"].ToString();
         }
     }
     public void GetPrimeStatus()
@@ -430,131 +333,11 @@ public partial class user_Dashboard : System.Web.UI.Page
         DataTable dt = new DataTable();
         dt = objnews.getRecentNews();
         ltnews.Text += "<span style='color:red;'> ";
-        string ticker = string.Empty;
         foreach (DataRow r in dt.Rows)
         {
-            string detail = r["newsdetail"].ToString();
-            ltnews.Text += detail + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            ticker += detail + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            ltnews.Text += r["newsdetail"].ToString() + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         }
         ltnews.Text += "</span>";
-
-        if (dt.Rows.Count > 0)
-        {
-            string firstNews = dt.Rows[0]["newsdetail"].ToString();
-            ltWelcomeNews.Text = dt.Rows.Count > 1
-                ? firstNews + " and " + (dt.Rows.Count - 1) + " more updates today."
-                : firstNews;
-            ltnewsTicker.Text = "<span class=\"dash-news-item\">" + ticker + "</span>";
-        }
-        else
-        {
-            ltnewsTicker.Text = "<span class=\"dash-news-item dash-news-item--empty\">No updates at the moment.</span>";
-        }
-    }
-
-    void SyncDashboardHero()
-    {
-        lblWelcomeName.Text = GetDisplayValue(lblusername.Text, Convert.ToString(Session["username"]), "Member");
-        lblWelcomeId.Text = GetDisplayValue(lbluserid.Text, Convert.ToString(Session["userid"]), "-");
-        lblWelcomeRank.Text = GetDisplayValue(lblrank.Text, string.Empty, "N/A");
-
-        string computedTotalTeam = PreferNonZeroValue(
-            SumCountValues(LblTotalLeft.Text, LblTotalright.Text),
-            LblDownline.Text);
-        string computedActiveTeam = PreferNonZeroValue(
-            SumCountValues(Lblactiveleft.Text, LblActiveRight.Text),
-            LblActiveDownline.Text);
-
-        string userId = Convert.ToString(Session["userid"]);
-        string totalTeam = computedTotalTeam;
-        string activeTeam = computedActiveTeam;
-        string directMembers = GetDisplayValue(LblDirect.Text, "0", "0");
-
-        if (!string.IsNullOrWhiteSpace(userId))
-        {
-            DataTable dashDt = objuser.getUserDasboardproc(userId);
-            if (dashDt != null && dashDt.Rows.Count > 0)
-            {
-                DataRow row = dashDt.Rows[0];
-                totalTeam = PreferNonZeroValue(
-                    GetRowText(row, "TotalTeam"),
-                    computedTotalTeam,
-                    LblDownline.Text);
-                activeTeam = PreferNonZeroValue(
-                    GetRowText(row, "TotalActiveTeam"),
-                    computedActiveTeam,
-                    LblActiveDownline.Text);
-                directMembers = PreferNonZeroValue(
-                    GetRowText(row, "TotalDirect"),
-                    LblDirect.Text);
-            }
-        }
-
-        lblStatTeam.Text = FormatStatNumber(totalTeam);
-        lblStatActiveTeam.Text = FormatStatNumber(activeTeam);
-        lblStatDirect.Text = FormatStatNumber(directMembers);
-        LblDownline.Text = lblStatTeam.Text;
-        LblActiveDownline.Text = lblStatActiveTeam.Text;
-
-        string wallet = GetDisplayValue(LblCurrentWallet.Text, string.Empty, string.Empty);
-        if (string.IsNullOrEmpty(wallet) || wallet == "0")
-        {
-            wallet = GetDisplayValue(lblwalletBalance.Text, string.Empty, string.Empty);
-        }
-        if (string.IsNullOrEmpty(wallet))
-        {
-            wallet = GetDisplayValue(lblwalletbalance123.Text, "0", "0");
-        }
-
-        lblStatWallet.Text = FormatWalletValue(wallet);
-    }
-
-    static string GetDisplayValue(string primary, string fallback, string defaultValue)
-    {
-        if (!string.IsNullOrWhiteSpace(primary) && !string.Equals(primary.Trim(), "Label", StringComparison.OrdinalIgnoreCase))
-        {
-            return primary.Trim();
-        }
-
-        if (!string.IsNullOrWhiteSpace(fallback) && !string.Equals(fallback.Trim(), "Label", StringComparison.OrdinalIgnoreCase))
-        {
-            return fallback.Trim();
-        }
-
-        return defaultValue;
-    }
-
-    static string FormatStatNumber(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return "0";
-        }
-
-        decimal number;
-        if (decimal.TryParse(value, out number))
-        {
-            return number % 1 == 0 ? ((long)number).ToString() : number.ToString("0.##");
-        }
-
-        return value;
-    }
-
-    static string FormatWalletValue(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return "0";
-        }
-
-        decimal number;
-        if (decimal.TryParse(value, out number))
-        {
-            return number.ToString("0.##");
-        }
-
-        return value;
     }
 
     void TotalDownline()
@@ -574,88 +357,31 @@ public partial class user_Dashboard : System.Web.UI.Page
     void loadnotification()
     {
         objuser.UserId = Session["userid"].ToString();
-        DataTable dt = objuser.getUserDetail(objuser);
-        if (dt == null || dt.Rows.Count == 0)
-        {
-            pnlnotification.Visible = true;
-            return;
-        }
+        DataTable dt = new DataTable();
 
-        DataRow row = dt.Rows[0];
-        if (GetRowText(row, "AccountHolderName", "accountholdername") == ""
-            || GetRowText(row, "AccountNo", "accountno") == ""
-            || GetRowText(row, "IFSCCode", "ifsccode") == ""
-            || GetRowText(row, "BankName", "bankname") == ""
-            || GetRowText(row, "BankName", "bankname") == "0"
-            || GetRowText(row, "BranchName", "branchname") == ""
-            || GetRowText(row, "PanNumber", "pannumber") == "")
+        dt = objuser.getUserDetail(objuser);
+        if (dt.Rows[0]["AccountHolderName"].ToString() == "" || dt.Rows[0]["AccountNo"].ToString() == "" || dt.Rows[0]["IFSCCode"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "0" || dt.Rows[0]["BranchName"].ToString() == "" || dt.Rows[0]["PanNumber"].ToString() == "")
         {
             pnlnotification.Visible = true;
+
         }
         else
         {
             pnlnotification.Visible = false;
         }
-    }
 
-    static string GetRowText(DataRow row, params string[] columnNames)
-    {
-        if (row == null || row.Table == null)
-        {
-            return string.Empty;
-        }
-
-        foreach (string columnName in columnNames)
-        {
-            string actualColumn = FindColumnName(row.Table, columnName);
-            if (actualColumn == null)
-            {
-                continue;
-            }
-
-            object value = row[actualColumn];
-            if (value == null || value == DBNull.Value)
-            {
-                return string.Empty;
-            }
-
-            return Convert.ToString(value).Trim();
-        }
-
-        return string.Empty;
-    }
-
-    static string FindColumnName(DataTable table, string columnName)
-    {
-        if (table == null || string.IsNullOrWhiteSpace(columnName))
-        {
-            return null;
-        }
-
-        if (table.Columns.Contains(columnName))
-        {
-            return columnName;
-        }
-
-        foreach (DataColumn column in table.Columns)
-        {
-            if (string.Equals(column.ColumnName, columnName, StringComparison.OrdinalIgnoreCase))
-            {
-                return column.ColumnName;
-            }
-        }
-
-        return null;
     }
     void laoddata()
     {
         objuser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
-        dt = objuser.getUserDetail(objuser);
-        if (dt != null && dt.Rows.Count > 0)
+        dt = getUserDetail(objuser);
+        if (dt.Rows.Count > 0)
         {
             lbluserid.Text = dt.Rows[0]["userid"].ToString();
+            lblWelcomeId.Text = dt.Rows[0]["userid"].ToString();
             lblusername.Text = dt.Rows[0]["username"].ToString();
+            lblWelcomeName.Text = dt.Rows[0]["username"].ToString();
             LblSponserId.Text = dt.Rows[0]["sponserId"].ToString();
             LblParentId.Text = dt.Rows[0]["parentuserid"].ToString();
             ImgMyPhoto.ImageUrl = "../ProductImage/" + dt.Rows[0]["PhotoImage"].ToString();
@@ -688,6 +414,23 @@ public partial class user_Dashboard : System.Web.UI.Page
 
         }
 
+    }
+
+    public DataTable getUserDetail(clsUser objUser)
+    {
+        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
     }
     void loadaward()
     {
@@ -905,7 +648,7 @@ public partial class user_Dashboard : System.Web.UI.Page
         DataTable dt = new DataTable();
         objuser.UserId = UserId;
         dt = objuser.getUserDetail(objuser);
-        if (dt != null && dt.Rows.Count > 0)
+        if (dt.Rows.Count > 0)
         {
             lblwalletbalance123.Text = dt.Rows[0]["balanceamount"].ToString();
             lblUtilityBalance.Text = dt.Rows[0]["UtilityBalance"].ToString();
@@ -1040,11 +783,9 @@ public partial class user_Dashboard : System.Web.UI.Page
     protected void Button3_Click(object sender, EventArgs e)
     {
         filldashboard();
-        SyncDashboardHero();
     }
     protected void Button4_Click(object sender, EventArgs e)
     {
         loadPerformance();
-        SyncDashboardHero();
     }
 }

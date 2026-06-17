@@ -441,13 +441,18 @@ body {
 
 .site-header {
     background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 50;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+@media (min-width: 769px) {
+    .site-header {
+        backdrop-filter: blur(12px);
+    }
 }
 
     .site-header.is-scrolled {
@@ -690,7 +695,8 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     position: relative;
     z-index: 65;
-    background: linear-gradient(90deg, #0f1729 0%, #16233f 50%, #0f1729 100%);
+    /* background: linear-gradient(90deg, #0f1729 0%, #16233f 50%, #0f1729 100%); */
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #5b21b6 65%, #c2410c 100%);
 }
 
 .header-bottom-wrap {
@@ -1036,8 +1042,10 @@ body {
     transform: translateY(-4px) rotate(-45deg);
 }
 
-body.mobile-menu-open {
+body.mobile-menu-open,
+html.mobile-menu-open {
     overflow: hidden;
+    height: 100%;
 }
 
 .cart-btn {
@@ -2581,7 +2589,8 @@ h2 span {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.85rem;
     padding: 1.15rem 1.25rem;
-    background: linear-gradient(135deg, #141f38 0%, #0f1729 100%);
+    /* background: linear-gradient(135deg, #141f38 0%, #0f1729 100%); */
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #5b21b6 65%, #c2410c 100%);
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 16px 40px rgba(15, 23, 41, 0.18);
@@ -3135,7 +3144,8 @@ body.cart-open {
 }
 
 .site-footer {
-    background: linear-gradient(180deg, #121c2e 0%, #0f1726 100%);
+    /* background: linear-gradient(180deg, #121c2e 0%, #0f1726 100%); */
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #5b21b6 65%, #c2410c 100%);
     color: #b8c4d6;
     position: relative;
 }
@@ -3163,7 +3173,7 @@ body.cart-open {
     max-width: 26rem;
     font-size: 0.88rem;
     line-height: 1.6;
-    color: #9aabc0;
+    color: #ffffff;
 }
 
 .footer-contact-compact {
@@ -3209,7 +3219,7 @@ body.cart-open {
 
     .footer-links a {
         text-decoration: none;
-        color: #9aabc0;
+        color: #ffffff;
         font-size: 0.88rem;
         transition: color 0.18s ease, padding-left 0.18s ease;
     }
@@ -3228,7 +3238,7 @@ body.cart-open {
         display: flex;
         align-items: center;
         gap: 0.55rem;
-        color: #9aabc0;
+        color: #ffffff;
         font-size: 0.88rem;
         line-height: 1.45;
     }
@@ -3292,7 +3302,7 @@ body.cart-open {
 
 .footer-app-text {
     margin: 0 0 0.85rem;
-    color: #9aabc0;
+    color: #ffffff;
     font-size: 0.86rem;
     line-height: 1.5;
 }
@@ -3564,6 +3574,7 @@ body.cart-open {
         justify-content: center;
         flex-wrap: wrap;
         gap: 0.65rem;
+        display: none;
     }
 
     .top-social-links {
@@ -3594,6 +3605,7 @@ body.cart-open {
 
     .top-offer-marquee {
         mask-image: none;
+        display: none;
     }
 
     .top-offer-text {
@@ -3742,22 +3754,30 @@ body.cart-open {
         flex-wrap: wrap;
         justify-content: space-between;
         padding: 0rem 0;
+        position: relative;
         /* display: none; */
     }
 
     .header-menu {
         width: 100%;
         display: none;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: calc(100% + 0.35rem);
-        z-index: 220;
-        padding: 0 0.65rem;
     }
 
         .header-menu.mobile-open {
             display: block;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: var(--site-header-height, 8.5rem);
+            bottom: 0;
+            z-index: 10000;
+            padding: 0.65rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            background: rgba(15, 23, 41, 0.55);
         }
 
     .shop-category-btn {
@@ -3767,17 +3787,16 @@ body.cart-open {
 
     .header-menu-list {
         gap: 0.25rem;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
+        overflow: visible;
         padding: 0.45rem;
         border-radius: 0.72rem;
         display: grid;
         grid-template-columns: 1fr;
-        height: auto !important;
-        max-height: calc(100dvh - 145px);
+        height: auto;
+        max-height: none;
         min-height: 0;
         background: #ffffff;
+        box-shadow: 0 18px 40px rgba(15, 23, 41, 0.16);
     }
 
     .menu-link {
@@ -7976,6 +7995,93 @@ a.addr-btn-add:focus {
 
     .pay-form-span-2 {
         grid-column: auto;
+    }
+}
+
+/* Floating WhatsApp button (index page) */
+.whatsapp-float {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 280;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(145deg, #2fe06a 0%, #25d366 48%, #1ebe57 100%);
+    box-shadow:
+        0 10px 28px rgba(37, 211, 102, 0.38),
+        0 2px 8px rgba(15, 23, 42, 0.12);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.whatsapp-float:hover,
+.whatsapp-float:focus-visible {
+    color: #fff;
+    transform: translateY(-3px) scale(1.04);
+    box-shadow:
+        0 14px 34px rgba(37, 211, 102, 0.45),
+        0 4px 12px rgba(15, 23, 42, 0.14);
+}
+
+.whatsapp-float-icon {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.whatsapp-float-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(37, 211, 102, 0.35);
+    animation: whatsapp-float-pulse 2.2s ease-out infinite;
+    z-index: 1;
+}
+
+@keyframes whatsapp-float-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.65;
+    }
+
+    70% {
+        transform: scale(1.55);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.55);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .whatsapp-float {
+        right: 16px;
+        bottom: 18px;
+        width: 54px;
+        height: 54px;
+    }
+
+    .whatsapp-float-icon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .whatsapp-float-pulse {
+        animation: none;
+    }
+
+    .whatsapp-float:hover,
+    .whatsapp-float:focus-visible {
+        transform: none;
     }
 }
 

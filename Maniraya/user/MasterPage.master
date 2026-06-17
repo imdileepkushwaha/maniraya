@@ -64,7 +64,7 @@
 
 		<!-- Maniraya layout enhancements (must load after all theme CSS) -->
 		<link href="assets/css/sidebar-enhanced.css?v=14" rel="stylesheet">
-		<link href="assets/css/content-header-modern.css?v=1" rel="stylesheet">
+		<link href="assets/css/content-header-modern.css?v=2" rel="stylesheet">
 		<link href="assets/css/box-modern.css?v=7" rel="stylesheet">
 
     	<!-- main-sidebar opened -->

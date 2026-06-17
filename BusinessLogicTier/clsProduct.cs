@@ -2425,5 +2425,26 @@ namespace BusinessLogicTier
             return dt;
         }
 
+//           public DataTable getSubProductForVendorPurchase(string ID)
+//   {
+//       string str_query = "SELECT P.ProductId,P.Productname,S.SubProductID,C.ColorName+'|'+SZ.SizeName SubProductName,CASE WHEN productimage='' THEN '../ProductImage/images.png' ELSE  '../ProductImage/'+ productimage END AS [Image] FROM SubProductMaster S JOIN Productmaster P ON S.ProductID=P.ProductId JOIN colormaster C ON S.ColorId=C.ID JOIN  SizeMaster SZ ON S.SizeID=SZ.ID WHERE 1=1 and S.Productid='" + ID + "' ";
+//       str_query += " order by P.ProductName";
+//       DataTable dt = null;
+//       ObjData.StartConnection();
+//       try
+//       {
+//           dt = ObjData.RunDataTable(str_query);
+//       }
+//       catch (Exception ex)
+//       {
+//           dt = null;
+//       }
+//       ObjData.EndConnection();
+//       return dt;
+//   }
+
+
+
+
     }
 }

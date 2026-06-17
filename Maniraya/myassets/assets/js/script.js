@@ -358,6 +358,51 @@ function setupHeaderScroll() {
   window.addEventListener("scroll", toggleHeaderState, { passive: true });
 }
 
+let headerMenuPlaceholder = null;
+
+function updateSiteHeaderHeight() {
+  if (!siteHeader) return;
+  document.documentElement.style.setProperty("--site-header-height", `${siteHeader.offsetHeight}px`);
+}
+
+function moveHeaderMenuToBody() {
+  if (!headerMenu || headerMenu.parentElement === document.body) return;
+  headerMenuPlaceholder = document.createComment("header-menu-anchor");
+  headerMenu.parentElement.insertBefore(headerMenuPlaceholder, headerMenu);
+  document.body.appendChild(headerMenu);
+}
+
+function restoreHeaderMenuPosition() {
+  if (!headerMenu || !headerMenuPlaceholder || !headerMenuPlaceholder.parentElement) return;
+  headerMenuPlaceholder.parentElement.insertBefore(headerMenu, headerMenuPlaceholder);
+  headerMenuPlaceholder.remove();
+  headerMenuPlaceholder = null;
+}
+
+function setMobileMenuOpen(open) {
+  if (!headerMenu || !mobileMenuBtn) return;
+
+  if (open) {
+    updateSiteHeaderHeight();
+    moveHeaderMenuToBody();
+    headerMenu.classList.add("mobile-open");
+    mobileMenuBtn.setAttribute("aria-expanded", "true");
+    mobileMenuBtn.classList.add("is-open");
+    document.documentElement.classList.add("mobile-menu-open");
+    document.body.classList.add("mobile-menu-open");
+    closeMobileSearch();
+    return;
+  }
+
+  headerMenu.classList.remove("mobile-open");
+  restoreHeaderMenuPosition();
+  mobileMenuBtn.setAttribute("aria-expanded", "false");
+  mobileMenuBtn.classList.remove("is-open");
+  document.documentElement.classList.remove("mobile-menu-open");
+  document.body.classList.remove("mobile-menu-open");
+  closeAllHeaderMenus();
+}
+
 function closeAllHeaderMenus() {
   if (!headerMenu) return;
   headerMenu.querySelectorAll(".menu-item.open").forEach((item) => item.classList.remove("open"));
@@ -366,12 +411,17 @@ function closeAllHeaderMenus() {
 
 function closeMobileMenu() {
   if (!headerMenu) return;
-  headerMenu.classList.remove("mobile-open");
-  document.body.classList.remove("mobile-menu-open");
+  if (headerMenu.classList.contains("mobile-open")) {
+    setMobileMenuOpen(false);
+    return;
+  }
+  restoreHeaderMenuPosition();
   if (mobileMenuBtn) {
     mobileMenuBtn.setAttribute("aria-expanded", "false");
     mobileMenuBtn.classList.remove("is-open");
   }
+  document.documentElement.classList.remove("mobile-menu-open");
+  document.body.classList.remove("mobile-menu-open");
   closeAllHeaderMenus();
 }
 
@@ -426,6 +476,7 @@ function setupHeaderMenu() {
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof Node)) return;
     if (headerMenu.contains(event.target)) return;
+    if (mobileMenuBtn && mobileMenuBtn.contains(event.target)) return;
     closeAllHeaderMenus();
     if (window.innerWidth <= 768 && siteHeader && !siteHeader.contains(event.target)) {
       closeMobileMenu();
@@ -434,20 +485,17 @@ function setupHeaderMenu() {
   });
 
   if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener("click", () => {
-      const isOpen = headerMenu.classList.toggle("mobile-open");
-      mobileMenuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      mobileMenuBtn.classList.toggle("is-open", isOpen);
-      document.body.classList.toggle("mobile-menu-open", isOpen);
-      if (!isOpen) {
-        closeAllHeaderMenus();
-      }
-      if (isOpen) closeMobileSearch();
+    mobileMenuBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const isOpen = headerMenu.classList.contains("mobile-open");
+      setMobileMenuOpen(!isOpen);
     });
   }
 
   if (mobileSearchToggle && headerSearchWrap) {
-    mobileSearchToggle.addEventListener("click", () => {
+    mobileSearchToggle.addEventListener("click", (event) => {
+      event.preventDefault();
       const isOpen = !document.body.classList.contains("mobile-search-open");
       document.body.classList.toggle("mobile-search-open", isOpen);
       mobileSearchToggle.classList.toggle("is-open", isOpen);
@@ -462,11 +510,14 @@ function setupHeaderMenu() {
   }
 
   window.addEventListener("resize", () => {
+    updateSiteHeaderHeight();
     if (window.innerWidth > 768) {
       closeMobileMenu();
       closeMobileSearch();
     }
   });
+
+  updateSiteHeaderHeight();
 }
 
 function setupPasswordToggle() {

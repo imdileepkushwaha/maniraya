@@ -24,8 +24,7 @@ public partial class index : System.Web.UI.Page
         ddcountry.DataBind();
         ddcountry.Items.Insert(0, new ListItem("All Categories", "0"));
 
-        DataTable homeCategories = CatalogHelper.TakeRows(dt, CatalogHelper.HomeCategoryLimit);
-        rptcategory.DataSource = homeCategories;
+        rptcategory.DataSource = dt;
         rptcategory.DataBind();
     }
 
@@ -37,7 +36,7 @@ public partial class index : System.Web.UI.Page
             categoryId = ddcountry.SelectedValue;
         }
 
-        DataTable dt = CatalogHelper.LoadProducts(pageIndex, CatalogHelper.HomeProductLimit, categoryId);
+        DataTable dt = CatalogHelper.LoadProducts(pageIndex, CatalogHelper.CatalogProductPageSize, categoryId);
         rptProducts.DataSource = dt;
         rptProducts.DataBind();
     }

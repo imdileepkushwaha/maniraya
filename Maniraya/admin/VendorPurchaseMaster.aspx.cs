@@ -27,6 +27,21 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
             Response.Redirect("index.aspx");
         }
     }
+
+    void loadSubProduct()
+    {
+        DDLstSubProduct.Items.Clear();
+        DataTable dt = new DataTable();
+        dt = objP.getSubProductForVendorPurchase(DDLstProduct.SelectedValue);
+        DDLstSubProduct.DataSource = dt;
+        DDLstSubProduct.DataTextField = "SubProductName";
+        DDLstSubProduct.DataValueField = "SubProductID";
+        DDLstSubProduct.DataBind();
+        ListItem li = new ListItem("Select SubProduct", "0");
+        DDLstSubProduct.Items.Insert(0, li);
+
+
+    }
     void loadVendor()
     {
         DDLstVendor.Items.Clear();
@@ -55,7 +70,9 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
     {
         PurchaseDt = new DataTable();
         PurchaseDt.Columns.Add("ProductId");
+        PurchaseDt.Columns.Add("SubProductId");
         PurchaseDt.Columns.Add("ProductName");
+        PurchaseDt.Columns.Add("SubProductName");
         PurchaseDt.Columns.Add("Image");
         PurchaseDt.Columns.Add("Amount");
         PurchaseDt.Columns.Add("BV");      
@@ -75,7 +92,9 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
             {
                 DR = PurchaseDt.NewRow();             
                 DR["ProductId"] = ((Label)Gr.FindControl("LblProductCodeG")).Text;
+                DR["SubProductId"] = ((Label)Gr.FindControl("LblProductCodeG")).Text;
                 DR["ProductName"] = ((Label)Gr.FindControl("LblProductNameG")).Text;
+                DR["SubProductName"] = ((Label)Gr.FindControl("LblProductNameG")).Text;
                 DR["Image"] = ((Label)Gr.FindControl("LblProductImageG")).Text;
                 DR["Amount"] = ((Label)Gr.FindControl("LblProductAmountG")).Text;
                 DR["BV"] = ((Label)Gr.FindControl("LblBv")).Text;
@@ -267,7 +286,7 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
             //btnSubmit.Attributes["disabled"] = "disabled";
             //ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "alert('Insufficient Stock');", true);
         }
-
+        loadSubProduct();
 
     }
     protected void TxtCGST_TextChanged(object sender, EventArgs e)
