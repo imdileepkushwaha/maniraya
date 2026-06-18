@@ -36,7 +36,7 @@
                     <div class="fr-login-card">
                         <div class="fr-login-brand">
                             <div class="fr-login-logo-wrap">
-                                <img src="../user/img/logo.png" alt="<%= clsUtility.ProjectName %>" class="fr-login-logo" />
+                                <span class="brand-text-mpremium fr-login-brand-text">MPremium</span>
                             </div>
                             <h1><%= clsUtility.ProjectName %></h1>
                             <p>Franchisee Portal</p>

@@ -1,268 +1,322 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="UserPurchaseDetail.aspx.cs" Inherits="UserPurchaseDetail" %>
-<%--<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>--%>
+﻿<%@ Page Title="Franchisee Sales" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="UserPurchaseDetail.aspx.cs" Inherits="UserPurchaseDetail" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
- 
+    <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+    <style>
+        .purchase-detail-page .admin-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px 16px;
+        }
+
+        .purchase-detail-page .admin-filter-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .purchase-detail-page .table-responsive {
+            margin: 0;
+            border: 1px solid #e8edf3;
+            border-radius: 10px;
+            overflow: auto;
+        }
+
+        .purchase-detail-page .purchase-expand-btn {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 1px solid #dbe3ee;
+            background: #fff;
+            padding: 2px;
+            object-fit: contain;
+        }
+
+        .purchase-detail-page tr.purchase-child-row > td {
+            background: #f8fafc;
+            padding: 0 !important;
+            border-top: 0 !important;
+        }
+
+        .purchase-detail-page .purchase-child-wrap {
+            padding: 14px 16px 16px 48px;
+        }
+
+        .purchase-detail-page .purchase-child-wrap .table {
+            margin-bottom: 0;
+            background: #fff;
+        }
+
+        .purchase-detail-page .purchase-child-title {
+            margin: 0 0 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .purchase-detail-page .purchase-address-block {
+            font-size: 12px;
+            line-height: 1.55;
+            color: #475569;
+        }
+
+        .purchase-detail-page .purchase-address-block strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .purchase-detail-page .btn-invoice-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 991px) {
+            .purchase-detail-page .admin-filter-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575px) {
+            .purchase-detail-page .admin-filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </asp:Content>
+
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
-      
-        <section class="content-header">
-      <h1>
-   Farnchsiee Sales
-      </h1>
-      <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+    <section class="content-header">
+        <h1>Franchisee Sales</h1>
+        <ol class="breadcrumb">
+            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Franchisee</a></li>
-        <li class="active">Farnchsiee Sales</li>
-      
-      </ol>
-    </section>   
+            <li class="active">Franchisee Sales</li>
+        </ol>
+    </section>
 </asp:Content>
+
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" Runat="Server">
-     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
-    <asp:UpdateProgress ID="updateProgress" runat="server">
+    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+    <asp:UpdateProgress ID="updateProgress" runat="server" AssociatedUpdatePanelID="UpdatePanel1">
         <ProgressTemplate>
-            <div style="position: fixed; text-align: center; height: 100%; width: 100%; top: 0; right: 0; left: 0; z-index: 9999999; background-color: #000000; opacity: 0.7;">
-                <asp:Image ID="imgUpdateProgress" runat="server" ImageUrl="~/img/ajax-loader.gif" AlternateText="Loading ..." ToolTip="Loading ..." Style="padding: 10px; position: fixed; top: 15%; left: 25%;" />
+            <div class="modal2">
+                <div class="center2">
+                    <img alt="Loading" src="loader.gif" />
+                </div>
             </div>
         </ProgressTemplate>
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-                 <div class="row">
-          <div class="col-md-12">
-              <div class="box box-primary">
-
-
-            
-                  
-                          <div class="row">
-                         <div class="col-md-4">
-                             <div class="form-group">
-                                 <label>From date :</label>
-                                 <asp:TextBox ID="txtfromdate" CssClass="form-control form_date" runat="server"></asp:TextBox>
-                                 <%-- <cc1:CalendarExtender ID="CalFromDate" runat="server" TargetControlID="txtFromDate" Format="dd/MM/yyyy"></cc1:CalendarExtender>
-                        --%>     </div>
-                         </div>
-                         <div class="col-md-4">
-                             <div class="form-group">
-                                 <label>To date :</label>
-                                  <asp:TextBox ID="txttodate"  CssClass="form-control form_date" runat="server"></asp:TextBox>
-                                                            <%-- <cc1:CalendarExtender ID="CalToDate" runat="server" TargetControlID="txtToDate" Format="dd/MM/yyyy"></cc1:CalendarExtender>
-       --%>                      </div>
-                         </div>
-                               <div class="col-md-4">
-                             <div class="form-group">
-                                 <label>Franchisee ID :</label>
-                                   <asp:TextBox ID="TxtFranchiseeId" runat="server" CssClass="form-control" />
-                               
-                             </div>
-                         </div>
-
-                               <div class="col-md-4">
-                             <div class="form-group">
-                                 <label>Status :</label>
-                                   <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
-                                            <asp:ListItem Value="0">Select Status</asp:ListItem>
+            <div class="purchase-detail-page">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search Criteria</h3>
+                            </div>
+                            <div class="box-body admin-product-form">
+                                <p class="admin-section-hint">Filter franchisee sales by date range, franchisee ID, and approval status.</p>
+                                <div class="admin-filter-grid">
+                                    <div class="form-group">
+                                        <label for="<%= txtfromdate.ClientID %>">From Date</label>
+                                        <asp:TextBox ID="txtfromdate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="<%= txttodate.ClientID %>">To Date</label>
+                                        <asp:TextBox ID="txttodate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="<%= TxtFranchiseeId.ClientID %>">Franchisee ID</label>
+                                        <asp:TextBox ID="TxtFranchiseeId" runat="server" CssClass="form-control" placeholder="Enter franchisee ID" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="<%= ddstatus.ClientID %>">Status</label>
+                                        <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
+                                            <asp:ListItem Value="0">All Status</asp:ListItem>
                                             <asp:ListItem Value="1">Approved</asp:ListItem>
                                             <asp:ListItem Value="2">Rejected</asp:ListItem>
-                                             
                                         </asp:DropDownList>
-                               
-                             </div>
-                         </div>
-                     </div>
-                          <div class="row">
-                         <div class="col-md-12">
-                             <div class="form-group">
-                                    <asp:Button ID="btnSubmit"  CssClass="btn btn-primary" runat="server" Text="Search" OnClick="btnSubmit_Click" />
-                                        <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Cancel" OnClick="btnCancel_Click" />
-                                 </div>
-                             </div>
-                              </div>
-                          
-                        <div class="row">
-                         <div class="col-md-12">
-                             <div class="form-group">
-                                <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
-                               <Columns>
-                                    <asp:TemplateField>
-            <ItemTemplate>
-                <img alt = "" style="cursor: pointer" src="img/PLUS.jpg" />
-                <asp:Panel ID="pnlOrders" runat="server" Style="display: none">
-                    <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered table-hover dataTable" >
-                        <Columns>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer admin-product-footer">
+                                <div class="admin-filter-actions">
+                                    <asp:Button ID="btnSubmit" CssClass="btn btn-primary" runat="server" Text="Search" OnClick="btnSubmit_Click" />
+                                    <asp:Button ID="btnCancel" CssClass="btn btn-default" runat="server" Text="Cancel" OnClick="btnCancel_Click" />
+                                </div>
+                            </div>
+                        </div>
 
-                            <asp:BoundField ItemStyle-Width="150px" DataField="ProductID" HeaderText="Product Code" />
-                               <asp:TemplateField HeaderText="Image">
-                               <ItemTemplate>
-                                   <asp:Image ID="Image1" runat="server" ImageUrl='<%# Eval("Image") %>' Height="40px" Width="40px"  />
-                                 
-                               </ItemTemplate>
-                           </asp:TemplateField>
-                             <asp:BoundField ItemStyle-Width="150px" DataField="ProductName" HeaderText="Product Name" />
-                             <asp:BoundField ItemStyle-Width="150px" DataField="MRP" HeaderText="MRP" />
-                                 <asp:BoundField ItemStyle-Width="150px" DataField="Amount" HeaderText="Amount" />
-                               <asp:BoundField ItemStyle-Width="150px" DataField="Quantity" HeaderText="Quantity" />
-                              <asp:BoundField ItemStyle-Width="150px" DataField="PurchaseAmount" HeaderText="PurchaseAmount" />
-                                 <asp:TemplateField HeaderText="CGST" >
-                               <ItemTemplate>
-                                    <asp:Label ID="LblCGST" runat="server"  Text='<%#Eval("CGST") %>' ></asp:Label>
-                               </ItemTemplate>
-                           </asp:TemplateField>    
-                                <asp:TemplateField HeaderText="SGST" >
-                               <ItemTemplate>
-                                    <asp:Label ID="LblSGST" runat="server"  Text='<%#Eval("SGST") %>' ></asp:Label>
-                               </ItemTemplate>
-                           </asp:TemplateField>   
-                              <asp:TemplateField HeaderText="IGST" >
-                               <ItemTemplate>
-                                    <asp:Label ID="LblIGST" runat="server"  Text='<%#Eval("IGST") %>' ></asp:Label>
-                               </ItemTemplate>
-                           </asp:TemplateField>  
-                           
-                            <asp:BoundField ItemStyle-Width="150px" DataField="TotalAmount" HeaderText="TotalAmount" />
-                        </Columns>
-                    </asp:GridView>
-                </asp:Panel>
-            </ItemTemplate>
-        </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="#">
-                                        <ItemTemplate>
-                                            <%#Container.DataItemIndex+1 %>
-                                          
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Purchase Id">
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluserid123" runat="server" Text='<%#Eval("PurchaseID") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                      <asp:TemplateField HeaderText="Franchisee name">
-                                        <ItemTemplate>
-                                               <asp:Label ID="Labeluserid" runat="server" Text='<%#Eval("userid") %>' Visible="false"></asp:Label>
-                                            <asp:Label ID="lbluseridUsername" runat="server" Text='<%#Eval("Username") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-
-
-                                    <asp:TemplateField HeaderText="Shipping Address">
-                                        <ItemTemplate>
-                                              
-                                       Address :      <asp:Label ID="lblshippingaddress" runat="server" Text='<%#Eval("shippingaddress") %>'></asp:Label>,
-                                        City :     <asp:Label ID="lblcity" runat="server" Text='<%#Eval("CityName") %>'></asp:Label><br />
-                                        State :     <asp:Label ID="lblstate" runat="server" Text='<%#Eval("StateName") %>'></asp:Label><br />
-                                        Area  :   <asp:Label ID="lblarea" runat="server" Text='<%#Eval("ShippingAreaName") %>'></asp:Label><br />
-                                        Pincode :      <asp:Label ID="lblpincode" runat="server" Text='<%#Eval("shippingpincode") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                   <asp:TemplateField HeaderText="Purchase Amount">
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluseridEmailId" runat="server" Text='<%#Eval("PurchaseAmount") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                      <asp:TemplateField HeaderText="CGST" >
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluseridContactNo" runat="server" Text='<%#Eval("CGST") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                      <asp:TemplateField HeaderText="SGST">
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluseridaddress" runat="server" Text='<%#Eval("SGST") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                     <asp:TemplateField HeaderText="IGST" >
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluserid" runat="server" Text='<%#Eval("IGST") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                   <asp:TemplateField HeaderText="Total Amount">
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbluserid2" runat="server" Text='<%#Eval("TotalAmount") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                     <asp:TemplateField HeaderText="Purchase date">
-                                        <ItemTemplate>
-                                            <asp:Label ID="lbldate" runat="server" Text='<%#Eval("Purchasedate") %>'></asp:Label>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>         
-                                       <asp:TemplateField HeaderText="Invoice">
-                                        <ItemTemplate>
-                                             <asp:HyperLink runat="server" Target="_blank" NavigateUrl='<%# string.Format("JoiningInvoice.aspx?OrderNo={0}",
-                    HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>'
-                                           Text="Print" />
-                                         
-                                        </ItemTemplate>
-                                    </asp:TemplateField>  
-                                  
-
-                                </Columns>
-                            </asp:GridView>
-                             </div>
-                         </div>
-                      
-                            
-                     </div>
-
-            
-                          </div>
-                       </div>
-                 </div>
-
-
- </div>
-
-
-           
-
-            
-             </ContentTemplate>
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Purchase Details</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="table-responsive">
+                                    <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
+                                        <Columns>
+                                            <asp:TemplateField HeaderText="" ItemStyle-Width="40px">
+                                                <ItemTemplate>
+                                                    <img alt="Expand" class="purchase-expand-btn js-purchase-expand" src="img/PLUS.jpg" />
+                                                    <asp:Panel ID="pnlOrders" runat="server" Style="display: none">
+                                                        <div class="purchase-child-wrap">
+                                                            <p class="purchase-child-title"><i class="fa fa-list"></i> Order Items</p>
+                                                            <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered table-hover dataTable">
+                                                                <Columns>
+                                                                    <asp:BoundField ItemStyle-Width="120px" DataField="ProductID" HeaderText="Product Code" />
+                                                                    <asp:TemplateField HeaderText="Image" ItemStyle-Width="70px">
+                                                                        <ItemTemplate>
+                                                                            <asp:Image ID="Image1" runat="server" ImageUrl='<%# Eval("Image") %>' Height="40" Width="40" CssClass="img-thumbnail" />
+                                                                        </ItemTemplate>
+                                                                    </asp:TemplateField>
+                                                                    <asp:BoundField DataField="ProductName" HeaderText="Product Name" />
+                                                                    <asp:BoundField DataField="MRP" HeaderText="MRP" />
+                                                                    <asp:BoundField DataField="Amount" HeaderText="Amount" />
+                                                                    <asp:BoundField DataField="Quantity" HeaderText="Qty" />
+                                                                    <asp:BoundField DataField="PurchaseAmount" HeaderText="Purchase Amt" />
+                                                                    <asp:TemplateField HeaderText="CGST">
+                                                                        <ItemTemplate>
+                                                                            <asp:Label ID="LblCGST" runat="server" Text='<%# Eval("CGST") %>' />
+                                                                        </ItemTemplate>
+                                                                    </asp:TemplateField>
+                                                                    <asp:TemplateField HeaderText="SGST">
+                                                                        <ItemTemplate>
+                                                                            <asp:Label ID="LblSGST" runat="server" Text='<%# Eval("SGST") %>' />
+                                                                        </ItemTemplate>
+                                                                    </asp:TemplateField>
+                                                                    <asp:TemplateField HeaderText="IGST">
+                                                                        <ItemTemplate>
+                                                                            <asp:Label ID="LblIGST" runat="server" Text='<%# Eval("IGST") %>' />
+                                                                        </ItemTemplate>
+                                                                    </asp:TemplateField>
+                                                                    <asp:BoundField DataField="TotalAmount" HeaderText="Total" />
+                                                                </Columns>
+                                                            </asp:GridView>
+                                                        </div>
+                                                    </asp:Panel>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="#">
+                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Purchase ID">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluserid123" runat="server" Text='<%# Eval("PurchaseID") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Franchisee / User">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="Labeluserid" runat="server" Text='<%# Eval("userid") %>' Visible="false" />
+                                                    <strong><%# Eval("FranchiseeName") %></strong>
+                                                    <br />
+                                                    <small class="text-muted">User: <asp:Label ID="lbluseridUsername" runat="server" Text='<%# Eval("Username") %>' /></small>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Shipping Address">
+                                                <ItemTemplate>
+                                                    <div class="purchase-address-block">
+                                                        <div><strong>Address:</strong> <asp:Label ID="lblshippingaddress" runat="server" Text='<%# Eval("shippingaddress") %>' /></div>
+                                                        <div><strong>City:</strong> <asp:Label ID="lblcity" runat="server" Text='<%# Eval("CityName") %>' /></div>
+                                                        <div><strong>State:</strong> <asp:Label ID="lblstate" runat="server" Text='<%# Eval("StateName") %>' /></div>
+                                                        <div><strong>Area:</strong> <asp:Label ID="lblarea" runat="server" Text='<%# Eval("ShippingAreaName") %>' /></div>
+                                                        <div><strong>Pincode:</strong> <asp:Label ID="lblpincode" runat="server" Text='<%# Eval("shippingpincode") %>' /></div>
+                                                    </div>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Purchase Amt">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluseridEmailId" runat="server" Text='<%# Eval("PurchaseAmount") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="CGST">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluseridContactNo" runat="server" Text='<%# Eval("CGST") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="SGST">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluseridaddress" runat="server" Text='<%# Eval("SGST") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IGST">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluserid" runat="server" Text='<%# Eval("IGST") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Total Amt">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbluserid2" runat="server" Text='<%# Eval("TotalAmount") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Purchase Date">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbldate" runat="server" Text='<%# Eval("Purchasedate") %>' />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Invoice">
+                                                <ItemTemplate>
+                                                    <asp:HyperLink runat="server" Target="_blank" CssClass="btn btn-default btn-xs btn-invoice-link"
+                                                        NavigateUrl='<%# string.Format("JoiningInvoice.aspx?OrderNo={0}", HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>'
+                                                        Text="Print" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                    </asp:GridView>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
+
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
-       <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript">
-    $("[src*=PLUS]").live("click", function () {
-        $(this).closest("tr").after("<tr><td></td><td colspan = '999'>" + $(this).next().html() + "</td></tr>")
-        $(this).attr("src", "img/Continue1.png");
-    });
-    $("[src*=Continue1]").live("click", function () {
-        $(this).attr("src", "img/PLUS.jpg");
-        $(this).closest("tr").next().remove();
-    });
-
-</script>
-
-
-
-
-       <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript">
-        Sys.Application.add_load(LoadHandler);
-        function LoadHandler() {
+        function initPurchaseDetailPage() {
+            if (typeof $ === 'undefined') {
+                return;
+            }
+
             $('.form_date').datepicker({
                 format: 'dd/mm/yyyy',
-            }).on('changeDate', function (ev) {
+                autoclose: true,
+                todayHighlight: true
+            }).on('changeDate', function () {
                 $(this).datepicker('hide');
             });
-        }
-     </script>
-     <%--  <script type="text/javascript">
-           $('.form_date').datepicker({
-               format: 'dd/mm/yyyy',
-           }).on('changeDate', function (ev) {
-               $(this).datepicker('hide');
-           });
-     </script>
-       <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-    <script type="text/javascript">
-        Sys.Application.add_load(LoadHandler);
-        function LoadHandler() {
-            $('.form_date').datepicker({
-                format: 'dd/mm/yyyy',
-            }).on('changeDate', function (ev) {
-                $(this).datepicker('hide');
+
+            $(document).off('click.purchaseExpand').on('click.purchaseExpand', '.js-purchase-expand[src*="PLUS"]', function () {
+                var $btn = $(this);
+                var $row = $btn.closest('tr');
+                var childHtml = $btn.next().html();
+
+                if ($row.next().hasClass('purchase-child-row')) {
+                    return;
+                }
+
+                $row.after('<tr class="purchase-child-row"><td colspan="12">' + childHtml + '</td></tr>');
+                $btn.attr('src', 'img/Continue1.png');
+            });
+
+            $(document).off('click.purchaseCollapse').on('click.purchaseCollapse', '.js-purchase-expand[src*="Continue1"]', function () {
+                var $btn = $(this);
+                $btn.closest('tr').next('.purchase-child-row').remove();
+                $btn.attr('src', 'img/PLUS.jpg');
             });
         }
-     </script>--%>
+
+        if (window.Sys && Sys.Application) {
+            Sys.Application.add_load(initPurchaseDetailPage);
+        } else {
+            document.addEventListener('DOMContentLoaded', initPurchaseDetailPage);
+        }
+    </script>
 </asp:Content>
-

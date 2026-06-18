@@ -45,7 +45,7 @@
           <tr>
 
 
-              <td style="width:50%"><img src="../user/img/logo.png" alt="" style="height: 40%; width: 40%; display: inline-block; float:left;"/></td>
+              <td style="width:50%"><span style="display:inline-block;float:left;font-size:1.75rem;font-weight:800;letter-spacing:0.03em;color:#1e293b;">MPremium</span></td>
                <td style="width:50%"><h4>MANIRAYA MARKETING PRIVATE LIMITED</h4>
                     <h6><asp:Literal ID="litCompanyContact" runat="server" /></h6>
                     <b style="text-align: left; margin-right: 50px;"> COMPANY GSTN - 29AARCM8049H1ZQ  </b><br />

@@ -483,7 +483,26 @@ body {
     transition: transform 0.2s ease;
 }
 
-.logo-link:hover .logo {
+.site-brand-text {
+    display: inline-block;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--brand-gold-soft) 0%, var(--brand-gold) 50%, var(--brand-gold-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: transform 0.2s ease;
+}
+
+.site-brand-text.logo {
+    height: auto;
+}
+
+.logo-link:hover .logo,
+.logo-link:hover .site-brand-text {
     transform: scale(1.02);
 }
 
@@ -3189,6 +3208,12 @@ body.cart-open {
     filter: brightness(1.05);
 }
 
+.footer-brand-col .site-brand-text.footer-logo {
+    height: auto;
+    font-size: 1.55rem;
+    filter: none;
+}
+
 .footer-tagline {
     margin: 0.85rem 0 1.1rem;
     max-width: 26rem;
@@ -3231,6 +3256,7 @@ body.cart-open {
 
 .footer-logo-link {
     display: inline-flex;
+    text-decoration: none !important;
 }
 
 .footer-links {
@@ -3716,8 +3742,10 @@ body.cart-open {
         order: 2;
     }
 
-    .logo {
-        height: 40px;
+    .logo,
+    .site-brand-text.logo {
+        height: auto;
+        font-size: 1.45rem;
     }
 
     .header-search-wrap {

@@ -81,7 +81,7 @@ body.franchisee-app {
 
 .admin-sidebar-brand {
     flex-shrink: 0;
-    padding: 7px 20px;
+    padding: 17px 20px;
     border-bottom: 1px solid var(--admin-border);
 }
 
@@ -91,6 +91,7 @@ body.franchisee-app {
     gap: 12px;
     text-decoration: none !important;
     color: var(--admin-text) !important;
+    justify-content: center;
 }
 
 .admin-sidebar-brand img {
@@ -99,11 +100,28 @@ body.franchisee-app {
     object-fit: contain;
 }
 
-.admin-sidebar-brand span {
-    font-size: 1.15rem;
+.admin-sidebar-brand span,
+.admin-sidebar-brand .brand-text-mpremium {
+    font-size: 2.5rem;
     font-weight: 800;
     letter-spacing: 0.03em;
     color: var(--admin-accent);
+}
+
+.brand-text-mpremium {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--admin-accent, #0d9488);
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.invoice-brand-text {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    color: #1e293b;
 }
 
 .admin-sidebar-user {
