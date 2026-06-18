@@ -1,4 +1,4 @@
-﻿using BusinessLogicTier;
+using BusinessLogicTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -74,18 +74,18 @@ public partial class VideosAdd : System.Web.UI.Page
                     txttitle.Text = "";
                     txtdescripition.Text = "";
                     txtvideourl.Text = "";
-                    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
                 }
                 else
                     if (res == "f")
                     {
                         string popupScript = "alert('Product Already Exists');";
-                        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
                     }
                     else
                     {
                         string popupScript = "alert('Unknow error occurred');";
-                        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
                     }
 
                 }
@@ -129,15 +129,66 @@ public partial class VideosAdd : System.Web.UI.Page
         DataTable dt = objState.GetVideos(objState);
         if (dt != null && dt.Rows.Count > 0)
         {
-            txttitle.Text = dt.Rows[0]["title"].ToString();
-            txtvideourl.Text = dt.Rows[0]["VideoUrl"].ToString();
-            txtdescripition.Text = dt.Rows[0]["Description"].ToString();
-            btnSubmit.Text = "Update";
+            txtEdittitle.Text = dt.Rows[0]["title"].ToString();
+            txtEditvideourl.Text = dt.Rows[0]["VideoUrl"].ToString();
+            txtEditdescripition.Text = dt.Rows[0]["Description"].ToString();
             ViewState["PID"] = id;
+            string debugMsg = "showAdminModal('myModal');";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), debugMsg, true);
         }
         else
         {
             Message.Show("Some Error Occurrred");
+        }
+    }
+
+    protected void btnUpdate_Click(object sender, EventArgs e)
+    {
+        if (txtEdittitle.Text != "")
+        {
+            if (txtEditdescripition.Text != "")
+            {
+                if(txtEditvideourl.Text != "")
+                {
+                    objState.CategoryId = ViewState["PID"].ToString();
+                    objState.ProductImage = txtEditvideourl.Text;
+                    objState.Description = txtEditdescripition.Text;
+                    objState.ProductName = txtEdittitle.Text;
+                    objState.Status = "1";
+                    string res = objState.Insert_Videos(objState, "Update");
+                    if (res == "t")
+                    {
+                        loadVideo();
+                        string popupScript = "closeAdminModal('myModal'); alert('Video Updated Successfully');";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                    }
+                    else if (res == "f")
+                    {
+                        string popupScript = "alert('Product Already Exists'); showAdminModal('myModal');";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                    }
+                    else
+                    {
+                        string popupScript = "alert('Unknown error occurred'); showAdminModal('myModal');";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                    }
+                }
+                else
+                {
+                    Message.Show("Enter Video Url");
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "reopen", "showAdminModal('myModal');", true);
+                }
+            }
+            else
+            {
+                Message.Show("Enter Description");
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "reopen", "showAdminModal('myModal');", true);
+            }
+        }
+        else
+        {
+            Message.Show("Enter title");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "reopen", "showAdminModal('myModal');", true);
         }
     }
 

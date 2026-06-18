@@ -20,6 +20,7 @@ public partial class user_Incomestatement : System.Web.UI.Page
         {
             if (!IsPostBack)
             {
+                SiteContactHelper.BindIncomeStatementContact(litIncomeContact);
                 txtFromDate.Attributes.Add("readonly", "true");
                 txtToDate.Attributes.Add("readonly", "true");
                 txtFromDate.Text = DateTime.Now.ToString("dd/MMM/yyyy");

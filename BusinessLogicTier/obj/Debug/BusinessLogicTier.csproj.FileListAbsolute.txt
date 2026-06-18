@@ -700,4 +700,6 @@ c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Debug\DataTier.pdb
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.pdb
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Debug\Newtonsoft.Json.dll
-c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csprojResolveAssemblyReference.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csproj.AssemblyReference.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csproj.CoreCompileInputs.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\Business.2FDD14DE.Up2Date

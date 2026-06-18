@@ -57,7 +57,7 @@
         <div class="header" style="text-align:center;">
             <h1>MANIRAYA MARKETING PRIVATE LIMITED</h1>
             <p>ADDRESS: #33 1st floor MANIRAYA marketing pvt ltd 9th A cross HIG A sector yelahanka new town Bangalore Karnataka 560064</p>
-            <p>Ph: 8884448586, E-Mail: growmaniraya@gmail.com</p>
+            <p><asp:Literal ID="litIncomeContact" runat="server" /></p>
         </div>
 
         <table class="incomedetails">

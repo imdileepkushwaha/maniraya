@@ -217,7 +217,7 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
 
     public DataTable getFranchiseeStock(clsvendor objstate)
     {
-        string str_query = "  SELECT  fd.userid,fd.Username,pm.ProductId,pm.ProductName,pm.BV AS BV,pm.DP AS DP,isnull(sum(fm.CRQuantity),0) Recieve,isnull(sum(fm.DrQuantity),0) Sales,(isnull(sum(fm.CRQuantity),0)-isnull(sum(fm.DrQuantity),0)) AS stockleft, (BV * (isnull(sum(fm.CRQuantity),0)-isnull(sum(fm.DrQuantity),0))) AS BVLEFT, (DP *(isnull(sum(fm.CRQuantity),0)-isnull(sum(fm.DrQuantity),0)) ) AS DPLEFT FROM FranchiseeStockMaster fm JOIN ProductMaster pm ON fm.ProductID=pm.ProductId JOIN franchiseedetail fd ON fm.FranchiseeID=fd.userid where 1=1";
+        string str_query = "SELECT  fd.userid,fd.Username,pm.ProductId,pm.ProductName,SP.SubProductID,(C.ColorName+'|'+SZ.SizeName) Subproductname,isnull(sum(fm.CRQuantity),0) Recieve,isnull(sum(fm.DrQuantity),0) Sales,(isnull(sum(fm.CRQuantity),0)-isnull(sum(fm.DrQuantity),0)) AS stockleft FROM FranchiseeStockMaster fm JOIN ProductMaster pm ON fm.ProductID=pm.ProductId JOIN SubProductMaster SP on SP.SubProductID=fm.SubproductId JOIN colormaster C ON SP.ColorId=C.ID JOIN  SizeMaster SZ ON SP.SizeID=SZ.ID JOIN franchiseedetail fd ON fm.FranchiseeID=fd.userid where 1=1";
         if (objstate.VendorId != string.Empty)
         {
             str_query += " and fd.userid='" + objstate.VendorId + "'";
@@ -236,7 +236,7 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
             str_query += " and isnull(fm.Isdistributer,0)='" + 1 + "'";
 
         }
-        str_query += " GROUP BY fd.userid,fd.Username,pm.ProductId,pm.ProductName,pm.BV,pm.DP  order BY pm.ProductId";
+        str_query += " GROUP BY fd.userid,fd.Username,pm.ProductId,pm.ProductName,SP.SubProductID,(C.ColorName+'|'+SZ.SizeName)  order BY pm.ProductId";
         DataTable dt = null;
 
         ObjData.StartConnection();
@@ -255,23 +255,23 @@ public partial class FranchiseeStockDetail : System.Web.UI.Page
     {
         if (e.Row.RowType == DataControlRowType.Footer && StockData != null)
         {
-            decimal totalBv = 0;
-            decimal totalDp = 0;
+            //decimal totalBv = 0;
+            //decimal totalDp = 0;
 
-            foreach (DataRow row in StockData.Rows)
-            {
-                if (row["BVLEFT"] != DBNull.Value)
-                {
-                    totalBv += Convert.ToDecimal(row["BVLEFT"]);
-                }
-                if (row["DPLEFT"] != DBNull.Value)
-                {
-                    totalDp += Convert.ToDecimal(row["DPLEFT"]);
-                }
-            }
+            //foreach (DataRow row in StockData.Rows)
+            //{
+            //    if (row["BVLEFT"] != DBNull.Value)
+            //    {
+            //        totalBv += Convert.ToDecimal(row["BVLEFT"]);
+            //    }
+            //    if (row["DPLEFT"] != DBNull.Value)
+            //    {
+            //        totalDp += Convert.ToDecimal(row["DPLEFT"]);
+            //    }
+            //}
 
-            e.Row.Cells[5].Text = String.Format("{0:N0}", totalBv);
-            e.Row.Cells[6].Text = String.Format("{0:N0}", totalDp);
+            //e.Row.Cells[5].Text = String.Format("{0:N0}", totalBv);
+            //e.Row.Cells[6].Text = String.Format("{0:N0}", totalDp);
         }
     }
 }

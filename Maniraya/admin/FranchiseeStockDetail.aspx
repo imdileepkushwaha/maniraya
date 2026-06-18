@@ -42,7 +42,7 @@
            
               <div class="box-body">
             
-                   <div class="row">
+                   <div class="row" style="display:none;">
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <asp:RadioButton ID="RDBtnTRecharge" runat="server" Text="Stock by Customer Price" GroupName="A"  />
@@ -120,6 +120,16 @@
                                             <asp:Label ID="lbluseridEmailId" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
+                                                                      <asp:TemplateField HeaderText="SubProduct Id">
+    <ItemTemplate>
+        <asp:Label ID="lblSubproductname" runat="server" Text='<%#Eval("SubProductID") %>'></asp:Label>
+    </ItemTemplate>
+</asp:TemplateField>
+ <asp:TemplateField HeaderText="SubProduct name">
+    <ItemTemplate>
+        <asp:Label ID="lblSubproductname" runat="server" Text='<%#Eval("Subproductname") %>'></asp:Label>
+    </ItemTemplate>
+       </asp:TemplateField>
                                     <%-- <asp:TemplateField HeaderText="BV">
                                         <ItemTemplate>
                                             <asp:Label ID="lbluseridContactNo" runat="server" Text='<%#Eval("BV") %>'></asp:Label>
@@ -130,14 +140,14 @@
                                             <asp:Label ID="lbluseridContactNo" runat="server" Text='<%#Eval("DP") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>--%>
-                                      <asp:TemplateField HeaderText="Stock Left">
+                                      <asp:TemplateField HeaderText="Stock Recieve">
                                         <ItemTemplate>
-                                            <asp:Label ID="lblStockNo" runat="server" Text='<%#Eval("StockLeft") %>'></asp:Label>
+                                            <asp:Label ID="lblStockNo" runat="server" Text='<%#Eval("Recieve") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="BV Left">
+                                    <asp:TemplateField HeaderText="Sales">
                                         <ItemTemplate>
-                                            <asp:Label ID="lblbvleft" runat="server" Text='<%#Eval("BVLEFT") %>'></asp:Label>
+                                            <asp:Label ID="lblbvleft" runat="server" Text='<%#Eval("Sales") %>'></asp:Label>
                                         </ItemTemplate>
                                          
 
@@ -150,9 +160,9 @@
 
 
 
-                                    <asp:TemplateField HeaderText="DP Left">
+                                    <asp:TemplateField HeaderText="Stock">
                                         <ItemTemplate>
-                                            <asp:Label ID="lbldpleft" runat="server" Text='<%#Eval("DPLEFT") %>'></asp:Label>
+                                            <asp:Label ID="lbldpleft" runat="server" Text='<%#Eval("stockleft") %>'></asp:Label>
                                         </ItemTemplate>
                                             <FooterTemplate>
 

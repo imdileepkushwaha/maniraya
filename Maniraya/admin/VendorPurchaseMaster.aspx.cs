@@ -116,7 +116,9 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
 
             DR["ProductId"] = DDLstProduct.SelectedValue;
             DR["ProductName"] = DDLstProduct.SelectedItem.Text;
-            DR["Image"] = TxtImage.Text;
+        DR["SubProductId"] = DDLstSubProduct.SelectedValue;
+        DR["SubProductName"] = DDLstSubProduct.SelectedItem.Text;
+        DR["Image"] = TxtImage.Text;
             DR["Amount"] = TxtPurchasePrice.Text;
             DR["BV"] = TxtPurchaseMRP.Text;
             DR["Quantity"] = TxtPurchaseStock.Text;
@@ -221,6 +223,8 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
                 DR = PurchaseDt.NewRow();               
                 DR["ProductId"] = ((Label)Gr.FindControl("LblProductCodeG")).Text;
                 DR["ProductName"] = ((Label)Gr.FindControl("LblProductNameG")).Text;
+                DR["SubProductId"] = ((Label)Gr.FindControl("LblSubProductCodeG")).Text;
+                DR["SubProductName"] = ((Label)Gr.FindControl("LblSubProductNameG")).Text;
                 DR["Image"] = ((Label)Gr.FindControl("LblProductImageG")).Text;
                 DR["Amount"] = TxtAmount.Text;
                 DR["BV"] = TxtMrp.Text;
@@ -234,6 +238,8 @@ public partial class VendorPurchaseMaster : System.Web.UI.Page
                 DR = PurchaseDt.NewRow();             
                 DR["ProductId"] = ((Label)Gr.FindControl("LblProductCodeG")).Text;
                 DR["ProductName"] = ((Label)Gr.FindControl("LblProductNameG")).Text;
+                DR["SubProductId"] = ((Label)Gr.FindControl("LblSubProductCodeG")).Text;
+                DR["SubProductName"] = ((Label)Gr.FindControl("LblSubProductNameG")).Text;
                 DR["Image"] = ((Label)Gr.FindControl("LblProductImageG")).Text;
                 DR["Amount"] = ((Label)Gr.FindControl("LblProductAmountG")).Text;
                 DR["BV"] = ((Label)Gr.FindControl("LblBv")).Text;

@@ -39,7 +39,7 @@
 		<%--<link href="../sarah/assets/css/layout.css" rel="stylesheet" type="text/css" />--%>
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=60" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=62" />
     <link rel="stylesheet" href="assets/css/admin-theme.css?v=2" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -108,7 +108,10 @@
                                 <button type="button" class="admin-side-toggle"><i class="fa fa-globe admin-side-icon"></i> Website Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
                                 <ul class="admin-side-submenu">
                                     <li><a href="AddSlider.aspx">Add Slider</a></li>
-                                    <li><a href="AddGalleryImage.aspx">Add Gallery Image</a></li>
+                                    <li><a href="AddGalleryImage.aspx">Add Image Gallery</a></li>
+                                    <li><a href="VideosAdd.aspx">Add Video Gallery</a></li>
+                                    <li><a href="FAQAdd.aspx">Add FAQ</a></li>
+                                    <li><a href="ContactAdd.aspx">Contact Settings</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
@@ -126,6 +129,7 @@
                                     <li><a href="VendorMaster.aspx">Vendor Master</a></li>
                                     <li><a href="VendorPurchaseMaster.aspx">Stock Purchase</a></li>
                                     <li><a href="VendorPurchaseDetail.aspx">Purchase Details</a></li>
+                                    <li><a href="MetalPriceMaster.aspx">Add Commodities Price</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
@@ -268,7 +272,7 @@
                     <div class="pull-right hidden-xs">
                         <b><%= clsUtility.ProjectName %></b> 2.4.0
                     </div>
-                    <strong>Copyright &copy; <%= clsUtility.Session %><a href="#"><%= clsUtility.ProjectName %></a>.</strong> All rights reserved.
+                    <strong>Copyright &copy; <%= clsUtility.Session %> <a href="#"><%= clsUtility.ProjectName %></a>.</strong> All rights reserved.
                 </footer>
             </div>
         </div>

@@ -16,27 +16,27 @@
 /* Scrollbar width */
 ::-webkit-scrollbar {
     width: 5px;
-  }
-  
-  /* Track (background) */
-  ::-webkit-scrollbar-track {
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
     background: #f1f1f1;
-  }
-  
-  /* Thumb (scroll handle) */
-  ::-webkit-scrollbar-thumb {
+}
+
+/* Thumb (scroll handle) */
+::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 5px;
-  }
-  
-  /* Hover effect */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+}
 
-  .box{
-    padding: 0px!important;
-  }
+/* Hover effect */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.box {
+    padding: 0px !important;
+}
 
 html,
 body.admin-app {
@@ -2729,7 +2729,7 @@ body.admin-app .modal {
     opacity: 1 !important;
 }
 
-body.admin-app > .modal.in .modal-dialog,
+body.admin-app>.modal.in .modal-dialog,
 body.admin-app .modal.in .modal-dialog {
     position: relative;
     z-index: 1;
@@ -2849,7 +2849,6 @@ body.admin-app .modal-dialog.modal-lg {
 .admin-app .modal-body .form-control {
     min-height: 42px;
     padding: 8px 14px !important;
-    font-size: 0.9rem;
     border: 1px solid #dfe3ea !important;
     border-radius: 10px !important;
     box-shadow: none !important;
@@ -4769,7 +4768,7 @@ body.admin-app .modal.in.admin-modal-scrollable {
     background: transparent;
 }
 
-.admin-plan-package-table > thead > tr > th {
+.admin-plan-package-table>thead>tr>th {
     background: #f8fafc;
     border-top: 0 !important;
     border-color: #e8edf3 !important;
@@ -4780,13 +4779,13 @@ body.admin-app .modal.in.admin-modal-scrollable {
     letter-spacing: 0.03em;
 }
 
-.admin-plan-package-table > tbody > tr > td {
+.admin-plan-package-table>tbody>tr>td {
     border-color: #e8edf3 !important;
     vertical-align: middle !important;
     background: #fff;
 }
 
-.admin-plan-package-table > tbody > tr:last-child > td {
+.admin-plan-package-table>tbody>tr:last-child>td {
     border-bottom: 0 !important;
 }
 
@@ -5385,5 +5384,142 @@ body.admin-app .modal.in.admin-modal-scrollable {
 @media (max-width: 575px) {
     .admin-purchase-summary-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Videos add — edit & delete modals */
+.admin-video-edit-dialog .modal-dialog {
+    max-width: 640px;
+    width: calc(100% - 24px);
+    margin: 30px auto;
+}
+
+.admin-video-edit-dialog .modal-body {
+    padding: 16px 20px 12px !important;
+}
+
+.admin-video-form .admin-modal-form-intro {
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-video-form .admin-modal-form-intro--visible {
+    display: block;
+}
+
+.admin-delete-confirm-dialog .modal-dialog {
+    max-width: 400px;
+    width: calc(100% - 24px);
+    margin: 12vh auto 30px;
+}
+
+.admin-app .admin-delete-confirm-dialog {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.admin-delete-confirm-dialog .modal-content {
+    overflow: hidden;
+}
+
+.admin-delete-confirm-dialog .modal-header {
+    display: none;
+}
+
+.admin-app .admin-delete-confirm-body {
+    padding: 28px 24px 18px !important;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.admin-delete-confirm-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    color: #dc2626;
+    background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+    border: 1px solid #fecaca;
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.1);
+}
+
+.admin-app .admin-delete-confirm-dialog .admin-delete-confirm-title {
+    margin: 0 0 10px;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #0f172a !important;
+}
+
+.admin-app .admin-delete-confirm-dialog .admin-delete-confirm-text {
+    margin: 0 0 8px;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    color: #475569 !important;
+}
+
+.admin-app .admin-delete-confirm-dialog .admin-delete-confirm-text strong {
+    font-size: 14px !important;
+    color: #0f172a;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.admin-app .admin-delete-confirm-dialog .admin-delete-confirm-note {
+    margin: 0;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+    color: #94a3b8 !important;
+}
+
+.admin-delete-confirm-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px 18px !important;
+    background: #fafbfc !important;
+    border-top: 1px solid #eef2f6 !important;
+}
+
+.admin-app .admin-delete-confirm-footer .btn {
+    min-width: 108px;
+    margin: 0 !important;
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+}
+
+.admin-delete-confirm-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.24);
+}
+
+.admin-delete-confirm-btn:hover,
+.admin-delete-confirm-btn:focus {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #fff !important;
+}
+
+@media (max-width: 575px) {
+    .admin-delete-confirm-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-delete-confirm-footer .btn {
+        width: 100%;
+        min-width: 0;
     }
 }

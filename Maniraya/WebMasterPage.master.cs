@@ -1,9 +1,6 @@
-﻿using BusinessLogicTier;
+using BusinessLogicTier;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -14,9 +11,91 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (!IsPostBack)
+        {
+            BindCategories();
+            BindSiteContacts();
+        }
         loadaddcartitem();
         UpdateBal();
         UpdateAuthHeader();
+    }
+
+    private void BindCategories()
+    {
+        try
+        {
+            DataTable dt = CatalogHelper.BuildDisplayCategories();
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                return;
+            }
+
+            if (!dt.Columns.Contains("CategoryId") && dt.Columns.Contains("CategoryID"))
+            {
+                dt.Columns["CategoryID"].ColumnName = "CategoryId";
+            }
+            else if (!dt.Columns.Contains("CategoryId") && dt.Columns.Contains("Categoryid"))
+            {
+                dt.Columns["Categoryid"].ColumnName = "CategoryId";
+            }
+
+            rptShopCategories.DataSource = dt;
+            rptShopCategories.DataBind();
+
+            if (rptFooterCategories != null)
+            {
+                rptFooterCategories.DataSource = dt;
+                rptFooterCategories.DataBind();
+            }
+
+            if (ddlHeaderCategory != null)
+            {
+                ddlHeaderCategory.Items.Clear();
+                ddlHeaderCategory.DataSource = dt;
+                ddlHeaderCategory.DataTextField = "CategoryName";
+                ddlHeaderCategory.DataValueField = "CategoryId";
+                ddlHeaderCategory.DataBind();
+                ddlHeaderCategory.Items.Insert(0, new ListItem("All categories", "0"));
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void BindSiteContacts()
+    {
+        try
+        {
+            string phone = SiteContactHelper.GetPrimaryPhone();
+            string email = SiteContactHelper.GetPrimaryEmail();
+
+            if (lnkHeaderPhone != null)
+            {
+                lnkHeaderPhone.HRef = SiteContactHelper.BuildTelHref(phone);
+            }
+
+            if (lblHeaderPhone != null)
+            {
+                lblHeaderPhone.InnerText = phone;
+            }
+
+            if (lnkFooterPhone != null)
+            {
+                lnkFooterPhone.HRef = SiteContactHelper.BuildTelHref(phone);
+                lnkFooterPhone.InnerText = phone;
+            }
+
+            if (lnkFooterEmail != null)
+            {
+                lnkFooterEmail.HRef = SiteContactHelper.BuildMailtoHref(email);
+                lnkFooterEmail.InnerText = email;
+            }
+        }
+        catch
+        {
+        }
     }
 
     void UpdateAuthHeader()
@@ -65,16 +144,11 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
             DataTable Dt = objState.getCartItems(objState);
             if (Dt != null && Dt.Rows.Count > 0)
             {
-
-
                 cartCount.Text = Dt.Rows.Count.ToString();
-
-               
             }
-        }     
-
-
+        }
     }
+
     public void UpdateBal()
     {
         DataTable dt = new DataTable();
@@ -87,9 +161,8 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
                 lblwallet.Text = "Wallet: " + Math.Round(Convert.ToDecimal(dt.Rows[0]["balanceamount"].ToString()), 2).ToString();
             }
         }
-       
-       
     }
+
     protected void BtnMyaccount_Click(object sender, EventArgs e)
     {
         if (Session["userid"] != null)
@@ -100,7 +173,6 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
         {
             Session["returnUrl"] = "user/dashboard.aspx";
             Response.Redirect("login.aspx");
-
         }
     }
 }

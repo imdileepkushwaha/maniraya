@@ -500,6 +500,27 @@ namespace BusinessLogicTier
   
 }
 
+  public DataTable getStockSubproductwise(clsvendor objV)
+  {
+      string str_query = "SELECT S.ProductID,P.ProductName,SP.SubProductID,(C.ColorName+'|'+SZ.SizeName) Subproductname,isnull(Sum(S.CrQuantity),0)  as Cr,isnull(Sum(S.DrQuantity),0) as Dr,isnull(Sum(S.CrQuantity),0) -isnull(Sum(S.DrQuantity),0) as Stock FROM StockMaster S inner JOIN Productmaster P ON S.ProductID=P.ProductId JOIN SubProductMaster SP on SP.SubProductID=S.SubproductId JOIN colormaster C ON SP.ColorId=C.ID JOIN  SizeMaster SZ ON SP.SizeID=SZ.ID where 1=1 ";
+      if (objV.ProductId != string.Empty)
+      {
+          str_query += " and S.ProductID='" + objV.ProductId + "'";
+      }
+      str_query += " GROUP BY S.ProductID,P.ProductName,SP.SubProductID,(C.ColorName+'|'+SZ.SizeName)";
+      DataTable dt = null;
+      ObjData.StartConnection();
+      try
+      {
+          dt = ObjData.RunDataTable(str_query);
+      }
+      catch (Exception ex)
+      {
+          dt = null;
+      }
+      ObjData.EndConnection();
+      return dt;
+  }
 
 //replace the function
 

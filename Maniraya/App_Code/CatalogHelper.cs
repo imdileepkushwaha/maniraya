@@ -19,9 +19,16 @@ public static class CatalogHelper
             return dt;
         }
 
-        if (!dt.Columns.Contains("CategoryId") && dt.Columns.Contains("CategoryID"))
+        if (!dt.Columns.Contains("CategoryId"))
         {
-            dt.Columns["CategoryID"].ColumnName = "CategoryId";
+            if (dt.Columns.Contains("CategoryID"))
+            {
+                dt.Columns["CategoryID"].ColumnName = "CategoryId";
+            }
+            else if (dt.Columns.Contains("Categoryid"))
+            {
+                dt.Columns["Categoryid"].ColumnName = "CategoryId";
+            }
         }
 
         if (!dt.Columns.Contains("Image"))

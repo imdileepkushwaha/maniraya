@@ -59,7 +59,7 @@ public partial class StockReport : System.Web.UI.Page
             objV.ProductId = DDLstProduct.SelectedValue;
         }
         DataTable dt = new DataTable();
-        dt = objV.getStock(objV);
+        dt = objV.getStockSubproductwise(objV);
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
