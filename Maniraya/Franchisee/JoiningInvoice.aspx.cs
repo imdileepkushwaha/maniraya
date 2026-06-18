@@ -12,6 +12,7 @@ public partial class MehndilinkInvoice : System.Web.UI.Page
     Data ObjData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
+        SiteContactHelper.BindInvoiceCompanyInfo(litCompanyContact);
         //if (Session["userid"] != null)
         //{
         //    if (!IsPostBack)

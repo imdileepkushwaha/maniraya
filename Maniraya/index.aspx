@@ -406,7 +406,7 @@
 
                             <div class="about-actions">
                                 <a href="#products" class="btn-primary about-shop-btn">Start Shopping</a>
-                                <a href="mailto:info@mpremium.in" class="btn-hero-outline about-outline-btn">Contact
+                                <a id="lnkAboutContact" runat="server" href="mailto:info@mpremium.in" class="btn-hero-outline about-outline-btn">Contact
                                     Us</a>
                             </div>
                         </div>
@@ -480,7 +480,7 @@
             </div>
         </section>
 
-        <a href="https://wa.me/918884448586?text=Hi%20Maniraya%2C%20I%20need%20help" class="whatsapp-float"
+        <a id="lnkWhatsAppFloat" runat="server" href="https://wa.me/918884448586" class="whatsapp-float"
             target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" title="Chat on WhatsApp">
             <span class="whatsapp-float-pulse" aria-hidden="true"></span>
             <svg class="whatsapp-float-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

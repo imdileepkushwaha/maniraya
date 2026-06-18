@@ -92,6 +92,16 @@
                                             <asp:Label ID="lbluserid1" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="SubProduct Id">
+     <ItemTemplate>
+         <asp:Label ID="lblSubproductname" runat="server" Text='<%#Eval("SubProductID") %>'></asp:Label>
+     </ItemTemplate>
+ </asp:TemplateField>
+  <asp:TemplateField HeaderText="SubProduct name">
+     <ItemTemplate>
+         <asp:Label ID="lblSubproductname" runat="server" Text='<%#Eval("Subproductname") %>'></asp:Label>
+     </ItemTemplate>
+ </asp:TemplateField>
                                      <asp:TemplateField HeaderText="Recieve">
                                         <ItemTemplate>
                                             <asp:Label ID="lbluserid2" runat="server" Text='<%#Eval("Cr") %>'></asp:Label>

@@ -47,8 +47,7 @@
 
               <td style="width:50%"><img src="../user/img/logo.png" alt="" style="height: 40%; width: 40%; display: inline-block; float:left;"/></td>
                <td style="width:50%"><h4>MANIRAYA MARKETING PRIVATE LIMITED</h4>
-                    <h6>HEAD OFFICE - #33 1st floor MANIRAYA marketing pvt ltd 9th A cross HIG A sector yelahanka new town Bangalore Karnataka 560064, INDIA<br>
-CONTACT – +91 8884448586 <br>EMAIL- Customer@maniraya.com <br>WEBSITE – maniraya.com</h6>
+                    <h6><asp:Literal ID="litCompanyContact" runat="server" /></h6>
                     <b style="text-align: left; margin-right: 50px;"> COMPANY GSTN - 29AARCM8049H1ZQ  </b><br />
        <%--<b style="text-align: right;"> COMPANY CIN - U73100UP2024PTC195130 </b>--%>
 	   </td> 

@@ -1,29 +1,50 @@
 using System;
 using System.Web.UI;
 
-public partial class Contact : System.Web.UI.Page
+public partial class Contact : Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        if (!IsPostBack)
+        {
+            BindContactInfo();
+        }
     }
 
-    protected void btnSubmit_Click(object sender, EventArgs e)
+    private void BindContactInfo()
     {
-        if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtEmail.Text) || string.IsNullOrWhiteSpace(txtMessage.Text))
+        string phone = SiteContactHelper.GetPrimaryPhone();
+        string email = SiteContactHelper.GetPrimaryEmail();
+        string address = SiteContactHelper.GetPrimaryAddress();
+
+        if (lnkContactPhone != null)
         {
-            ScriptManager.RegisterStartupScript(this, GetType(), "msg", "alert('Please fill out all required fields.');", true);
-            return;
+            lnkContactPhone.HRef = SiteContactHelper.BuildTelHref(phone);
         }
 
-        // Add email sending logic or database save logic here
-        
-        ScriptManager.RegisterStartupScript(this, GetType(), "msg", "alert('Thank you for contacting us. We will get back to you shortly!');", true);
-        
-        // Clear form
-        txtName.Text = "";
-        txtEmail.Text = "";
-        txtSubject.Text = "";
-        txtMessage.Text = "";
+        if (lblContactPhone != null)
+        {
+            lblContactPhone.InnerText = phone;
+        }
+
+        if (lnkContactEmail != null)
+        {
+            lnkContactEmail.HRef = SiteContactHelper.BuildMailtoHref(email);
+        }
+
+        if (lblContactEmail != null)
+        {
+            lblContactEmail.InnerText = email;
+        }
+
+        if (lblContactAddress != null)
+        {
+            lblContactAddress.InnerText = address;
+        }
+
+        if (lnkContactWhatsApp != null)
+        {
+            lnkContactWhatsApp.HRef = SiteContactHelper.BuildWhatsAppHref(phone, "Hi Maniraya, I need help");
+        }
     }
 }

@@ -11,6 +11,23 @@ public partial class index : System.Web.UI.Page
         {
             loadCategory();
             loadProduct(1);
+            BindSiteContacts();
+        }
+    }
+
+    void BindSiteContacts()
+    {
+        string phone = SiteContactHelper.GetPrimaryPhone();
+        string email = SiteContactHelper.GetPrimaryEmail();
+
+        if (lnkAboutContact != null)
+        {
+            lnkAboutContact.HRef = SiteContactHelper.BuildMailtoHref(email);
+        }
+
+        if (lnkWhatsAppFloat != null)
+        {
+            lnkWhatsAppFloat.HRef = SiteContactHelper.BuildWhatsAppHref(phone, "Hi Maniraya, I need help");
         }
     }
 

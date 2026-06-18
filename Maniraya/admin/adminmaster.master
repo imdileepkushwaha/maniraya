@@ -111,6 +111,7 @@
                                     <li><a href="AddGalleryImage.aspx">Add Image Gallery</a></li>
                                     <li><a href="VideosAdd.aspx">Add Video Gallery</a></li>
                                     <li><a href="FAQAdd.aspx">Add FAQ</a></li>
+                                    <li><a href="ContactAdd.aspx">Contact Settings</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
@@ -128,6 +129,7 @@
                                     <li><a href="VendorMaster.aspx">Vendor Master</a></li>
                                     <li><a href="VendorPurchaseMaster.aspx">Stock Purchase</a></li>
                                     <li><a href="VendorPurchaseDetail.aspx">Purchase Details</a></li>
+                                    <li><a href="MetalPriceMaster.aspx">Add Commodities Price</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">

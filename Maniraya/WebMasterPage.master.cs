@@ -14,6 +14,7 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
         if (!IsPostBack)
         {
             BindCategories();
+            BindSiteContacts();
         }
         loadaddcartitem();
         UpdateBal();
@@ -56,6 +57,40 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
                 ddlHeaderCategory.DataValueField = "CategoryId";
                 ddlHeaderCategory.DataBind();
                 ddlHeaderCategory.Items.Insert(0, new ListItem("All categories", "0"));
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void BindSiteContacts()
+    {
+        try
+        {
+            string phone = SiteContactHelper.GetPrimaryPhone();
+            string email = SiteContactHelper.GetPrimaryEmail();
+
+            if (lnkHeaderPhone != null)
+            {
+                lnkHeaderPhone.HRef = SiteContactHelper.BuildTelHref(phone);
+            }
+
+            if (lblHeaderPhone != null)
+            {
+                lblHeaderPhone.InnerText = phone;
+            }
+
+            if (lnkFooterPhone != null)
+            {
+                lnkFooterPhone.HRef = SiteContactHelper.BuildTelHref(phone);
+                lnkFooterPhone.InnerText = phone;
+            }
+
+            if (lnkFooterEmail != null)
+            {
+                lnkFooterEmail.HRef = SiteContactHelper.BuildMailtoHref(email);
+                lnkFooterEmail.InnerText = email;
             }
         }
         catch

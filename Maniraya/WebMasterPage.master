@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
  
-  <link rel="stylesheet" href="myassets/assets/css/style.css?v=42" />
+  <link rel="stylesheet" href="myassets/assets/css/style.css?v=44" />
   <link rel="stylesheet" href="myassets/assets/css/maniraya-loader.css?v=1" />
     <asp:ContentPlaceHolder id="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -111,7 +111,7 @@
         </div>
 
         <div class="header-right-tools">
-            <a href="tel:+91973768944" class="header-call">
+            <a id="lnkHeaderPhone" runat="server" href="tel:+918884448586" class="header-call">
                 <span class="phone-icon">
                     <svg
                         width="24"
@@ -136,7 +136,7 @@
                 </span>
                 <div class="header-call-text">
                     <small>24/7 Support</small>
-                    <p>+91 888 444 8586</p>
+                    <p id="lblHeaderPhone" runat="server">+91 888 444 8586</p>
                 </div>
             </a>
 
@@ -329,13 +329,13 @@
                            <span class="footer-icon" aria-hidden="true">
                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.6 3H8.4L9.2 7.8L7.6 8.8C8.5 11.1 9.9 13.5 12.2 15.8L13.2 14.2L18 15V16.8C18 17.5 17.5 18 16.8 18.1C10.1 18.8 5.2 13.9 5.9 7.2C6 6.5 6.5 6 6.6 3Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                            </span>
-                           <a href="tel:+918884448586">+91 888 444 8586</a>
+                           <a id="lnkFooterPhone" runat="server" href="tel:+918884448586">+91 888 444 8586</a>
                        </li>
                        <li>
                            <span class="footer-icon" aria-hidden="true">
                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6H20V18H4V6ZM4 8L12 13L20 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                            </span>
-                           <a href="mailto:info@mpremium.in">info@mpremium.in</a>
+                           <a id="lnkFooterEmail" runat="server" href="mailto:info@mpremium.in">info@mpremium.in</a>
                        </li>
                    </ul>
                    <div class="footer-social">

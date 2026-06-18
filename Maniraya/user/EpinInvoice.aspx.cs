@@ -12,6 +12,8 @@ public partial class user_EpinInvoice : System.Web.UI.Page
     Data ObjData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
+        SiteContactHelper.BindInvoiceCompanyInfo(litCompanyContact);
+        SiteContactHelper.BindSupportContactLine(litSupportContact);
         //if (Session["userid"] != null)
         //{
         //    if (!IsPostBack)
