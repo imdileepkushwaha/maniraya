@@ -386,10 +386,12 @@
     border: 1px solid #e2e8f0;
 }
 
-.downline-team-panel .team-table-wrap {
+.downline-team-panel .team-table-wrap,
+body.main-body.app .box.box-primary .downline-team-panel .team-table-wrap,
+.content-wrapper .box.box-primary .downline-team-panel .team-table-wrap {
     border-color: #e2e8f0;
-    max-height: min(420px, 55vh);
-    overflow: auto;
+    max-height: min(420px, 55vh) !important;
+    overflow: auto !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;

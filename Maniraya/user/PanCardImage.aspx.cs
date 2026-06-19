@@ -40,7 +40,7 @@ public partial class user_PanCardImage : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
 

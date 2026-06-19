@@ -949,7 +949,7 @@ namespace BusinessLogicTier
 
         public DataTable getCartItems(clsProduct objstate)
         {
-            string str_query = "SELECT s.SubProductID, ct.Id,ct.Franchiseeid,ct.Userid,ct.Productid,ct.subproductid,ct.Amount,ct.MRP,ct.PurchaseAmount,ct.CGST,ct.SGST,ct.IGST,ct.IGSTper,ct.CGSTper,ct.SGSTper,ct.TotalAmount,ct.Quantity,cl.ColorName,sz.SizeName,p.ProductName,p.DP,p.GST,p.BV,p.BV*ct.Quantity TOTALBV,p.DP*ct.Quantity TOTALDP,5 stock FROM CartItems ct JOIN productmaster p ON ct.Productid=p.ProductId JOIN subproductmaster s ON ct.SubProductid=s.SubProductID JOIN colormaster cl ON s.ColorId=cl.ID JOIN SizeMaster sz ON s.SizeID=sz.ID WHERE UserId='" + objstate.UserId + "'";
+            string str_query = "SELECT s.SubProductID, ct.Id,ct.Franchiseeid,ct.Userid,ct.Productid,ct.subproductid,ct.Amount,ct.MRP,ct.PurchaseAmount,ct.CGST,ct.SGST,ct.IGST,ct.IGSTper,ct.CGSTper,ct.SGSTper,ct.TotalAmount,ct.Quantity,cl.ColorName,sz.SizeName,p.ProductName,p.DP,p.GST,p.BV,p.BV*ct.Quantity TOTALBV,p.DP*ct.Quantity TOTALDP,p.productimage AS ProductImage,5 stock FROM CartItems ct JOIN productmaster p ON ct.Productid=p.ProductId JOIN subproductmaster s ON ct.SubProductid=s.SubProductID JOIN colormaster cl ON s.ColorId=cl.ID JOIN SizeMaster sz ON s.SizeID=sz.ID WHERE UserId='" + objstate.UserId + "'";
 
             DataTable dt = null;
             ObjData.StartConnection();
@@ -1116,10 +1116,12 @@ namespace BusinessLogicTier
                        new SqlParameter("@Cashamount","0"),
                        new SqlParameter("@RestAmount","0"),
                        new SqlParameter("@Plantype","1"),
-                        new SqlParameter("@Onlinetransactionid",objP.TransactionCode),
-                       
                     new SqlParameter("@PurchaseProduct",Dt),
-                       
+                        new SqlParameter("@BankID",objP.tehsilid ?? string.Empty),
+                        new SqlParameter("@Onlinetransactionid",objP.TransactionCode ?? string.Empty),
+                          new SqlParameter("@PaymentMode",objP.PaymentMode ?? "1"),
+                     new SqlParameter("@Img",objP.ProductImage ?? string.Empty),
+                      new SqlParameter("@Isdistributer","0"),
 
                 };
                     DataTable Dtresult = ObjData.RunDataTableProcedureTRans(s2, tr, parameter);

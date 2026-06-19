@@ -28,7 +28,7 @@
             <aside class="admin-sidebar" id="adminSidebar">
                 <div class="admin-sidebar-brand">
                     <a href="Dashboard.aspx">
-                        <img src="../user/img/logo.png" alt="" />
+                        <span class="brand-text-mpremium">MPremium</span>
                     </a>
                 </div>
                 <div class="admin-sidebar-user">

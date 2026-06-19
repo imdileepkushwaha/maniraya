@@ -75,6 +75,15 @@
     filter: brightness(0) invert(1);
 }
 
+.admin-login-brand-text {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #fff;
+    text-align: center;
+    line-height: 1.2;
+}
+
 .admin-login-brand h1 {
     margin: 0;
     /* font-size: 1.65rem; */

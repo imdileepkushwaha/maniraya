@@ -38,7 +38,7 @@ public partial class user_DepositRequstAdd : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     void loadbankaccount()

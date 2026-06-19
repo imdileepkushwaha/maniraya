@@ -53,8 +53,7 @@
             <aside class="admin-sidebar" id="adminSidebar">
                 <div class="admin-sidebar-brand">
                     <a href="Dashboard.aspx">
-                        <img src="../user/img/logo.png" alt="" />
-                        <%--<span><%= clsUtility.ProjectName %></span>--%>
+                        <span class="brand-text-mpremium">MPremium</span>
                     </a>
                 </div>
                 <div class="admin-sidebar-user">
@@ -112,6 +111,7 @@
                                     <li><a href="VideosAdd.aspx">Add Video Gallery</a></li>
                                     <li><a href="FAQAdd.aspx">Add FAQ</a></li>
                                     <li><a href="ContactAdd.aspx">Contact Settings</a></li>
+                                    <li><a href="PopupAdd.aspx">Add Popup</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
@@ -149,6 +149,25 @@
                                     <li><a href="Dailypayoutdetail.aspx">Daily Closing Report</a></li>
                                 </ul>
                             </li>
+
+                             <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-cube admin-side-icon"></i> Saving Product <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="SavingProductAdd.aspx">Add Saving Product</a></li>
+                                    <li><a href="SavingProductAssign.aspx">Assign Saving Product</a></li>
+                                    <li><a href="SavingProductStockAdd.aspx">Add Saving Product Stock</a></li>
+                                </ul>
+                            </li>
+
+                             <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-cube admin-side-icon"></i> Purchase Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="UserRepurchaseReport.aspx">Approve Purchase</a></li>
+                                <li><a href="UserPurchaseDetail.aspx">Purchase Invoice</a></li>
+                                </ul>
+                            </li>
+
+                           
                         </ul>
                     </asp:Panel>
                     <asp:Panel ID="panelsubadmin2" runat="server">

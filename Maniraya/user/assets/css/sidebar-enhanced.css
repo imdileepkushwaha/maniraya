@@ -103,6 +103,33 @@ body.main-body.app .main-sidebar-header::after {
     background: linear-gradient(90deg, var(--sidebar-gold-deep), var(--sidebar-gold), var(--sidebar-gold-soft));
 }
 
+body.main-body.app .brand-text-mpremium.sidebar-brand-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, #f6cf63 0%, #e5a906 50%, #c9920a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 12px rgba(229, 169, 6, 0.25));
+    transition: transform 0.3s ease;
+}
+
+body.main-body.app .sidebar-brand-text--compact {
+    font-size: 1.15rem;
+}
+
+body.main-body.app .mobile-brand-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.04em;
+}
+
+body.main-body.app .main-sidebar-header .desktop-logo:hover .sidebar-brand-text {
+    transform: scale(1.05);
+}
+
 body.main-body.app .main-sidebar-header .desktop-logo img,
 body.main-body.app .main-sidebar-header .logo-icon img {
     /* width: 68px !important;
@@ -556,6 +583,15 @@ body.main-body.app .header-brand-logo {
     height: 38px;
     object-fit: contain;
     filter: drop-shadow(0 2px 8px rgba(229, 169, 6, 0.25));
+}
+
+body.main-body.app span.header-brand-logo {
+    width: auto;
+    height: auto;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    filter: none;
 }
 
 body.main-body.app .header-welcome {

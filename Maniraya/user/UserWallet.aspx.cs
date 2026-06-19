@@ -15,7 +15,7 @@ public partial class UserWallet : System.Web.UI.Page
     {
         if (Session["username"] == null)
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
         if (!IsPostBack)
         {

@@ -16,7 +16,7 @@
             <div class="admin-login-card">
                 <div class="admin-login-brand">
                     <div class="admin-login-logo-wrap">
-                        <img src="../user/img/logo.png" alt="<%= clsUtility.ProjectName %> Logo" class="admin-login-logo" />
+                        <span class="brand-text-mpremium admin-login-brand-text">MPremium</span>
                     </div>
                     <h1><%= clsUtility.ProjectName %></h1>
                     <p>Admin Control Panel</p>

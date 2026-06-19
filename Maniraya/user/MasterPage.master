@@ -92,10 +92,10 @@
 		<aside class="app-sidebar">
 			<div class="main-sidebar-header">
 				<a class="desktop-logo logo-light" href="Dashboard.aspx" title="Maniraya Dashboard">
-					<img src="../user/img/logo.png" alt="Maniraya Logo">
+					<span class="brand-text-mpremium sidebar-brand-text">MPremium</span>
 				</a>
 				<a class="logo-icon mobile-logo icon-dark" href="Dashboard.aspx" title="Maniraya Dashboard">
-					<img src="../user/img/logo.png" class="logo-icon dark-theme" alt="Maniraya Logo">
+					<span class="brand-text-mpremium sidebar-brand-text sidebar-brand-text--compact">MPremium</span>
 				</a>
 			</div>
 			<div class="main-sidebar-body sidebar-menu-scroll circle-animation">
@@ -169,6 +169,15 @@
 							<%--<li><a class="slide-item" href="FranchiseeSearchNew.aspx">Purchase Product</a></li>--%>
 							<li><a class="slide-item" href="#">Purchase Report</a></li>
                           <li><a class="slide-item" href="PurchaseInvoice.aspx">Purchase Invoice</a></li>
+							
+						</ul>
+					</li>
+
+					<li class="slide" >
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><i class="angle fe fe-chevron-down"></i></a>
+						<ul class="slide-menu">
+							<li><a class="slide-item" href="SavingProductPurchase.aspx">Purchase Saving Product</a></li>
+                          <li><a class="slide-item" href="SAvingProductPurchaseReport.aspx">Saving Product Report</a></li>
 							
 						</ul>
 					</li>
@@ -276,7 +285,7 @@
 						</div>
 						<!--<div class="header-brand-block">
 							<a href="Dashboard.aspx" class="header-brand-link d-none d-md-flex" title="Dashboard">
-								<img src="../user/img/logo.png" class="header-brand-logo" alt="Maniraya Logo">
+								<span class="brand-text-mpremium header-brand-logo">MPremium</span>
 							</a>
 							<div class="header-welcome d-none d-md-block">
 								<p class="header-welcome-sub">Welcome back,</p>
@@ -288,7 +297,7 @@
 					<div class="main-header-center d-md-none">
 						<div class="responsive-logo header-mobile-logo">
 							<a href="Dashboard.aspx" title="Dashboard">
-								<img src="../user/img/logo.png" class="mobile-logo" alt="Maniraya Logo">
+								<span class="brand-text-mpremium mobile-brand-text">MPremium</span>
 							</a>
 						</div>
 					</div>
@@ -499,7 +508,7 @@
 								<span class="navbar-toggler-icon fe fe-more-vertical "></span>
 							</button>-->
 							<!--<div class="dropdown main-profile-menu nav nav-item nav-link">
-								<a class="profile-user" href="#"><img alt="" src="../user/img/logo.png"></a>
+								<a class="profile-user" href="#"><span class="brand-text-mpremium">MPremium</span></a>
 								<div class="dropdown-menu dropdown-menu-arrow animated fadeInUp">
 									<div class="main-header-profile header-img">
 										<div class="main-img-user"><img alt="" src="assets/img/faces/5.jpg"></div>
@@ -756,7 +765,7 @@
                         <%--<a href="#"><i class="fa fa-circle text-success"></i>Online</a>--%>
                     </div>
                 </div>
-<%--									<span class="avatar avatar-xxl brround mx-auto"><img src="../user/img/logo.png" alt="Profile-img" class="avatar avatar-xxl brround"></span>
+<%--									<span class="avatar avatar-xxl brround mx-auto"><span class="brand-text-mpremium">MPremium</span></span>
 								--%><%--	<div class=" text-center font-weight-semibold user mt-3 h6 mb-0">Elizabeth Jane</div>--%>
 									
 								</div>

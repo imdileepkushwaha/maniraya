@@ -8,3 +8,9 @@ c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Release\DataTier.cspro
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Release\DataTier.csproj.CoreCompileInputs.cache
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Release\DataTier.dll
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\DataTier\obj\Release\DataTier.pdb
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Release\DataTier.dll
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Release\DataTier.pdb
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Release\DataTier.csproj.AssemblyReference.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Release\DataTier.csproj.CoreCompileInputs.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Release\DataTier.dll
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Release\DataTier.pdb

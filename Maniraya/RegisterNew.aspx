@@ -306,7 +306,7 @@
             <div class="header d-lg-flex justify-content-between align-items-center py-sm-3 py-2 px-sm-2 px-1">
                 <!-- logo -->
                 <div id="logo" style="text-align:center">
-                     <h1><a href="index.html"><img src="user/img/logo.png" width="200"></a></h1>
+                     <h1><a href="index.html"><span class="brand-text-mpremium">MPremium</span></a></h1>
                        
                 </div>
                 <!-- //logo -->

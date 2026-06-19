@@ -27,7 +27,7 @@ public partial class GSTImage : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
 

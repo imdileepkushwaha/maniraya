@@ -24,7 +24,7 @@
 
                     <div class="reg-confirm-content">
                         <div class="reg-confirm-brand">
-                            <img src="myassets/assets/images/logo.png" alt="<%= clsUtility.ProjectName %>" class="reg-confirm-logo" />
+                            <span class="site-brand-text reg-confirm-logo">MPremium</span>
                         </div>
 
                         <p class="reg-confirm-status">Registration Successful</p>
