@@ -701,3 +701,11 @@ c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicT
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.pdb
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Debug\Newtonsoft.Json.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csprojResolveAssemblyReference.cache
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\BusinessLogicTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\BusinessLogicTier.pdb
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\DataTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\Newtonsoft.Json.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\bin\Debug\DataTier.pdb
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.csprojResolveAssemblyReference.cache
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.dll
+D:\Web\mpremium\maniraya\BusinessLogicTier\obj\Debug\BusinessLogicTier.pdb

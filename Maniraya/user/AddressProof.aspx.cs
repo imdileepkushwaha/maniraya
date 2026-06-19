@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using DataTier;
 using System.Web.UI.WebControls;
 using System.Data;
 using BusinessLogicTier;
@@ -13,6 +14,7 @@ public partial class user_AddressProof : System.Web.UI.Page
 
     clsEPin objEPin = new clsEPin();
     clsUser objUser = new clsUser();
+    Data ObjData = new Data();
     clsState objState = new clsState();
     clsAccount objaccount = new clsAccount();
     protected void Page_Load(object sender, EventArgs e)
@@ -81,7 +83,7 @@ public partial class user_AddressProof : System.Web.UI.Page
     {
         objUser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
+        dt = getUserDetail(objUser);
         if (dt.Rows[0]["activestatus"].ToString() == "0")
         {
             Response.Redirect("Dashboard.aspx");
@@ -208,6 +210,23 @@ public partial class user_AddressProof : System.Web.UI.Page
             Message.Show("Enter User Id...!!!");
         }
     }
+
+    public DataTable getUserDetail(clsUser objUser)
+    {
+        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
     void loadcountry()
     {
         ddcountry.Items.Clear();
@@ -253,7 +272,7 @@ public partial class user_AddressProof : System.Web.UI.Page
     {
         objUser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
+        dt = getUserDetail(objUser);
         if (dt.Rows.Count > 0)
         {
          

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using DataTier;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -12,6 +13,7 @@ public partial class UserBankDetail : System.Web.UI.Page
     clsState objState = new clsState();
     clsUser objUser = new clsUser();
     clsBank objbank = new clsBank();
+    Data ObjData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -65,7 +67,7 @@ public partial class UserBankDetail : System.Web.UI.Page
     {
         objUser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
-        dt = objUser.getUserDetail(objUser);
+        dt = getUserDetail(objUser);
         if (dt.Rows.Count > 0)
         {
             txtsponserid.Text = dt.Rows[0]["sponserid"].ToString();
@@ -97,6 +99,24 @@ public partial class UserBankDetail : System.Web.UI.Page
             ddbank.SelectedValue = dt.Rows[0]["bankname"].ToString(); ;
             hdstatus.Value = dt.Rows[0]["status"].ToString();
         }
+    }
+
+
+    public DataTable getUserDetail(clsUser objUser)
+    {
+        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
     }
     void loadbank()
     {
