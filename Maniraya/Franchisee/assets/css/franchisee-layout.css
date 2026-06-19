@@ -403,11 +403,11 @@ body.franchisee-app {
 }
 
 .admin-side-group.is-open {
-    padding: 6px;
+    /* padding: 6px;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.72);
     border: 1px solid #edf2f7;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9); */
 }
 
 .admin-side-group.is-open>.admin-side-toggle {
@@ -650,12 +650,12 @@ body.franchisee-app {
 }
 
 .admin-notify-dropdown-head strong {
-    font-size: 0.92rem;
+    font-size: 1.25rem;
     color: #0f172a;
 }
 
 .admin-notify-dropdown-head span {
-    font-size: 0.74rem;
+    font-size: 1rem;
     color: #64748b;
 }
 
@@ -697,7 +697,7 @@ body.franchisee-app {
 
 .admin-notify-item-copy strong {
     display: block;
-    font-size: 0.82rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #0f172a;
     line-height: 1.35;
@@ -706,7 +706,7 @@ body.franchisee-app {
 
 .admin-notify-item-copy small {
     display: block;
-    font-size: 0.74rem;
+    font-size: 1rem;
     color: #64748b;
     line-height: 1.35;
 }
@@ -737,7 +737,7 @@ body.franchisee-app {
     background: #fafbfc;
     border-top: 1px solid #eef2f6;
     color: var(--admin-accent) !important;
-    font-size: 0.8rem;
+    font-size: 1.25rem;
     font-weight: 700;
     text-decoration: none !important;
 }

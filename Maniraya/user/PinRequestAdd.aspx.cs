@@ -37,7 +37,7 @@ public partial class user_PinRequestAdd : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     void loadbankaccount()

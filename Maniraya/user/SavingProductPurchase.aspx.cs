@@ -36,7 +36,7 @@ public partial class user_WithdrawlRequstAdd : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     public DataTable getPrevProduct()

@@ -9,3 +9,7 @@ c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Release\Busin
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Release\BusinessLogicTier.csproj.CoreCompileInputs.cache
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Release\BusinessLogicTier.dll
 c:\Data\Work\Deepak\Trusted Wallet\trustcart\BusinessLogicTier\obj\Release\BusinessLogicTier.pdb
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.csproj.AssemblyReference.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.csproj.CoreCompileInputs.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.dll
+c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.pdb

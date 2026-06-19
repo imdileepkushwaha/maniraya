@@ -45,7 +45,7 @@ public partial class user_AddressProof : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
 
@@ -254,21 +254,47 @@ public partial class user_AddressProof : System.Web.UI.Page
         objUser.UserId = Session["userid"].ToString();
         DataTable dt = new DataTable();
         dt = objUser.getUserDetail(objUser);
-        if (dt.Rows.Count > 0)
+        if (dt != null && dt.Rows.Count > 0)
         {
-         
+            DataRow row = dt.Rows[0];
+
             loadsusername();
-         
-            txtaddress.Text = dt.Rows[0]["address"].ToString();
-            ddcountry.SelectedValue = dt.Rows[0]["countryid"].ToString();
+
+            txtaddress.Text = GetColumnValue(row, "address");
+
+            SetDropDownValue(ddcountry, GetColumnValue(row, "countryid"));
             loadstate();
-            ddstate.SelectedValue = dt.Rows[0]["stateid"].ToString();
+            SetDropDownValue(ddstate, GetColumnValue(row, "stateid"));
             loadcity();
-            ddcity.SelectedValue = dt.Rows[0]["cityid"].ToString();
-            txtareaname.Text = dt.Rows[0]["areaname"].ToString();
-            txtpincode.Text = dt.Rows[0]["pincode"].ToString();
-           
-            hdstatus.Value = dt.Rows[0]["status"].ToString();
+            SetDropDownValue(ddcity, GetColumnValue(row, "cityid"));
+
+            txtareaname.Text = GetColumnValue(row, "areaname");
+            txtpincode.Text = GetColumnValue(row, "pincode");
+
+            hdstatus.Value = GetColumnValue(row, "status");
+        }
+    }
+
+    static string GetColumnValue(DataRow row, string columnName)
+    {
+        if (row != null && row.Table.Columns.Contains(columnName) && row[columnName] != DBNull.Value)
+        {
+            return row[columnName].ToString();
+        }
+        return string.Empty;
+    }
+
+    static void SetDropDownValue(DropDownList ddl, string value)
+    {
+        if (ddl == null || string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+        ListItem item = ddl.Items.FindByValue(value);
+        if (item != null)
+        {
+            ddl.ClearSelection();
+            item.Selected = true;
         }
     }
     protected void btnCancel_Click(object sender, EventArgs e)

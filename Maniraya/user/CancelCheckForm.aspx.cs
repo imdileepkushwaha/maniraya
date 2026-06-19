@@ -42,7 +42,7 @@ public partial class user_CancelCheckForm : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
 

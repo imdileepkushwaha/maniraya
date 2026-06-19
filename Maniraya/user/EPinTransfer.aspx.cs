@@ -27,7 +27,7 @@ public partial class admin_EPinAdd : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     void loadusername()

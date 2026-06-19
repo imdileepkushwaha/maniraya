@@ -18,6 +18,151 @@
             .category-card {
                 cursor: pointer;
             }
+
+            .site-popup-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(16, 19, 29, 0.65);
+                z-index: 9999;
+                display: none;
+                place-items: center;
+                padding: 1rem;
+            }
+
+            .site-popup-backdrop.is-open {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .site-popup-stack {
+                position: relative;
+                width: min(560px, calc(100vw - 2rem));
+                margin: 0 auto;
+                min-height: 220px;
+            }
+
+            .site-popup {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                border-radius: 0.85rem;
+                box-shadow: 0 18px 45px rgba(16, 19, 29, 0.22);
+                overflow: hidden;
+                pointer-events: none;
+                transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+            }
+
+            .site-popup.is-top-layer {
+                pointer-events: auto;
+                box-shadow: 0 28px 70px rgba(16, 19, 29, 0.34);
+            }
+
+            .site-popup:not(.is-top-layer):not(.is-hidden) {
+                opacity: 0.95;
+            }
+
+            .site-popup.site-popup--image-only {
+                width: 100%;
+            }
+
+            .site-popup-close-btn {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 2.1rem;
+                height: 2.1rem;
+                border: none;
+                border-radius: 0.5rem;
+                background: #151922;
+                color: #fff;
+                font-size: 1.25rem;
+                line-height: 1;
+                cursor: pointer;
+                z-index: 2;
+            }
+
+            .site-popup.is-hidden {
+                display: none;
+            }
+
+            .site-popup-close-btn:hover {
+                background: #e5a906;
+            }
+
+            .site-popup-body-wrap {
+                padding: 2.5rem 1.75rem 1.75rem;
+            }
+
+            .site-popup-title {
+                margin: 0 0 0.85rem;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: #151922;
+            }
+
+            .site-popup-message {
+                margin: 0;
+                font-size: 1rem;
+                line-height: 1.65;
+                color: #4b5568;
+                word-break: break-word;
+                max-height: min(50vh, 320px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 0.25rem;
+            }
+
+            .site-popup-message::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .site-popup-message::-webkit-scrollbar-thumb {
+                background: rgba(21, 25, 34, 0.28);
+                border-radius: 999px;
+            }
+
+            .site-popup-message::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .site-popup-image-wrap {
+                margin-top: 0.5rem;
+            }
+
+            .site-popup-image-wrap img {
+                display: block;
+                width: 100%;
+                height: auto;
+                border-radius: 0.55rem;
+            }
+
+            .site-popup--image-only .site-popup-body-wrap {
+                padding: 0;
+            }
+
+            .site-popup--image-only .site-popup-image-wrap {
+                margin: 0;
+            }
+
+            .site-popup--image-only .site-popup-image-wrap img {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: 0;
+            }
+
+            .site-popup--image-only .site-popup-title {
+                margin: 0;
+                padding: 1rem 1rem 0.5rem;
+            }
+
+            .site-popup--image-only .site-popup-close-btn {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
         </style>
     </asp:Content>
     <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
@@ -488,6 +633,25 @@
                     d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
             </svg>
         </a>
+
+        <asp:Panel ID="pnlSitePopup" runat="server" Visible="false" CssClass="site-popup-backdrop" aria-hidden="true">
+            <div class="site-popup-stack">
+                <asp:Repeater ID="rptSitePopups" runat="server" OnItemDataBound="rptSitePopups_ItemDataBound">
+                    <ItemTemplate>
+                        <div runat="server" id="popupCard" class="site-popup">
+                            <button type="button" class="site-popup-close-btn" aria-label="Close popup">&times;</button>
+                            <div class="site-popup-body-wrap">
+                                <h2 runat="server" id="popupTitle" class="site-popup-title" visible="false"></h2>
+                                <div runat="server" id="popupMessage" class="site-popup-message" visible="false"></div>
+                                <div runat="server" id="popupImageWrap" class="site-popup-image-wrap" visible="false">
+                                    <img runat="server" id="popupImage" alt="Announcement" />
+                                </div>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+            </div>
+        </asp:Panel>
 
     </asp:Content>
     <asp:Content ID="Content3" ContentPlaceHolderID="contentScript" Runat="Server">

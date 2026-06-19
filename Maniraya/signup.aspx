@@ -232,6 +232,41 @@
             <contenttemplate>
 
                 <main class="signup-page-main">
+                    <div class="signup-bg-icons" aria-hidden="true">
+                        <span class="sbg" style="top:5%;left:4%;width:62px;height:62px;color:#e5a906;--rot:-12deg;--dur:7s;--delay:0s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.4a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 8H6"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg>
+                        </span>
+                        <span class="sbg" style="top:3%;left:46%;width:48px;height:48px;color:#3b63d6;--rot:8deg;--dur:6.2s;--delay:.8s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>
+                        </span>
+                        <span class="sbg" style="top:13%;left:82%;width:54px;height:54px;color:#3b63d6;--rot:12deg;--dur:7.6s;--delay:.3s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12"/><path d="M12 9C10.5 5 6 6 7.5 8.5 8.4 10 12 9 12 9zM12 9c1.5-4 6-3 4.5-.5C15.6 10 12 9 12 9z"/></svg>
+                        </span>
+                        <span class="sbg" style="top:30%;left:24%;width:52px;height:52px;color:#e5a906;--rot:-7deg;--dur:6.8s;--delay:1.4s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 4 7l2.5 2.5L8 8v12h8V8l1.5 1.5L20 7l-4-3-1.8 1.8a3.2 3.2 0 0 1-4.4 0L8 4z"/></svg>
+                        </span>
+                        <span class="sbg" style="top:38%;left:3%;width:50px;height:50px;color:#3b63d6;--rot:-18deg;--dur:8s;--delay:.6s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="8" cy="8" r="1.6"/></svg>
+                        </span>
+                        <span class="sbg" style="top:46%;left:60%;width:58px;height:58px;color:#3b63d6;--rot:6deg;--dur:7.2s;--delay:1.1s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10V8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5V10"/><path d="M4 10a2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5H2v-5a2 2 0 0 1 2-2z"/><path d="M6 20v1.5M18 20v1.5"/></svg>
+                        </span>
+                        <span class="sbg" style="top:52%;left:88%;width:60px;height:60px;color:#e5a906;--rot:10deg;--dur:6.5s;--delay:.2s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.4a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 8H6"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg>
+                        </span>
+                        <span class="sbg" style="top:80%;left:7%;width:56px;height:56px;color:#3b63d6;--rot:8deg;--dur:7.8s;--delay:1s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 9h20M6 15h4"/></svg>
+                        </span>
+                        <span class="sbg" style="top:78%;left:30%;width:54px;height:54px;color:#e5a906;--rot:-10deg;--dur:6.6s;--delay:.5s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10V8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5V10"/><path d="M4 10a2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5H2v-5a2 2 0 0 1 2-2z"/><path d="M6 20v1.5M18 20v1.5"/></svg>
+                        </span>
+                        <span class="sbg" style="top:84%;left:72%;width:52px;height:52px;color:#e5a906;--rot:-9deg;--dur:7.4s;--delay:1.3s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>
+                        </span>
+                        <span class="sbg" style="top:64%;left:48%;width:48px;height:48px;color:#3b63d6;--rot:14deg;--dur:6.9s;--delay:.9s;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 4 7l2.5 2.5L8 8v12h8V8l1.5 1.5L20 7l-4-3-1.8 1.8a3.2 3.2 0 0 1-4.4 0L8 4z"/></svg>
+                        </span>
+                    </div>
                     <section class="auth-section">
                         <div class="container">
                             <div class="auth-wrap auth-wrap-signup">
@@ -900,7 +935,7 @@
 
                                         <div class="signup-terms-box">
                                             <asp:CheckBox ID="CheckBox1" AutoPostBack="true" OnCheckedChanged="CheckBox1_CheckedChanged" runat="server" />
-                                            <span>I agree to the <a href="Terms_Conditions.html" target="_blank">Terms &amp; Conditions</a></span>
+                                            <span>I agree to the <a href="#" target="_blank">E Contract</a></span>
                                         </div>
                                             </div>
                                         </div>

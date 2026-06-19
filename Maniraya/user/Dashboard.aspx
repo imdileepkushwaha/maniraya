@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=8" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=13" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -268,6 +268,79 @@
                         <div class="dash-welcome-actions">
                             <a href="DownlineReport.aspx" class="dash-btn dash-btn-primary">My Team</a>
                             <a href="UserWallet.aspx" class="dash-btn dash-btn-outline">My Wallet</a>
+                        </div>
+                    </div>
+
+                    <div class="row dash-feature-row">
+                        <div class="col-md-6">
+                            <div class="dash-feature-card tone-saving" id="savingDashCard">
+                                <div class="dash-feature-head">
+                                    <div class="dash-feature-title">
+                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-bank"></i></span>
+                                        <div>
+                                            <h3>Saving Dashboard</h3>
+                                            <p>Your savings products &amp; balance overview</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="dash-btn dash-feature-toggle" onclick="toggleDashFeature(this, 'savingDashCard');">
+                                        <span class="dash-feature-toggle-text">View</span> <i class="fa fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="dash-feature-body">
+                                    <div class="dash-care-card">
+                                        <div class="dash-care-card-top">
+                                            <span class="dash-care-card-title">Unique Care Number</span>
+                                            <span class="dash-care-card-chip" aria-hidden="true"><i class="fa fa-id-card"></i></span>
+                                        </div>
+                                        <div class="dash-care-card-number">
+                                            <asp:Label ID="lblCareNumber" runat="server" Text="0000 0000 0000" /></div>
+                                        <div class="dash-care-card-bottom">
+                                            <div class="dash-care-card-holder">
+                                                <span class="dash-care-card-label">Card Holder</span>
+                                                <span class="dash-care-card-name">
+                                                    <asp:Label ID="lblCareName" runat="server" Text="Member Name" /></span>
+                                            </div>
+                                            <span class="dash-care-card-logo" aria-hidden="true"><i class="fa fa-bank"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="dash-feature-links">
+                                        <a href="SavingProductPurchase.aspx" class="dash-feature-link"><i class="fa fa-shopping-cart"></i> Buy Saving Product</a>
+                                        <a href="SAvingProductPurchaseReport.aspx" class="dash-feature-link"><i class="fa fa-list-alt"></i> Saving Report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dash-feature-card tone-premium" id="premiumDashCard">
+                                <div class="dash-feature-head">
+                                    <div class="dash-feature-title">
+                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-diamond"></i></span>
+                                        <div>
+                                            <h3>MPremium Dashboard</h3>
+                                            <p>Your premium plans &amp; package overview</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="dash-btn dash-feature-toggle" onclick="toggleDashFeature(this, 'premiumDashCard');">
+                                        <span class="dash-feature-toggle-text">View</span> <i class="fa fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="dash-feature-body">
+                                    <div class="dash-feature-stats">
+                                        <div class="dash-feature-stat">
+                                            <p class="dash-feature-stat-label">Premium Status</p>
+                                            <p class="dash-feature-stat-value"><asp:Label ID="lblPremiumStatus" runat="server" Text="-" /></p>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <p class="dash-feature-stat-label">Active Package</p>
+                                            <p class="dash-feature-stat-value"><asp:Label ID="lblPremiumPackage" runat="server" Text="-" /></p>
+                                        </div>
+                                    </div>
+                                    <div class="dash-feature-links">
+                                        <a href="JoiningPackage.aspx" class="dash-feature-link"><i class="fa fa-cube"></i> View Packages</a>
+                                        <a href="PurchaseReport.aspx" class="dash-feature-link"><i class="fa fa-list-alt"></i> Purchase Report</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -2912,6 +2985,16 @@ Profit Share Budget</p>
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
     <script type="text/javascript" language="javascript">
+        function toggleDashFeature(btn, cardId) {
+            var card = document.getElementById(cardId);
+            if (!card) return;
+            var isOpen = card.classList.toggle("is-open");
+            var label = btn.querySelector(".dash-feature-toggle-text");
+            if (label) {
+                label.textContent = isOpen ? "Hide" : "View";
+            }
+        }
+
         (function () {
             var el = document.getElementById("dashDateRange");
             if (!el) return;

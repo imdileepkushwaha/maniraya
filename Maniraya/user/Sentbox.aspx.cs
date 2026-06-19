@@ -34,7 +34,7 @@ public partial class Associate_Details : System.Web.UI.Page
             }
             else
             {
-                Response.Redirect("index.aspx");
+                Response.Redirect("~/Login.aspx");
             }
         }
 

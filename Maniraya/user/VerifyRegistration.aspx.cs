@@ -54,7 +54,7 @@ public partial class VerifyRegistration : System.Web.UI.Page
                     btnverifyemail.Attributes.Add("disabled", "disabled");
                     //if (s == 0)
                     //{
-                        Response.Redirect("index.aspx");
+                        Response.Redirect("~/Login.aspx");
                     //}
                     //else
                     //{
@@ -82,7 +82,7 @@ public partial class VerifyRegistration : System.Web.UI.Page
                         }
                         else
                         {
-                            Response.Redirect("index.aspx");
+                            Response.Redirect("~/Login.aspx");
                         }
                     }
                     if (emailstatus == 0)
@@ -109,7 +109,7 @@ public partial class VerifyRegistration : System.Web.UI.Page
                         }
                         else
                         {
-                            Response.Redirect("index.aspx");
+                            Response.Redirect("~/Login.aspx");
                         }
                     }
                 }

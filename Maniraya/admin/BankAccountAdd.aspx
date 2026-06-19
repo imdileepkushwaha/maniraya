@@ -60,11 +60,11 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
     <section class="content-header">
-        <h1>Bankaccount Add</h1>
+        <h1>Add Bank Account </h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Utility management</a></li>
-            <li class="active">Bankaccount Add</li>
+            <li class="active">Add Bank Account</li>
         </ol>
     </section>
 </asp:Content>

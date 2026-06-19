@@ -20,7 +20,7 @@ public partial class User_account_Ledger : System.Web.UI.Page
         {
             Session.Abandon();
             Session.Clear();
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
           
         }
 

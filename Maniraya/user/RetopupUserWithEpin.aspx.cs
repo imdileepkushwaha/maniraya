@@ -29,7 +29,7 @@ public partial class RetopupUserWithEpin : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     void loadAmountepin()

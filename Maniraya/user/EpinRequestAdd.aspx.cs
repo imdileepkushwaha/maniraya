@@ -43,7 +43,7 @@ public partial class EpinRequestAdd : System.Web.UI.Page
         }
         else
         {
-            Response.Redirect("index.aspx");
+            Response.Redirect("~/Login.aspx");
         }
     }
     void loadplan()

@@ -111,6 +111,7 @@
                                     <li><a href="VideosAdd.aspx">Add Video Gallery</a></li>
                                     <li><a href="FAQAdd.aspx">Add FAQ</a></li>
                                     <li><a href="ContactAdd.aspx">Contact Settings</a></li>
+                                    <li><a href="PopupAdd.aspx">Add Popup</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">
