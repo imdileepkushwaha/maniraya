@@ -190,35 +190,74 @@
                                     <div class="pay-fields-panel" id="qrFields" role="tabpanel" hidden>
                                         <div class="pay-method-panel-intro">
                                             <h3>Scan &amp; pay</h3>
-                                            <p>Scan the QR code using any UPI app and complete the payment.</p>
+                                            <p>Scan the QR code using any UPI app and pay the exact order amount.</p>
+                                        </div>
+
+                                        <div class="pay-qr-amount-banner">
+                                            <span class="pay-qr-amount-label">Amount to pay</span>
+                                            <asp:Label ID="lblQrAmount" runat="server" CssClass="pay-qr-amount-value" Text="₹0.00" />
                                         </div>
 
                                         <asp:Panel ID="pnlNoQr" runat="server" Visible="false" CssClass="pay-bank-empty">
                                             <p>QR code is not available right now. Please use online bank transfer or contact support.</p>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="pnlQrPayment" runat="server" CssClass="pay-qr-list">
-                                            <asp:Repeater ID="rptQrAccounts" runat="server">
-                                                <ItemTemplate>
-                                                    <div class="pay-qr-card pay-qr-card--panel">
-                                                        <div class="pay-qr-card-copy">
-                                                            <p class="pay-qr-bank-name"><%# GetBankField(Container.DataItem, "BankName", "bankname") %></p>
-                                                            <p class="pay-qr-account">Account ending <%# MaskAccountNo(GetBankField(Container.DataItem, "AccountNo", "accountno")) %></p>
-                                                        </div>
-                                                        <div class="pay-qr-card-visual">
-                                                            <p class="pay-qr-label">Scan to pay</p>
-                                                            <img src='<%# GetQrImageUrl(Container.DataItem) %>' alt="Payment QR code" class="pay-qr-image" />
-                                                        </div>
-                                                    </div>
-                                                </ItemTemplate>
-                                            </asp:Repeater>
-                                        </asp:Panel>
+                                        <div class="pay-qr-scan-shell">
+                                            <ol class="pay-qr-steps" aria-label="QR payment steps">
+                                                <li><span>1</span> Scan QR</li>
+                                                <li><span>2</span> Pay amount</li>
+                                                <li><span>3</span> Upload proof</li>
+                                            </ol>
 
-                                        <div class="pay-qr-fallback">
-                                            <asp:Panel ID="pnlFallbackQr" runat="server">
-                                                <p class="pay-qr-label">Scan to pay</p>
-                                                <asp:Image ID="imgFallbackQr" runat="server" ImageUrl="~/myassets/assets/images/QRCODE.jpeg" CssClass="pay-qr-image" AlternateText="Payment QR code" />
+                                            <asp:Panel ID="pnlQrPayment" runat="server" CssClass="pay-qr-list">
+                                                <asp:Repeater ID="rptQrAccounts" runat="server">
+                                                    <ItemTemplate>
+                                                        <article class="pay-qr-card pay-qr-card--panel">
+                                                            <div class="pay-qr-card-visual">
+                                                                <div class="pay-qr-frame" aria-hidden="true">
+                                                                    <span class="pay-qr-corner pay-qr-corner--tl"></span>
+                                                                    <span class="pay-qr-corner pay-qr-corner--tr"></span>
+                                                                    <span class="pay-qr-corner pay-qr-corner--bl"></span>
+                                                                    <span class="pay-qr-corner pay-qr-corner--br"></span>
+                                                                    <img src='<%# GetQrImageUrl(Container.DataItem) %>' alt='<%# "Payment QR code for " + GetBankField(Container.DataItem, "BankName", "bankname") %>' class="pay-qr-image" />
+                                                                </div>
+                                                                <p class="pay-qr-scan-hint">Open Google Pay, PhonePe, Paytm or any UPI app</p>
+                                                            </div>
+                                                            <div class="pay-qr-card-meta">
+                                                                <p class="pay-qr-bank-name"><%# GetBankField(Container.DataItem, "BankName", "bankname") %></p>
+                                                                <p class="pay-qr-account">Account ending <%# MaskAccountNo(GetBankField(Container.DataItem, "AccountNo", "accountno")) %></p>
+                                                                <div class="pay-qr-upi-tags" aria-hidden="true">
+                                                                    <span>GPay</span>
+                                                                    <span>PhonePe</span>
+                                                                    <span>Paytm</span>
+                                                                    <span>BHIM</span>
+                                                                </div>
+                                                            </div>
+                                                        </article>
+                                                    </ItemTemplate>
+                                                </asp:Repeater>
                                             </asp:Panel>
+
+                                            <div class="pay-qr-fallback">
+                                                <asp:Panel ID="pnlFallbackQr" runat="server">
+                                                    <article class="pay-qr-card pay-qr-card--panel pay-qr-card--fallback">
+                                                        <div class="pay-qr-card-visual">
+                                                            <div class="pay-qr-frame" aria-hidden="true">
+                                                                <span class="pay-qr-corner pay-qr-corner--tl"></span>
+                                                                <span class="pay-qr-corner pay-qr-corner--tr"></span>
+                                                                <span class="pay-qr-corner pay-qr-corner--bl"></span>
+                                                                <span class="pay-qr-corner pay-qr-corner--br"></span>
+                                                                <asp:Image ID="imgFallbackQr" runat="server" ImageUrl="~/myassets/assets/images/QRCODE.jpeg" CssClass="pay-qr-image" AlternateText="Payment QR code" />
+                                                            </div>
+                                                            <p class="pay-qr-scan-hint">Open Google Pay, PhonePe, Paytm or any UPI app</p>
+                                                        </div>
+                                                        <div class="pay-qr-card-meta">
+                                                            <p class="pay-qr-bank-name">Company payment QR</p>
+                                                            <p class="pay-qr-account">Scan and pay the exact order total</p>
+                                                        </div>
+                                                    </article>
+                                                </asp:Panel>
+                                            </div>
                                         </div>
                                     </div>
 

@@ -55,7 +55,6 @@ public partial class admin_BankAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Bank Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addBankModal');", true);
             txtbankname.Text = "";
             loaddata();
         }

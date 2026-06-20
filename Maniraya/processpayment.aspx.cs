@@ -191,6 +191,7 @@ public partial class processpayment : System.Web.UI.Page
         lblDiscount.Text = "₹" + discount.ToString("0.00");
         lblTax.Text = "₹" + tax.ToString("0.00");
         lblTotal.Text = "₹" + Totaltotal.ToString("0.00");
+        lblQrAmount.Text = "₹" + Totaltotal.ToString("0.00");
     }
 
     protected string GetBankField(object dataItem, params string[] columnNames)

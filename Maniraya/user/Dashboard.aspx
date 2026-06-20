@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=13" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=15" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -303,10 +303,70 @@
                                             <span class="dash-care-card-logo" aria-hidden="true"><i class="fa fa-bank"></i></span>
                                         </div>
                                     </div>
-                                    <div class="dash-feature-links">
+
+                                    <div class="dash-feature-stats">
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-list-ol"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Total EMI</p>
+                                                <p class="dash-feature-stat-value">18</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon is-success" aria-hidden="true"><i class="fa fa-check-circle"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Paid EMI</p>
+                                                <p class="dash-feature-stat-value">2</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon is-warning" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Unpaid EMI</p>
+                                                <p class="dash-feature-stat-value">16</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Investment Date</p>
+                                                <p class="dash-feature-stat-value is-date">15/06/2026</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon is-highlight" aria-hidden="true"><i class="fa fa-inr"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Maturity Amount</p>
+                                                <p class="dash-feature-stat-value">10,000</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat">
+                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar-check-o"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Maturity Date</p>
+                                                <p class="dash-feature-stat-value is-date">14/12/2027</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="dash-level-income-box">
+                                        <div class="dash-level-income-main">
+                                            <span class="dash-level-income-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
+                                            <div class="dash-level-income-text">
+                                                <h4>Level Income</h4>
+                                                <p>Your total level-wise earnings</p>
+                                            </div>
+                                            <div class="dash-level-income-amount">
+                                                <span class="dash-level-income-currency"><i class="fa fa-inr"></i></span>
+                                                <asp:Label ID="lblSavingLevelIncome" runat="server" Text="0" />
+                                            </div>
+                                        </div>
+                                        <a href="LevelIncomeReport.aspx" class="dash-level-income-link"><i class="fa fa-external-link"></i> View Level Income Report</a>
+                                    </div>
+                                    <!-- <div class="dash-feature-links">
                                         <a href="SavingProductPurchase.aspx" class="dash-feature-link"><i class="fa fa-shopping-cart"></i> Buy Saving Product</a>
                                         <a href="SAvingProductPurchaseReport.aspx" class="dash-feature-link"><i class="fa fa-list-alt"></i> Saving Report</a>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -325,14 +385,34 @@
                                     </button>
                                 </div>
                                 <div class="dash-feature-body">
-                                    <div class="dash-feature-stats">
-                                        <div class="dash-feature-stat">
-                                            <p class="dash-feature-stat-label">Premium Status</p>
-                                            <p class="dash-feature-stat-value"><asp:Label ID="lblPremiumStatus" runat="server" Text="-" /></p>
+                                    <div class="dash-feature-stats dash-feature-stats-premium">
+                                        <div class="dash-feature-stat dash-feature-stat-premium">
+                                            <span class="dash-feature-stat-icon is-premium-gold" aria-hidden="true"><i class="fa fa-sitemap"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Binary Income</p>
+                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
+                                            </div>
                                         </div>
-                                        <div class="dash-feature-stat">
-                                            <p class="dash-feature-stat-label">Active Package</p>
-                                            <p class="dash-feature-stat-value"><asp:Label ID="lblPremiumPackage" runat="server" Text="-" /></p>
+                                        <div class="dash-feature-stat dash-feature-stat-premium">
+                                            <span class="dash-feature-stat-icon is-premium-blue" aria-hidden="true"><i class="fa fa-user-plus"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Direct Income</p>
+                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat dash-feature-stat-premium">
+                                            <span class="dash-feature-stat-icon is-premium-green" aria-hidden="true"><i class="fa fa-money"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Cashback Wallet</p>
+                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
+                                            </div>
+                                        </div>
+                                        <div class="dash-feature-stat dash-feature-stat-premium">
+                                            <span class="dash-feature-stat-icon is-premium-purple" aria-hidden="true"><i class="fa fa-shopping-bag"></i></span>
+                                            <div class="dash-feature-stat-content">
+                                                <p class="dash-feature-stat-label">Product Wallet</p>
+                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="dash-feature-links">

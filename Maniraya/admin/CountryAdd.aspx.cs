@@ -57,7 +57,6 @@ public partial class admin_CountryAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Country Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addCountryModal');", true);
             txtcountryname.Text = "";
             txtcountrycode.Text = "";
             loaddata();

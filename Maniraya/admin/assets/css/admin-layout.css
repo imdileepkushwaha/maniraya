@@ -3016,6 +3016,24 @@ body.admin-app.modal-open .content-wrapper {
         max-width: 180px;
         margin: 0 auto;
     }
+
+    body.admin-app > .admin-image-preview-modal.modal.in .modal-dialog,
+    #form1 > .admin-image-preview-modal.modal.in .modal-dialog {
+        max-width: none !important;
+        max-height: calc(100dvh - 16px);
+        max-height: calc(100vh - 16px);
+    }
+
+    body.admin-app > .admin-image-preview-modal .modal-content,
+    #form1 > .admin-image-preview-modal .modal-content {
+        max-height: calc(100dvh - 16px);
+        max-height: calc(100vh - 16px);
+    }
+
+    .admin-image-preview-modal .admin-image-preview-img {
+        max-height: calc(100dvh - 240px);
+        max-height: calc(100vh - 240px);
+    }
 }
 
 /* ── Modal form sections (bank account etc.) ── */
@@ -5539,5 +5557,573 @@ body.admin-app .modal.in.admin-modal-scrollable {
     .admin-delete-confirm-footer .btn {
         width: 100%;
         min-width: 0;
+    }
+}
+
+/* Admin report pages */
+.admin-report-page .admin-report-intro {
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-report-page .admin-search-form .admin-form-section {
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.admin-report-page .admin-search-form .admin-form-section-last {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.admin-report-page .admin-form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.admin-report-page .admin-form-section-title i {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--admin-accent);
+    background: var(--admin-accent-soft);
+}
+
+.admin-report-page .admin-search-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.admin-report-page .admin-search-form .form-group {
+    margin-bottom: 16px;
+}
+
+.admin-report-page .admin-input-group {
+    display: flex;
+    align-items: stretch;
+    min-height: 44px;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-report-page .admin-input-group:focus-within {
+    border-color: rgba(229, 45, 39, 0.45);
+    box-shadow: 0 0 0 3px rgba(229, 45, 39, 0.1);
+}
+
+.admin-report-page .admin-input-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    flex-shrink: 0;
+    color: #94a3b8;
+    background: #f8fafc;
+    border-right: 1px solid #eef2f6;
+}
+
+.admin-report-page .admin-input-group .form-control {
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 42px;
+    padding: 8px 14px !important;
+    background: transparent !important;
+}
+
+.admin-report-page .admin-input-group .form-control:focus {
+    box-shadow: none !important;
+}
+
+.admin-report-page .admin-report-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-report-page .admin-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+}
+
+.admin-report-page .admin-table-caption {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.admin-report-page .admin-table-caption i {
+    color: var(--admin-accent);
+}
+
+.admin-report-page .admin-table-wrap {
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    overflow: auto;
+    max-height: min(560px, 70vh);
+}
+
+.admin-report-page .admin-table-wrap .table > thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc !important;
+    white-space: nowrap;
+}
+
+.admin-report-page .admin-amount-text {
+    font-weight: 700;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-report-page .admin-product-thumb-link {
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-decoration: none !important;
+}
+
+.admin-report-page .admin-product-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.admin-report-page .admin-product-thumb-link:hover .admin-product-thumb {
+    transform: scale(1.04);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+}
+
+.admin-report-page .admin-action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-report-page .admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none !important;
+    border: 1px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-report-page .admin-action-btn.is-approve {
+    color: #166534 !important;
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+}
+
+.admin-report-page .admin-action-btn.is-approve:hover {
+    background: #dcfce7;
+    transform: translateY(-1px);
+}
+
+.admin-report-page .admin-action-btn.is-reject {
+    color: #b91c1c !important;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.admin-report-page .admin-action-btn.is-reject:hover {
+    background: #fee2e2;
+    transform: translateY(-1px);
+}
+
+.admin-report-page .table .label {
+    display: inline-block;
+    min-width: 78px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-report-page .admin-image-preview-modal .modal-content {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22);
+}
+
+.admin-report-page .admin-image-preview-modal .modal-header {
+    background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+    border-bottom: 1px solid #eef2f6;
+}
+
+.admin-report-page .admin-image-preview-wrap,
+.admin-image-preview-modal .admin-image-preview-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.admin-report-page .admin-image-preview-img,
+.admin-image-preview-modal .admin-image-preview-img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100vh - 220px);
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+/* Image preview modal must sit above backdrop when moved to form */
+body.admin-app > .admin-image-preview-modal.modal,
+#form1 > .admin-image-preview-modal.modal {
+    z-index: 2110 !important;
+}
+
+body.admin-app > .admin-image-preview-modal.modal.in,
+#form1 > .admin-image-preview-modal.modal.in {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+}
+
+body.admin-app > .admin-image-preview-modal.modal.in .modal-dialog,
+#form1 > .admin-image-preview-modal.modal.in .modal-dialog {
+    position: relative;
+    z-index: 2111 !important;
+    pointer-events: auto;
+    width: 100%;
+    max-width: min(920px, calc(100vw - 32px));
+    max-height: calc(100vh - 40px);
+    margin: 0 auto !important;
+    display: flex;
+    flex-direction: column;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-content,
+#form1 > .admin-image-preview-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22);
+}
+
+body.admin-app > .admin-image-preview-modal .modal-header,
+#form1 > .admin-image-preview-modal .modal-header {
+    flex-shrink: 0;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-body,
+#form1 > .admin-image-preview-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 20px !important;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-footer,
+#form1 > .admin-image-preview-modal .modal-footer {
+    flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+    .admin-report-page .admin-report-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-report-page .admin-report-footer .btn {
+        width: 100%;
+    }
+}
+
+/* ── Utility master pages (Country, State, City, Bank, Bank Account) ── */
+.admin-utility-page {
+    margin-bottom: 6px;
+}
+
+.admin-utility-page .admin-utility-add-card,
+.admin-utility-page .admin-utility-list-card {
+    height: 100%;
+}
+
+.admin-utility-page .admin-utility-add-card > .box-header .box-title i,
+.admin-utility-page .admin-utility-list-card > .box-header .box-title i {
+    margin-right: 8px;
+    color: var(--admin-accent);
+}
+
+.admin-utility-page .admin-utility-form {
+    padding-top: 18px !important;
+}
+
+.admin-utility-page .admin-utility-form .admin-section-hint {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-utility-page .admin-utility-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.admin-utility-page .admin-utility-form .form-group {
+    margin-bottom: 16px;
+}
+
+.admin-utility-page .admin-utility-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.admin-utility-page .admin-input-group {
+    display: flex;
+    align-items: stretch;
+    min-height: 44px;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-utility-page .admin-input-group:focus-within {
+    border-color: rgba(229, 45, 39, 0.45);
+    box-shadow: 0 0 0 3px rgba(229, 45, 39, 0.1);
+}
+
+.admin-utility-page .admin-input-icon {
+    flex-shrink: 0;
+    width: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--admin-accent);
+    background: var(--admin-accent-soft);
+    border-right: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.admin-utility-page .admin-input-group .form-control {
+    border: 0 !important;
+    box-shadow: none !important;
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 14px;
+    background: transparent !important;
+}
+
+.admin-utility-page .admin-input-group select.form-control {
+    height: 42px;
+}
+
+.admin-utility-page .admin-utility-list-card .box-body {
+    padding-top: 14px !important;
+}
+
+.admin-utility-page .admin-table-wrap {
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    overflow: auto;
+    background: #fff;
+}
+
+.admin-utility-page .admin-table-wrap .table {
+    margin-bottom: 0;
+}
+
+.admin-utility-page .admin-table-wrap .table > thead > tr > th {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e2e8f0 !important;
+    white-space: nowrap;
+}
+
+.admin-utility-page .admin-table-wrap .table > tbody > tr > td {
+    vertical-align: middle;
+    font-size: 13px;
+    color: #334155;
+}
+
+.admin-utility-page .admin-table-wrap .table > tbody > tr:hover > td {
+    background: #fff9f9;
+}
+
+.admin-utility-page .admin-utility-stack {
+    margin-bottom: 22px;
+}
+
+.admin-utility-page .admin-bank-account-form {
+    padding-top: 4px;
+}
+
+.admin-utility-page .admin-bank-account-form .admin-modal-form-intro {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+}
+
+.admin-utility-page .admin-utility-qr-thumb {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.admin-utility-edit-modal .modal-content {
+    border: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.admin-utility-edit-modal .modal-header {
+    padding: 18px 22px;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+    border-bottom: 1px solid #fde8e8;
+}
+
+.admin-utility-edit-modal .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.admin-utility-edit-modal .modal-title i {
+    margin-right: 8px;
+    color: var(--admin-accent);
+}
+
+.admin-utility-edit-modal .modal-body {
+    padding: 20px 22px;
+}
+
+.admin-utility-edit-modal .modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.admin-utility-edit-modal .modal-body .form-group {
+    margin-bottom: 16px;
+}
+
+.admin-utility-edit-modal .modal-body .form-control {
+    min-height: 42px;
+    border-radius: 10px;
+    border-color: #dfe3ea;
+    box-shadow: none;
+}
+
+.admin-utility-edit-modal .modal-body .form-control:focus {
+    border-color: rgba(229, 45, 39, 0.45);
+    box-shadow: 0 0 0 3px rgba(229, 45, 39, 0.1);
+}
+
+.admin-utility-edit-modal .modal-footer {
+    padding: 14px 22px 18px;
+    background: #fafbfc;
+    border-top: 1px solid #eef2f6;
+}
+
+.admin-utility-edit-modal .modal-footer .btn-primary {
+    min-height: 40px;
+    padding: 8px 20px;
+    font-weight: 600;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #e52d27 0%, #c41e17 100%) !important;
+    border-color: transparent !important;
+}
+
+@media (max-width: 991px) {
+    .admin-utility-page .admin-utility-add-card,
+    .admin-utility-page .admin-utility-list-card {
+        height: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-utility-page .admin-product-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-utility-page .admin-product-footer .btn {
+        width: 100%;
     }
 }

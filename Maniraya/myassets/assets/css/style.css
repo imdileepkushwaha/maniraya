@@ -7754,20 +7754,160 @@ a.addr-btn-add:focus {
 
 .pay-qr-list {
     display: grid;
-    gap: 0.85rem;
-    margin-bottom: 0.85rem;
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.pay-qr-scan-shell {
+    display: grid;
+    gap: 1rem;
+}
+
+.pay-qr-amount-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(229, 169, 6, 0.28);
+    background: linear-gradient(135deg, rgba(246, 207, 99, 0.16), rgba(229, 169, 6, 0.08));
+}
+
+.pay-qr-amount-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #52607a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pay-qr-amount-value {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--brand-dark);
+    line-height: 1;
+}
+
+.pay-qr-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pay-qr-steps li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.45rem;
+    border-radius: 0.75rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #52607a;
+    background: #f4f7fb;
+    border: 1px solid #e3e8f0;
+    text-align: center;
+}
+
+.pay-qr-steps li span {
+    display: inline-grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--brand-gold-deep);
+    background: rgba(229, 169, 6, 0.18);
 }
 
 .pay-qr-card--panel {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1rem;
-    align-items: center;
-    text-align: left;
-    padding: 1rem;
+    grid-template-columns: 1fr;
+    gap: 0;
+    align-items: stretch;
+    text-align: center;
+    padding: 0;
     border: 1px solid #e3e8f0;
-    border-radius: 0.95rem;
+    border-radius: 1rem;
     background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.pay-qr-card-visual {
+    padding: 1.15rem 1rem 0.85rem;
+    background: linear-gradient(180deg, #fffdf8 0%, #ffffff 100%);
+    border-bottom: 1px solid #eef2f8;
+}
+
+.pay-qr-frame {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    padding: 0.85rem;
+    margin: 0 auto;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #edf1f7;
+}
+
+.pay-qr-corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-color: var(--brand-gold);
+    border-style: solid;
+    border-width: 0;
+}
+
+.pay-qr-corner--tl {
+    top: 10px;
+    left: 10px;
+    border-top-width: 3px;
+    border-left-width: 3px;
+    border-top-left-radius: 4px;
+}
+
+.pay-qr-corner--tr {
+    top: 10px;
+    right: 10px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-top-right-radius: 4px;
+}
+
+.pay-qr-corner--bl {
+    bottom: 10px;
+    left: 10px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-bottom-left-radius: 4px;
+}
+
+.pay-qr-corner--br {
+    bottom: 10px;
+    right: 10px;
+    border-bottom-width: 3px;
+    border-right-width: 3px;
+    border-bottom-right-radius: 4px;
+}
+
+.pay-qr-scan-hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+.pay-qr-card-meta {
+    padding: 0.95rem 1rem 1.1rem;
 }
 
 .pay-qr-card-copy {
@@ -7776,31 +7916,48 @@ a.addr-btn-add:focus {
 
 .pay-qr-bank-name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 700;
     color: var(--brand-dark);
 }
 
 .pay-qr-account {
-    margin: 0.25rem 0 0;
+    margin: 0.3rem 0 0;
     font-size: 0.82rem;
     color: var(--text-muted);
 }
 
-.pay-qr-card-visual {
-    text-align: center;
-    padding: 0.65rem;
-    border-radius: 0.8rem;
-    border: 1px dashed #d7deea;
-    background: #fff;
+.pay-qr-upi-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.pay-qr-upi-tags span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
 }
 
 .pay-qr-fallback {
     text-align: center;
-    padding: 0.85rem;
-    border-radius: 0.9rem;
-    border: 1px dashed #d7deea;
-    background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.pay-qr-card--fallback .pay-qr-card-meta {
+    padding-bottom: 0.25rem;
 }
 
 .pay-method-tab {
@@ -7876,9 +8033,13 @@ a.addr-btn-add:focus {
 }
 
 .pay-qr-image {
-    width: min(220px, 100%);
-    border-radius: 0.65rem;
-    border: 1px solid #e3e8f0;
+    display: block;
+    width: min(210px, 72vw);
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 0.5rem;
     background: #fff;
 }
 
@@ -8515,6 +8676,19 @@ a.addr-btn-add:focus {
 
     .pay-qr-card--panel {
         grid-template-columns: 1fr;
+    }
+
+    .pay-qr-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .pay-qr-steps li {
+        justify-content: flex-start;
+    }
+
+    .pay-qr-amount-banner {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
