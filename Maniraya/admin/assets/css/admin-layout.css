@@ -3016,6 +3016,24 @@ body.admin-app.modal-open .content-wrapper {
         max-width: 180px;
         margin: 0 auto;
     }
+
+    body.admin-app > .admin-image-preview-modal.modal.in .modal-dialog,
+    #form1 > .admin-image-preview-modal.modal.in .modal-dialog {
+        max-width: none !important;
+        max-height: calc(100dvh - 16px);
+        max-height: calc(100vh - 16px);
+    }
+
+    body.admin-app > .admin-image-preview-modal .modal-content,
+    #form1 > .admin-image-preview-modal .modal-content {
+        max-height: calc(100dvh - 16px);
+        max-height: calc(100vh - 16px);
+    }
+
+    .admin-image-preview-modal .admin-image-preview-img {
+        max-height: calc(100dvh - 240px);
+        max-height: calc(100vh - 240px);
+    }
 }
 
 /* ── Modal form sections (bank account etc.) ── */
@@ -5782,22 +5800,84 @@ body.admin-app .modal.in.admin-modal-scrollable {
     border-bottom: 1px solid #eef2f6;
 }
 
-.admin-report-page .admin-image-preview-wrap {
+.admin-report-page .admin-image-preview-wrap,
+.admin-image-preview-modal .admin-image-preview-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 0;
     padding: 12px;
     background: #f8fafc;
     border-radius: 12px;
 }
 
-.admin-report-page .admin-image-preview-img {
+.admin-report-page .admin-image-preview-img,
+.admin-image-preview-modal .admin-image-preview-img {
+    display: block;
     max-width: 100%;
-    max-height: 600px;
-    width: auto;
-    height: auto;
+    max-height: calc(100vh - 220px);
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+/* Image preview modal must sit above backdrop when moved to form */
+body.admin-app > .admin-image-preview-modal.modal,
+#form1 > .admin-image-preview-modal.modal {
+    z-index: 2110 !important;
+}
+
+body.admin-app > .admin-image-preview-modal.modal.in,
+#form1 > .admin-image-preview-modal.modal.in {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+}
+
+body.admin-app > .admin-image-preview-modal.modal.in .modal-dialog,
+#form1 > .admin-image-preview-modal.modal.in .modal-dialog {
+    position: relative;
+    z-index: 2111 !important;
+    pointer-events: auto;
+    width: 100%;
+    max-width: min(920px, calc(100vw - 32px));
+    max-height: calc(100vh - 40px);
+    margin: 0 auto !important;
+    display: flex;
+    flex-direction: column;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-content,
+#form1 > .admin-image-preview-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22);
+}
+
+body.admin-app > .admin-image-preview-modal .modal-header,
+#form1 > .admin-image-preview-modal .modal-header {
+    flex-shrink: 0;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-body,
+#form1 > .admin-image-preview-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 20px !important;
+}
+
+body.admin-app > .admin-image-preview-modal .modal-footer,
+#form1 > .admin-image-preview-modal .modal-footer {
+    flex-shrink: 0;
 }
 
 @media (max-width: 767px) {

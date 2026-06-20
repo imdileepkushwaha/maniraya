@@ -309,7 +309,7 @@ public partial class admin_UserReport : System.Web.UI.Page
             Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
             Label LblImage = (Label)GridView1.Rows[index].FindControl("LblImage");
             ImageLarge.ImageUrl = "../ProductImage/" + LblImage.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showAdminModal('DivPhotolarge');", true);
         }
     }
 }

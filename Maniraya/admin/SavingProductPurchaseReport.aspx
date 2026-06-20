@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=63" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=66" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
@@ -189,12 +189,12 @@
                     </div>
                 </div>
 
-                <div id="DivPhotolarge" class="modal fade admin-image-preview-modal">
-                    <div class="modal-dialog modal-lg">
+                <div id="DivPhotolarge" class="modal fade admin-image-preview-modal" tabindex="-1" role="dialog" aria-labelledby="savingProductImagePreviewTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title"><i class="fa fa-picture-o"></i> Product Image Preview</h4>
+                                <h4 class="modal-title" id="savingProductImagePreviewTitle"><i class="fa fa-picture-o"></i> Product Image Preview</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="admin-image-preview-wrap">
@@ -230,16 +230,5 @@
         Sys.Application.add_load(function () {
             initSavingReportDatepickers();
         });
-
-        function showModal1() {
-            $('#DivPhotolarge').modal({ backdrop: 'static', keyboard: false });
-        }
-
-        function Closepopup() {
-            $('#DivPhotolarge').modal('hide');
-            $('body').removeClass('modal-open');
-            $('body').css('padding-right', '0');
-            $('.modal-backdrop').remove();
-        }
     </script>
 </asp:Content>
