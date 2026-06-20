@@ -46,21 +46,16 @@
             }
         }
 
-        function openAddBankAccountModal() {
-            document.getElementById("<%=txtdepositbank.ClientID%>").value = "";
-            document.getElementById("<%=txtdepositaccountno.ClientID%>").value = "";
-            document.getElementById("<%=txtifsccode.ClientID%>").value = "";
-            document.getElementById("<%=txtaccountholdername.ClientID%>").value = "";
+        function resetAddBankQrUpload() {
             if (window.AdminImageUpload) {
                 AdminImageUpload.reset(document.querySelector(".admin-qr-upload-card"));
             }
-            showAdminModal('addBankAccountModal');
         }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
     <section class="content-header">
-        <h1>Add Bank Account </h1>
+        <h1>Add Bank Account</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Utility management</a></li>
@@ -72,19 +67,102 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box box-primary">
+            <div class="row admin-utility-page">
+                <div class="col-md-12 admin-utility-stack">
+                    <div class="box box-primary admin-utility-add-card">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Details</h3>
-                            <div class="box-tools">
-                                <button type="button" class="btn btn-primary btn-sm admin-box-header-btn" onclick="openAddBankAccountModal();">
-                                    <i class="fa fa-plus"></i> Add Bank Account
-                                </button>
+                            <h3 class="box-title"><i class="fa fa-plus-circle"></i> Add Bank Account</h3>
+                        </div>
+                        <div class="box-body admin-bank-account-form">
+                            <p class="admin-modal-form-intro">Add payment bank account details and upload QR code for user deposits.</p>
+
+                            <div class="admin-form-section">
+                                <h5 class="admin-form-section-title"><i class="fa fa-university"></i> Bank Details</h5>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtdepositbank.ClientID %>">Bank Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-building"></i></span>
+                                                <asp:TextBox ID="txtdepositbank" runat="server" CssClass="form-control" placeholder="e.g. State Bank of India" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtifsccode.ClientID %>">IFSC Code</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-barcode"></i></span>
+                                                <asp:TextBox ID="txtifsccode" runat="server" CssClass="form-control" placeholder="e.g. SBIN0001234" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="admin-form-section">
+                                <h5 class="admin-form-section-title"><i class="fa fa-credit-card"></i> Account Details</h5>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtdepositaccountno.ClientID %>">Account Number</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
+                                                <asp:TextBox ID="txtdepositaccountno" runat="server" CssClass="form-control" placeholder="Enter account number" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtaccountholdername.ClientID %>">Account Holder Name</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-user"></i></span>
+                                                <asp:TextBox ID="txtaccountholdername" runat="server" CssClass="form-control" placeholder="Name as per bank records" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="admin-form-section admin-form-section-last">
+                                <h5 class="admin-form-section-title"><i class="fa fa-qrcode"></i> Payment QR Code</h5>
+                                <div class="admin-qr-upload-card">
+                                    <div class="admin-qr-preview-box">
+                                        <div id="qrPreviewPlaceholder" class="admin-qr-placeholder">
+                                            <i class="fa fa-qrcode"></i>
+                                            <span>QR preview</span>
+                                        </div>
+                                        <asp:Image ID="ImageShow" runat="server" CssClass="admin-qr-preview-img" />
+                                    </div>
+                                    <div class="admin-qr-upload-side">
+                                        <p class="admin-qr-upload-title">Upload QR Image</p>
+                                        <p class="admin-qr-upload-hint">Use a clear, high-quality payment QR so users can scan easily.</p>
+                                        <div class="admin-qr-dropzone" id="qrDropzone">
+                                            <asp:FileUpload ID="ProductImageUpload" runat="server" CssClass="admin-file-input-hidden" accept="image/*" />
+                                            <label class="admin-qr-dropzone-label" for="<%= ProductImageUpload.ClientID %>">
+                                                <span class="admin-qr-dropzone-icon"><i class="fa fa-cloud-upload"></i></span>
+                                                <span class="admin-qr-dropzone-text"><strong>Browse file</strong> or drag image here</span>
+                                                <span class="admin-qr-dropzone-meta">PNG, JPG, WEBP</span>
+                                            </label>
+                                        </div>
+                                        <span class="admin-qr-filename" id="qrFileName">No file selected</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <div class="box-footer admin-product-footer">
+                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Save Bank Account" OnClick="btnSubmit_Click" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="box box-primary admin-utility-list-card">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fa fa-list"></i> Bank Account List</h3>
+                        </div>
                         <div class="box-body">
-                            <div class="form-group table-responsive">
+                            <div class="admin-table-wrap table-responsive">
                                 <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand">
                                     <Columns>
                                         <asp:TemplateField HeaderText="#">
@@ -93,7 +171,7 @@
                                                 <asp:Label ID="lblid" runat="server" Visible="false" Text='<%#Eval("id") %>'></asp:Label>
                                             </ItemTemplate>
                                         </asp:TemplateField>
-                                        <asp:TemplateField HeaderText=" Account Number">
+                                        <asp:TemplateField HeaderText="Account Number">
                                             <ItemTemplate>
                                                 <asp:Label ID="lblaccountno" runat="server" Text='<%#Eval("accountno") %>'></asp:Label>
                                             </ItemTemplate>
@@ -115,12 +193,12 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="QR Code">
                                             <ItemTemplate>
-                                                <asp:Image ID="lblbranchname" runat="server" ImageUrl='<%# "../ProductImage/" + Eval("BranchName") %>' />
+                                                <asp:Image ID="lblbranchname" runat="server" CssClass="admin-utility-qr-thumb" ImageUrl='<%# "../ProductImage/" + Eval("BranchName") %>' />
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Action">
                                             <ItemTemplate>
-                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" ToolTip="Edit account"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                                 <asp:LinkButton ID="lnkDel" CssClass="admin-grid-delete-btn" CommandName="del" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" OnClientClick="return confirm('Are you sure you want to delete this bank account?');" ToolTip="Delete account"><i class="icon fa fa-trash" aria-hidden="true"></i></asp:LinkButton>
                                             </ItemTemplate>
                                         </asp:TemplateField>
@@ -131,99 +209,7 @@
                     </div>
                 </div>
 
-                <div id="addBankAccountModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="bankAccountAddModalTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="bankAccountAddModalTitle">Add Bank Account</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <div class="modal-body admin-modal-form admin-bank-account-form">
-                                <p class="admin-modal-form-intro">Add payment bank account details and upload QR code for deposits.</p>
-
-                                <div class="admin-form-section">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-university"></i> Bank Details</h5>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtdepositbank.ClientID %>">Bank Name</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-building"></i></span>
-                                                    <asp:TextBox ID="txtdepositbank" runat="server" CssClass="form-control" placeholder="e.g. State Bank of India" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtifsccode.ClientID %>">IFSC Code</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-barcode"></i></span>
-                                                    <asp:TextBox ID="txtifsccode" runat="server" CssClass="form-control" placeholder="e.g. SBIN0001234" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="admin-form-section">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-credit-card"></i> Account Details</h5>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtdepositaccountno.ClientID %>">Account Number</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
-                                                    <asp:TextBox ID="txtdepositaccountno" runat="server" CssClass="form-control" placeholder="Enter account number" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtaccountholdername.ClientID %>">Account Holder Name</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-user"></i></span>
-                                                    <asp:TextBox ID="txtaccountholdername" runat="server" CssClass="form-control" placeholder="Name as per bank records" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="admin-form-section admin-form-section-last">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-qrcode"></i> Payment QR Code</h5>
-                                    <div class="admin-qr-upload-card">
-                                        <div class="admin-qr-preview-box">
-                                            <div id="qrPreviewPlaceholder" class="admin-qr-placeholder">
-                                                <i class="fa fa-qrcode"></i>
-                                                <span>QR preview</span>
-                                            </div>
-                                            <asp:Image ID="ImageShow" runat="server" CssClass="admin-qr-preview-img" />
-                                        </div>
-                                        <div class="admin-qr-upload-side">
-                                            <p class="admin-qr-upload-title">Upload QR Image</p>
-                                            <p class="admin-qr-upload-hint">Use a clear, high-quality payment QR so users can scan easily.</p>
-                                            <div class="admin-qr-dropzone" id="qrDropzone">
-                                                <asp:FileUpload ID="ProductImageUpload" runat="server" CssClass="admin-file-input-hidden" accept="image/*" />
-                                                <label class="admin-qr-dropzone-label" for="<%= ProductImageUpload.ClientID %>">
-                                                    <span class="admin-qr-dropzone-icon"><i class="fa fa-cloud-upload"></i></span>
-                                                    <span class="admin-qr-dropzone-text"><strong>Browse file</strong> or drag image here</span>
-                                                    <span class="admin-qr-dropzone-meta">PNG, JPG, WEBP</span>
-                                                </label>
-                                            </div>
-                                            <span class="admin-qr-filename" id="qrFileName">No file selected</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="bankAccountEditModalTitle" aria-hidden="true">
+                <div id="myModal" class="modal fade admin-utility-edit-modal" tabindex="-1" role="dialog" aria-labelledby="bankAccountEditModalTitle" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                             <div class="modal-header">

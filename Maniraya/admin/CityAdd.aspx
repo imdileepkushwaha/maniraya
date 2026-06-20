@@ -18,6 +18,7 @@
                 document.getElementById("<%=txtcityname.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
 
         function validate2() {
@@ -38,13 +39,6 @@
             }
             return true;
         }
-
-        function openAddCityModal() {
-            document.getElementById("<%=ddcountry.ClientID%>").selectedIndex = 0;
-            document.getElementById("<%=ddstate.ClientID%>").selectedIndex = 0;
-            document.getElementById("<%=txtcityname.ClientID%>").value = "";
-            showAdminModal('addCityModal');
-        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
@@ -61,19 +55,61 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box box-primary">
+            <div class="row admin-utility-page">
+                <div class="col-md-12 admin-utility-stack">
+                    <div class="box box-primary admin-utility-add-card">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Details</h3>
-                            <div class="box-tools">
-                                <button type="button" class="btn btn-primary btn-sm admin-box-header-btn" onclick="openAddCityModal();">
-                                    <i class="fa fa-plus"></i> Add City
-                                </button>
+                            <h3 class="box-title"><i class="fa fa-plus-circle"></i> Add City</h3>
+                        </div>
+                        <div class="box-body admin-utility-form">
+                            <p class="admin-section-hint">Choose country and state, then enter the city name. State list updates automatically when country changes.</p>
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="<%= ddcountry.ClientID %>">Select Country</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-globe"></i></span>
+                                            <asp:DropDownList ID="ddcountry" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
+                                                <asp:ListItem Value="0"> Select Country</asp:ListItem>
+                                            </asp:DropDownList>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="<%= ddstate.ClientID %>">Select State</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-map"></i></span>
+                                            <asp:DropDownList ID="ddstate" CssClass="form-control" runat="server">
+                                                <asp:ListItem Value="0"> Select State</asp:ListItem>
+                                            </asp:DropDownList>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="<%= txtcityname.ClientID %>">City Name</label>
+                                        <div class="admin-input-group">
+                                            <span class="admin-input-icon"><i class="fa fa-building"></i></span>
+                                            <asp:TextBox ID="txtcityname" CssClass="form-control" runat="server" placeholder="e.g. Mumbai"></asp:TextBox>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <div class="box-footer admin-product-footer">
+                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Save City" OnClick="btnSubmit_Click" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="box box-primary admin-utility-list-card">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fa fa-list"></i> City List</h3>
+                        </div>
                         <div class="box-body">
-                            <div class="form-group table-responsive">
+                            <div class="admin-table-wrap table-responsive">
                                 <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand">
                                     <Columns>
                                         <asp:TemplateField HeaderText="#">
@@ -100,7 +136,7 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Action">
                                             <ItemTemplate>
-                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" ToolTip="Edit city"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                     </Columns>
@@ -110,44 +146,11 @@
                     </div>
                 </div>
 
-                <div id="addCityModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cityAddModalTitle" aria-hidden="true">
+                <div id="myModal" class="modal fade admin-utility-edit-modal" tabindex="-1" role="dialog" aria-labelledby="cityEditModalTitle" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title" id="cityAddModalTitle">Add City</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label for="<%= ddcountry.ClientID %>">Select Country</label>
-                                    <asp:DropDownList ID="ddcountry" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddcountry_SelectedIndexChanged">
-                                        <asp:ListItem Value="0"> Select Country</asp:ListItem>
-                                    </asp:DropDownList>
-                                </div>
-                                <div class="form-group">
-                                    <label for="<%= ddstate.ClientID %>">Select State</label>
-                                    <asp:DropDownList ID="ddstate" CssClass="form-control" runat="server">
-                                        <asp:ListItem Value="0"> Select State</asp:ListItem>
-                                    </asp:DropDownList>
-                                </div>
-                                <div class="form-group">
-                                    <label for="<%= txtcityname.ClientID %>">City Name</label>
-                                    <asp:TextBox ID="txtcityname" CssClass="form-control" runat="server"></asp:TextBox>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cityEditModalTitle" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="cityEditModalTitle">Edit City</h4>
+                                <h4 class="modal-title" id="cityEditModalTitle"><i class="fa fa-pencil-square-o"></i> Edit City</h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body">
@@ -166,12 +169,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="<%= txtcitynameedit.ClientID %>">City Name</label>
-                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtcitynameedit"></asp:TextBox>
+                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtcitynameedit" placeholder="City name"></asp:TextBox>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <asp:Button ID="btnUpdate" runat="server" Text="Update" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

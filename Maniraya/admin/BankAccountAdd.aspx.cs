@@ -68,7 +68,7 @@ public partial class admin_BankAccountAdd : System.Web.UI.Page
         {
             string popupScript = "alert('Account Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addBankAccountModal');", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "resetAddBankQrUpload();", true);
             txtdepositbank.Text = "";
             txtaccountholdername.Text = "";
             txtdepositaccountno.Text = "";

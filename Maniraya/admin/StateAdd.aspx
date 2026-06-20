@@ -13,6 +13,7 @@
                 document.getElementById("<%=txtstatename.ClientID%>").focus();
                 return false;
             }
+            return true;
         }
 
         function validate2() {
@@ -27,12 +28,6 @@
                 return false;
             }
             return true;
-        }
-
-        function openAddStateModal() {
-            document.getElementById("<%=ddcountry.ClientID%>").selectedIndex = 0;
-            document.getElementById("<%=txtstatename.ClientID%>").value = "";
-            showAdminModal('addStateModal');
         }
     </script>
 </asp:Content>
@@ -50,19 +45,44 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box box-primary">
+            <div class="row admin-utility-page">
+                <div class="col-md-5 col-lg-4">
+                    <div class="box box-primary admin-utility-add-card">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Details</h3>
-                            <div class="box-tools">
-                                <button type="button" class="btn btn-primary btn-sm admin-box-header-btn" onclick="openAddStateModal();">
-                                    <i class="fa fa-plus"></i> Add State
-                                </button>
+                            <h3 class="box-title"><i class="fa fa-plus-circle"></i> Add State</h3>
+                        </div>
+                        <div class="box-body admin-utility-form">
+                            <p class="admin-section-hint">Select the parent country and enter the state name to add it to the location master.</p>
+                            <div class="form-group">
+                                <label for="<%= ddcountry.ClientID %>">Select Country</label>
+                                <div class="admin-input-group">
+                                    <span class="admin-input-icon"><i class="fa fa-globe"></i></span>
+                                    <asp:DropDownList ID="ddcountry" CssClass="form-control" runat="server">
+                                        <asp:ListItem Value="0"> Select Country</asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="<%= txtstatename.ClientID %>">State Name</label>
+                                <div class="admin-input-group">
+                                    <span class="admin-input-icon"><i class="fa fa-map"></i></span>
+                                    <asp:TextBox ID="txtstatename" CssClass="form-control" runat="server" placeholder="e.g. Maharashtra"></asp:TextBox>
+                                </div>
                             </div>
                         </div>
+                        <div class="box-footer admin-product-footer">
+                            <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Save State" OnClick="btnSubmit_Click" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7 col-lg-8">
+                    <div class="box box-primary admin-utility-list-card">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fa fa-list"></i> State List</h3>
+                        </div>
                         <div class="box-body">
-                            <div class="form-group">
+                            <div class="admin-table-wrap table-responsive">
                                 <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand">
                                     <Columns>
                                         <asp:TemplateField HeaderText="#">
@@ -74,6 +94,7 @@
                                         <asp:TemplateField HeaderText="Country Name">
                                             <ItemTemplate>
                                                 <asp:Label ID="lblCountryname" runat="server" Text='<%#Eval("CountryName") %>'></asp:Label>
+                                                <asp:Label ID="lblcountryid" runat="server" Visible="false" Text='<%#Eval("countryid") %>'></asp:Label>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="State Name">
@@ -83,7 +104,7 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Action">
                                             <ItemTemplate>
-                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                                <asp:LinkButton ID="lbEdit" CssClass="admin-grid-edit-btn" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" ToolTip="Edit state"><i class="icon fa fa-pencil-square-o" aria-hidden="true"></i></asp:LinkButton>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                     </Columns>
@@ -93,38 +114,11 @@
                     </div>
                 </div>
 
-                <div id="addStateModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="stateAddModalTitle" aria-hidden="true">
+                <div id="myModal" class="modal fade admin-utility-edit-modal" tabindex="-1" role="dialog" aria-labelledby="stateEditModalTitle" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title" id="stateAddModalTitle">Add State</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label for="<%= ddcountry.ClientID %>">Select Country</label>
-                                    <asp:DropDownList ID="ddcountry" CssClass="form-control" runat="server">
-                                        <asp:ListItem Value="0"> Select Country</asp:ListItem>
-                                    </asp:DropDownList>
-                                </div>
-                                <div class="form-group">
-                                    <label for="<%= txtstatename.ClientID %>">State Name</label>
-                                    <asp:TextBox ID="txtstatename" CssClass="form-control" runat="server"></asp:TextBox>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <asp:Button ID="btnSubmit" OnClientClick="return validate();" CssClass="btn btn-primary" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="stateEditModalTitle" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="stateEditModalTitle">Edit State</h4>
+                                <h4 class="modal-title" id="stateEditModalTitle"><i class="fa fa-pencil-square-o"></i> Edit State</h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body">
@@ -137,12 +131,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="<%= txtstatenameedit.ClientID %>">State Name</label>
-                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtstatenameedit"></asp:TextBox>
+                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtstatenameedit" placeholder="State name"></asp:TextBox>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <asp:Button ID="btnUpdate" runat="server" Text="Update" OnClientClick="return validate2();" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

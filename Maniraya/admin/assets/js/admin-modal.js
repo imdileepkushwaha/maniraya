@@ -19,18 +19,27 @@
         return $form.length ? $form : $('body');
     }
 
+    function removeDuplicateModals(modalId) {
+        var $all = $('#' + modalId);
+        if ($all.length > 1) {
+            // Keep first instance (fresh UpdatePanel markup); drop orphans moved to form on prior open.
+            $all.slice(1).remove();
+        }
+    }
+
     window.showAdminModal = function (modalId) {
         modalId = modalId || 'myModal';
 
         window.setTimeout(function () {
             resetBackdrop();
+            removeDuplicateModals(modalId);
 
             document.body.classList.remove('admin-sidebar-open');
 
             var $container = getModalContainer();
             $('body > #' + modalId).remove();
 
-            var $modal = $('#' + modalId).last();
+            var $modal = $('#' + modalId).first();
             if (!$modal.length) {
                 return;
             }
@@ -97,6 +106,16 @@
 
         prm._adminModalHooked = true;
         prm.add_endRequest(function () {
+            var seen = {};
+            $('.modal[id]').each(function () {
+                var id = this.id;
+                if (!id || seen[id]) {
+                    $(this).remove();
+                    return;
+                }
+                seen[id] = true;
+            });
+
             var $container = getModalContainer();
             $('.modal.in').each(function () {
                 var $modal = $(this);

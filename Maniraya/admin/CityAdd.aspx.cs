@@ -120,7 +120,6 @@ public partial class admin_CityAdd : System.Web.UI.Page
         {
             string popupScript = "alert('City Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addCityModal');", true);
             txtcityname.Text = "";
             ddcountry.SelectedIndex = 0;
             ddstate.SelectedIndex = 0;
@@ -171,13 +170,12 @@ public partial class admin_CityAdd : System.Web.UI.Page
     protected void ddcountry_SelectedIndexChanged(object sender, EventArgs e)
     {
         loadstate();
-        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "showAdminModal('addCityModal');", true);
     }
 
     protected void ddcountryedit_SelectedIndexChanged(object sender, EventArgs e)
     {
         loadstateedit(string.Empty);
-        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "showAdminModal('myModal');", true);
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "ReopenEditCityModal", "showAdminModal('myModal');", true);
     }
 
     string GetCountryIdByStateId(string stateId)

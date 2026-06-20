@@ -63,8 +63,9 @@ public partial class admin_StateAdd : System.Web.UI.Page
    
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
-        objState.StateName = txtstatenameedit.Text;
-        objState.StateId = lblstateid.Text;
+        objState.StateName = txtstatenameedit.Text.Trim();
+        objState.StateId = lblstateid.Text.Trim();
+        objState.CountryId = ddcountryedit.SelectedValue;
         string res = objState.Update_State(objState);
         if (res == "t")
         {
@@ -73,6 +74,11 @@ public partial class admin_StateAdd : System.Web.UI.Page
             string popupScript2 = "closeAdminModal('myModal');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loadstate();
+        }
+        else
+        {
+            string popupScript = "alert('Unable to update state. Please try again.'); showAdminModal('myModal');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
@@ -85,7 +91,6 @@ public partial class admin_StateAdd : System.Web.UI.Page
         {
             string popupScript = "alert('State Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), "closeAdminModal('addStateModal');", true);
             txtstatename.Text = "";
             ddcountry.SelectedIndex = 0;
             loadstate();
@@ -110,10 +115,16 @@ public partial class admin_StateAdd : System.Web.UI.Page
             int index = Convert.ToInt32(e.CommandArgument.ToString());
             Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
             Label lblstatename = (Label)GridView1.Rows[index].FindControl("lblstatename");
+            Label lblcountryid = (Label)GridView1.Rows[index].FindControl("lblcountryid");
             lblstateid.Text = lblid.Text;
             txtstatenameedit.Text = lblstatename.Text;
 
-            string countryId = GetCountryIdByStateId(lblid.Text);
+            string countryId = lblcountryid != null ? lblcountryid.Text.Trim() : string.Empty;
+            if (string.IsNullOrEmpty(countryId))
+            {
+                countryId = GetCountryIdByStateId(lblid.Text);
+            }
+
             if (!string.IsNullOrEmpty(countryId))
             {
                 ListItem countryItem = ddcountryedit.Items.FindByValue(countryId);
