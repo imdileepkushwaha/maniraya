@@ -96,9 +96,9 @@ public partial class UnityTreeOne : System.Web.UI.Page
             fetchimage(gender, status));
     }
 
-    string BuildEmptyNodeHtml()
+    string BuildEmptyNodeHtml(string position)
     {
-        return "<span class='binary-tree-node-empty'><img src=\"img/available.png\" alt=\"Available position\" /></span>";
+        return "<a href='../signup.aspx?p="+ position + "&userid=" + Request.QueryString["SuperId"].ToString() + "' target='_blank' class='binary-tree-node-empty'><img src=\"img/available.png\" alt=\"Available position\" /></a>";
     }
 
     public string  fetchimage(string Gender,string Status)
@@ -264,7 +264,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser2.Text = BuildEmptyNodeHtml();
+                ltuser2.Text = BuildEmptyNodeHtml("1");
             }
             //================ Second Child============
 
@@ -329,7 +329,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser3.Text = BuildEmptyNodeHtml();
+                ltuser3.Text = BuildEmptyNodeHtml("2");
             }
 
 
@@ -391,7 +391,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser4.Text = BuildEmptyNodeHtml();
+                ltuser4.Text = BuildEmptyNodeHtml("1");
             }
 
 
@@ -458,7 +458,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             else
             {
 
-                ltuser5.Text = BuildEmptyNodeHtml();
+                ltuser5.Text = BuildEmptyNodeHtml("2");
             }
 
 
@@ -526,7 +526,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             else
             {
 
-                ltuser6.Text = BuildEmptyNodeHtml();
+                ltuser6.Text = BuildEmptyNodeHtml("1");
             }
 
 
@@ -589,7 +589,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             }
             else
             {
-                ltuser7.Text = BuildEmptyNodeHtml();
+                ltuser7.Text = BuildEmptyNodeHtml("2");
             }
 
 

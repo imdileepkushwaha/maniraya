@@ -411,5 +411,9 @@ c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Debug\DataTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\bin\Debug\DataTier.pdb
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.pdb
-c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csproj.AssemblyReference.cache
-c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csproj.CoreCompileInputs.cache
+c:\Data\Work\Deepak\Maniraya\maniraya\DataTier\obj\Debug\DataTier.csprojResolveAssemblyReference.cache
+D:\Web\mpremium\maniraya\DataTier\bin\Debug\DataTier.dll
+D:\Web\mpremium\maniraya\DataTier\bin\Debug\DataTier.pdb
+D:\Web\mpremium\maniraya\DataTier\obj\Debug\DataTier.csprojResolveAssemblyReference.cache
+D:\Web\mpremium\maniraya\DataTier\obj\Debug\DataTier.dll
+D:\Web\mpremium\maniraya\DataTier\obj\Debug\DataTier.pdb
