@@ -140,6 +140,7 @@
 							<li><a class="slide-item" href="UserDirectAssociates.aspx">My Direct</a></li>
 							<li><a class="slide-item" href="DownlineReport.aspx">My Downline</a></li>
 							<li><a class="slide-item" href="binaryreport.aspx">My Treeview</a></li>
+                            <li><a class="slide-item" href="leveltree.aspx">Level Tree</a></li>
                             	<%--<li><a class="slide-item" href="PoolBinaryReport.aspx">Pool Wise Binary</a></li>
                             	<li><a class="slide-item" href="PoolDownlineReport.aspx">Pool Wise Downline</a></li>
 							<li><a class="slide-item" href="PoolBinaryReport.aspx">Pool Wise Treeview</a></li>--%>
@@ -227,8 +228,8 @@
 							 <li><a class="slide-item" href="#">Level Income</a></li>
 						</ul>
 					</li>
-                     <li><h3>Topup Request</h3></li>
-					<li class="slide">
+                     <li style="display:none"><h3>Topup Request</h3></li>
+					<li class="slide" style="display:none">
 						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">Topup Request</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="TopupRequestAdd.aspx">Topup Request Add</a></li>
