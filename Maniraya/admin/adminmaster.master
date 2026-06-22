@@ -90,6 +90,7 @@
                                     <li><a href="NewsAdd.aspx">News Add</a></li>
                                     <li><a href="PlanAdd.aspx">Add Plan</a></li>
                                     <li><a href="PackagePlanMaster.aspx">Package Plan Master</a></li>
+                                    <li><a href="MemberLoginPanel.aspx">Direct Member Login</a></li>
                                 </ul>
                             </li>
                             <li class="admin-side-group">

@@ -194,7 +194,7 @@
                                             <ItemTemplate>
                                                 <%# Container.DataItemIndex + 1 %>
                                                 <asp:Label ID="lblid" runat="server" Visible="false" Text='<%# Eval("Categoryid") %>'></asp:Label>
-                                                <asp:Label ID="lblCategoryImg" runat="server" Visible="false" Text='<%# Eval("img") %>'></asp:Label>
+                                                <asp:Label ID="lblCategoryImg" runat="server" Visible="false" Text='<%# Eval("image") %>'></asp:Label>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Image">
