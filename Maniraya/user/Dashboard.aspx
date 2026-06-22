@@ -293,12 +293,12 @@
                                             <span class="dash-care-card-chip" aria-hidden="true"><i class="fa fa-id-card"></i></span>
                                         </div>
                                         <div class="dash-care-card-number">
-                                            <asp:Label ID="lblCareNumber" runat="server" Text="0000 0000 0000" /></div>
+                                            <asp:Label ID="lblcardno" runat="server" Text="0000 0000 0000" /></div>
                                         <div class="dash-care-card-bottom">
                                             <div class="dash-care-card-holder">
-                                                <span class="dash-care-card-label">Card Holder</span>
+                                                <span class="dash-care-card-label">Status</span>
                                                 <span class="dash-care-card-name">
-                                                    <asp:Label ID="lblCareName" runat="server" Text="Member Name" /></span>
+                                                    <asp:Label ID="lblsavingstatus" runat="server" Text="Label" /></span>
                                             </div>
                                             <span class="dash-care-card-logo" aria-hidden="true"><i class="fa fa-bank"></i></span>
                                         </div>
@@ -308,43 +308,43 @@
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-list-ol"></i></span>
                                             <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Total EMI</p>
-                                                <p class="dash-feature-stat-value">18</p>
+                                                <p class="dash-feature-stat-label">Total Monthly Purchase</p>
+                                                <p class="dash-feature-stat-value"><asp:Label ID="lbltotalemi" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon is-success" aria-hidden="true"><i class="fa fa-check-circle"></i></span>
                                             <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Paid EMI</p>
-                                                <p class="dash-feature-stat-value">2</p>
+                                                <p class="dash-feature-stat-label">Paid Monthly Purchase</p>
+                                                <p class="dash-feature-stat-value"><asp:Label ID="lblpaidemi" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon is-warning" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
                                             <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Unpaid EMI</p>
-                                                <p class="dash-feature-stat-value">16</p>
+                                                <p class="dash-feature-stat-label">Unpaid Monthly Purchase</p>
+                                                <p class="dash-feature-stat-value"><asp:Label ID="lblpendingemi" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar"></i></span>
                                             <div class="dash-feature-stat-content">
                                                 <p class="dash-feature-stat-label">Investment Date</p>
-                                                <p class="dash-feature-stat-value is-date">15/06/2026</p>
+                                                <p class="dash-feature-stat-value is-date"><asp:Label ID="lblactivationdate" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon is-highlight" aria-hidden="true"><i class="fa fa-inr"></i></span>
                                             <div class="dash-feature-stat-content">
                                                 <p class="dash-feature-stat-label">Maturity Amount</p>
-                                                <p class="dash-feature-stat-value">10,000</p>
+                                                <p class="dash-feature-stat-value"><asp:Label ID="lblmaturityamount" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                         <div class="dash-feature-stat">
                                             <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar-check-o"></i></span>
                                             <div class="dash-feature-stat-content">
                                                 <p class="dash-feature-stat-label">Maturity Date</p>
-                                                <p class="dash-feature-stat-value is-date">14/12/2027</p>
+                                                <p class="dash-feature-stat-value is-date"><asp:Label ID="lblmaturitydate" runat="server" Text="0.00" /></p>
                                             </div>
                                         </div>
                                     </div>
@@ -358,7 +358,7 @@
                                             </div>
                                             <div class="dash-level-income-amount">
                                                 <span class="dash-level-income-currency"><i class="fa fa-inr"></i></span>
-                                                <asp:Label ID="lblSavingLevelIncome" runat="server" Text="0" />
+                                                <asp:Label ID="lbllevelincome" runat="server" Text="0" />
                                             </div>
                                         </div>
                                         <a href="LevelIncomeReport.aspx" class="dash-level-income-link"><i class="fa fa-external-link"></i> View Level Income Report</a>
