@@ -1,67 +1,111 @@
 ﻿using BusinessLogicTier;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Web;
-using DataTier;
-using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
-
+using DataTier;
 
 public partial class admin_MemberLoginPanel : System.Web.UI.Page
 {
     Data ObjData = new Data();
-     clsUser objuser = new clsUser();
-    clsState objState = new clsState();
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["useradmin"] == null)
+        {
+            Response.Redirect("logout.aspx");
+            return;
+        }
+
         if (!IsPostBack)
         {
-            if (Session["useradmin"] != null)
-            {
-               
-                loadcity();
-             
-            }
-            else
-            {
-                Response.Redirect("logout.aspx");
-            }
+            BindMembers();
         }
     }
-  
-    void loadcity()
+
+    void BindMembers()
     {
-        DataSet dt = new DataSet();
-        dt = getMemberLoginPanel();
+        DataTable dt = GetMemberLoginPanelData();
         GridView1.DataSource = dt;
         GridView1.DataBind();
-
-
     }
 
+    DataTable GetMemberLoginPanelData()
+    {
+        string sql = @"SELECT
+                ud.UserId,
+                ud.UserName,
+                ud.Mobile,
+                CASE WHEN ISNULL(ud.Status, 0) = 1 THEN 'Active' ELSE 'Deactive' END AS status,
+                ISNULL(ud.PhotoImage, '') AS UserImage
+            FROM UserDetail ud WITH (NOLOCK)
+            WHERE 1 = 1";
 
-
-
-    public DataSet getMemberLoginPanel()
+        if (!string.IsNullOrWhiteSpace(txtsearch.Text))
         {
-            return DBHelper.ExecuteQuery("getMemberLoginPanel");
+            sql += " AND ud.UserId LIKE '%" + SqlEscape(txtsearch.Text.Trim()) + "%'";
         }
 
-        public DataSet FetchInGdvwByUserId(clsUser fetch)
+        if (!string.IsNullOrWhiteSpace(txtusername.Text))
         {
-            SqlParameter[] para = {
-                                  new SqlParameter("@UserId", string.IsNullOrWhiteSpace(fetch.UserId) ? (object)DBNull.Value : fetch.UserId),
-                                  new SqlParameter("@UserName", string.IsNullOrWhiteSpace(fetch.UserName) ? (object)DBNull.Value : fetch.UserName)
-                                  };
-            return DBHelper.ExecuteQuery("getMemberLoginPanelFetch", para);
+            sql += " AND ud.UserName LIKE '%" + SqlEscape(txtusername.Text.Trim()) + "%'";
         }
 
+        if (!string.IsNullOrWhiteSpace(txtmobile.Text))
+        {
+            sql += " AND ud.Mobile LIKE '%" + SqlEscape(txtmobile.Text.Trim()) + "%'";
+        }
 
+        if (ddlststatus.SelectedValue != "-1")
+        {
+            sql += " AND ISNULL(ud.Status, 0) = " + ddlststatus.SelectedValue;
+        }
 
+        sql += " ORDER BY ud.UserName, ud.UserId";
+
+        DataTable dt = new DataTable();
+        ObjData.StartConnection();
+        try
+        {
+            DataTable result = ObjData.RunDataTable(sql);
+            if (result != null)
+            {
+                dt = result;
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        return dt;
+    }
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType != DataControlRowType.DataRow)
+        {
+            return;
+        }
+
+        Label lblStatus = (Label)e.Row.FindControl("lblStatus");
+        if (lblStatus == null)
+        {
+            return;
+        }
+
+        if (string.Equals(lblStatus.Text, "Active", StringComparison.OrdinalIgnoreCase))
+        {
+            lblStatus.CssClass = "label label-success";
+        }
+        else if (string.Equals(lblStatus.Text, "Deactive", StringComparison.OrdinalIgnoreCase))
+        {
+            lblStatus.CssClass = "label label-danger";
+        }
+    }
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
@@ -72,29 +116,28 @@ public partial class admin_MemberLoginPanel : System.Web.UI.Page
             Label lblusernm = (Label)GridView1.Rows[index].FindControl("lblUserName");
             Label lbluserimg = (Label)GridView1.Rows[index].FindControl("LblUserImage");
             Label lblStats = (Label)GridView1.Rows[index].FindControl("lblStatus");
-            Session["userid"] = lbluser.Text.ToString();
-            Session["username"] = lblusernm.Text.ToString();
-            Session["UserImage"] = lbluserimg.Text.ToString();
-            Session["status"] = lblStats.Text.ToString();
+            Session["userid"] = lbluser.Text;
+            Session["username"] = lblusernm.Text;
+            Session["UserImage"] = lbluserimg.Text;
+            Session["status"] = lblStats.Text;
             Response.Redirect("../user/Dashboard.aspx");
         }
     }
-    public void FetchInGdVw()
-    {
-        objuser.UserId = !string.IsNullOrWhiteSpace(txtsearch.Text) ? txtsearch.Text.Trim() : null;
-        objuser.UserName = !string.IsNullOrWhiteSpace(txtusername.Text) ? txtusername.Text.Trim() : null;
 
-        GridView1.DataSource = FetchInGdvwByUserId(objuser);
-        GridView1.DataBind();
-    }
     protected void btnfet_Click(object sender, EventArgs e)
     {
-        FetchInGdVw();
-        //Response.Redirect("MemberLoginPanel.aspx");
+        GridView1.PageIndex = 0;
+        BindMembers();
     }
+
     protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
     {
         GridView1.PageIndex = e.NewPageIndex;
-        FetchInGdVw();
+        BindMembers();
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
 }

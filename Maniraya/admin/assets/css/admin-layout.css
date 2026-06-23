@@ -5876,6 +5876,25 @@ body.admin-app .modal.in.admin-modal-scrollable {
     opacity: 0.75;
 }
 
+.admin-report-page .admin-action-btn.is-member-login {
+    color: #6d28d9 !important;
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+    white-space: nowrap;
+}
+
+.admin-report-page .admin-action-btn.is-member-login:hover {
+    color: #5b21b6 !important;
+    background: #ede9fe;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(109, 40, 217, 0.14);
+}
+
+.admin-member-login-page .admin-member-id {
+    font-weight: 700;
+    color: #1e293b;
+}
+
 .admin-report-page .table .label {
     display: inline-block;
     min-width: 78px;
