@@ -152,9 +152,13 @@
     border-radius: 50%;
 }
 
-.binary-tree-legend-dot.is-active { background: #22c55e; }
+.binary-tree-legend-dot.is-golden { background: #d4a017; }
+.binary-tree-legend-dot.is-saving { background: #22c55e; }
+.binary-tree-legend-dot.is-member { background: #1e3a8a; }
 .binary-tree-legend-dot.is-inactive { background: #ef4444; }
 .binary-tree-legend-dot.is-empty { background: #cbd5e1; }
+
+.binary-tree-legend-dot.is-active { background: #22c55e; }
 
 .binary-tree-table {
     width: 100%;
@@ -166,7 +170,7 @@
 .binary-tree-cell {
     text-align: center;
     vertical-align: top;
-    padding: 8px 6px;
+    padding: 0px 6px;
 }
 
 .binary-tree-node-card {
@@ -204,6 +208,18 @@
     overflow: hidden;
     border: 3px solid #fff;
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.binary-tree-node-link.is-golden .binary-tree-node-avatar {
+    box-shadow: 0 0 0 2px #d4a017, 0 8px 18px rgba(212, 160, 23, 0.28);
+}
+
+.binary-tree-node-link.is-saving .binary-tree-node-avatar {
+    box-shadow: 0 0 0 2px #22c55e, 0 8px 18px rgba(34, 197, 94, 0.22);
+}
+
+.binary-tree-node-link.is-member .binary-tree-node-avatar {
+    box-shadow: 0 0 0 2px #1e3a8a, 0 8px 18px rgba(30, 58, 138, 0.22);
 }
 
 .binary-tree-node-link.is-active .binary-tree-node-avatar {
