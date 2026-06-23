@@ -39,7 +39,7 @@
 		<%--<link href="../sarah/assets/css/layout.css" rel="stylesheet" type="text/css" />--%>
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=64" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=68" />
     <link rel="stylesheet" href="assets/css/admin-theme.css?v=2" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -166,6 +166,7 @@
                                 <ul class="admin-side-submenu">
                                     <li><a href="UserRepurchaseReport.aspx">Approve Purchase</a></li>
                                 <li><a href="UserPurchaseDetail.aspx">Purchase Invoice</a></li>
+                                    <li><a href="SavingProductOrderDetails.aspx">Saving Purchase Orders</a></li>
                                 </ul>
                             </li>
 

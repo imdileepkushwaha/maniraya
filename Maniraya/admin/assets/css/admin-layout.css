@@ -5698,6 +5698,79 @@ body.admin-app .modal.in.admin-modal-scrollable {
     max-height: min(560px, 70vh);
 }
 
+.admin-report-page .admin-table-paged-shell {
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.admin-report-page .admin-table-paged-shell .admin-table-wrap {
+    border: none;
+    border-radius: 0;
+    max-height: min(560px, 70vh);
+    overflow: auto;
+}
+
+.admin-report-page .admin-table-pager-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 12px 16px;
+    border-top: 1px solid #e8edf3;
+    background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+}
+
+.admin-report-page .admin-pager-info {
+    width: 100%;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+}
+
+.admin-report-page .admin-pager-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    margin: 0 2px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    color: #64748b;
+    text-decoration: none;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-report-page a.admin-pager-btn:hover,
+.admin-report-page a.admin-pager-btn:focus {
+    color: var(--admin-accent);
+    border-color: var(--admin-accent-border);
+    background: var(--admin-accent-soft);
+    text-decoration: none;
+}
+
+.admin-report-page .admin-pager-btn.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, #e52d27 0%, #c41e17 100%);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(229, 45, 39, 0.25);
+}
+
+.admin-report-page .admin-pager-btn.is-disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
 .admin-report-page .admin-table-wrap .table > thead > tr > th {
     position: sticky;
     top: 0;
@@ -5775,6 +5848,32 @@ body.admin-app .modal.in.admin-modal-scrollable {
 .admin-report-page .admin-action-btn.is-reject:hover {
     background: #fee2e2;
     transform: translateY(-1px);
+}
+
+.admin-report-page .admin-action-btn.is-view {
+    color: #1d4ed8 !important;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    white-space: nowrap;
+}
+
+.admin-report-page .admin-action-btn.is-view:hover {
+    color: #1e40af !important;
+    background: #dbeafe;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12);
+}
+
+.admin-report-page .admin-action-btn.is-view.is-disabled,
+.admin-report-page .admin-action-btn.is-view.is-disabled:hover {
+    color: #94a3b8 !important;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    pointer-events: none;
+    opacity: 0.75;
 }
 
 .admin-report-page .table .label {
@@ -6125,5 +6224,278 @@ body.admin-app > .admin-image-preview-modal .modal-footer,
 
     .admin-utility-page .admin-product-footer .btn {
         width: 100%;
+    }
+}
+
+/* ── Contact Settings tabs (ContactAdd.aspx) ── */
+.contact-settings-page.box {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.contact-settings-page > .box-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 1px solid var(--admin-border);
+    padding: 16px 20px;
+}
+
+.contact-settings-page > .box-header .box-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--admin-text);
+    letter-spacing: -0.01em;
+}
+
+.contact-settings-page > .box-body {
+    padding: 0;
+}
+
+.contact-settings-tabbar {
+    /* padding: 18px 18px 0;
+    background: #f8fafc; */
+    margin-bottom: 10px;
+}
+
+.contact-settings-tabs.nav-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid #dde4ec;
+    border-radius: 14px;
+    background: #edf2f7;
+    list-style: none;
+}
+
+.contact-settings-tabs.nav-tabs > li {
+    float: none;
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+    background: transparent;
+    border: none;
+}
+
+.contact-settings-tabs.nav-tabs > li > a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 11px 14px;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: transparent;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.35;
+    text-decoration: none !important;
+    white-space: normal;
+    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.contact-settings-tabs.nav-tabs > li > a:hover,
+.contact-settings-tabs.nav-tabs > li > a:focus {
+    background: rgba(255, 255, 255, 0.55);
+    color: #334155;
+    outline: none;
+}
+
+.contact-settings-tabs.nav-tabs > li.active > a,
+.contact-settings-tabs.nav-tabs > li.active > a:hover,
+.contact-settings-tabs.nav-tabs > li.active > a:focus {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+
+.contact-settings-tab-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.contact-settings-tab-icon.is-contact {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.contact-settings-tab-icon.is-gst {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.contact-settings-tab-icon.is-sign {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.contact-settings-tabs.nav-tabs > li.active .contact-settings-tab-icon.is-contact {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.contact-settings-tabs.nav-tabs > li.active .contact-settings-tab-icon.is-gst {
+    background: #059669;
+    color: #ffffff;
+}
+
+.contact-settings-tabs.nav-tabs > li.active .contact-settings-tab-icon.is-sign {
+    background: #ea580c;
+    color: #ffffff;
+}
+
+.contact-settings-tab-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.3;
+    min-width: 0;
+}
+
+.contact-settings-tab-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: inherit;
+    letter-spacing: -0.01em;
+}
+
+.contact-settings-tab-text small {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #94a3b8;
+    line-height: 1.35;
+}
+
+.contact-settings-tabs.nav-tabs > li.active .contact-settings-tab-text strong {
+    color: #0f172a;
+}
+
+.contact-settings-tabs.nav-tabs > li.active .contact-settings-tab-text small {
+    color: #64748b;
+}
+
+.contact-settings-tab-content {
+    padding: 18px 18px 14px;
+    background: #ffffff;
+    border-top: 1px solid var(--admin-border);
+}
+
+.contact-settings-tab-content .tab-pane > .row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.contact-settings-inner-box {
+    margin-bottom: 0;
+    box-shadow: none !important;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.contact-settings-inner-box > .box-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #eef2f7;
+    padding: 12px 16px;
+}
+
+.contact-settings-inner-box > .box-header .box-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.contact-settings-inner-box > .box-body {
+    padding: 16px;
+    font-size: 14px;
+}
+
+.contact-settings-inner-box > .box-body label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.contact-settings-inner-box > .box-body .admin-section-hint {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.contact-settings-inner-box > .box-body .help-block {
+    font-size: 12px;
+}
+
+.contact-settings-inner-box > .box-footer {
+    background: #fafbfc;
+    border-top: 1px solid #eef2f7;
+    padding: 12px 16px;
+}
+
+@media (max-width: 991px) {
+    .contact-settings-tabs.nav-tabs {
+        flex-wrap: wrap;
+    }
+
+    .contact-settings-tabs.nav-tabs > li {
+        flex: 1 1 calc(50% - 4px);
+        min-width: calc(50% - 4px);
+    }
+
+    .contact-settings-tab-text small {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 767px) {
+    .contact-settings-tabbar {
+        padding: 14px 12px 0;
+    }
+
+    .contact-settings-tabs.nav-tabs {
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px;
+    }
+
+    .contact-settings-tabs.nav-tabs > li {
+        flex: 1 1 auto;
+        min-width: 100%;
+        width: 100%;
+    }
+
+    .contact-settings-tabs.nav-tabs > li > a {
+        padding: 12px 14px;
+    }
+
+    .contact-settings-tabs.nav-tabs > li.active > a {
+        transform: none;
+    }
+
+    .contact-settings-tab-text strong {
+        font-size: 14px;
+    }
+
+    .contact-settings-tab-text small {
+        font-size: 12px;
+    }
+
+    .contact-settings-tab-content {
+        padding: 14px 12px 10px;
     }
 }

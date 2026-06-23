@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=22" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=23" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
     <section class="content-header">
@@ -138,16 +138,30 @@
 
                 <div class="dash-subpage-panel">
                     <div class="dash-subpage-panel-body">
-                        <div class="dash-highlight-card">
-                            <div class="dash-highlight-card-main">
-                                <span class="dash-highlight-card-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
-                                <div class="dash-highlight-card-text">
-                                    <h4>Level Income</h4>
-                                    <p>Your total level-wise earnings</p>
+                        <div class="dash-income-status-row">
+                            <div class="dash-highlight-card dash-highlight-card--compact">
+                                <div class="dash-highlight-card-main">
+                                    <span class="dash-highlight-card-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
+                                    <div class="dash-highlight-card-text">
+                                        <h4>Level Income</h4>
+                                        <p>Your total level-wise earnings</p>
+                                    </div>
+                                    <div class="dash-highlight-card-amount"><i class="fa fa-inr"></i> <asp:Label ID="lbllevelincome" runat="server" Text="0" /></div>
                                 </div>
-                                <div class="dash-highlight-card-amount"><i class="fa fa-inr"></i> <asp:Label ID="lbllevelincome" runat="server" Text="0" /></div>
+                                <a href="LevelIncomeReport.aspx" class="dash-highlight-card-link"><i class="fa fa-external-link"></i> View Report</a>
                             </div>
-                            <a href="LevelIncomeReport.aspx" class="dash-highlight-card-link"><i class="fa fa-external-link"></i> View Report</a>
+
+                            <div class="dash-order-status-card">
+                                <div class="dash-order-status-card-main">
+                                    <span class="dash-order-status-card-icon" aria-hidden="true"><i class="fa fa-truck"></i></span>
+                                    <div class="dash-order-status-card-text">
+                                        <h4>Order Status</h4>
+                                        <p>Delivery update for selected coupon</p>
+                                        <span class="dash-order-status-orderid">Order: <asp:Label ID="lblorderid" runat="server" Text="-" /></span>
+                                    </div>
+                                    <asp:Label ID="lblorderdeliverystatus" runat="server" Text="-" CssClass="dash-order-status-badge" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

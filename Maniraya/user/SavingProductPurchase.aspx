@@ -156,7 +156,7 @@
             border-radius: 10px;
             background: rgba(59, 130, 246, 0.12);
             border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #bfdbfe;
+            color: #2e68b0;
             font-size: 13px;
             line-height: 1.5;
         }
@@ -201,6 +201,80 @@
             .saving-purchase-summary {
                 grid-template-columns: 1fr;
             }
+        }
+
+        .saving-shipping-card {
+            padding: 16px 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.04) 0%, rgba(30, 41, 59, 0.06) 100%);
+        }
+
+        .saving-shipping-card.is-empty {
+            border-style: dashed;
+            background: rgba(248, 250, 252, 0.9);
+        }
+
+        .saving-shipping-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .saving-shipping-card-title {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .saving-shipping-source {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: #0369a1;
+            background: rgba(14, 165, 233, 0.14);
+            border: 1px solid rgba(14, 165, 233, 0.28);
+        }
+
+        .saving-shipping-address-text {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: #334155;
+            white-space: pre-line;
+        }
+
+        .saving-shipping-empty-text {
+            margin: 0 0 12px;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: #64748b;
+        }
+
+        .saving-shipping-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .saving-shipping-edit-panel {
+            padding: 16px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(229, 169, 6, 0.28);
+            background: rgba(255, 251, 235, 0.55);
         }
     </style>
     <script type="text/javascript">
@@ -316,6 +390,82 @@
                                 <asp:TextBox ID="txtamount" Enabled="false" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>
+
+                        <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Shipping Address</p>
+                        <asp:HiddenField ID="hfShippingMode" runat="server" Value="view" />
+
+                        <asp:Panel ID="pnlShippingView" runat="server" CssClass="saving-shipping-card">
+                            <div class="saving-shipping-card-head">
+                                <h4 class="saving-shipping-card-title"><i class="fa fa-truck"></i> Delivery Address</h4>
+                                <asp:Label ID="lblShippingSource" runat="server" CssClass="saving-shipping-source" Visible="false" />
+                            </div>
+                            <asp:Literal ID="litShippingAddress" runat="server" Mode="PassThrough" />
+                            <div class="saving-shipping-actions">
+                                <asp:Button ID="btnChangeShipping" runat="server" CssClass="btn btn-default profile-btn-secondary-action"
+                                    Text="Change Address" CausesValidation="false" OnClick="btnChangeShipping_Click" />
+                                <asp:Button ID="btnUseProfileShipping" runat="server" CssClass="btn btn-primary profile-btn-primary-action"
+                                    Text="Use Profile Address" CausesValidation="false" OnClick="btnUseProfileShipping_Click" Visible="false" />
+                                <a href="AddressProof.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-id-card"></i> Update Profile Address</a>
+                            </div>
+                        </asp:Panel>
+
+                        <asp:Panel ID="pnlShippingEmpty" runat="server" CssClass="saving-shipping-card is-empty" Visible="false">
+                            <p class="saving-shipping-empty-text">
+                                <i class="fa fa-info-circle"></i>
+                                No shipping address found. Please add your delivery address before submitting the purchase request.
+                            </p>
+                            <div class="saving-shipping-actions">
+                                <asp:Button ID="btnAddShipping" runat="server" CssClass="btn btn-primary profile-btn-primary-action"
+                                    Text="Add Shipping Address" CausesValidation="false" OnClick="btnAddShipping_Click" />
+                                <asp:Button ID="btnUseProfileFromEmpty" runat="server" CssClass="btn btn-default profile-btn-secondary-action"
+                                    Text="Use Profile Address" CausesValidation="false" OnClick="btnUseProfileShipping_Click" Visible="false" />
+                                <a href="AddressProof.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-id-card"></i> Add Profile Address</a>
+                            </div>
+                        </asp:Panel>
+
+                        <asp:Panel ID="pnlShippingEdit" runat="server" CssClass="saving-shipping-edit-panel" Visible="false">
+                            <div class="form-group">
+                                <label for="<%= txtShipAddress.ClientID %>"><i class="fa fa-home"></i> Address</label>
+                                <asp:TextBox ID="txtShipAddress" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-control"
+                                    placeholder="House no., street, landmark" />
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="<%= ddShipState.ClientID %>"><i class="fa fa-map"></i> State</label>
+                                        <asp:DropDownList ID="ddShipState" runat="server" CssClass="form-control" AutoPostBack="true"
+                                            OnSelectedIndexChanged="ddShipState_SelectedIndexChanged" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="<%= ddShipCity.ClientID %>"><i class="fa fa-building"></i> City</label>
+                                        <asp:DropDownList ID="ddShipCity" runat="server" CssClass="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="<%= txtShipArea.ClientID %>"><i class="fa fa-location-arrow"></i> Area / Locality</label>
+                                        <asp:TextBox ID="txtShipArea" runat="server" CssClass="form-control" placeholder="Area or locality" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="<%= txtShipPincode.ClientID %>"><i class="fa fa-thumb-tack"></i> Pincode</label>
+                                        <asp:TextBox ID="txtShipPincode" runat="server" CssClass="form-control" placeholder="Pincode"
+                                            onkeypress="return isNumberKey(event);" MaxLength="6" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="saving-shipping-actions">
+                                <asp:Button ID="btnSaveShipping" runat="server" CssClass="btn btn-primary profile-btn-primary-action"
+                                    Text="Save Shipping Address" CausesValidation="false" OnClick="btnSaveShipping_Click" />
+                                <asp:Button ID="btnCancelShipping" runat="server" CssClass="btn btn-default profile-btn-secondary-action"
+                                    Text="Cancel" CausesValidation="false" OnClick="btnCancelShipping_Click" />
+                            </div>
+                        </asp:Panel>
 
                         <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
                         <div class="row">

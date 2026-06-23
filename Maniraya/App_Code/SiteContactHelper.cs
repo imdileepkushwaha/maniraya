@@ -11,6 +11,9 @@ public static class SiteContactHelper
     public const string TypeEmail = "Email";
     public const string TypeAddress = "Address";
     public const string TypeWebsite = "Website";
+    public const string TypeGst = "GST";
+    public const string TypeSign = "Sign";
+    public const string SignImageVirtualFolder = "~/InvoiceSign/";
 
     static readonly Tuple<string, string, string, bool>[] DefaultContacts = new[]
     {
@@ -22,7 +25,8 @@ public static class SiteContactHelper
             "Head Office",
             "#33 1st floor MANIRAYA marketing pvt ltd 9th A cross HIG A sector yelahanka new town Bangalore Karnataka 560064, INDIA",
             true),
-        Tuple.Create(TypeWebsite, "Website", "maniraya.com", true)
+        Tuple.Create(TypeWebsite, "Website", "maniraya.com", true),
+        Tuple.Create(TypeGst, "Company GSTIN", "29AARCM8049H1ZQ", true)
     };
 
     public static void EnsureTableAndSeedDefaults()
@@ -48,6 +52,7 @@ public static class SiteContactHelper
                     )
                 END";
                 objData.RunInsUpDelQuery(createSql);
+                EnsureGstContactExists(objData);
 
                 DataTable countTable = objData.RunDataTable("SELECT COUNT(*) AS ItemCount FROM tbl_SiteContact");
                 int count = 0;
@@ -95,6 +100,48 @@ public static class SiteContactHelper
         return RunSelect("SELECT * FROM tbl_SiteContact ORDER BY ContactType, DisplayOrder, Id DESC");
     }
 
+    public static DataTable GetContactsByType(string contactType)
+    {
+        EnsureTableAndSeedDefaults();
+        string safeType = (contactType ?? string.Empty).Replace("'", "''");
+        return RunSelect(
+            "SELECT * FROM tbl_SiteContact WHERE ContactType = '" + safeType + "' ORDER BY IsPrimary DESC, DisplayOrder, Id DESC");
+    }
+
+    public static DataTable GetContactsExcludingType(string excludedType)
+    {
+        return GetContactsExcludingTypes(excludedType);
+    }
+
+    public static DataTable GetContactsExcludingTypes(params string[] excludedTypes)
+    {
+        EnsureTableAndSeedDefaults();
+        if (excludedTypes == null || excludedTypes.Length == 0)
+        {
+            return GetAllContacts();
+        }
+
+        System.Collections.Generic.List<string> safeTypes = new System.Collections.Generic.List<string>();
+        foreach (string excludedType in excludedTypes)
+        {
+            if (string.IsNullOrWhiteSpace(excludedType))
+            {
+                continue;
+            }
+
+            safeTypes.Add("'" + excludedType.Trim().Replace("'", "''") + "'");
+        }
+
+        if (safeTypes.Count == 0)
+        {
+            return GetAllContacts();
+        }
+
+        return RunSelect(
+            "SELECT * FROM tbl_SiteContact WHERE ContactType NOT IN (" + string.Join(",", safeTypes)
+            + ") ORDER BY ContactType, DisplayOrder, Id DESC");
+    }
+
     public static DataTable GetActiveContacts(string contactType)
     {
         EnsureTableAndSeedDefaults();
@@ -132,6 +179,67 @@ public static class SiteContactHelper
     public static string GetPrimaryWebsite()
     {
         return GetPrimaryValue(TypeWebsite);
+    }
+
+    public static string GetPrimaryGst()
+    {
+        return GetPrimaryValue(TypeGst);
+    }
+
+    public static string GetPrimarySignImageFileName()
+    {
+        return GetPrimaryValue(TypeSign);
+    }
+
+    public static string GetInvoiceSignImageUrl(string relativePrefix)
+    {
+        string fileName = GetPrimarySignImageFileName();
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return string.Empty;
+        }
+
+        string prefix = string.IsNullOrWhiteSpace(relativePrefix) ? "../" : relativePrefix;
+        if (!prefix.EndsWith("/"))
+        {
+            prefix += "/";
+        }
+
+        return prefix + "InvoiceSign/" + fileName.Trim().Replace("\\", "/").TrimStart('/');
+    }
+
+    public static void BindInvoiceSign(System.Web.UI.WebControls.Image image, string relativePrefix)
+    {
+        if (image == null)
+        {
+            return;
+        }
+
+        string url = GetInvoiceSignImageUrl(relativePrefix);
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            image.Visible = false;
+            image.ImageUrl = string.Empty;
+            return;
+        }
+
+        image.ImageUrl = url;
+        image.Visible = true;
+        if (string.IsNullOrWhiteSpace(image.AlternateText))
+        {
+            image.AlternateText = "Authorised Signatory";
+        }
+    }
+
+    public static string BuildInvoiceGstLine()
+    {
+        string gst = GetPrimaryGst();
+        if (string.IsNullOrWhiteSpace(gst))
+        {
+            return string.Empty;
+        }
+
+        return "COMPANY GSTN - " + gst.Trim();
     }
 
     public static string BuildTelHref(string phone)
@@ -275,6 +383,16 @@ public static class SiteContactHelper
         }
 
         literal.Text = BuildInvoiceCompanyHtml();
+    }
+
+    public static void BindInvoiceGst(Literal literal)
+    {
+        if (literal == null)
+        {
+            return;
+        }
+
+        literal.Text = HttpUtilityHtmlEncode(BuildInvoiceGstLine());
     }
 
     public static void BindInvoiceCompanyInfo(Control page, string controlId)
@@ -448,6 +566,43 @@ public static class SiteContactHelper
         }
 
         return dt;
+    }
+
+    static void EnsureGstContactExists(Data objData)
+    {
+        DataTable gstCountTable = objData.RunDataTable(
+            "SELECT COUNT(*) AS ItemCount FROM tbl_SiteContact WHERE ContactType = '" + TypeGst.Replace("'", "''") + "'");
+        int gstCount = 0;
+        if (gstCountTable != null && gstCountTable.Rows.Count > 0)
+        {
+            gstCount = Convert.ToInt32(gstCountTable.Rows[0]["ItemCount"]);
+        }
+
+        if (gstCount > 0)
+        {
+            return;
+        }
+
+        foreach (Tuple<string, string, string, bool> item in DefaultContacts)
+        {
+            if (!string.Equals(item.Item1, TypeGst, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            string type = (item.Item1 ?? string.Empty).Replace("'", "''");
+            string title = (item.Item2 ?? string.Empty).Replace("'", "''");
+            string value = (item.Item3 ?? string.Empty).Replace("'", "''");
+            string isPrimary = item.Item4 ? "1" : "0";
+            string insertSql = string.Format(
+                "INSERT INTO tbl_SiteContact (ContactType, Title, ContactValue, DisplayOrder, IsPrimary, Status) VALUES ('{0}', '{1}', '{2}', 6, {3}, 1)",
+                type,
+                title,
+                value,
+                isPrimary);
+            objData.RunInsUpDelQuery(insertSql);
+            break;
+        }
     }
 
     static string NormalizeDigits(string phone)

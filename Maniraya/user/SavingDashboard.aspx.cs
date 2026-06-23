@@ -21,6 +21,7 @@ public partial class user_SavingDashboard : System.Web.UI.Page
         if (!IsPostBack)
         {
             string userId = Session["userid"].ToString();
+            SavingProductHelper.EnsureDeliveryColumns();
             LoadCouponDropdown(userId);
             BindSavingDashboard(userId);
         }
@@ -90,6 +91,7 @@ public partial class user_SavingDashboard : System.Web.UI.Page
 
         DataRow accountRow = GetAccountRow(userId, couponCode);
         BindAccountStatus(accountRow, userId);
+        BindOrderDeliveryStatus(accountRow);
 
         DataRow dashboardRow = GetSavingDashboardRow(userId, couponCode);
         if (dashboardRow != null)
@@ -105,6 +107,66 @@ public partial class user_SavingDashboard : System.Web.UI.Page
         }
 
         ResetMetrics();
+    }
+
+    void BindOrderDeliveryStatus(DataRow accountRow)
+    {
+        if (accountRow == null)
+        {
+            lblorderid.Text = "-";
+            lblorderdeliverystatus.Text = "-";
+            lblorderdeliverystatus.CssClass = "dash-order-status-badge is-inactive";
+            return;
+        }
+
+        string orderId = GetRowValue(accountRow, "orderid", "OrderId", "OrderID");
+        lblorderid.Text = string.IsNullOrWhiteSpace(orderId) ? "-" : orderId.ToUpperInvariant();
+
+        string accountStatus = NormalizeStatus(GetRowValue(accountRow, "status", "Status"));
+        if (IsPendingStatus(accountStatus))
+        {
+            lblorderdeliverystatus.Text = "Pending Approval";
+            lblorderdeliverystatus.CssClass = "dash-order-status-badge is-pending";
+            return;
+        }
+
+        if (IsRejectedStatus(accountStatus))
+        {
+            lblorderdeliverystatus.Text = "Rejected";
+            lblorderdeliverystatus.CssClass = "dash-order-status-badge is-rejected";
+            return;
+        }
+
+        if (!IsApprovedStatus(accountStatus))
+        {
+            lblorderdeliverystatus.Text = "Not Available";
+            lblorderdeliverystatus.CssClass = "dash-order-status-badge is-inactive";
+            return;
+        }
+
+        string deliveryStatus = GetRowValue(accountRow, "deliverystatus", "DeliveryStatus");
+        if (string.IsNullOrWhiteSpace(deliveryStatus))
+        {
+            deliveryStatus = "Confirmed";
+        }
+
+        lblorderdeliverystatus.Text = deliveryStatus;
+        lblorderdeliverystatus.CssClass = "dash-order-status-badge " + GetDeliveryStatusBadgeClass(deliveryStatus);
+    }
+
+    static string GetDeliveryStatusBadgeClass(string status)
+    {
+        switch ((status ?? string.Empty).Trim().ToLowerInvariant())
+        {
+            case "shipped":
+                return "is-shipped";
+            case "out for delivery":
+                return "is-out";
+            case "delivered":
+                return "is-delivered";
+            default:
+                return "is-confirmed";
+        }
     }
 
     void BindMetricsFromDashboard(DataRow dashboardRow)
@@ -258,6 +320,9 @@ public partial class user_SavingDashboard : System.Web.UI.Page
         lblactivationdate.Text = "-";
         lblmaturitydate.Text = "-";
         lblmaturityamount.Text = "0.00";
+        lblorderid.Text = "-";
+        lblorderdeliverystatus.Text = "-";
+        lblorderdeliverystatus.CssClass = "dash-order-status-badge is-inactive";
     }
 
     DataRow GetSavingDashboardRow(string userId, string couponCode)

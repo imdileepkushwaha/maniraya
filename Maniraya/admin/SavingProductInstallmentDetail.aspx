@@ -1,15 +1,15 @@
-﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
+﻿<%@ Page Title="Saving Product Installment Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductInstallmentDetail.aspx.cs" Inherits="admin_SavingProductInstallmentDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=69" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=66" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-        <h1>Saving Product Purchase Report</h1>
+        <h1>Saving Product Installment Report</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Saving Request</a></li>
-            <li class="active">Saving Product Purchase Report</li>
+            <li class="active">Saving Product Installment Report</li>
         </ol>
     </section>
 </asp:Content>
@@ -27,83 +27,18 @@
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+             </ContentTemplate>
+    </asp:UpdatePanel>
             <div class="admin-report-page">
                 <div class="row">
+                    
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
-                            </div>
-                            <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Filter saving product purchase requests by date range, user ID, or approval status.</p>
-                                <div class="admin-form-section">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Date Range</h5>
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="<%= txtfromdate.ClientID %>">From Date</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-calendar"></i></span>
-                                                    <asp:TextBox runat="server" CssClass="form-control form_date" ID="txtfromdate" placeholder="dd/mm/yyyy"></asp:TextBox>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="<%= txttodate.ClientID %>">To Date</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-calendar-check-o"></i></span>
-                                                    <asp:TextBox runat="server" CssClass="form-control form_date" ID="txttodate" placeholder="dd/mm/yyyy"></asp:TextBox>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="admin-form-section admin-form-section-last">
-                                    <h5 class="admin-form-section-title"><i class="fa fa-sliders"></i> Filters</h5>
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="<%= txtuserid.ClientID %>">User Id</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-id-badge"></i></span>
-                                                    <asp:TextBox ID="txtuserid" CssClass="form-control" runat="server" placeholder="Enter user id" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="<%= ddstatus.ClientID %>">Status</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-info-circle"></i></span>
-                                                    <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
-                                                        <asp:ListItem Value="0">Select Status</asp:ListItem>
-                                                        <asp:ListItem>Pending</asp:ListItem>
-                                                        <asp:ListItem>Approved</asp:ListItem>
-                                                        <asp:ListItem>Rejected</asp:ListItem>
-                                                    </asp:DropDownList>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="box-footer admin-report-footer">
-                                <asp:Button ID="btnSubmit" CssClass="btn btn-primary" runat="server" Text="Search" OnClick="btnSubmit_Click" />
-                                <asp:Button ID="btnCancel" CssClass="btn btn-default" runat="server" Text="Cancel" OnClick="btncancel_Click" CausesValidation="false" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="box box-primary">
-                            <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-list-alt"></i> Purchase Details</h3>
+                                <h3 class="box-title"><i class="fa fa-list-alt"></i> Installment Details</h3>
                             </div>
                             <div class="box-body">
-                                <div class="admin-table-toolbar">
-                                    <span class="admin-table-caption"><i class="fa fa-table"></i> Saving Product Requests</span>
-                                </div>
+                                
                                 <div class="admin-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
                                         AutoGenerateColumns="False" EmptyDataText="No saving product purchase requests found."
@@ -131,11 +66,11 @@
                                                     <asp:Label ID="lblname" runat="server" Text='<%#Eval("username") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Date of Request">
+                                         <%--   <asp:TemplateField HeaderText="Date of Request">
                                                 <ItemTemplate>
                                                     <asp:Label ID="lblcreatingdate" runat="server" Text='<%#Eval("entrydate","{0:dd/MM/yyyy hh:mm tt}") %>'></asp:Label>
                                                 </ItemTemplate>
-                                            </asp:TemplateField>
+                                            </asp:TemplateField>--%>
                                             <asp:TemplateField HeaderText="Approve Date">
                                                 <ItemTemplate>
                                                     <asp:Label ID="lblreleasedate" runat="server" Text='<%#Eval("approvedate","{0:dd/MM/yyyy hh:mm tt}") %>'></asp:Label>
@@ -176,26 +111,19 @@
 
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Approve" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
+                                            <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
-                                                    <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve" OnClick="btnApprove_click" runat="server">
-                                                        <i class="fa fa-check"></i> Approve
-                                                    </asp:LinkButton>
-                                                </ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Reject" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
-                                                <ItemTemplate>
-                                                    <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject" OnClick="btnReject_click" runat="server">
-                                                        <i class="fa fa-times"></i> Reject
-                                                    </asp:LinkButton>
-                                                </ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="View" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
-                                                <ItemTemplate>
-                                                    <a href='<%# string.IsNullOrWhiteSpace(Convert.ToString(Eval("couponcode"))) ? "javascript:void(0);" : "SavingProductInstallmentDetail.aspx?oid=" + Server.UrlEncode(Convert.ToString(Eval("couponcode"))) %>'
-                                                        class='<%# "admin-action-btn is-view" + (string.IsNullOrWhiteSpace(Convert.ToString(Eval("couponcode"))) ? " is-disabled" : "") %>'>
-                                                        <i class="fa fa-eye"></i> View
-                                                    </a>
+                                                    <div class="admin-action-group">
+                                                        <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve" OnClick="btnApprove_click" runat="server">
+                                                            <i class="fa fa-check"></i> Approve
+                                                        </asp:LinkButton>
+                                                        <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject" OnClick="btnReject_click" runat="server">
+                                                            <i class="fa fa-times"></i> Reject
+                                                        </asp:LinkButton>
+
+                                                      
+                                                        
+                                                    </div>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
@@ -225,8 +153,7 @@
                     </div>
                 </div>
             </div>
-        </ContentTemplate>
-    </asp:UpdatePanel>
+       
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
     <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>

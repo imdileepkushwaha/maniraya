@@ -32,6 +32,44 @@ public static class SavingProductHelper
         }
     }
 
+    public static void EnsureDeliveryColumns()
+    {
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'DeliveryStatus') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD DeliveryStatus NVARCHAR(50) NULL;
+            END");
+
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'DeliveryStatusUpdatedOn') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD DeliveryStatusUpdatedOn DATETIME NULL;
+            END");
+
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'DeliveryStatusUpdatedBy') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD DeliveryStatusUpdatedBy NVARCHAR(100) NULL;
+            END");
+
+        RunNonQuery(@"
+            UPDATE SavingAccountDetail
+            SET DeliveryStatus = 'Confirmed'
+            WHERE (status = 'Approved' OR LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('approved', 'approve'))
+              AND (DeliveryStatus IS NULL OR LTRIM(RTRIM(DeliveryStatus)) = '')");
+    }
+
+    public static bool HasDeliveryStatusColumn()
+    {
+        DataTable dt = RunSelect("SELECT COL_LENGTH('SavingAccountDetail', 'DeliveryStatus') AS ColLen");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ColLen"] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
+    }
+
     public static DataTable GetAllProducts()
     {
         EnsureStatusColumn();
