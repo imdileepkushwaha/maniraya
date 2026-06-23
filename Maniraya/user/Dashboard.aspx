@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=15" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=20" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -273,7 +273,7 @@
 
                     <div class="row dash-feature-row">
                         <div class="col-md-6">
-                            <div class="dash-feature-card tone-saving" id="savingDashCard">
+                            <div class="dash-feature-card tone-saving">
                                 <div class="dash-feature-head">
                                     <div class="dash-feature-title">
                                         <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-bank"></i></span>
@@ -282,96 +282,14 @@
                                             <p>Your savings products &amp; balance overview</p>
                                         </div>
                                     </div>
-                                    <button type="button" class="dash-btn dash-feature-toggle" onclick="toggleDashFeature(this, 'savingDashCard');">
-                                        <span class="dash-feature-toggle-text">View</span> <i class="fa fa-chevron-down"></i>
-                                    </button>
-                                </div>
-                                <div class="dash-feature-body">
-                                    <div class="dash-care-card">
-                                        <div class="dash-care-card-top">
-                                            <span class="dash-care-card-title">Unique Care Number</span>
-                                            <span class="dash-care-card-chip" aria-hidden="true"><i class="fa fa-id-card"></i></span>
-                                        </div>
-                                        <div class="dash-care-card-number">
-                                            <asp:Label ID="lblcardno" runat="server" Text="0000 0000 0000" /></div>
-                                        <div class="dash-care-card-bottom">
-                                            <div class="dash-care-card-holder">
-                                                <span class="dash-care-card-label">Status</span>
-                                                <span class="dash-care-card-name">
-                                                    <asp:Label ID="lblsavingstatus" runat="server" Text="Label" /></span>
-                                            </div>
-                                            <span class="dash-care-card-logo" aria-hidden="true"><i class="fa fa-bank"></i></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="dash-feature-stats">
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-list-ol"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Total Monthly Purchase</p>
-                                                <p class="dash-feature-stat-value"><asp:Label ID="lbltotalemi" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon is-success" aria-hidden="true"><i class="fa fa-check-circle"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Paid Monthly Purchase</p>
-                                                <p class="dash-feature-stat-value"><asp:Label ID="lblpaidemi" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon is-warning" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Unpaid Monthly Purchase</p>
-                                                <p class="dash-feature-stat-value"><asp:Label ID="lblpendingemi" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Investment Date</p>
-                                                <p class="dash-feature-stat-value is-date"><asp:Label ID="lblactivationdate" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon is-highlight" aria-hidden="true"><i class="fa fa-inr"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Maturity Amount</p>
-                                                <p class="dash-feature-stat-value"><asp:Label ID="lblmaturityamount" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat">
-                                            <span class="dash-feature-stat-icon" aria-hidden="true"><i class="fa fa-calendar-check-o"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Maturity Date</p>
-                                                <p class="dash-feature-stat-value is-date"><asp:Label ID="lblmaturitydate" runat="server" Text="0.00" /></p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="dash-level-income-box">
-                                        <div class="dash-level-income-main">
-                                            <span class="dash-level-income-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
-                                            <div class="dash-level-income-text">
-                                                <h4>Level Income</h4>
-                                                <p>Your total level-wise earnings</p>
-                                            </div>
-                                            <div class="dash-level-income-amount">
-                                                <span class="dash-level-income-currency"><i class="fa fa-inr"></i></span>
-                                                <asp:Label ID="lbllevelincome" runat="server" Text="0" />
-                                            </div>
-                                        </div>
-                                        <a href="LevelIncomeReport.aspx" class="dash-level-income-link"><i class="fa fa-external-link"></i> View Level Income Report</a>
-                                    </div>
-                                    <!-- <div class="dash-feature-links">
-                                        <a href="SavingProductPurchase.aspx" class="dash-feature-link"><i class="fa fa-shopping-cart"></i> Buy Saving Product</a>
-                                        <a href="SAvingProductPurchaseReport.aspx" class="dash-feature-link"><i class="fa fa-list-alt"></i> Saving Report</a>
-                                    </div> -->
+                                    <a href="SavingDashboard.aspx" class="dash-btn dash-feature-toggle">
+                                        View <i class="fa fa-arrow-right"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="dash-feature-card tone-premium" id="premiumDashCard">
+                            <div class="dash-feature-card tone-premium">
                                 <div class="dash-feature-head">
                                     <div class="dash-feature-title">
                                         <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-diamond"></i></span>
@@ -380,45 +298,9 @@
                                             <p>Your premium plans &amp; package overview</p>
                                         </div>
                                     </div>
-                                    <button type="button" class="dash-btn dash-feature-toggle" onclick="toggleDashFeature(this, 'premiumDashCard');">
-                                        <span class="dash-feature-toggle-text">View</span> <i class="fa fa-chevron-down"></i>
-                                    </button>
-                                </div>
-                                <div class="dash-feature-body">
-                                    <div class="dash-feature-stats dash-feature-stats-premium">
-                                        <div class="dash-feature-stat dash-feature-stat-premium">
-                                            <span class="dash-feature-stat-icon is-premium-gold" aria-hidden="true"><i class="fa fa-sitemap"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Binary Income</p>
-                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat dash-feature-stat-premium">
-                                            <span class="dash-feature-stat-icon is-premium-blue" aria-hidden="true"><i class="fa fa-user-plus"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Direct Income</p>
-                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat dash-feature-stat-premium">
-                                            <span class="dash-feature-stat-icon is-premium-green" aria-hidden="true"><i class="fa fa-money"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Cashback Wallet</p>
-                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
-                                            </div>
-                                        </div>
-                                        <div class="dash-feature-stat dash-feature-stat-premium">
-                                            <span class="dash-feature-stat-icon is-premium-purple" aria-hidden="true"><i class="fa fa-shopping-bag"></i></span>
-                                            <div class="dash-feature-stat-content">
-                                                <p class="dash-feature-stat-label">Product Wallet</p>
-                                                <p class="dash-feature-stat-value"><i class="fa fa-inr"></i> 0</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="dash-feature-links">
-                                        <a href="JoiningPackage.aspx" class="dash-feature-link"><i class="fa fa-cube"></i> View Packages</a>
-                                        <a href="PurchaseReport.aspx" class="dash-feature-link"><i class="fa fa-list-alt"></i> Purchase Report</a>
-                                    </div>
+                                    <a href="PremiumDashboard.aspx" class="dash-btn dash-feature-toggle">
+                                        View <i class="fa fa-arrow-right"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -544,9 +426,15 @@
                         </div>
                     </div>
 
-                    <div class="dash-section-head">
-                        <h3 class="dash-section-title">Income Overview</h3>
-                        <p class="dash-section-sub">Track all your earnings in one place</p>
+                    <div class="dash-section-head dash-section-head--income">
+                        <div class="dash-section-head-main">
+                            <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
+                            <div class="dash-section-head-copy">
+                                <h3 class="dash-section-title">Income Overview</h3>
+                                <p class="dash-section-sub">Track all your earnings in one place</p>
+                            </div>
+                        </div>
+                        <span class="dash-section-head-tag">Earnings</span>
                     </div>
                     <div class="row dash-income-grid">
 
@@ -759,9 +647,15 @@
 
                         </div>
 
-                    <div class="dash-section-head dash-section-head--spaced">
-                        <h3 class="dash-section-title">Member Overview</h3>
-                        <p class="dash-section-sub">Rank, team &amp; volume snapshot</p>
+                    <div class="dash-section-head dash-section-head--member dash-section-head--spaced">
+                        <div class="dash-section-head-main">
+                            <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+                            <div class="dash-section-head-copy">
+                                <h3 class="dash-section-title">Member Overview</h3>
+                                <p class="dash-section-sub">Rank, team &amp; volume snapshot</p>
+                            </div>
+                        </div>
+                        <span class="dash-section-head-tag">Team</span>
                     </div>
                     <div class="row dash-metrics-grid">
 
@@ -3065,16 +2959,6 @@ Profit Share Budget</p>
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
     <script type="text/javascript" language="javascript">
-        function toggleDashFeature(btn, cardId) {
-            var card = document.getElementById(cardId);
-            if (!card) return;
-            var isOpen = card.classList.toggle("is-open");
-            var label = btn.querySelector(".dash-feature-toggle-text");
-            if (label) {
-                label.textContent = isOpen ? "Hide" : "View";
-            }
-        }
-
         (function () {
             var el = document.getElementById("dashDateRange");
             if (!el) return;

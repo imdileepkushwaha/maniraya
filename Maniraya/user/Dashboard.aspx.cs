@@ -35,7 +35,6 @@ public partial class user_Dashboard : System.Web.UI.Page
                 TxtRightLink.Attributes.Add("readonly", "readonly");
                 loadnotification();
                 laoddata();
-                loadsavingmpremium();
                 string url = clsUtility.ProjectWebsite;
 
                 TxtLeftLinkLink.Text = "https://maniraya.com/" + "/Register.aspx?UserId=" + Session["userid"].ToString() + "&standingposition=1";
@@ -192,16 +191,6 @@ public partial class user_Dashboard : System.Web.UI.Page
         lblrank1.Text = dt.Rows[0]["Rank"].ToString();
         lblrank2.Text = dt.Rows[0]["categoryname"].ToString();
         //lblrfrl.Text = dt.Rows[0]["sponcering"].ToString();
-        lblsavingstatus.Text = dt.Rows[0]["SavingStatus"].ToString();
-
-        if (dt.Rows[0]["SavingStatus"].ToString() == "1")
-        {
-            lblsavingstatus.Text = "Active ";
-        }
-        else
-        {
-            lblsavingstatus.Text = "Deactive";
-        }
         // LblTds.Text = dt.Rows[0]["TDS"].ToString();
     }
 
@@ -605,65 +594,6 @@ public partial class user_Dashboard : System.Web.UI.Page
 
 
 
-
-    void loadsavingmpremium()
-    {
-        DataTable dt = new DataTable();
-        dt = getmpremiumformancenew(Session["userid"].ToString());
-
-        if (dt.Rows.Count > 0)
-        {
-            lblcardno.Text = dt.Rows[0]["OrderId"].ToString();
-            lbllevelincome.Text = dt.Rows[0]["levelincome"].ToString();
-            lbltotalemi.Text = dt.Rows[0]["totalemi"].ToString();
-            lblpendingemi.Text = dt.Rows[0]["pendingemi"].ToString();
-
-            lblpaidemi.Text = dt.Rows[0]["paidemi"].ToString();
-            lblactivationdate.Text = dt.Rows[0]["approvedate"].ToString();
-            lblmaturitydate.Text = dt.Rows[0]["maturitydate"].ToString();
-            lblmaturityamount.Text = dt.Rows[0]["maturityamount"].ToString();
-
-           
-
-        }
-
-
-    }
-
-
-    public DataTable getmpremiumformancenew(string UserId)
-        {
-
-            string res = "";
-            string s2 = "";
-            SqlConnection cn;
-            SqlTransaction tr = null;
-            DataTable Dt = new DataTable();
-            try
-            {
-                s2 = "sp_GetSAvingDashboard";
-                SqlParameter[] parameter = {              
-                    new SqlParameter("@UserId",UserId), 
-                   
-                 
-                  
-                };
-                Dt = ObjData.RunDataTableProcedure(s2, parameter);
-
-
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                ObjData.EndConnection();
-
-            }
-            return Dt;
-        }
 
     void loadPerformance()
     {
