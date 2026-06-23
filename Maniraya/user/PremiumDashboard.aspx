@@ -64,33 +64,7 @@
                 </div>
             </div>
 
-            <div class="dash-subpage-panel">
-                <div class="dash-subpage-panel-head">
-                    <span class="dash-subpage-panel-icon tone-purple" aria-hidden="true"><i class="fa fa-bolt"></i></span>
-                    <div>
-                        <h3>Quick Actions</h3>
-                        <p>Jump to packages and purchase history</p>
-                    </div>
-                </div>
-                <div class="dash-subpage-panel-body">
-                    <div class="dash-quick-links">
-                        <a href="JoiningPackage.aspx" class="dash-quick-link">
-                            <span class="dash-quick-link-icon" aria-hidden="true"><i class="fa fa-cube"></i></span>
-                            <span class="dash-quick-link-text">
-                                <strong>View Packages</strong>
-                                <span>Explore and upgrade your MPremium plans</span>
-                            </span>
-                        </a>
-                        <a href="PurchaseReport.aspx" class="dash-quick-link">
-                            <span class="dash-quick-link-icon tone-green" aria-hidden="true"><i class="fa fa-list-alt"></i></span>
-                            <span class="dash-quick-link-text">
-                                <strong>Purchase Report</strong>
-                                <span>Review your complete purchase history</span>
-                            </span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </asp:Content>

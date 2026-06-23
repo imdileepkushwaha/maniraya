@@ -80,21 +80,21 @@
                                 <span class="dash-metric-card-icon tone-slate" aria-hidden="true"><i class="fa fa-list-ol"></i></span>
                                 <div class="dash-metric-card-content">
                                     <p class="dash-metric-card-label">Total Monthly Purchase</p>
-                                    <p class="dash-metric-card-value"><i class="fa fa-inr"></i> <asp:Label ID="lbltotalemi" runat="server" Text="0.00" /></p>
+                                    <p class="dash-metric-card-value"> <asp:Label ID="lbltotalemi" runat="server" Text="0.00" /></p>
                                 </div>
                             </div>
                             <div class="dash-metric-card">
                                 <span class="dash-metric-card-icon tone-green" aria-hidden="true"><i class="fa fa-check-circle"></i></span>
                                 <div class="dash-metric-card-content">
                                     <p class="dash-metric-card-label">Paid Monthly Purchase</p>
-                                    <p class="dash-metric-card-value"><i class="fa fa-inr"></i> <asp:Label ID="lblpaidemi" runat="server" Text="0.00" /></p>
+                                    <p class="dash-metric-card-value"> <asp:Label ID="lblpaidemi" runat="server" Text="0.00" /></p>
                                 </div>
                             </div>
                             <div class="dash-metric-card">
                                 <span class="dash-metric-card-icon tone-amber" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
                                 <div class="dash-metric-card-content">
                                     <p class="dash-metric-card-label">Unpaid Monthly Purchase</p>
-                                    <p class="dash-metric-card-value"><i class="fa fa-inr"></i> <asp:Label ID="lblpendingemi" runat="server" Text="0.00" /></p>
+                                    <p class="dash-metric-card-value"> <asp:Label ID="lblpendingemi" runat="server" Text="0.00" /></p>
                                 </div>
                             </div>
                         </div>

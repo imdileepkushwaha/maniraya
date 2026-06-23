@@ -426,7 +426,7 @@
                         </div>
                     </div>
 
-                    <div class="dash-section-head dash-section-head--income">
+                    <div class="dash-section-head dash-section-head--income" style="display:none">
                         <div class="dash-section-head-main">
                             <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
                             <div class="dash-section-head-copy">
@@ -436,7 +436,7 @@
                         </div>
                         <span class="dash-section-head-tag">Earnings</span>
                     </div>
-                    <div class="row dash-income-grid">
+                    <div class="row dash-income-grid" style="display:none">
 
                               <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-red">

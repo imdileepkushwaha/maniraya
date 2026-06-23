@@ -115,18 +115,23 @@ public partial class user_SavingDashboard : System.Web.UI.Page
         lblpaidemi.Text = GetRowValueOrDefault(dashboardRow, "0.00", "paidemi", "PaidEmi");
         lblactivationdate.Text = FormatDate(GetRowValueOrDefault(dashboardRow, "-", "approvedate", "ApproveDate", "InvestmentDate"));
         lblmaturitydate.Text = FormatDate(GetRowValueOrDefault(dashboardRow, "-", "maturitydate", "MaturityDate"));
-        lblmaturityamount.Text = GetRowValueOrDefault(dashboardRow, "0.00", "maturityamount", "MaturityAmount");
+        lblmaturityamount.Text = IsRejectedStatus(NormalizeStatus(GetRowValue(dashboardRow, "status", "Status")))
+            ? "0.00"
+            : GetRowValueOrDefault(dashboardRow, "0.00", "maturityamount", "MaturityAmount");
     }
 
     void BindMetricsFromAccount(DataRow accountRow)
     {
+        string status = NormalizeStatus(GetRowValue(accountRow, "status", "Status"));
         lbllevelincome.Text = "0";
         lbltotalemi.Text = GetRowValueOrDefault(accountRow, "0.00", "amount", "Amount");
         lblpaidemi.Text = "0.00";
         lblpendingemi.Text = "0.00";
         lblactivationdate.Text = FormatDate(GetRowValueOrDefault(accountRow, "-", "approvedate", "ApproveDate", "entrydate", "EntryDate"));
         lblmaturitydate.Text = "-";
-        lblmaturityamount.Text = GetRowValueOrDefault(accountRow, "0.00", "amount", "Amount");
+        lblmaturityamount.Text = IsRejectedStatus(status)
+            ? "0.00"
+            : GetRowValueOrDefault(accountRow, "0.00", "amount", "Amount");
     }
 
     void BindAccountStatus(DataRow accountRow, string userId)
@@ -269,7 +274,7 @@ public partial class user_SavingDashboard : System.Web.UI.Page
             return matchedRow;
         }
 
-        if (string.IsNullOrWhiteSpace(couponCode))
+        if (string.IsNullOrWhiteSpace(couponCode) && dt.Rows.Count > 0)
         {
             return dt.Rows[0];
         }
@@ -323,54 +328,94 @@ public partial class user_SavingDashboard : System.Web.UI.Page
 
     DataTable GetSavingDashboardData(string userId, string couponCode)
     {
-        if (!string.IsNullOrWhiteSpace(couponCode))
-        {
-            DataTable withCoupon = ExecuteSavingDashboardSp(userId, couponCode, "CouponCode");
-            if (withCoupon != null && withCoupon.Rows.Count > 0 && !IsErrorResult(withCoupon))
-            {
-                return withCoupon;
-            }
-
-            DataTable withOrderId = ExecuteSavingDashboardSp(userId, couponCode, "OrderId");
-            if (withOrderId != null && withOrderId.Rows.Count > 0 && !IsErrorResult(withOrderId))
-            {
-                return withOrderId;
-            }
-        }
-
-        return ExecuteSavingDashboardSp(userId, null, null);
-    }
-
-    DataTable ExecuteSavingDashboardSp(string userId, string couponCode, string couponParameterName)
-    {
+        DataTable dt = new DataTable();
         try
         {
-            SqlParameter[] parameters;
-            if (string.IsNullOrWhiteSpace(couponCode) || string.IsNullOrWhiteSpace(couponParameterName))
-            {
-                parameters = new SqlParameter[] {
-                    new SqlParameter("@UserId", userId)
-                };
-            }
-            else
-            {
-                parameters = new SqlParameter[] {
-                    new SqlParameter("@UserId", userId),
-                    new SqlParameter("@" + couponParameterName, couponCode)
-                };
-            }
+            const string sql = @"
+;WITH UserAccounts AS (
+    SELECT sd.*,
+        CASE
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', '1', 'active')
+            THEN ROW_NUMBER() OVER (PARTITION BY sd.orderid, sd.userid ORDER BY sd.id)
+            ELSE NULL
+        END AS AcctSeq
+    FROM SavingAccountDetail sd WITH (NOLOCK)
+    WHERE sd.userid = @UserId
+),
+InstallmentBatches AS (
+    SELECT ld.*,
+        ((ROW_NUMBER() OVER (PARTITION BY ld.orderid, ld.userid ORDER BY ld.Id) - 1) / 18) + 1 AS BatchSeq
+    FROM SavingAccountInstallmentDetail ld WITH (NOLOCK)
+    WHERE ld.userid = @UserId
+)
+SELECT
+    ua.CouponCode,
+    UPPER(ua.OrderId) AS OrderId,
+    ISNULL((
+        SELECT SUM(ld.amount)
+        FROM SavingLevelIncomeDetail ld WITH (NOLOCK)
+        WHERE ld.userid = ua.userid
+    ), 0) AS levelincome,
+    COUNT(ib.Id) AS totalemi,
+    SUM(CASE WHEN ib.Status = 'Approved' THEN 1 ELSE 0 END) AS paidemi,
+    SUM(CASE WHEN ib.Status = 'Pending' THEN 1 ELSE 0 END) AS pendingemi,
+    CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(ua.Status, '')))) IN ('rejected', '2', 'cancelled', 'canceled', 'deactive', 'inactive')
+        THEN 0
+        ELSE ISNULL(SUM(ib.Amount), 0) + 2000
+    END AS maturityamount,
+    ua.ApproveDate AS approvedate,
+    ua.EntryDate AS entrydate,
+    ua.MaturityDate AS maturitydate,
+    ua.Amount,
+    ua.Status
+FROM UserAccounts ua
+LEFT JOIN InstallmentBatches ib
+    ON ib.orderid = ua.orderid
+    AND ib.userid = ua.userid
+    AND ua.AcctSeq IS NOT NULL
+    AND ib.BatchSeq = ua.AcctSeq
+WHERE (@CouponCode IS NULL OR @CouponCode = ''
+    OR ua.CouponCode = @CouponCode
+    OR ua.OrderId = @CouponCode
+    OR UPPER(ua.OrderId) = UPPER(@CouponCode))
+GROUP BY
+    ua.Id,
+    ua.CouponCode,
+    ua.OrderId,
+    ua.userid,
+    ua.ApproveDate,
+    ua.EntryDate,
+    ua.MaturityDate,
+    ua.Amount,
+    ua.Status
+ORDER BY ua.Id DESC";
 
-            DataSet ds = DBHelper.ExecuteQuery("sp_GetSAvingDashboard", parameters);
-            if (ds != null && ds.Tables.Count > 0)
+            object couponParam = string.IsNullOrWhiteSpace(couponCode)
+                ? (object)DBNull.Value
+                : couponCode.Trim();
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@UserId", userId),
+                new SqlParameter("@CouponCode", couponParam)
+            };
+
+            ObjData.StartConnection();
+            try
             {
-                return ds.Tables[0];
+                dt = ObjData.RunDataTableParam(sql, parameters);
+            }
+            finally
+            {
+                ObjData.EndConnection();
             }
         }
         catch
         {
+            dt = null;
         }
 
-        return null;
+        return dt;
     }
 
     static DataRow FindRowByCoupon(DataTable dt, string couponCode)
