@@ -12,6 +12,13 @@ public partial class UnityTreeOne : System.Web.UI.Page
 {
     clsUser objUser = new clsUser();
     Data ObjData = new Data();
+    readonly Dictionary<string, UserStatusFlags> _userFlagsCache = new Dictionary<string, UserStatusFlags>(StringComparer.OrdinalIgnoreCase);
+
+    sealed class UserStatusFlags
+    {
+        public bool SavingActive;
+        public bool MemberActive;
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
        loadbinary(Request.QueryString["SuperId"].ToString());
@@ -86,70 +93,121 @@ public partial class UnityTreeOne : System.Web.UI.Page
         dt = objUser.getRightDataPlanWise2(objUser);
         return dt;
     }
-    string BuildOccupiedNodeHtml(string userId, string gender, string status)
+    bool IsActiveFlag(object value)
     {
-        string statusClass = status.ToUpper() == "ACTIVE" ? "is-active" : "is-inactive";
+        if (value == null || value == DBNull.Value)
+            return false;
+
+        string status = value.ToString().Trim();
+        if (status == "1")
+            return true;
+
+        return status.Equals("Active", StringComparison.OrdinalIgnoreCase)
+            || status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase);
+    }
+
+    string GetRowUserId(DataRow row)
+    {
+        if (row == null)
+            return string.Empty;
+
+        if (row.Table.Columns.Contains("Userid"))
+            return row["Userid"].ToString();
+        if (row.Table.Columns.Contains("UserId"))
+            return row["UserId"].ToString();
+
+        return string.Empty;
+    }
+
+    UserStatusFlags LookupUserFlags(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            return new UserStatusFlags();
+
+        UserStatusFlags cached;
+        if (_userFlagsCache.TryGetValue(userId, out cached))
+            return cached;
+
+        UserStatusFlags flags = new UserStatusFlags();
+        try
+        {
+            ObjData.StartConnection();
+            SqlParameter[] parameter = { new SqlParameter("@UserId", userId) };
+            DataTable statusDt = ObjData.RunDataTableParam(
+                "SELECT ISNULL(Status, 0) AS MemberStatus, ISNULL(SavingStatus, 0) AS SavingStatus FROM UserDetail WHERE UserId = @UserId",
+                parameter);
+            if (statusDt != null && statusDt.Rows.Count > 0)
+            {
+                flags.MemberActive = IsActiveFlag(statusDt.Rows[0]["MemberStatus"]);
+                flags.SavingActive = IsActiveFlag(statusDt.Rows[0]["SavingStatus"]);
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        _userFlagsCache[userId] = flags;
+        return flags;
+    }
+
+    void GetUserFlags(DataRow row, out bool savingActive, out bool memberActive)
+    {
+        savingActive = false;
+        memberActive = false;
+
+        if (row == null)
+            return;
+
+        UserStatusFlags flags = LookupUserFlags(GetRowUserId(row));
+        savingActive = flags.SavingActive;
+        memberActive = flags.MemberActive;
+    }
+
+    string ResolveNodeCssClass(bool savingActive, bool memberActive)
+    {
+        if (savingActive && memberActive)
+            return "is-golden";
+        if (savingActive)
+            return "is-saving";
+        if (memberActive)
+            return "is-member";
+        return "is-inactive";
+    }
+
+    string ResolveNodeImage(bool savingActive, bool memberActive)
+    {
+        if (savingActive && memberActive)
+            return "img/gold.png";
+        if (savingActive)
+            return "img/pain.png";
+        if (memberActive)
+            return "img/blue.png";
+        return "img/unpaid.png";
+    }
+
+    string BuildOccupiedNodeHtml(string userId, DataRow row)
+    {
+        bool savingActive;
+        bool memberActive;
+        GetUserFlags(row, out savingActive, out memberActive);
+
+        string statusClass = ResolveNodeCssClass(savingActive, memberActive);
+        string imagePath = ResolveNodeImage(savingActive, memberActive);
+
         return string.Format(
             "<a href='UnityTreeOne.aspx?SuperId={0}' class='binary-tree-node-link gridViewToolTip {1}'><span class='binary-tree-node-avatar'><img src=\"{2}\" alt=\"Member\" /></span></a>",
             userId,
             statusClass,
-            fetchimage(gender, status));
+            imagePath);
     }
 
     string BuildEmptyNodeHtml(string position)
     {
         return "<a href='../signup.aspx?p="+ position + "&userid=" + Request.QueryString["SuperId"].ToString() + "' target='_blank' class='binary-tree-node-empty'><img src=\"img/available.png\" alt=\"Available position\" /></a>";
-    }
-
-    public string  fetchimage(string Gender,string Status)
-    {
-        string imagepath = "";
-
-        if (Status.ToUpper() == "ACTIVE")
-        {
-            imagepath = "img/paid.png";
-        }
-        if (Status.ToUpper() == "DEACTIVE")
-        {
-            imagepath = "img/unpaid.png";
-        }
-        if (Gender.ToUpper() == "MALE")
-        {
-            if (Status.ToUpper() == "ACTIVE")
-            {
-                imagepath = "img/paid.png";
-            }
-            if (Status.ToUpper() == "DEACTIVE")
-            {
-                imagepath = "img/unpaid.png";
-            }
-        }
-        if (Gender.ToUpper() == "FEMALE")
-        {
-            if (Status.ToUpper() == "ACTIVE")
-            {
-                imagepath = "img/paid.png";
-            }
-            if (Status.ToUpper() == "DEACTIVE")
-            {
-                imagepath = "img/unpaid.png";
-            }
-        }
-
-        if (Status.ToUpper() == "ACTIVE")
-            {
-                imagepath = "img/paid.png";
-            }
-            if (Status.ToUpper() == "DEACTIVE")
-            {
-                imagepath = "img/unpaid.png";
-            }
-        if (imagepath == "")
-        {
-            imagepath = "img/unpaid.png";
-        }
-
-        return imagepath;
     }
     void loadbinary(string str_superid)
     {
@@ -162,7 +220,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             //divdata.Visible = true;
             lbluserid1.Text = dt.Rows[0]["Userid"].ToString();
             lblusername1.Text = dt.Rows[0]["username"].ToString();
-            ltuser1.Text = BuildOccupiedNodeHtml(dt.Rows[0]["Userid"].ToString(), dt.Rows[0]["gender"].ToString(), dt.Rows[0]["Status"].ToString());
+            ltuser1.Text = BuildOccupiedNodeHtml(dt.Rows[0]["Userid"].ToString(), dt.Rows[0]);
             //LblUserID.Text = dt.Rows[0]["Userid"].ToString();
             //LblUserName.Text = dt.Rows[0]["username"].ToString();
             //LblSponserId.Text = dt.Rows[0]["SponserId"].ToString();
@@ -216,7 +274,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid2.Text = dt2.Rows[0]["Userid"].ToString();
                 lblusername2.Text = dt2.Rows[0]["username"].ToString();
-                ltuser2.Text = BuildOccupiedNodeHtml(dt2.Rows[0]["Userid"].ToString(), dt2.Rows[0]["gender"].ToString(), dt2.Rows[0]["Status"].ToString());
+                ltuser2.Text = BuildOccupiedNodeHtml(dt2.Rows[0]["Userid"].ToString(), dt2.Rows[0]);
                 ////LblUserID25.Text = dt2.Rows[0]["Userid"].ToString();
                 ////LblUserName25.Text = dt2.Rows[0]["username"].ToString();
                 ////LblSponserId1.Text = dt2.Rows[0]["SponserId"].ToString();
@@ -277,7 +335,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid3.Text = dt3.Rows[0]["Userid"].ToString();
                 lblusername3.Text = dt3.Rows[0]["username"].ToString();
-                ltuser3.Text = BuildOccupiedNodeHtml(dt3.Rows[0]["Userid"].ToString(), dt3.Rows[0]["gender"].ToString(), dt3.Rows[0]["Status"].ToString());
+                ltuser3.Text = BuildOccupiedNodeHtml(dt3.Rows[0]["Userid"].ToString(), dt3.Rows[0]);
                 //LblUserID26.Text = dt3.Rows[0]["Userid"].ToString();
                 //LblUserName26.Text = dt3.Rows[0]["username"].ToString();
                 //LblSponserId2.Text = dt3.Rows[0]["SponserId"].ToString();
@@ -343,7 +401,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid4.Text = dt4.Rows[0]["Userid"].ToString();
                 lblusername4.Text = dt4.Rows[0]["username"].ToString();
-                ltuser4.Text = BuildOccupiedNodeHtml(dt4.Rows[0]["Userid"].ToString(), dt4.Rows[0]["gender"].ToString(), dt4.Rows[0]["Status"].ToString());
+                ltuser4.Text = BuildOccupiedNodeHtml(dt4.Rows[0]["Userid"].ToString(), dt4.Rows[0]);
                 //LblUserID27.Text = dt4.Rows[0]["Userid"].ToString();
                 //LblUserName27.Text = dt4.Rows[0]["username"].ToString();
                 //LblSponserId3.Text = dt4.Rows[0]["SponserId"].ToString();
@@ -406,7 +464,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid5.Text = dt5.Rows[0]["Userid"].ToString();
                 lblusername5.Text = dt5.Rows[0]["username"].ToString();
-                ltuser5.Text = BuildOccupiedNodeHtml(dt5.Rows[0]["Userid"].ToString(), dt5.Rows[0]["gender"].ToString(), dt5.Rows[0]["Status"].ToString());
+                ltuser5.Text = BuildOccupiedNodeHtml(dt5.Rows[0]["Userid"].ToString(), dt5.Rows[0]);
                 //LblUserID28.Text = dt5.Rows[0]["Userid"].ToString();
                 //LblUserName28.Text = dt5.Rows[0]["username"].ToString();
                 //LblSponserId4.Text = dt5.Rows[0]["SponserId"].ToString();
@@ -473,7 +531,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid6.Text = dt6.Rows[0]["Userid"].ToString();
                 lblusername6.Text = dt6.Rows[0]["username"].ToString();
-                ltuser6.Text = BuildOccupiedNodeHtml(dt6.Rows[0]["Userid"].ToString(), dt6.Rows[0]["gender"].ToString(), dt6.Rows[0]["Status"].ToString());
+                ltuser6.Text = BuildOccupiedNodeHtml(dt6.Rows[0]["Userid"].ToString(), dt6.Rows[0]);
 
                 //LblUserID29.Text = dt6.Rows[0]["Userid"].ToString();
                 //LblUserName29.Text = dt6.Rows[0]["username"].ToString();
@@ -541,7 +599,7 @@ public partial class UnityTreeOne : System.Web.UI.Page
             {
                 lbluserid7.Text = dt7.Rows[0]["Userid"].ToString();
                 lblusername7.Text = dt7.Rows[0]["username"].ToString();
-                ltuser7.Text = BuildOccupiedNodeHtml(dt7.Rows[0]["Userid"].ToString(), dt7.Rows[0]["gender"].ToString(), dt7.Rows[0]["Status"].ToString());
+                ltuser7.Text = BuildOccupiedNodeHtml(dt7.Rows[0]["Userid"].ToString(), dt7.Rows[0]);
 
                 //LblUserID30.Text = dt7.Rows[0]["Userid"].ToString();
                 //LblUserName30.Text = dt7.Rows[0]["username"].ToString();

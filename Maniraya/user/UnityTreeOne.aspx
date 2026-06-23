@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <title>Binary Tree</title>
     <link href="new_assets/css/font-awesome.min.css" rel="stylesheet" />
-    <link href="assets/css/binary-tree.css?v=2" rel="stylesheet" />
+    <link href="assets/css/binary-tree.css?v=3" rel="stylesheet" />
     <script src="../MyJs/jquery-1.8.2.js"></script>
     <script src="../MyJs/jquery.tooltip.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
@@ -178,7 +178,9 @@
 
         <div class="binary-tree-page">
             <div class="binary-tree-legend">
-                <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-active"></span> Active</span>
+                <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-golden"></span> Saving + Active</span>
+                <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-saving"></span> Saving Active</span>
+                <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-member"></span> Member Active</span>
                 <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-inactive"></span> Inactive</span>
                 <span class="binary-tree-legend-item"><span class="binary-tree-legend-dot is-empty"></span> Available</span>
             </div>
