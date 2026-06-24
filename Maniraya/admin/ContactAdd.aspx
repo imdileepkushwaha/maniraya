@@ -1,6 +1,7 @@
 <%@ Page Title="Contact Settings" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ContactAdd.aspx.cs" Inherits="ContactAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
@@ -57,14 +58,15 @@
 
                     <div class="tab-content contact-settings-tab-content">
                         <div class="tab-pane active" id="tabContact" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-5 col-sm-6">
+                            <div class="row contact-settings-layout-stack">
+                                <div class="col-md-12">
                                     <div class="box box-primary contact-settings-inner-box">
                                         <div class="box-header with-border">
                                             <h3 class="box-title">Add / Update Contact</h3>
                                         </div>
                                         <div class="box-body">
                                             <p class="admin-section-hint">Manage phone, email, address, and website shown on the public website, footer, and contact page.</p>
+                                            <div class="contact-settings-form-grid">
                                             <div class="form-group">
                                                 <label for="<%= ddlContactType.ClientID %>">Contact Type</label>
                                                 <asp:DropDownList ID="ddlContactType" runat="server" CssClass="form-control">
@@ -78,7 +80,7 @@
                                                 <label for="<%= txtTitle.ClientID %>">Title / Label</label>
                                                 <asp:TextBox ID="txtTitle" runat="server" CssClass="form-control" placeholder="e.g. Customer Support, Head Office"></asp:TextBox>
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group span-full">
                                                 <label for="<%= txtContactValue.ClientID %>">Value</label>
                                                 <asp:TextBox ID="txtContactValue" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="3" placeholder="Phone number, email, address, or website"></asp:TextBox>
                                             </div>
@@ -94,6 +96,7 @@
                                                 <label for="<%= chkStatus.ClientID %>">Status (Active)</label>
                                                 <asp:CheckBox ID="chkStatus" runat="server" Checked="true" />
                                             </div>
+                                            </div>
                                         </div>
                                         <div class="box-footer">
                                             <asp:Button ID="btnSubmit" runat="server" Text="Submit" CssClass="btn btn-primary" OnClick="btnSubmit_Click" />
@@ -102,7 +105,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-7 col-sm-6">
+                                <div class="col-md-12">
                                     <div class="box box-primary contact-settings-inner-box">
                                         <div class="box-header with-border">
                                             <h3 class="box-title">Contact List</h3>

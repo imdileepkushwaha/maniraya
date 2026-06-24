@@ -128,6 +128,62 @@
             letter-spacing: 0.02em;
             text-transform: uppercase;
         }
+
+        .saving-order-products {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 180px;
+        }
+
+        .saving-order-product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .saving-order-product-item strong {
+            color: #0f766e;
+            white-space: nowrap;
+        }
+
+        .saving-order-product-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .saving-order-modal-products {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .saving-order-modal-products li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
     </style>
 </asp:Content>
 
@@ -156,7 +212,7 @@
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <asp:HiddenField ID="hfOrderRecordId" runat="server" />
+            <asp:HiddenField ID="hfOrderId" runat="server" />
 
             <div class="admin-report-page">
                 <div class="row">
@@ -227,7 +283,7 @@
                                         <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
                                             AutoGenerateColumns="False" EmptyDataText="No confirmed saving orders found."
                                             AllowPaging="true"
-                                            OnRowDataBound="GridView1_RowDataBound" OnRowCommand="GridView1_RowCommand" DataKeyNames="id">
+                                            OnRowDataBound="GridView1_RowDataBound" OnRowCommand="GridView1_RowCommand" DataKeyNames="orderid">
                                             <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
@@ -246,12 +302,14 @@
                                             <asp:TemplateField HeaderText="Name">
                                                 <ItemTemplate><%# Eval("username") %></ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Product">
-                                                <ItemTemplate><%# Eval("productname") %></ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Amount">
+                                            <asp:TemplateField HeaderText="Products">
                                                 <ItemTemplate>
-                                                    <span class="admin-amount-text"><%# Eval("amount") %></span>
+                                                    <asp:Literal ID="litProducts" runat="server" Mode="PassThrough" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Total Amount">
+                                                <ItemTemplate>
+                                                    <span class="admin-amount-text"><%# Eval("amount", "{0:N2}") %></span>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Approved On">
@@ -262,7 +320,7 @@
                                                     <div class="saving-order-address-cell">
                                                         <span class="saving-order-address-text"><%# Eval("AddressSummary") %></span>
                                                         <asp:LinkButton ID="btnPrintAddress" runat="server" CssClass="saving-order-icon-btn"
-                                                            CommandName="printaddress" CommandArgument='<%# Eval("id") %>' ToolTip="Print address">
+                                                            CommandName="printaddress" CommandArgument='<%# Eval("orderid") %>' ToolTip="Print address">
                                                             <i class="fa fa-print"></i>
                                                         </asp:LinkButton>
                                                     </div>
@@ -276,7 +334,7 @@
                                             <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
                                                     <asp:LinkButton ID="btnUpdateStatus" runat="server" CssClass="saving-order-icon-btn is-status"
-                                                        CommandName="updatestatus" CommandArgument='<%# Eval("id") %>' ToolTip="Update delivery status">
+                                                        CommandName="updatestatus" CommandArgument='<%# Eval("orderid") %>' ToolTip="Update delivery status for all products in this order">
                                                         <i class="fa fa-pencil"></i> Status
                                                     </asp:LinkButton>
                                                 </ItemTemplate>
@@ -318,7 +376,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status</h4>
+                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status (All Products)</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
@@ -328,6 +386,10 @@
                                 <div class="form-group">
                                     <label>Customer Name</label>
                                     <asp:TextBox ID="txtModalUserName" runat="server" CssClass="form-control" ReadOnly="true" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Products In Order</label>
+                                    <asp:Literal ID="litModalProducts" runat="server" Mode="PassThrough" />
                                 </div>
                                 <div class="form-group">
                                     <label for="<%= ddModalDeliveryStatus.ClientID %>">Delivery Status</label>

@@ -3,7 +3,9 @@ using DataTier;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -54,7 +56,7 @@ public partial class admin_SavingProductOrderDetails : Page
 
     void LoadOrders()
     {
-        OrderData = GetConfirmedOrders();
+        OrderData = GroupOrdersByOrderId(GetConfirmedOrders());
         BindGrid();
     }
 
@@ -291,15 +293,177 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
         return dt ?? new DataTable();
     }
 
+    DataTable GroupOrdersByOrderId(DataTable source)
+    {
+        DataTable grouped = new DataTable();
+        grouped.Columns.Add("orderid", typeof(string));
+        grouped.Columns.Add("userid", typeof(string));
+        grouped.Columns.Add("username", typeof(string));
+        grouped.Columns.Add("mobile", typeof(string));
+        grouped.Columns.Add("productsummary", typeof(string));
+        grouped.Columns.Add("productcount", typeof(int));
+        grouped.Columns.Add("amount", typeof(decimal));
+        grouped.Columns.Add("approvedate", typeof(DateTime));
+        grouped.Columns.Add("DeliveryStatus", typeof(string));
+        grouped.Columns.Add("AddressSummary", typeof(string));
+        grouped.Columns.Add("ShipAddress", typeof(string));
+        grouped.Columns.Add("ShipArea", typeof(string));
+        grouped.Columns.Add("ShipCity", typeof(string));
+        grouped.Columns.Add("ShipState", typeof(string));
+        grouped.Columns.Add("ShipPincode", typeof(string));
+
+        if (source == null || source.Rows.Count == 0)
+        {
+            return grouped;
+        }
+
+        var orderGroups = source.AsEnumerable()
+            .GroupBy(row => Convert.ToString(row["orderid"]).Trim(), StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(group => group.Max(row => GetDateValue(row["approvedate"])));
+
+        foreach (var group in orderGroups)
+        {
+            if (string.IsNullOrWhiteSpace(group.Key))
+            {
+                continue;
+            }
+
+            DataRow first = group
+                .OrderByDescending(row => GetDateValue(row["approvedate"]))
+                .ThenByDescending(row => Convert.ToInt32(row["id"]))
+                .First();
+
+            DataRow groupedRow = grouped.NewRow();
+            groupedRow["orderid"] = group.Key;
+            groupedRow["userid"] = first["userid"];
+            groupedRow["username"] = first["username"];
+            groupedRow["mobile"] = first["mobile"];
+            groupedRow["productsummary"] = BuildProductSummaryHtml(group);
+            groupedRow["productcount"] = group.Count();
+            groupedRow["amount"] = group.Sum(row => GetDecimalValue(row["amount"]));
+            groupedRow["approvedate"] = group.Max(row => GetDateValue(row["approvedate"]));
+            groupedRow["DeliveryStatus"] = GetGroupDeliveryStatus(group);
+            groupedRow["AddressSummary"] = Convert.ToString(first["AddressSummary"]);
+            groupedRow["ShipAddress"] = first["ShipAddress"];
+            groupedRow["ShipArea"] = first["ShipArea"];
+            groupedRow["ShipCity"] = first["ShipCity"];
+            groupedRow["ShipState"] = first["ShipState"];
+            groupedRow["ShipPincode"] = first["ShipPincode"];
+            grouped.Rows.Add(groupedRow);
+        }
+
+        return grouped;
+    }
+
+    static DateTime GetDateValue(object value)
+    {
+        DateTime parsed;
+        if (value == null || value == DBNull.Value)
+        {
+            return DateTime.MinValue;
+        }
+
+        return DateTime.TryParse(Convert.ToString(value), out parsed) ? parsed : DateTime.MinValue;
+    }
+
+    static decimal GetDecimalValue(object value)
+    {
+        decimal parsed;
+        if (value == null || value == DBNull.Value)
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(Convert.ToString(value), out parsed) ? parsed : 0m;
+    }
+
+    static string GetGroupDeliveryStatus(IGrouping<string, DataRow> group)
+    {
+        var statuses = group
+            .Select(row => (Convert.ToString(row["DeliveryStatus"]) ?? "Confirmed").Trim())
+            .Where(status => !string.IsNullOrWhiteSpace(status))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (statuses.Count == 0)
+        {
+            return "Confirmed";
+        }
+
+        return statuses[0];
+    }
+
+    static string BuildProductSummaryHtml(IGrouping<string, DataRow> group)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append("<div class=\"saving-order-products\">");
+
+        foreach (DataRow row in group.OrderBy(r => Convert.ToString(r["productname"])))
+        {
+            sb.Append("<div class=\"saving-order-product-item\"><span>")
+                .Append(HttpUtility.HtmlEncode(Convert.ToString(row["productname"])))
+                .Append("</span><strong>")
+                .Append(HttpUtility.HtmlEncode(Convert.ToString(row["amount"])))
+                .Append("</strong></div>");
+        }
+
+        if (group.Count() > 1)
+        {
+            sb.Append("<span class=\"saving-order-product-count\"><i class=\"fa fa-cubes\"></i> ")
+                .Append(group.Count())
+                .Append(" products</span>");
+        }
+
+        sb.Append("</div>");
+        return sb.ToString();
+    }
+
+    static string BuildModalProductsHtml(DataRow[] rows)
+    {
+        if (rows == null || rows.Length == 0)
+        {
+            return "<p class=\"text-muted\">No products found for this order.</p>";
+        }
+
+        StringBuilder sb = new StringBuilder("<ul class=\"saving-order-modal-products\">");
+        foreach (DataRow row in rows.OrderBy(r => Convert.ToString(r["productname"])))
+        {
+            sb.Append("<li><span>")
+                .Append(HttpUtility.HtmlEncode(Convert.ToString(row["productname"])))
+                .Append("</span><strong>")
+                .Append(HttpUtility.HtmlEncode(Convert.ToString(row["amount"])))
+                .Append("</strong></li>");
+        }
+
+        sb.Append("</ul>");
+        return sb.ToString();
+    }
+
+    static string GetGroupDeliveryStatus(DataRow[] rows)
+    {
+        if (rows == null || rows.Length == 0)
+        {
+            return "Confirmed";
+        }
+
+        var statuses = rows
+            .Select(row => (Convert.ToString(row["DeliveryStatus"]) ?? "Confirmed").Trim())
+            .Where(status => !string.IsNullOrWhiteSpace(status))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return statuses.Count == 0 ? "Confirmed" : statuses[0];
+    }
+
     static string GetApprovedStatusFilter(string tableAlias)
     {
         return "(" + tableAlias + ".status = 'Approved'"
             + " OR LOWER(LTRIM(RTRIM(ISNULL(" + tableAlias + ".status, '')))) IN ('approved', 'approve'))";
     }
 
-    DataRow GetOrderRow(int recordId)
+    DataRow GetOrderRow(string orderId)
     {
-        DataTable dt = GetOrderById(recordId);
+        DataTable dt = GetOrdersByOrderId(orderId);
         if (dt != null && dt.Rows.Count > 0)
         {
             return dt.Rows[0];
@@ -308,7 +472,18 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
         return null;
     }
 
-    DataTable GetOrderById(int recordId)
+    DataRow[] GetOrderRows(string orderId)
+    {
+        DataTable dt = GetOrdersByOrderId(orderId);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return new DataRow[0];
+        }
+
+        return dt.AsEnumerable().ToArray();
+    }
+
+    DataTable GetOrdersByOrderId(string orderId)
     {
         DataTable dt = new DataTable();
         try
@@ -357,8 +532,9 @@ LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
 LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
-WHERE sd.id = " + recordId + @"
-  AND " + GetApprovedStatusFilter("sd");
+WHERE sd.orderid = '" + SqlEscape(orderId) + @"'
+  AND " + GetApprovedStatusFilter("sd") + @"
+ORDER BY sd.id";
 
             ObjData.StartConnection();
             try
@@ -380,41 +556,41 @@ WHERE sd.id = " + recordId + @"
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        int recordId;
-        if (!int.TryParse(Convert.ToString(e.CommandArgument), out recordId))
+        string orderId = Convert.ToString(e.CommandArgument).Trim();
+        if (string.IsNullOrWhiteSpace(orderId))
         {
             return;
         }
 
         if (e.CommandName == "printaddress")
         {
-            BindPrintModal(recordId);
+            BindPrintModal(orderId);
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "openPrintModal", "showAdminModal('addressPrintModal');", true);
             return;
         }
 
         if (e.CommandName == "updatestatus")
         {
-            BindStatusModal(recordId);
+            BindStatusModal(orderId);
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "openStatusModal", "showAdminModal('statusUpdateModal');", true);
         }
     }
 
-    void BindPrintModal(int recordId)
+    void BindPrintModal(string orderId)
     {
-        DataRow row = GetOrderRow(recordId);
+        DataRow row = GetOrderRow(orderId);
+        DataRow[] rows = GetOrderRows(orderId);
         if (row == null)
         {
             litPrintAddress.Text = "<p>No address found for this order.</p>";
             return;
         }
 
-        string orderId = Convert.ToString(row["orderid"]);
         string userName = Convert.ToString(row["username"]);
         string userId = Convert.ToString(row["userid"]);
         string mobile = Convert.ToString(row["mobile"]);
-        string productName = Convert.ToString(row["productname"]);
         string addressBlock = Server.HtmlEncode(FormatAddressBlock(row));
+        string productsBlock = BuildModalProductsHtml(rows);
 
         litPrintAddress.Text =
             "<div class=\"saving-address-print-brand\">" +
@@ -429,23 +605,25 @@ WHERE sd.id = " + recordId + @"
             "<div class=\"saving-address-print-footer\">" +
             "User ID: " + Server.HtmlEncode(userId) +
             (string.IsNullOrWhiteSpace(mobile) ? string.Empty : " | Mobile: " + Server.HtmlEncode(mobile)) +
-            (string.IsNullOrWhiteSpace(productName) ? string.Empty : " | Product: " + Server.HtmlEncode(productName)) +
-            "</div>";
+            "</div>" +
+            "<div class=\"saving-address-print-footer\">Products:" + productsBlock + "</div>";
     }
 
-    void BindStatusModal(int recordId)
+    void BindStatusModal(string orderId)
     {
-        DataRow row = GetOrderRow(recordId);
+        DataRow row = GetOrderRow(orderId);
+        DataRow[] rows = GetOrderRows(orderId);
         if (row == null)
         {
             return;
         }
 
-        hfOrderRecordId.Value = recordId.ToString();
-        txtModalOrderId.Text = Convert.ToString(row["orderid"]);
+        hfOrderId.Value = orderId;
+        txtModalOrderId.Text = orderId;
         txtModalUserName.Text = Convert.ToString(row["username"]);
+        litModalProducts.Text = BuildModalProductsHtml(rows);
 
-        string currentStatus = Convert.ToString(row["DeliveryStatus"]);
+        string currentStatus = GetGroupDeliveryStatus(rows);
         ListItem statusItem = ddModalDeliveryStatus.Items.FindByValue(currentStatus);
         if (statusItem != null)
         {
@@ -456,8 +634,8 @@ WHERE sd.id = " + recordId + @"
 
     protected void btnSaveDeliveryStatus_Click(object sender, EventArgs e)
     {
-        int recordId;
-        if (!int.TryParse(hfOrderRecordId.Value, out recordId) || recordId <= 0)
+        string orderId = (hfOrderId.Value ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(orderId))
         {
             Message.Show("Invalid order selected.");
             return;
@@ -471,9 +649,9 @@ WHERE sd.id = " + recordId + @"
             return;
         }
 
-        if (UpdateDeliveryStatus(recordId, newStatus, Session["useradmin"].ToString()))
+        if (UpdateDeliveryStatusByOrderId(orderId, newStatus, Session["useradmin"].ToString()))
         {
-            Message.Show("Delivery status updated successfully.");
+            Message.Show("Delivery status updated for all products in this order.");
             LoadOrders();
         }
         else
@@ -483,7 +661,7 @@ WHERE sd.id = " + recordId + @"
         }
     }
 
-    bool UpdateDeliveryStatus(int recordId, string deliveryStatus, string updatedBy)
+    bool UpdateDeliveryStatusByOrderId(string orderId, string deliveryStatus, string updatedBy)
     {
         if (!SavingProductHelper.HasDeliveryStatusColumn())
         {
@@ -497,7 +675,7 @@ WHERE sd.id = " + recordId + @"
             {
                 string sql = "UPDATE SavingAccountDetail SET DeliveryStatus='" + SqlEscape(deliveryStatus)
                     + "', DeliveryStatusUpdatedOn=GETDATE(), DeliveryStatusUpdatedBy='" + SqlEscape(updatedBy)
-                    + "' WHERE id=" + recordId;
+                    + "' WHERE orderid='" + SqlEscape(orderId) + "' AND " + GetApprovedStatusFilter("SavingAccountDetail");
                 ObjData.RunInsUpDelQuery(sql);
                 return true;
             }
@@ -525,6 +703,12 @@ WHERE sd.id = " + recordId + @"
         }
 
         Label lblDeliveryStatus = (Label)e.Row.FindControl("lblDeliveryStatus");
+        Literal litProducts = (Literal)e.Row.FindControl("litProducts");
+        if (litProducts != null)
+        {
+            litProducts.Text = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "productsummary"));
+        }
+
         if (lblDeliveryStatus == null)
         {
             return;

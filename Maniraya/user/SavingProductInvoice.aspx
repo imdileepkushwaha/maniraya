@@ -95,6 +95,14 @@
             font-weight: 700;
         }
 
+        .invoice-gst-note {
+            margin: 8px 0 0;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
         .invoice-footer-note {
             text-align: center;
             margin-top: 18px;
@@ -204,6 +212,7 @@
             <div class="invoice-total-bar">
                 Total Payable: ₹ <asp:Label ID="lblPayableAmount" runat="server" />
             </div>
+            <p class="invoice-gst-note">18% GST including</p>
 
             <p style="margin-top: 12px;">
                 <strong>Amount in words:</strong>

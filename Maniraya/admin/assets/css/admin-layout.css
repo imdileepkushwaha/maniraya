@@ -6423,6 +6423,35 @@ body.admin-app > .admin-image-preview-modal .modal-footer,
     margin-right: -8px;
 }
 
+.contact-settings-layout-stack > [class*="col-"] {
+    width: 100%;
+    float: none;
+}
+
+.contact-settings-layout-stack > [class*="col-"] + [class*="col-"] {
+    margin-top: 18px;
+}
+
+.contact-settings-layout-stack .contact-settings-inner-box {
+    width: 100%;
+}
+
+.contact-settings-layout-stack .contact-settings-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 18px;
+}
+
+.contact-settings-layout-stack .contact-settings-form-grid .form-group.span-full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 767px) {
+    .contact-settings-layout-stack .contact-settings-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .contact-settings-inner-box {
     margin-bottom: 0;
     box-shadow: none !important;
