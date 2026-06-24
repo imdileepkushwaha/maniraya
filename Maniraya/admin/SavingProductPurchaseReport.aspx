@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=69" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
@@ -91,7 +91,9 @@
                             <div class="box-footer admin-report-footer">
                                 <asp:Button ID="btnSubmit" CssClass="btn btn-primary" runat="server" Text="Search" OnClick="btnSubmit_Click" />
                                 <asp:Button ID="btnCancel" CssClass="btn btn-default" runat="server" Text="Cancel" OnClick="btncancel_Click" CausesValidation="false" />
-                            </div>
+                                <asp:Button ID="btnPayAll" CssClass="btn btn-info" runat="server" Text="Approve All" OnClick="btnPayAll_Click" />
+                              
+                                </div>
                         </div>
                     </div>
 
@@ -109,9 +111,16 @@
                                         AutoGenerateColumns="False" EmptyDataText="No saving product purchase requests found."
                                         OnRowDataBound="grdGetHelp_RowDataBound" OnRowCommand="GridView1_RowCommand">
                                         <Columns>
-                                            <asp:TemplateField HeaderText="S.No">
-                                                <ItemTemplate>
-                                                    <%#Container.DataItemIndex+1 %>
+                                            <asp:TemplateField >
+                                                 <HeaderTemplate>  
+                                                    <%--<asp:CheckBox="CheckBox1" AutoPostBack="true" OnCheckedChanged="chckchanged" runat="server" />--%>
+                                                    <asp:CheckBox ID="CheckBox1" OnCheckedChanged="chckchanged" AutoPostBack="true" runat="server" />
+                                                </HeaderTemplate>  
+                                                <ItemTemplate>  
+                                                    <%--<asp:CheckBox="CheckBox2" runat="server" />--%>
+
+                                                    <asp:CheckBox ID="CheckBox2" runat="server" />
+                                                    <%--<%#Container.DataItemIndex+1 %>--%>
                                                     <asp:Label ID="lblId" runat="server" Visible="false" Text='<%#Eval("id") %>'></asp:Label>
                                                     <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("imagename") %>'></asp:Label>
                                                 </ItemTemplate>
@@ -176,24 +185,23 @@
 
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Approve" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
+                                            <asp:TemplateField HeaderText="Approve" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="110px">
                                                 <ItemTemplate>
                                                     <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve" OnClick="btnApprove_click" runat="server">
                                                         <i class="fa fa-check"></i> Approve
                                                     </asp:LinkButton>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Reject" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
+                                            <asp:TemplateField HeaderText="Reject" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="100px">
                                                 <ItemTemplate>
                                                     <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject" OnClick="btnReject_click" runat="server">
                                                         <i class="fa fa-times"></i> Reject
                                                     </asp:LinkButton>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="View" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="90px">
+                                            <asp:TemplateField HeaderText="View" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="100px">
                                                 <ItemTemplate>
-                                                    <a href='<%# string.IsNullOrWhiteSpace(Convert.ToString(Eval("couponcode"))) ? "javascript:void(0);" : "SavingProductInstallmentDetail.aspx?oid=" + Server.UrlEncode(Convert.ToString(Eval("couponcode"))) %>'
-                                                        class='<%# "admin-action-btn is-view" + (string.IsNullOrWhiteSpace(Convert.ToString(Eval("couponcode"))) ? " is-disabled" : "") %>'>
+                                                    <a href='SavingProductInstallmentDetail.aspx?oid=<%# Eval("couponcode") %>' class="admin-action-btn is-view" title="View installments">
                                                         <i class="fa fa-eye"></i> View
                                                     </a>
                                                 </ItemTemplate>

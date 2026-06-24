@@ -5890,6 +5890,11 @@ body.admin-app .modal.in.admin-modal-scrollable {
     box-shadow: 0 4px 10px rgba(109, 40, 217, 0.14);
 }
 
+.admin-report-page .admin-table-wrap td .admin-action-btn {
+    min-width: 88px;
+    justify-content: center;
+}
+
 .admin-member-login-page .admin-member-id {
     font-weight: 700;
     color: #1e293b;

@@ -63,7 +63,7 @@ public partial class admin_SavingProductInstallmentDetail : System.Web.UI.Page
             return new DataTable();
         }
 
-        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
+        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, sd.userid, sd.orderid, sd.imagename, pm.productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
             LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
             LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id

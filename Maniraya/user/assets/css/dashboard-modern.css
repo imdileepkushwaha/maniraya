@@ -1640,24 +1640,24 @@ a.dash-feature-toggle:focus {
 }
 
 .dash-subpage-hero--saving {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #5b21b6 65%, #c2410c 100%);
-    border-color: rgba(74, 222, 128, 0.28);
+    background: linear-gradient(135deg, #0f1729 0%, #1a2540 55%, #243352 100%);
+    border-color: rgba(229, 169, 6, 0.22);
 }
 
 .dash-subpage-hero--saving .profile-hero-avatar {
-    background: linear-gradient(135deg, rgba(74, 222, 128, 0.28) 0%, rgba(34, 197, 94, 0.1) 100%);
-    border-color: rgba(134, 239, 172, 0.55);
-    color: #86efac;
+    background: linear-gradient(135deg, rgba(229, 169, 6, 0.25) 0%, rgba(229, 169, 6, 0.08) 100%);
+    border-color: rgba(246, 207, 99, 0.55);
+    color: #f6cf63;
 }
 
 .dash-subpage-hero--saving .profile-btn-primary {
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    color: #fff !important;
-    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.32);
+    background: linear-gradient(135deg, #e5a906 0%, #c98f05 100%);
+    color: #1a1d21 !important;
+    box-shadow: 0 6px 18px rgba(229, 169, 6, 0.28);
 }
 
 .dash-subpage-hero--saving .profile-btn-primary:hover {
-    color: #fff !important;
+    color: #1a1d21 !important;
 }
 
 .dash-subpage-hero--premium {
@@ -2886,5 +2886,226 @@ a.saving-pager-btn:focus {
     .dash-highlight-card-link {
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* Saving purchase & installment report pages */
+.dash-saving-report-page {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.dash-saving-report-panel .dash-subpage-panel-body {
+    padding-top: 8px;
+}
+
+.dash-saving-report-intro {
+    margin: 0 0 16px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: #64748b;
+}
+
+.dash-saving-coupon-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(229, 169, 6, 0.12);
+    border: 1px solid rgba(229, 169, 6, 0.28);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.dash-saving-coupon-chip i {
+    color: #d97706;
+}
+
+.dash-saving-report-table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e8ecf1;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #1e293b;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table th {
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #475569;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table td {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef2f7;
+    background: #fff;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table tr:hover td {
+    background: #f8fafc;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table .dash-saving-amount {
+    font-weight: 700;
+    color: #0f766e;
+    white-space: nowrap;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table .dash-saving-product {
+    font-weight: 600;
+    color: #1e293b;
+    max-width: 180px;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table .dash-saving-txn {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.8rem;
+    color: #64748b;
+    word-break: break-all;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table .dash-saving-date {
+    white-space: nowrap;
+    color: #475569;
+}
+
+.dash-saving-report-table-wrap .dash-saving-report-table .dash-saving-sno {
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.dash-saving-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.dash-saving-status.is-pending {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.dash-saving-status.is-approved {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.dash-saving-status.is-rejected {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.dash-saving-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 92px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dash-saving-action-btn.is-view {
+    color: #fff !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.24);
+}
+
+.dash-saving-action-btn.is-view:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+    color: #fff !important;
+}
+
+.dash-saving-action-btn.is-pay {
+    color: #92400e !important;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid rgba(217, 119, 6, 0.28);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.14);
+}
+
+.dash-saving-action-btn.is-pay:hover {
+    transform: translateY(-1px);
+    color: #78350f !important;
+}
+
+.dash-saving-report-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 48px 24px;
+    text-align: center;
+    color: #64748b;
+}
+
+.dash-saving-report-empty i {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.35rem;
+    color: #94a3b8;
+    background: #f1f5f9;
+}
+
+.dash-saving-report-empty h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.dash-saving-report-empty p {
+    margin: 0;
+    max-width: 36ch;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+    .dash-saving-report-table-wrap .dash-saving-report-table th,
+    .dash-saving-report-table-wrap .dash-saving-report-table td {
+        padding: 11px 12px;
+        font-size: 0.82rem;
     }
 }

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="My Savings" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SAvingProductPurchaseReport.aspx.cs" Inherits="user_SavingProductPurchaseReport" %>
+﻿<%@ Page Title="My Savings Installment" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SavingProductInstallmentDetail.aspx.cs" Inherits="user_SavingProductInstallmentDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
@@ -6,11 +6,11 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
     <section class="content-header">
-        <h1>My Savings</h1>
+        <h1>My Savings Installment</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
-            <li><a href="SavingDashboard.aspx">Saving</a></li>
-            <li class="active">My Savings</li>
+            <li><a href="SAvingProductPurchaseReport.aspx">My Savings</a></li>
+            <li class="active">Installments</li>
         </ol>
     </section>
 </asp:Content>
@@ -20,28 +20,28 @@
         <ContentTemplate>
             <div class="profile-page dash-subpage dash-subpage--saving dash-saving-report-page">
                 <div class="profile-hero dash-subpage-hero dash-subpage-hero--saving">
-                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-list-alt"></i></div>
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-calendar-check-o"></i></div>
                     <div class="profile-hero-info">
-                        <h2>My Savings</h2>
-                        <p class="profile-hero-meta">View your saving product requests, approval status, and installment history in one place.</p>
+                        <h2>Installment Details</h2>
+                        <p class="profile-hero-meta">Track monthly installment dates, payment status, and transaction references for your saving plan.</p>
+                        <asp:Label ID="lblCouponCode" runat="server" CssClass="dash-saving-coupon-chip" Visible="false" />
                     </div>
                     <div class="profile-hero-actions">
-                        <a href="SavingProductPurchase.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-shopping-cart"></i> Buy Product</a>
-                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i> Saving Dashboard</a>
-                        <a href="Dashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-arrow-left"></i> Back</a>
+                        <a href="SAvingProductPurchaseReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-arrow-left"></i> Back to Savings</a>
+                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i> Dashboard</a>
                     </div>
                 </div>
 
                 <div class="dash-subpage-panel dash-saving-report-panel">
                     <div class="dash-subpage-panel-head">
-                        <span class="dash-subpage-panel-icon tone-blue" aria-hidden="true"><i class="fa fa-table"></i></span>
+                        <span class="dash-subpage-panel-icon tone-amber" aria-hidden="true"><i class="fa fa-money"></i></span>
                         <div>
-                            <h3>Purchase History</h3>
-                            <p>All saving product requests linked to your account</p>
+                            <h3>Monthly Installments</h3>
+                            <p>Payment schedule and approval status for this coupon</p>
                         </div>
                     </div>
                     <div class="dash-subpage-panel-body">
-                        <p class="dash-saving-report-intro">Click <strong>Installments</strong> on any approved request to view monthly payment details.</p>
+                        <p class="dash-saving-report-intro">Pending installments can be paid from the action column when payment is enabled.</p>
                         <div class="dash-saving-report-table-wrap">
                             <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%" AutoGenerateColumns="False" OnRowDataBound="grdGetHelp_RowDataBound" GridLines="None">
                                 <Columns>
@@ -51,14 +51,9 @@
                                             <asp:Label ID="lblid" runat="server" Visible="false" Text='<%# Eval("id") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Coupon Code">
+                                    <asp:TemplateField HeaderText="Installment Date">
                                         <ItemTemplate>
-                                            <strong><%# Eval("couponcode") %></strong>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Request Date">
-                                        <ItemTemplate>
-                                            <span class="dash-saving-date"><asp:Label ID="lblcreatingdate" runat="server" Text='<%# Eval("entrydate", "{0:dd MMM yyyy, hh:mm tt}") %>'></asp:Label></span>
+                                            <span class="dash-saving-date"><asp:Label ID="lblcreatingdate" runat="server" Text='<%# Eval("entrydate", "{0:dd MMM yyyy}") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Approve Date">
@@ -88,17 +83,17 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                            <a href='SavingProductInstallmentDetail.aspx?oid=<%# Eval("couponcode") %>' class="dash-saving-action-btn is-view">
-                                                <i class="fa fa-calendar-check-o"></i> Installments
+                                            <a href="#" class="dash-saving-action-btn is-pay">
+                                                <i class="fa fa-credit-card"></i> Pay
                                             </a>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
                                 <EmptyDataTemplate>
                                     <div class="dash-saving-report-empty">
-                                        <i class="fa fa-inbox"></i>
-                                        <h4>No saving requests yet</h4>
-                                        <p>Your saving product purchase history will appear here once you place a request.</p>
+                                        <i class="fa fa-calendar-times-o"></i>
+                                        <h4>No installments found</h4>
+                                        <p>Installment records for this coupon will appear here once they are generated.</p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>

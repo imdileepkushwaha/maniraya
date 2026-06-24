@@ -1,56 +1,111 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+
+using System.Configuration;
 using BusinessLogicTier;
 using DataTier;
-
 public partial class admin_UserReport : System.Web.UI.Page
 {
     clsAccount objaccount = new clsAccount();
     clsUser objuser = new clsUser();
-    Data ObjData = new Data();
-
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["useradmin"] == null)
+        if (Session["useradmin"] != null)
+        {
+            if (!IsPostBack)
+            {
+
+
+            }
+        }
+        else
         {
             Response.Redirect("logout.aspx");
-            return;
         }
     }
-
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
         loadprevproduct();
     }
-
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT ud.username, sd.*, pm.productname, pm.ImageName AS imagename
-            FROM SavingAccountDetail sd WITH (NOLOCK)
-            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id
-            LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
-            WHERE 1=1 ";
-
+        string str_query = @"SELECT ud.username, sd.*,pm.productname FROM SavingAccountDetail sd WITH (nolock) LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 ";
         if (txtfromdate.Text != "" && txttodate.Text != "")
         {
-            str_query += " AND CONVERT(date, sd.entrydate) >= CONVERT(date,'" + Message.GetIndianDate(txtfromdate.Text)
-                + "') AND CONVERT(date, sd.entrydate) <= CONVERT(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
+            str_query += "  and convert(date, sd.entrydate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sd.entrydate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
         }
 
-        if (ddstatus.SelectedValue != "0")
+
+
+        if (ddstatus.SelectedValue.ToString() != "0")
         {
-            str_query += " AND sd.status = '" + ddstatus.SelectedValue.Replace("'", "''") + "' ";
+            str_query += "  and sd.status = '" + ddstatus.SelectedValue.ToString() + "' ";
         }
 
-        if (!string.IsNullOrWhiteSpace(txtuserid.Text))
+        if (txtuserid.Text != "")
         {
-            str_query += " AND sd.UserId = '" + txtuserid.Text.Trim().Replace("'", "''") + "' ";
+            str_query += "  and sd.UserId = '" + txtuserid.Text + "' ";
+        }
+        str_query += " order by sd.entrydate  desc";
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
+    void loadprevproduct()
+    {
+
+        DataTable dt = new DataTable();
+        dt = getPrevProduct();
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    public DataTable getWithdrawlRequest(clsAccount objaccount)
+    {
+        string s1 = "select isnull(CashWalletPercent,0) as CashWalletPercent from tbl_Deduction";
+        ObjData.StartConnection();
+        DataTable dt1 = ObjData.RunDataTable(s1);
+        ObjData.EndConnection();
+        decimal deductionPercent = Convert.ToDecimal(dt1.Rows[0]["CashWalletPercent"].ToString());
+
+        string str_query = "select wr.*,ud.UserName,ud.SponserId,ud2.UserName AS Sponsername,case when img='' then '../ProductImage/images.png' else '../ProductImage/'+ img end as Image,case when requesttype='R' then 'Cash Wallet' when requesttype='U' then 'ProfitShare wallet' else 'Wallet' end as RequestType1,ud.mobile, bm.BankName, ud.AccountNo, ud.IFSCCode, ud.phonepay, ud.bhimno, ud.upino from withdrawlrequest wr LEFT JOIN userdetail ud ON wr.UserId=ud.UserId LEFT JOIN userdetail ud2 ON ud2.UserId=ud.SponserId Left Join BankMaster bm on ud.BankName=bm.BankId where 1=1  ";
+
+
+        if (objaccount.FromDate != DateTime.MinValue && objaccount.ToDate != DateTime.MinValue)
+        {
+            str_query += "  and wr.mentiondate  >= '" + objaccount.FromDate + "'   and wr.mentiondate   <= '" + objaccount.ToDate + "' ";
         }
 
-        str_query += " ORDER BY sd.entrydate DESC";
+
+
+        if (objaccount.WithdrawlRequestStatus != "0")
+        {
+            str_query += "  and wr.status = '" + objaccount.WithdrawlRequestStatus + "' ";
+        }
+
+        if (objaccount.UserId != "")
+        {
+            str_query += "  and wr.UserId = '" + objaccount.UserId + "' ";
+        }
+
+
+        str_query += " order by wr.mentiondate  desc";
+
+
 
         DataTable dt = null;
         ObjData.StartConnection();
@@ -58,116 +113,119 @@ public partial class admin_UserReport : System.Web.UI.Page
         {
             dt = ObjData.RunDataTable(str_query);
         }
-        catch
+        catch (Exception ex)
         {
             dt = null;
         }
         ObjData.EndConnection();
         return dt;
     }
-
-    void loadprevproduct()
-    {
-        DataTable dt = getPrevProduct();
-        GridView1.DataSource = dt;
-        GridView1.DataBind();
-    }
-
     protected void grdGetHelp_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-        if (e.Row.RowType != DataControlRowType.DataRow)
+        if (e.Row.RowType == DataControlRowType.DataRow)
         {
-            return;
-        }
-
-        Label lblstatus = (Label)e.Row.FindControl("lblstatus");
-        Label lblremark = (Label)e.Row.FindControl("lblremark");
-        TextBox txtremark = (TextBox)e.Row.FindControl("txtremark");
-        LinkButton btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
-        LinkButton btnReject = (LinkButton)e.Row.FindControl("btnReject");
-
-        if (lblremark != null)
-        {
+            Label lblstatus = (Label)e.Row.FindControl("lblstatus");
+            Label lblremark = (Label)e.Row.FindControl("lblremark");
+            TextBox txtremark = (TextBox)e.Row.FindControl("txtremark");
+            LinkButton btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
+            LinkButton btnReject = (LinkButton)e.Row.FindControl("btnReject");
             lblremark.Visible = false;
-        }
-
-        if (txtremark != null)
-        {
             txtremark.Visible = false;
-        }
 
-        if (lblstatus == null)
-        {
-            return;
-        }
+            if (lblstatus.Text == "Pending")
+            {
+                lblstatus.Text = "Pending";
+                lblstatus.CssClass = "label label-warning";
+                btnApprove.Visible = true;
+                btnReject.Visible = true;
+                txtremark.Visible = true;
+            }
+            else
+                if (lblstatus.Text == "Approved")
+            {
+                lblstatus.Text = "Approved";
+                lblstatus.CssClass = "label label-success";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+            else
 
-        if (lblstatus.Text == "Pending")
-        {
-            lblstatus.CssClass = "label label-warning";
-            if (btnApprove != null) btnApprove.Visible = true;
-            if (btnReject != null) btnReject.Visible = true;
-            if (txtremark != null) txtremark.Visible = true;
-        }
-        else if (lblstatus.Text == "Approved")
-        {
-            lblstatus.CssClass = "label label-success";
-            if (btnApprove != null) btnApprove.Visible = false;
-            if (btnReject != null) btnReject.Visible = false;
-            if (lblremark != null) lblremark.Visible = true;
-        }
-        else if (lblstatus.Text == "Rejected")
-        {
-            lblstatus.Text = "Cancelled";
-            lblstatus.CssClass = "label label-danger";
-            if (btnApprove != null) btnApprove.Visible = false;
-            if (btnReject != null) btnReject.Visible = false;
-            if (lblremark != null) lblremark.Visible = true;
+                    if (lblstatus.Text == "Rejected")
+            {
+                lblstatus.Text = "Cancelled";
+                lblstatus.CssClass = "label label-danger";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+
         }
     }
-
     protected void btnApprove_click(object sender, EventArgs e)
     {
-        GridViewRow gvRow = (GridViewRow)((Control)sender).Parent.Parent;
+        GridViewRow gvRow = (GridViewRow)(sender as Control).Parent.Parent;
         Label lblgalleryid = (Label)gvRow.FindControl("lblId");
 
-        string res = Approve_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString());
+
+        TextBox txtremark = (TextBox)gvRow.FindControl("txtremark");
+
+
+
+        string res = Approve_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString(), txtremark.Text);
         if (res == "t")
         {
-            SetInitialDeliveryStatus(lblgalleryid.Text);
-            ShowAlert("Purchase Approved Successfully");
+
+            string popupScript = "alert('Purchase Approved Successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
+
         }
         else if (res == "f")
         {
-            ShowAlert("Purchase Already Processed");
+
+            string popupScript = "alert('Purchase Already Processed');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
+
         }
         else
         {
-            ShowAlert("Something wrong");
+            string popupScript = "alert('Something wrong ');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
+
         }
+        loadprevproduct();
     }
 
-    public string Approve_ProductPurchase(string str_id, string str_approveby)
+
+    public string Approve_ProductPurchase(string str_id, string str_approveby, string str_remark)
     {
+
+
         string res = "";
+        string s2 = "";
         SqlConnection cn;
         SqlTransaction tr = null;
+        DataSet ds = new DataSet();
         cn = ObjData.StartConnectionInTransaction();
         tr = cn.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            string s2 = "sp_approveSavingAccountDetail";
+            s2 = "sp_approveSavingAccountDetail";
             SqlParameter[] parameter = {
-                new SqlParameter("@id", str_id),
-                new SqlParameter("@Approveby", str_approveby)
-            };
+                new SqlParameter("@id",str_id),
+                new SqlParameter("@Approveby",str_approveby),
+                new SqlParameter("@Remark",str_remark),
+
+
+                };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
         }
-        catch
+        catch (Exception ex)
         {
             res = "0";
             tr.Rollback();
@@ -177,49 +235,34 @@ public partial class admin_UserReport : System.Web.UI.Page
             ObjData.EndConnection();
             tr.Dispose();
         }
-
         return res;
     }
-
-    void SetInitialDeliveryStatus(string recordId)
+    public string Reject_ProductPurchase(string str_id, string str_approveby, string str_remark)
     {
-        try
-        {
-            SavingProductHelper.EnsureDeliveryColumns();
-            ObjData.StartConnection();
-            try
-            {
-                ObjData.RunInsUpDelQuery("UPDATE SavingAccountDetail SET DeliveryStatus='Confirmed' WHERE id=" + recordId);
-            }
-            finally
-            {
-                ObjData.EndConnection();
-            }
-        }
-        catch
-        {
-        }
-    }
 
-    public string Reject_ProductPurchase(string str_id, string str_approveby)
-    {
+
         string res = "";
+        string s2 = "";
         SqlConnection cn;
         SqlTransaction tr = null;
+        DataSet ds = new DataSet();
         cn = ObjData.StartConnectionInTransaction();
         tr = cn.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            string s2 = "sp_rejectSavingAccountDetail";
+            s2 = "sp_rejectSavingAccountDetail";
             SqlParameter[] parameter = {
-                new SqlParameter("@id", str_id),
-                new SqlParameter("@Approveby", str_approveby)
-            };
+                new SqlParameter("@id",str_id),
+                new SqlParameter("@Approveby",str_approveby),
+                new SqlParameter("@Remark",str_remark),
+
+
+                };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
         }
-        catch
+        catch (Exception ex)
         {
             res = "0";
             tr.Rollback();
@@ -229,52 +272,137 @@ public partial class admin_UserReport : System.Web.UI.Page
             ObjData.EndConnection();
             tr.Dispose();
         }
-
         return res;
     }
+    Data ObjData = new Data();
 
     protected void btnReject_click(object sender, EventArgs e)
     {
-        GridViewRow gvRow = (GridViewRow)((Control)sender).Parent.Parent;
+        GridViewRow gvRow = (GridViewRow)(sender as Control).Parent.Parent;
         Label lblgalleryid = (Label)gvRow.FindControl("lblId");
 
-        string res = Reject_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString());
+        TextBox txtremark = (TextBox)gvRow.FindControl("txtremark");
+        string res = Reject_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString(), txtremark.Text);
         if (res == "t")
         {
-            ShowAlert("Purchase Rejected Successfully");
+
+            string popupScript = "alert('Purchase Rejected Successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
+
         }
         else if (res == "f")
         {
-            ShowAlert("Purchase Already Processed");
+
+            string popupScript = "alert('Purchase Already Processed');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
+
         }
         else
         {
-            ShowAlert("Something wrong");
+            string popupScript = "alert('Something wrong ');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
-        }
-    }
 
+        }
+
+        loadprevproduct();
+
+    }
     protected void btncancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
     }
-
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
         if (e.CommandName == "photolarge")
         {
-            int index = Convert.ToInt32(e.CommandArgument);
+            int index = Convert.ToInt32(e.CommandArgument.ToString());
+            Label lblid = (Label)GridView1.Rows[index].FindControl("lblid");
             Label LblImage = (Label)GridView1.Rows[index].FindControl("LblImage");
             ImageLarge.ImageUrl = "../ProductImage/" + LblImage.Text;
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "Pop", "showAdminModal('DivPhotolarge');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showAdminModal('DivPhotolarge');", true);
         }
     }
 
-    void ShowAlert(string message)
+    protected void btnview_Click(object sender, EventArgs e)
     {
-        string popupScript = "alert('" + message.Replace("'", "\\'") + "');";
-        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+
+    }
+    protected void chckchanged(object sender, EventArgs e)
+
+    {
+
+        CheckBox chckheader = (CheckBox)GridView1.HeaderRow.FindControl("CheckBox1");
+
+        foreach (GridViewRow row in GridView1.Rows)
+
+        {
+
+            CheckBox chckrw = (CheckBox)row.FindControl("CheckBox2");
+
+            if (chckheader.Checked == true)
+
+            {
+                chckrw.Checked = true;
+            }
+            else
+
+            {
+                chckrw.Checked = false;
+            }
+
+        }
+
+    }
+    protected void btnPayAll_Click(object sender, EventArgs e)
+    {
+        foreach (GridViewRow r in GridView1.Rows)
+        {
+            CheckBox CheckBox2 = (CheckBox)r.FindControl("CheckBox2");
+            if (CheckBox2.Checked == true)
+            {
+
+                Label lblgalleryid = (Label)r.FindControl("lblId");
+
+
+                TextBox txtremark = (TextBox)r.FindControl("txtremark");
+
+
+
+                string res = Approve_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString(), txtremark.Text);
+                //if (res == "t")
+                //{
+
+                //    string popupScript = "alert('Purchase Approved Successfully');";
+                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                //    loadprevproduct();
+
+                //}
+                //else if (res == "f")
+                //{
+
+                //    string popupScript = "alert('Purchase Already Processed');";
+                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                //    loadprevproduct();
+
+                //}
+                //else
+                //{
+                //    string popupScript = "alert('Something wrong ');";
+                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+                //    loadprevproduct();
+
+                //}
+                //loadprevproduct();
+            }
+        }
+       
+            string popupScript = "alert('Purchase Approved Successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            loadprevproduct();
+
+       
     }
 }
