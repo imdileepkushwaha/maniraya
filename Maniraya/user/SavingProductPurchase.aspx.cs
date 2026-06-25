@@ -664,6 +664,21 @@ public partial class user_WithdrawlRequstAdd : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             txttransactionid.Text = "";
         }
+  else
+                    if (res == "f")
+                    {
+                         string popupScript = "alert('Another Request Is Pending');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            txttransactionid.Text = "";
+                    }
+
+ else
+                    if (res == "u")
+                    {
+                         string popupScript = "alert('This Transaction Id already used');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            txttransactionid.Text = "";
+                    }
         else
         {
             string popupScript = "alert('Unknown error occurred');";
