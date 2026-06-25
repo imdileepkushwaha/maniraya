@@ -284,6 +284,16 @@
                 document.getElementById("<%=txttransactionid.ClientID%>").focus();
                 return false;
             }
+
+            var paymentInput = document.getElementById("<%=ImageUpload.ClientID%>");
+            if (!paymentInput || !paymentInput.files || !paymentInput.files.length) {
+                alert('Please upload payment screenshot');
+                if (paymentInput) {
+                    paymentInput.focus();
+                }
+                return false;
+            }
+
             return true;
         }
     </script>
@@ -606,19 +616,23 @@
                     });
                 });
 
+                zone.addEventListener('click', function (e) {
+                    if (e.target === input) {
+                        return;
+                    }
+                    input.click();
+                });
+
                 zone.addEventListener('drop', function (e) {
-                    var file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
-                    if (!file) {
+                    var files = e.dataTransfer && e.dataTransfer.files;
+                    if (!files || !files.length) {
                         return;
                     }
-                    try {
-                        var dt = new DataTransfer();
-                        dt.items.add(file);
-                        input.files = dt.files;
-                    } catch (ex) {
-                        return;
+
+                    input.files = files;
+                    if (!showPaymentUpload(files[0], zone, selection, preview, filechip)) {
+                        clearPaymentUpload(input, zone, selection, preview, filechip);
                     }
-                    showPaymentUpload(file, zone, selection, preview, filechip);
                 });
             }
 
