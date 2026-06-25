@@ -45,7 +45,7 @@ public partial class Treeviewdetail : System.Web.UI.Page
 
         using (SqlConnection conn = new SqlConnection(connStr))
         {
-            string query = "SELECT userid, username, parentuserid AS parentid, CASE WHEN ISNULL(SavingStatus,0)=1 THEN 'Active' ELSE 'Inactive' END AS status, CASE WHEN ISNULL(Savingstatus,0)=1 THEN 'user/img/green-boy.png' ELSE 'user/img/red-boy.png' END AS photoimage, (SELECT ISNULL(SUM(planamount),0) FROM UserTopupTb WHERE Userid=u.userid) AS topupamount FROM UserDetail u WHERE u.sponserid=@parentid;";
+            string query = "SELECT userid, username, parentuserid AS parentid, CASE WHEN ISNULL(SavingStatus,0)=1 THEN 'Active' ELSE 'Inactive' END AS status, CASE WHEN ISNULL(Savingstatus,0)=1 THEN 'user/img/green-boy.png' ELSE 'user/img/red-boy.png' END AS photoimage, (SELECT ISNULL(SUM(amount),0) FROM SavingAccountDetail WHERE Userid=u.userid) AS topupamount FROM UserDetail u WHERE u.sponserid=@parentid;";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@parentid", parentId);
 

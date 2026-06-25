@@ -172,7 +172,7 @@
 
         <script type="text/javascript">
             function showModal() {
-                $('#MyPopup').modal({ backdrop: 'static', keyboard: false });
+               INR('#MyPopup').modal({ backdrop: 'static', keyboard: false });
             }
         </script>
 
