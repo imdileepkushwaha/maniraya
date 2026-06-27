@@ -43,11 +43,11 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
             rptShopCategories.DataSource = dt;
             rptShopCategories.DataBind();
 
-            if (rptFooterCategories != null)
-            {
-                rptFooterCategories.DataSource = dt;
-                rptFooterCategories.DataBind();
-            }
+            // if (rptFooterCategories != null)
+            // {
+            //     rptFooterCategories.DataSource = dt;
+            //     rptFooterCategories.DataBind();
+            // }
 
             if (ddlHeaderCategory != null)
             {

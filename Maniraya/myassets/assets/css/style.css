@@ -3400,7 +3400,7 @@ body.cart-open {
     .footer-payments img {
         height: 28px;
         width: auto;
-        padding: 0.25rem 0.45rem;
+        padding: 0rem;
         border-radius: 0.35rem;
         background: rgba(255, 255, 255, 0.92);
         border: 1px solid rgba(255, 255, 255, 0.15);
