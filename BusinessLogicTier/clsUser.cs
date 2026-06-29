@@ -1465,21 +1465,20 @@ FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid  WHERE MyCTE.
 
         public DataTable getUserDetail(clsUser objUser)
         {
-            string userId = (objUser.UserId ?? string.Empty).Trim().Replace("'", "''");
-            if (string.IsNullOrEmpty(userId))
+            string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.statename,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount FROM userdetail ud left join citymaster cm on ud.cityid=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + objUser.UserId + "' ";
+            DataTable dt = null;
+            ObjData.StartConnection();
+            try
             {
-                return null;
+                dt = ObjData.RunDataTable(str_query);
             }
-
-            DataTable dt = RunGetUserDetailQuery(BuildGetUserDetailQuery(userId));
-            if (dt != null && dt.Rows.Count > 0)
+            catch (Exception ex)
             {
-                return dt;
+                dt = null;
             }
-
-            return RunGetUserDetailQuery("SELECT * FROM userdetail WHERE UserId = '" + userId + "'");
+            ObjData.EndConnection();
+            return dt;
         }
-
         static string BuildGetUserDetailQuery(string userId)
         {
             return @"SELECT ud.UserId, ud.UserName, ud.Mobile, ud.Email, ud.Gender, ud.Address, ud.CityId, ud.AreaName, ud.Pincode,
