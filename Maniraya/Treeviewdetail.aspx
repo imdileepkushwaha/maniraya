@@ -9,14 +9,14 @@
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-     <style>
+       <style>
         .tree { text-align: center; }
 
         .tree ul {
             padding-top: 20px;
             position: relative;
             display: flex;
-            justify-content: center;
+           
         }
 
         .tree li {
@@ -91,7 +91,6 @@
             margin-bottom: 5px;
         }
     </style>
-
    
 </head>
 <body>
@@ -149,7 +148,7 @@
                         <img src="${item.photoimage}" />
                         <div>${item.username}</div>
                         <small>${item.status}</small>
-                          $<small>${item.topupamount}</small>
+                          ₹<small>${item.topupamount}</small>
                     </div>
                 `);
 
