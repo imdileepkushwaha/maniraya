@@ -1,0 +1,370 @@
+<%@ Page Title="Coupon Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CouponReport.aspx.cs" Inherits="admin_CouponReport" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
+    <style>
+        .coupon-report-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .coupon-report-header-tools {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .coupon-report-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(229, 169, 6, 0.14) 0%, rgba(229, 169, 6, 0.06) 100%);
+            border: 1px solid rgba(229, 169, 6, 0.28);
+            color: #92400e;
+            font-size: 13px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .coupon-report-count i {
+            font-size: 14px;
+            color: #b45309;
+        }
+
+        .coupon-report-count-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #78350f;
+        }
+
+        .coupon-report-count-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid rgba(229, 169, 6, 0.35);
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .coupon-report-header-tools .btn {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 7px 14px;
+            line-height: 1.2;
+        }
+
+        .coupon-code {
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 0.04em;
+        }
+
+        .coupon-print-toolbar {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.45);
+        }
+
+        .coupon-print-hint {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #64748b;
+        }
+
+        .coupon-print-area {
+            display: none;
+        }
+
+        .coupon-print-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .coupon-ticket {
+            position: relative;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 14px 14px 12px;
+            background: linear-gradient(180deg, #fffdf5 0%, #ffffff 100%);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .coupon-ticket::before,
+        .coupon-ticket::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 14px;
+            height: 14px;
+            margin-top: -7px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .coupon-ticket::before { left: -9px; }
+        .coupon-ticket::after { right: -9px; }
+
+        .coupon-ticket-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(229, 169, 6, 0.45);
+        }
+
+        .coupon-ticket-brand {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #b45309;
+        }
+
+        .coupon-ticket-no {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .coupon-ticket-code {
+            margin: 0;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .coupon-ticket-copy {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .coupon-ticket-meta {
+            display: grid;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .coupon-ticket-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+
+        .coupon-ticket-row span {
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        .coupon-ticket-row strong {
+            color: #0f172a;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .coupon-ticket-foot {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.45);
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 767px) {
+            .coupon-print-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .coupon-report-header-tools {
+                width: 100%;
+                justify-content: flex-start;
+                margin-left: 0;
+            }
+        }
+    </style>
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
+    <section class="content-header">
+        <h1>Coupon Report</h1>
+        <ol class="breadcrumb">
+            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="#">Saving Product</a></li>
+            <li class="active">Coupon Report</li>
+        </ol>
+    </section>
+</asp:Content>
+
+<asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
+    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <div class="admin-report-page">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border coupon-report-box-header">
+                                <h3 class="box-title"><i class="fa fa-ticket"></i> Approved Coupons</h3>
+                                <div class="box-tools coupon-report-header-tools">
+                                    <p class="coupon-report-count">
+                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                        <span class="coupon-report-count-label">Printable Tickets</span>
+                                        <strong class="coupon-report-count-value"><asp:Literal ID="litCouponCount" runat="server" Text="0" /></strong>
+                                    </p>
+                                    <asp:Button ID="btnPrintAll" runat="server" CssClass="btn btn-primary"
+                                        Text="Print All Coupons" OnClientClick="printAllCoupons(); return false;" Visible="false" />
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <p class="admin-report-intro">Approved coupons from <strong>SavingAccountDetail</strong> for lucky draw. Print all tickets, cut along dashed lines, and use them in the draw.</p>
+
+                                <div class="admin-table-wrap table-responsive">
+                                    <asp:GridView ID="GridView1" runat="server"
+                                        CssClass="table table-bordered table-hover dataTable coupon-report-table"
+                                        Width="100%" AutoGenerateColumns="False"
+                                        EmptyDataText="No approved coupons found.">
+                                        <Columns>
+                                            <asp:TemplateField HeaderText="S.No">
+                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Coupon Code">
+                                                <ItemTemplate><span class="coupon-code"><%# Eval("couponcode") %></span></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="User Name">
+                                                <ItemTemplate><%# Eval("username") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="User ID">
+                                                <ItemTemplate><%# Eval("userid") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Mobile No">
+                                                <ItemTemplate><%# Eval("mobile") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Product">
+                                                <ItemTemplate><%# Eval("productname") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Qty">
+                                                <ItemTemplate><%# Eval("quantity") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Approve Date">
+                                                <ItemTemplate><%# Eval("approvedate", "{0:dd MMM yyyy}") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                    </asp:GridView>
+                                </div>
+
+                                <asp:Panel ID="pnlPrintArea" runat="server" CssClass="coupon-print-area" Visible="false">
+                                    <div id="couponPrintArea" class="coupon-print-grid">
+                                        <asp:Repeater ID="rptPrintCoupons" runat="server">
+                                            <ItemTemplate>
+                                                <div class="coupon-ticket">
+                                                    <div class="coupon-ticket-head">
+                                                        <span class="coupon-ticket-brand">Mpremium Lucky Draw</span>
+                                                        <span class="coupon-ticket-no">#<%# Eval("TicketNo") %></span>
+                                                    </div>
+                                                    <p class="coupon-ticket-code">
+                                                        <%# Eval("couponcode") %>
+                                                        <asp:Label runat="server" CssClass="coupon-ticket-copy" Text='<%# Eval("copyLabel") %>'
+                                                            Visible='<%# !string.IsNullOrWhiteSpace(Convert.ToString(Eval("copyLabel"))) %>' />
+                                                    </p>
+                                                    <div class="coupon-ticket-meta">
+                                                        <div class="coupon-ticket-row"><span>User Name</span><strong><%# Eval("username") %></strong></div>
+                                                        <div class="coupon-ticket-row"><span>User ID</span><strong><%# Eval("userid") %></strong></div>
+                                                        <div class="coupon-ticket-row"><span>Mobile No</span><strong><%# Eval("mobile") %></strong></div>
+                                                    </div>
+                                                    <div class="coupon-ticket-foot">Cut here · Lucky Draw Coupon</div>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </div>
+                                </asp:Panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ContentTemplate>
+    </asp:UpdatePanel>
+</asp:Content>
+
+<asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
+    <script type="text/javascript">
+        function printAllCoupons() {
+            var printArea = document.getElementById('couponPrintArea');
+            if (!printArea || !printArea.children.length) {
+                alert('No approved coupons available to print.');
+                return;
+            }
+
+            var printStyles = [
+                'body { margin: 0; padding: 12px; background: #fff; font-family: Arial, sans-serif; }',
+                '.coupon-print-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }',
+                '.coupon-ticket { position: relative; border: 2px dashed #94a3b8; border-radius: 14px; padding: 16px 14px 12px; background: #fff; break-inside: avoid; page-break-inside: avoid; }',
+                '.coupon-ticket-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #e5a906; }',
+                '.coupon-ticket-brand { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #b45309; }',
+                '.coupon-ticket-no { font-size: 11px; font-weight: 700; color: #64748b; }',
+                '.coupon-ticket-code { margin: 0 0 8px; text-align: center; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; color: #0f172a; }',
+                '.coupon-ticket-copy { display: block; margin-top: 6px; font-size: 11px; font-weight: 600; color: #64748b; }',
+                '.coupon-ticket-meta { display: grid; gap: 6px; margin-top: 8px; }',
+                '.coupon-ticket-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; line-height: 1.4; }',
+                '.coupon-ticket-row span { color: #64748b; }',
+                '.coupon-ticket-row strong { color: #0f172a; text-align: right; word-break: break-word; }',
+                '.coupon-ticket-foot { margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e1; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #94a3b8; }',
+                '@page { margin: 10mm; }'
+            ].join('');
+
+            var printWindow = window.open('', '_blank', 'width=900,height=700');
+            if (!printWindow) {
+                alert('Please allow popups to print coupons.');
+                return;
+            }
+
+            printWindow.document.open();
+            printWindow.document.write('<!DOCTYPE html><html><head><title>Coupon Print</title><style>' + printStyles + '</style></head><body>');
+            printWindow.document.write('<div class="coupon-print-grid">' + printArea.innerHTML + '</div>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
+
+            setTimeout(function () {
+                printWindow.print();
+                printWindow.close();
+            }, 400);
+        }
+    </script>
+</asp:Content>
