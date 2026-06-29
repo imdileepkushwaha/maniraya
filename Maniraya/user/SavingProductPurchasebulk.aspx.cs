@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using DataTier;
 using System.Text;
 
-public partial class user_SavingProductPurchase : System.Web.UI.Page
+public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
 {
     clsEPin objEPin = new clsEPin();
     clsUser objUser = new clsUser();
@@ -20,7 +20,6 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
     clsState objState = new clsState();
 
     Data ObjData = new Data();
-
     protected void Page_Load(object sender, EventArgs e)
     {
         if (Session["userid"] != null)
@@ -39,7 +38,6 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
             Response.Redirect("~/Login.aspx");
         }
     }
-
     public DataTable getPrevProduct()
     {
         string str_query = @"SELECT sd.productid, pd.productname, pd.ImageName, pd.MRP, pd.DP
@@ -99,43 +97,25 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
         imgProduct.ImageUrl = imageUrl;
         imgProduct.CssClass = "saving-product-showcase-img";
     }
-
     public string UploadImage()
     {
-        if (!ImageUpload.HasFile)
+        string Imagename = "";
+        if (ImageUpload.HasFile)
         {
-            return string.Empty;
-        }
+            string RandomNumber = DateTime.Now.Ticks.ToString();
+            string fileName = Path.GetFileName(ImageUpload.PostedFile.FileName);
+            Imagename = RandomNumber + fileName;
+            ImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
 
-        string extension = Path.GetExtension(ImageUpload.PostedFile.FileName);
-        if (string.IsNullOrWhiteSpace(extension))
-        {
-            extension = ".jpg";
         }
-
-        extension = extension.ToLowerInvariant();
-        if (extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".webp" && extension != ".gif")
-        {
-            return string.Empty;
-        }
-
-        string uploadFolder = Server.MapPath("~/ProductImage/");
-        if (!Directory.Exists(uploadFolder))
-        {
-            Directory.CreateDirectory(uploadFolder);
-        }
-
-        string imagename = DateTime.Now.Ticks + extension;
-        ImageUpload.PostedFile.SaveAs(Path.Combine(uploadFolder, imagename));
-        return imagename;
+        return Imagename;
     }
-
+  
     protected void txtuserid_TextChanged(object sender, EventArgs e)
     {
         loadsusername();
         LoadShippingAddress();
     }
-
     void loadsusername()
     {
         DataTable dt = new DataTable();
@@ -146,6 +126,8 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
             txtusername.Text = dt.Rows[0]["username"].ToString();
             objaccount.UserId = txtuserid.Text;
             DataTable dtrechrge = objaccount.getUserWalletBalanceReportrechargewallet(objaccount);
+           
+            
         }
         else
         {
@@ -619,16 +601,16 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
         try
         {
             s2 = "sp_add_SavingAccountDetail";
-            int quantity = objState.Quantity > 0 ? objState.Quantity : 1;
             SqlParameter[] parameter = {
-                new SqlParameter("@OrderId", str_orderid),
-                new SqlParameter("@UserId", objState.UserId),
-                new SqlParameter("@Amount", objState.Amount),
-                new SqlParameter("@OnlineTransactionId", objState.TransactionCode),
-                new SqlParameter("@ImageName", objState.ProductImage ?? string.Empty),
-                new SqlParameter("@EntryBy", objState.MentionBy),
-                new SqlParameter("@quantity", quantity),
-            };
+                new SqlParameter("@orderid",str_orderid),
+                new SqlParameter("@UserId",objState.UserId),
+                new SqlParameter("@Amount",objState.Amount),
+                new SqlParameter("@OnlineTransactionId",objState.TransactionCode),
+                new SqlParameter("@ImageName",objState.ProductImage),
+                new SqlParameter("@EntryBy",objState.MentionBy),
+                new SqlParameter("@Quantity",objState.Quantity),
+
+                };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
         }
@@ -670,32 +652,14 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(txttransactionid.Text))
-        {
-            Message.Show("Enter UTR No / Transaction ID.");
-            return;
-        }
+        objproduct.ProductImage = UploadImage();
 
-        if (!ImageUpload.HasFile)
-        {
-            Message.Show("Please upload payment screenshot.");
-            return;
-        }
-
-        string uploadedImage = UploadImage();
-        if (string.IsNullOrWhiteSpace(uploadedImage))
-        {
-            Message.Show("Invalid payment screenshot. Please upload JPG, PNG, WEBP or GIF image.");
-            return;
-        }
-
-        objproduct.ProductImage = uploadedImage;
         objproduct.MentionBy = Session["userid"].ToString();
         objproduct.UserId = Session["userid"].ToString();
-        objproduct.Amount = Convert.ToDecimal(txtamount.Text);
-        objproduct.TransactionCode = txttransactionid.Text.Trim();
-        objproduct.Quantity = 1;
 
+        objproduct.Amount = Convert.ToDecimal(txtamount.Text);
+        objproduct.TransactionCode = txttransactionid.Text;
+        objproduct.Quantity = Convert.ToInt32(txtquantity.Text);
         string res = Insert_ProductPurchase(objproduct);
         if (res == "t")
         {
@@ -703,30 +667,33 @@ public partial class user_SavingProductPurchase : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             txttransactionid.Text = "";
         }
-  else
-                    if (res == "f")
-                    {
-                         string popupScript = "alert('Another Request Is Pending');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            txttransactionid.Text = "";
-                    }
-
- else
-                    if (res == "u")
-                    {
-                         string popupScript = "alert('This Transaction Id already used');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            txttransactionid.Text = "";
-                    }
         else
         {
             string popupScript = "alert('Unknown error occurred');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
     }
-
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
+    }
+
+
+
+
+    protected void txtquantity_TextChanged(object sender, EventArgs e)
+    {
+        if (txtquantity.Text != "")
+        {
+            int quantity = Convert.ToInt32(txtquantity.Text);
+            decimal totalamount = Convert.ToDecimal("1000") * quantity;
+            txttotalamount.Text = totalamount.ToString();
+        }
+        else
+        {
+            int quantity = 1;
+            decimal totalamount = Convert.ToDecimal("1000") * quantity;
+            txttotalamount.Text = totalamount.ToString();
+        }
     }
 }

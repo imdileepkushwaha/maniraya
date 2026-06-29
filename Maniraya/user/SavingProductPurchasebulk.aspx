@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_SavingProductPurchase" %>
+﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchasebulk.aspx.cs" Inherits="user_SavingProductPurchasebulk" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
@@ -156,7 +156,7 @@
             border-radius: 10px;
             background: rgba(59, 130, 246, 0.12);
             border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #2e68b0;
+            color: #bfdbfe;
             font-size: 13px;
             line-height: 1.5;
         }
@@ -284,16 +284,11 @@
                 document.getElementById("<%=txttransactionid.ClientID%>").focus();
                 return false;
             }
-
-            var paymentInput = document.getElementById("<%=ImageUpload.ClientID%>");
-            if (!paymentInput || !paymentInput.files || !paymentInput.files.length) {
-                alert('Please upload payment screenshot');
-                if (paymentInput) {
-                    paymentInput.focus();
-                }
+               if (document.getElementById("<%=txtquantity.ClientID%>").value.trim() === "") {
+                alert('Enter Quantity');
+                document.getElementById("<%=txtquantity.ClientID%>").focus();
                 return false;
             }
-
             return true;
         }
     </script>
@@ -398,6 +393,16 @@
                             <div class="form-group">
                                 <label for="<%= txtamount.ClientID %>"><i class="fa fa-inr"></i> Amount</label>
                                 <asp:TextBox ID="txtamount" Enabled="false" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
+                            </div>
+                        </div>
+                           <div class="saving-purchase-summary">
+                            <div class="form-group">
+                                <label for="<%= txtquantity.ClientID %>"><i class="fa fa-cube"></i> Quantity</label>
+                                <asp:TextBox ID="txtquantity" AutoPostBack="true" Text="1" OnTextChanged="txtquantity_TextChanged" CssClass="form-control" runat="server" />
+                            </div>
+                            <div class="form-group">
+                                <label for="<%= txttotalamount.ClientID %>"><i class="fa fa-inr"></i> Total Amount</label>
+                                <asp:TextBox ID="txttotalamount" Enabled="false" Text="1000" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>
 
@@ -616,23 +621,19 @@
                     });
                 });
 
-                zone.addEventListener('click', function (e) {
-                    if (e.target === input) {
-                        return;
-                    }
-                    input.click();
-                });
-
                 zone.addEventListener('drop', function (e) {
-                    var files = e.dataTransfer && e.dataTransfer.files;
-                    if (!files || !files.length) {
+                    var file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
+                    if (!file) {
                         return;
                     }
-
-                    input.files = files;
-                    if (!showPaymentUpload(files[0], zone, selection, preview, filechip)) {
-                        clearPaymentUpload(input, zone, selection, preview, filechip);
+                    try {
+                        var dt = new DataTransfer();
+                        dt.items.add(file);
+                        input.files = dt.files;
+                    } catch (ex) {
+                        return;
                     }
+                    showPaymentUpload(file, zone, selection, preview, filechip);
                 });
             }
 
