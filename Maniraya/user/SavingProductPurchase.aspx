@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_WithdrawlRequstAdd" %>
+﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_SavingProductPurchase" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
