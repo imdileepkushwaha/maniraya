@@ -1,4 +1,5 @@
 ﻿using BusinessLogicTier;
+using DataTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,8 @@ using System.Web.UI.WebControls;
 public partial class admin_UserReport : System.Web.UI.Page
 {
     clsAccount objaccount = new clsAccount();
+
+    Data ObjData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -57,11 +60,45 @@ public partial class admin_UserReport : System.Web.UI.Page
         }
         objaccount.UserId = txtuserid.Text;
         DataTable dt = new DataTable();
-        dt = objaccount.getLevelIncome(objaccount);
+        dt = getLevelIncome(objaccount);
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
 
+    public DataTable getLevelIncome(clsAccount objaccount)
+    {
+        string str_query = "SELECT I.Userid,U.UserName,I.JuniorUserId,I.levelNo,I.Amount,Convert(VARCHAR(50),I.MentionDate,103) EntryDate FROM SavingLevelIncomeDetail I JOIN UserDetail U ON I.Userid=U.UserId where 1=1 ";
+
+
+        if (objaccount.FromDate != DateTime.MinValue && objaccount.ToDate != DateTime.MinValue)
+        {
+            str_query += "  and cast(I.Entrydate as date)  >= cast('" + objaccount.FromDate + "' as date)   and cast(I.Entrydate as date)   <= cast('" + objaccount.ToDate + "' as date) ";
+        }
+
+
+        if (objaccount.UserId != "")
+        {
+            str_query += "  and I.UserId = '" + objaccount.UserId + "' ";
+        }
+
+
+        str_query += " order by I.MentionDate  desc";
+
+
+
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch (Exception ex)
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");

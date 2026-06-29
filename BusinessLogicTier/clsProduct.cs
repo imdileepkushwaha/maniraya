@@ -780,21 +780,25 @@ namespace BusinessLogicTier
         {
             string str_query = "select row_number() over(order by ProductName,cm.categoryname) as srno,sm.*,cm.categoryname,('../ProductImage/'+ sm.productimage) as Image,case when sm.status=1 then 'Active' else 'Deactive' end as status1,case when sm.purchasestatus=0 then 'Open' else 'Sold' end as purchaseStatus1,('../ProductImage/'+ sm.ProductImage2) as Image2,('../ProductImage/'+ sm.productimage3) as Image3,('../ProductImage/'+ sm.ProductImage4) as Image4,Bv     from ProductMaster sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId  where 1=1 ";
 
-            if (objP.ProductName != String.Empty)
+            if (!string.IsNullOrEmpty(objP.ProductName))
             {
-                str_query += " and ProductName like '% "+objP.ProductName+" %' ";
+                string name = objP.ProductName.Trim().Replace("'", "''");
+                str_query += " and ProductName like '%" + name + "%' ";
             }
-            if (objP.Status != string.Empty)
+            if (!string.IsNullOrEmpty(objP.Status))
             {
-                str_query += " and Status='"+objP.Status+"'";
+                string status = objP.Status.Replace("'", "''");
+                str_query += " and Status='" + status + "'";
             }
-            if (objP.PurchaseStatus != string.Empty)
+            if (!string.IsNullOrEmpty(objP.PurchaseStatus))
             {
-                str_query += " and PurchaseStatus='" + objP.PurchaseStatus + "'";
+                string ps = objP.PurchaseStatus.Replace("'", "''");
+                str_query += " and PurchaseStatus='" + ps + "'";
             }
-            if (objP.ProductId != string.Empty)
+            if (!string.IsNullOrEmpty(objP.ProductId))
             {
-                str_query += " and productId='" + objP.ProductId + "'";
+                string pid = objP.ProductId.Replace("'", "''");
+                str_query += " and productId='" + pid + "'";
             }
             str_query += " order by ProductName,cm.categoryname";
             DataTable dt = null;
@@ -2125,21 +2129,25 @@ namespace BusinessLogicTier
         {
             string str_query = "select row_number() over(order by ProductName,cm.categoryname) as srno,sm.*,cm.categoryname,('../ProductImage/'+ sm.productimage) as Image,case when sm.status=1 then 'Active' else 'Deactive' end as status1,case when sm.purchasestatus=0 then 'Open' else 'Sold' end as purchaseStatus1,('../ProductImage/'+ sm.ProductImage2) as Image2,('../ProductImage/'+ sm.productimage3) as Image3,Bv     from ComingProduct_Master sm left join CategoryMaster cm on sm.CategoryId=cm.CategoryId  where 1=1 ";
 
-            if (objP.ProductName != String.Empty)
+            if (!string.IsNullOrEmpty(objP.ProductName))
             {
-                str_query += " and ProductName like '% " + objP.ProductName + " %' ";
+                string name = objP.ProductName.Trim().Replace("'", "''");
+                str_query += " and ProductName like '%" + name + "%' ";
             }
-            if (objP.Status != string.Empty)
+            if (!string.IsNullOrEmpty(objP.Status))
             {
-                str_query += " and Status='" + objP.Status + "'";
+                string status = objP.Status.Replace("'", "''");
+                str_query += " and Status='" + status + "'";
             }
-            if (objP.PurchaseStatus != string.Empty)
+            if (!string.IsNullOrEmpty(objP.PurchaseStatus))
             {
-                str_query += " and PurchaseStatus='" + objP.PurchaseStatus + "'";
+                string ps = objP.PurchaseStatus.Replace("'", "''");
+                str_query += " and PurchaseStatus='" + ps + "'";
             }
-            if (objP.ProductId != string.Empty)
+            if (!string.IsNullOrEmpty(objP.ProductId))
             {
-                str_query += " and productId='" + objP.ProductId + "'";
+                string pid = objP.ProductId.Replace("'", "''");
+                str_query += " and productId='" + pid + "'";
             }
             str_query += " order by ProductName,cm.categoryname";
             DataTable dt = null;
