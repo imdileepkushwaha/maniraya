@@ -148,7 +148,7 @@
                                 <Columns>
                                 <asp:TemplateField HeaderText="#">
                                     <ItemTemplate>
-                                        <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                        <%# Container.DataItemIndex + 1 %>
                                     
                                           <asp:Label ID="LblDescription" runat="server" Visible="false" Text='<%#Eval("Description") %>'></asp:Label>
                                           <asp:Label ID="LblAdditionalInfo" runat="server" Visible="false" Text='<%#Eval("additionalinfo") %>'></asp:Label>

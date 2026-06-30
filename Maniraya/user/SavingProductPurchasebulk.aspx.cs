@@ -27,7 +27,7 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
             if (!IsPostBack)
             {
                 txtuserid.Text = Session["userid"].ToString();
-                txtuserid.Enabled = false;
+                //txtuserid.Enabled = false;
                 loadsusername();
                 loadprevproduct();
                 LoadShippingAddress();
@@ -655,7 +655,7 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
         objproduct.ProductImage = UploadImage();
 
         objproduct.MentionBy = Session["userid"].ToString();
-        objproduct.UserId = Session["userid"].ToString();
+        objproduct.UserId =txtuserid.Text;
 
         objproduct.Amount = Convert.ToDecimal(txtamount.Text);
         objproduct.TransactionCode = txttransactionid.Text;

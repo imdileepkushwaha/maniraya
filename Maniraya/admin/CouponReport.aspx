@@ -329,6 +329,11 @@
                             <div class="box-body">
                                 <p class="admin-report-intro">Approved coupons from <strong>SavingAccountDetail</strong> for lucky draw. Print all filtered tickets, cut along dashed lines, and use them in the draw.</p>
 
+                                <asp:Panel ID="pnlLoadError" runat="server" Visible="false" CssClass="alert alert-warning admin-report-alert">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    <asp:Literal ID="litLoadError" runat="server" />
+                                </asp:Panel>
+
                                 <div class="admin-table-paged-shell">
                                 <div class="admin-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server"
@@ -339,7 +344,7 @@
                                         <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
-                                                <ItemTemplate><%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %></ItemTemplate>
+                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Coupon Code">
                                                 <ItemTemplate><span class="coupon-code"><%# Eval("couponcode") %></span></ItemTemplate>
@@ -358,6 +363,9 @@
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Qty">
                                                 <ItemTemplate><%# Eval("quantity") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Status">
+                                                <ItemTemplate><%# Eval("status") %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Approve Date">
                                                 <ItemTemplate><%# Eval("approvedate", "{0:dd MMM yyyy}") %></ItemTemplate>

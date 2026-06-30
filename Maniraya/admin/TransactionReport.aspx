@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Transaction Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="TransactionReport.aspx.cs" Inherits="admin_UserReport" %>
+<%@ Page Title="Transaction Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="TransactionReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -95,7 +95,7 @@
                                     <Columns>
                                         <asp:TemplateField HeaderText="#">
                                             <ItemTemplate>
-                                                <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                                <%# Container.DataItemIndex + 1 %>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Date">

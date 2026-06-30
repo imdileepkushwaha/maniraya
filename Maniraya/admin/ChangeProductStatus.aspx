@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Level Master" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ChangeProductStatus.aspx.cs" Inherits="admin_ChangeProductStatus" %>
+<%@ Page Title="Level Master" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="ChangeProductStatus.aspx.cs" Inherits="admin_ChangeProductStatus" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -95,7 +95,7 @@
                                 <Columns>
                                  <asp:TemplateField HeaderText="#">
                                     <ItemTemplate>
-                                        <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                        <%# Container.DataItemIndex + 1 %>
                                        
                                           <asp:Label ID="LblDescription" runat="server" Visible="false" Text='<%#Eval("Description") %>'></asp:Label>
                                           <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("Image") %>'></asp:Label>

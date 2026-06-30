@@ -76,9 +76,18 @@ public partial class admin_CouponReport : System.Web.UI.Page
 
     void LoadCouponReport()
     {
-        CouponData = GetApprovedCoupons();
+        string loadError;
+        CouponData = GetApprovedCoupons(out loadError);
+        ShowLoadError(loadError);
         BindGrid();
         BindPrint();
+    }
+
+    void ShowLoadError(string message)
+    {
+        bool hasError = !string.IsNullOrWhiteSpace(message);
+        pnlLoadError.Visible = hasError;
+        litLoadError.Text = hasError ? message : string.Empty;
     }
 
     void BindGrid()
@@ -201,8 +210,10 @@ public partial class admin_CouponReport : System.Web.UI.Page
         pnlPager.Controls.Add(link);
     }
 
-    DataTable GetApprovedCoupons()
+    DataTable GetApprovedCoupons(out string loadError)
     {
+        loadError = string.Empty;
+
         StringBuilder sql = new StringBuilder();
         sql.Append(@"SELECT sd.couponcode,
                 sd.approvedate,
@@ -257,21 +268,37 @@ public partial class admin_CouponReport : System.Web.UI.Page
                 .Append("')");
         }
 
-        sql.Append(" ORDER BY sd.approvedate DESC, ud.username, sd.couponcode");
+        sql.Append(" ORDER BY sd.id DESC");
 
         DataTable dt = null;
-        ObjData.StartConnection();
+        bool connectionOpened = false;
         try
         {
+            ObjData.StartConnection();
+            connectionOpened = true;
             dt = ObjData.RunDataTable(sql.ToString());
         }
-        catch
+        catch (Exception ex)
         {
             dt = null;
+            loadError = "Unable to load coupon data. Please check the database connection and try again.";
+            if (ex != null && !string.IsNullOrWhiteSpace(ex.Message))
+            {
+                loadError += " (" + ex.Message + ")";
+            }
         }
         finally
         {
-            ObjData.EndConnection();
+            if (connectionOpened)
+            {
+                try
+                {
+                    ObjData.EndConnection();
+                }
+                catch
+                {
+                }
+            }
         }
 
         return dt ?? new DataTable();

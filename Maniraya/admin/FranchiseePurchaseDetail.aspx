@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseePurchaseDetail.aspx.cs" Inherits="FranchiseePurchaseDetail" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseePurchaseDetail.aspx.cs" Inherits="FranchiseePurchaseDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
  
@@ -123,7 +123,7 @@
         </asp:TemplateField>
                                     <asp:TemplateField HeaderText="#">
                                         <ItemTemplate>
-                                            <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                            <%# Container.DataItemIndex + 1 %>
                                           
                                         </ItemTemplate>
                                     </asp:TemplateField>
