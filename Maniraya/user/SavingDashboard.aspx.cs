@@ -366,7 +366,7 @@ public partial class user_SavingDashboard : System.Web.UI.Page
             string sql = @"SELECT sd.*, pm.productname
                 FROM SavingAccountDetail sd WITH (NOLOCK)
                 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
-                WHERE sd.userid = @UserId
+                WHERE sd.userid = @UserId AND sd.Status='Approved'
                 ORDER BY sd.entrydate DESC, sd.id DESC";
 
             SqlParameter[] parameters = {

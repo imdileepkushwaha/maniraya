@@ -8,7 +8,7 @@
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">My Income</a></li>
-            <li class="active">Binary Summary</li>
+            <li class="active">Level Income Summary</li>
         </ol>
     </section>
 </asp:Content>
