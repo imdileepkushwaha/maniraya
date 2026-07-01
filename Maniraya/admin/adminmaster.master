@@ -148,6 +148,9 @@
                                 <ul class="admin-side-submenu">
                                     <li><a href="TransactionReport.aspx">Transaction Report</a></li>
                                     <li><a href="Dailypayoutdetail.aspx">Daily Closing Report</a></li>
+                                    <li><a href="SavingLevelIncomeReport.aspx">Saving Level Income Report</a></li>
+                                    <li><a href="SavingDirectIncomeReport.aspx">Saving Direct Income Report</a></li>
+                                    <li><a href="PayoutReportSavingLevel.aspx">Saving Level Payout Report</a></li>
                                 </ul>
                             </li>
 
