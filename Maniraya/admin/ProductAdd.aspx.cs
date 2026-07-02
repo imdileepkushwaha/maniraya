@@ -55,57 +55,69 @@ public partial class admin_ProductAdd : System.Web.UI.Page
         ListItem li = new ListItem("Select SubCategory", "0");
         ddsubcategory.Items.Insert(0, li);
     }
+    string SaveUploadedImage(FileUpload upload)
+    {
+        if (upload == null || !upload.HasFile)
+        {
+            return string.Empty;
+        }
+
+        string extension = Path.GetExtension(upload.FileName);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        extension = extension.ToLowerInvariant();
+        if (extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".webp" && extension != ".gif")
+        {
+            return null;
+        }
+
+        string folder = Server.MapPath("~/ProductImage/");
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        string fileName = Guid.NewGuid().ToString("N").Substring(0, 12) + extension;
+        upload.SaveAs(Path.Combine(folder, fileName));
+        return fileName;
+    }
+
+    bool TryAssignUploadedImage(FileUpload upload, string label, out string imageName)
+    {
+        imageName = SaveUploadedImage(upload);
+        if (imageName == null)
+        {
+            Message.Show(label + ": Please upload JPG, PNG, WEBP or GIF image only.");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(imageName))
+        {
+            Message.Show("Upload " + label + " first.");
+            return false;
+        }
+
+        return true;
+    }
+
     public string UploadImage()
     {
-        string Imagename = "";
-        if (ProductImageUpload.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload.PostedFile.FileName);
-            Imagename = RandomNumber+ fileName;
-            ProductImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-            
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload);
     }
     public string UploadImage2()
     {
-        string Imagename = "";
-        if (ProductImageUpload2.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload2.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload2.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload2);
     }
     public string UploadImage3()
     {
-        string Imagename = "";
-        if (ProductImageUpload3.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload3.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload3.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload3);
     }
     public string UploadImage4()
     {
-        string Imagename = "";
-        if (ProductImageUpload4.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload4.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload4.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload4);
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
@@ -132,18 +144,18 @@ public partial class admin_ProductAdd : System.Web.UI.Page
                  new SqlParameter("@Amount",objState.Amount), 
                   new SqlParameter("@Description",objState.Description), 
                 new SqlParameter("@MentionBy",objState.MentionBy),
-                 new SqlParameter("@ProductImage",objState.ProductImage),
-                   new SqlParameter("@ProductImage2",objState.ProductImage2),
-                     new SqlParameter("@ProductImage3",objState.ProductImage3),
-                       new SqlParameter("@ProductImage4",objState.ProductImage4),
+                 new SqlParameter("@ProductImage",objState.ProductImage ?? string.Empty),
+                   new SqlParameter("@ProductImage2",objState.ProductImage2 ?? string.Empty),
+                     new SqlParameter("@ProductImage3",objState.ProductImage3 ?? string.Empty),
+                       new SqlParameter("@ProductImage4",objState.ProductImage4 ?? string.Empty),
                       new SqlParameter("@BV",objState.BV),
                         new SqlParameter("@GST",objState.GST),
-                          new SqlParameter("@HSNCODE",objState.HSNCODE),
-                            new SqlParameter("@BATCHNO",objState.BATCHNO),
-                        new SqlParameter("@DP",objState.DP),
+                          new SqlParameter("@HSNCODE",objState.HSNCODE ?? string.Empty),
+                            new SqlParameter("@BATCHNO",objState.BATCHNO ?? string.Empty),
+                        new SqlParameter("@DP",objState.DP ?? string.Empty),
                        new SqlParameter("@MRP",objState.MRP),
-                        new SqlParameter("@SubcategoryArray",objState.SubproductArray),
-                        new SqlParameter("@AdditionalInfo", TxtDescription.Content)
+                        new SqlParameter("@SubcategoryArray",objState.SubproductArray ?? string.Empty),
+                        new SqlParameter("@AdditionalInfo", TxtDescription.Content ?? string.Empty)
                 };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
@@ -162,45 +174,46 @@ public partial class admin_ProductAdd : System.Web.UI.Page
     }
     protected void btnSubmit_Click1(object sender, EventArgs e)
     {
-        objState.ProductImage = UploadImage();
-        objState.ProductImage2 = UploadImage2();
-        objState.ProductImage3 = UploadImage3();
-        objState.ProductImage4 = UploadImage4();
-        if(objState.ProductImage == "")
+        string imageName;
+        if (!TryAssignUploadedImage(ProductImageUpload, "Image 1", out imageName))
         {
-            Message.Show("Upload Image first");
             return;
         }
-        if (objState.ProductImage2 == "")
+        objState.ProductImage = imageName;
+
+        if (!TryAssignUploadedImage(ProductImageUpload2, "Image 2", out imageName))
         {
-            Message.Show("Upload Image Second");
             return;
         }
-        if (objState.ProductImage3 == "")
+        objState.ProductImage2 = imageName;
+
+        if (!TryAssignUploadedImage(ProductImageUpload3, "Image 3", out imageName))
         {
-            Message.Show("Upload Image Third");
             return;
         }
-        if (objState.ProductImage4 == "")
+        objState.ProductImage3 = imageName;
+
+        if (!TryAssignUploadedImage(ProductImageUpload4, "Image 4", out imageName))
         {
-            Message.Show("Upload Image Fourth");
             return;
         }
+        objState.ProductImage4 = imageName;
+
         if(GridView2.Rows.Count==0)
         {
-            Message.Show("Select Subcategory where size color exixts");
+            Message.Show("Select Subcategory where size color exists");
             return;
         }
         objState.CategoryId = ddcountry.SelectedValue.ToString();
         objState.SubCategoryId = ddsubcategory.SelectedValue.ToString();
-        objState.ProductName = txtstatename.Text;
-        objState.HSNCODE = txtHSN.Text;
-        objState.BATCHNO = txtBatch.Text;
+        objState.ProductName = txtstatename.Text.Trim();
+        objState.HSNCODE = txtHSN.Text.Trim();
+        objState.BATCHNO = txtBatch.Text.Trim();
         objState.Amount = Convert.ToDecimal(TxtAmount.Text);
         objState.MRP = Convert.ToDecimal(TxtMRP.Text);
         objState.GST = Convert.ToDecimal(txtGst.Text);
-        objState.Description = Txtshortdiscription.Text;
-        objState.BV = Convert.ToInt32(TxtBV.Text);
+        objState.Description = Txtshortdiscription.Text.Trim();
+        objState.BV = Convert.ToDecimal(TxtBV.Text);
         objState.DP = Convert.ToString(Convert.ToDecimal(TxtDP.Text));
         objState.SubproductArray = getoperatorpermission();
         if (objState.SubproductArray == "")
@@ -217,17 +230,16 @@ public partial class admin_ProductAdd : System.Web.UI.Page
             txtstatename.Text = ""; ddcountry.SelectedValue = "0"; TxtAmount.Text = ""; TxtDescription.Content = String.Empty; TxtBV.Text = string.Empty;
 
         }
+        else if (res == "f")
+        {
+            string popupScript = "alert('Product Already Exists');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
         else
-            if (res == "f")
-            {
-                string popupScript = "alert('Product Already Exists');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            }
-            else
-            {
-                string popupScript = "alert('Unknow error occurred');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            }     
+        {
+            string popupScript = "alert('Unknown error occurred. Please verify all fields and try again.');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }     
     }
 
 

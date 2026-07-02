@@ -14,6 +14,7 @@ public partial class PayoutReport : System.Web.UI.Page
 {
     clsAccount objaccount = new clsAccount();
     clsUser objuser = new clsUser();
+    bool _isExcelExport = false;
     protected void Page_Load(object sender, EventArgs e)
     {
         if (Session["useradmin"] != null)
@@ -52,8 +53,31 @@ public partial class PayoutReport : System.Web.UI.Page
         dt = getWithdrawlRequest(objaccount);
         GridView1.DataSource = dt;
         GridView1.DataBind();
-
+        UpdatePayoutSummary(dt);
     }
+
+    void UpdatePayoutSummary(DataTable dt)
+    {
+        int count = dt != null ? dt.Rows.Count : 0;
+        decimal total = 0m;
+
+        if (dt != null)
+        {
+            foreach (DataRow row in dt.Rows)
+            {
+                decimal amount;
+                if (decimal.TryParse(Convert.ToString(row["amount"]), out amount))
+                {
+                    total += amount;
+                }
+            }
+        }
+
+        litRecordCount.Text = count.ToString();
+        litTotalAmount.Text = total.ToString("N2");
+        pnlSummary.Visible = count > 0;
+    }
+
     public DataTable getWithdrawlRequest(clsAccount objaccount)
     {
         // string s1 = "select isnull(CashWalletPercent,0) as CashWalletPercent from tbl_Deduction";
@@ -101,12 +125,57 @@ ORDER BY u.username";
         ObjData.EndConnection();
         return dt;
     }
-    protected void grdGetHelp_RowDataBound(object sender, GridViewRowEventArgs e)
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-        if (e.Row.RowType == DataControlRowType.DataRow)
+        if (e.Row.RowType != DataControlRowType.DataRow)
         {
-
+            return;
         }
+
+        Label lblAmount = (Label)e.Row.FindControl("lblamount");
+        if (lblAmount != null)
+        {
+            decimal amount;
+            if (decimal.TryParse(lblAmount.Text, out amount))
+            {
+                lblAmount.Text = amount.ToString("N2");
+            }
+        }
+
+        FormatExcelTextCell(e.Row, "lblAccountNo", "AccountNo");
+        FormatExcelTextCell(e.Row, "lblMobile", "Mobile");
+        FormatExcelTextCell(e.Row, "lblUserIdDisplay", "userid");
+    }
+
+    void FormatExcelTextCell(GridViewRow row, string controlId, string fieldName)
+    {
+        Label label = row.FindControl(controlId) as Label;
+        if (label == null)
+        {
+            return;
+        }
+
+        string value = Convert.ToString(DataBinder.Eval(row.DataItem, fieldName)).Trim();
+        TableCell cell = label.Parent as TableCell;
+        if (cell == null)
+        {
+            return;
+        }
+
+        cell.Attributes["style"] = "mso-number-format:\\@;";
+        cell.Attributes["x:str"] = value;
+
+        if (_isExcelExport)
+        {
+            cell.Controls.Clear();
+            if (!string.IsNullOrEmpty(value))
+            {
+                cell.Controls.Add(new LiteralControl(HttpUtility.HtmlEncode(value)));
+            }
+            return;
+        }
+
+        label.Text = value;
     }
     public override void VerifyRenderingInServerForm(Control control)
     {
@@ -122,7 +191,7 @@ ORDER BY u.username";
         Response.ClearContent();
         Response.ClearHeaders();
         Response.Charset = "";
-        string FileName = "PayoutReport_" + DateTime.Now + ".xls";
+        string FileName = "PayoutReportSavingLevel_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls";
         System.IO.StringWriter strwritter = new System.IO.StringWriter();
         HtmlTextWriter htmltextwrtter = new HtmlTextWriter(strwritter);
         Response.Cache.SetCacheability(HttpCacheability.NoCache);
@@ -132,7 +201,12 @@ ORDER BY u.username";
         GridView1.GridLines = GridLines.Both;
         GridView1.HeaderStyle.Font.Bold = true;
         GridView1.RenderControl(htmltextwrtter);
+
+        Response.Write("<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\">");
+        Response.Write("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />");
+        Response.Write("<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Payout Report</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>");
         Response.Write(strwritter.ToString());
+        Response.Write("</body></html>");
         Response.End();
 
     }
@@ -146,7 +220,10 @@ ORDER BY u.username";
     }
     protected void imgExcel_Click(object sender, ImageClickEventArgs e)
     {
+        _isExcelExport = true;
+        loadgethelp();
         ExportGridToExcel();
+        _isExcelExport = false;
     }
     public string Release_SavingLevelIncome(string userid, decimal amount)
     {

@@ -107,6 +107,44 @@
     color: #fff !important;
 }
 
+/* Saving product purchase – hero + content button colors */
+.saving-purchase-page .profile-hero-actions .profile-btn-outline {
+    background: rgba(229, 169, 6, 0.14);
+    color: #fde68a !important;
+    border: 1px solid rgba(246, 207, 99, 0.52);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+
+.saving-purchase-page .profile-hero-actions .profile-btn-outline:hover {
+    background: rgba(229, 169, 6, 0.3);
+    color: #fff !important;
+    border-color: #e5a906;
+}
+
+.saving-purchase-page .profile-hero-actions .profile-btn-primary {
+    background: linear-gradient(135deg, #e5a906 0%, #c98f05 100%);
+    color: #1a1d21 !important;
+    box-shadow: 0 6px 18px rgba(229, 169, 6, 0.28);
+}
+
+.saving-purchase-page .profile-hero-actions .profile-btn-primary:hover {
+    color: #1a1d21 !important;
+}
+
+.saving-purchase-page .saving-shipping-actions .profile-btn-outline {
+    background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+    color: #92400e !important;
+    border: 1px solid rgba(217, 119, 6, 0.38);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.1);
+}
+
+.saving-purchase-page .saving-shipping-actions .profile-btn-outline:hover {
+    background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 100%);
+    color: #78350f !important;
+    border-color: #d97706;
+    box-shadow: 0 6px 16px rgba(217, 119, 6, 0.16);
+}
+
 .profile-sections {
     display: flex;
     flex-direction: column;

@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=20" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=34" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -306,6 +306,164 @@
                         </div>
                     </div>
 
+                    <div class="row dash-referral-income-row">
+                        <div class="col-lg-8 col-md-12">
+                    <div id="dvlink" runat="server" visible="True" class="dash-referral-section dash-referral-section--compact">
+                        <div class="dash-referral-head">
+                            <div class="dash-referral-head-main">
+                                <span class="dash-referral-head-icon" aria-hidden="true"><i class="fa fa-share-alt"></i></span>
+                                <div>
+                                    <h3 class="dash-referral-title">Referral Links</h3>
+                                    <p class="dash-referral-sub">Share your personal link and grow your left &amp; right team</p>
+                                </div>
+                            </div>
+                            <span class="dash-referral-id-pill">
+                                <i class="fa fa-id-badge"></i>
+                                Your ID: <strong><asp:Label ID="lblReferralUserId" runat="server" Text="-" /></strong>
+                            </span>
+                        </div>
+
+                        <div class="dash-referral-grid">
+                            <div class="dash-referral-card is-left">
+                                <div class="dash-referral-card-top">
+                                    <span class="dash-referral-card-badge">Left Team</span>
+                                    <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
+                                </div>
+                                <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>left</strong> side.</p>
+                                <div class="dash-referral-field">
+                                    <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control dash-referral-input" />
+                                    <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtLeftLinkLink.ClientID%>', this);" title="Copy link">
+                                        <i class="fa fa-copy"></i>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
+                                <div class="dash-referral-actions">
+                                    <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtLeftLinkLink.ClientID%>');">
+                                        <i class="fa fa-whatsapp"></i> Share on WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dash-referral-card is-right">
+                                <div class="dash-referral-card-top">
+                                    <span class="dash-referral-card-badge">Right Team</span>
+                                    <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                                </div>
+                                <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>right</strong> side.</p>
+                                <div class="dash-referral-field">
+                                    <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control dash-referral-input" />
+                                    <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtRightLink.ClientID%>', this);" title="Copy link">
+                                        <i class="fa fa-copy"></i>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
+                                <div class="dash-referral-actions">
+                                    <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtRightLink.ClientID%>');">
+                                        <i class="fa fa-whatsapp"></i> Share on WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dash-referral-tip">
+                            <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                            <span>Tip: Share the correct link for the team side you want to build. Members register using your ID automatically.</span>
+                        </div>
+                    </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-12">
+                            <div class="dash-incentive-card">
+                                <div class="dash-incentive-logo-bar">
+                                    <!-- <img src="img/logo.png" alt="Maniraya" class="dash-incentive-logo" /> -->
+                                    <span class="dash-incentive-brand">MPremium</span>
+                                </div>
+
+                                <div class="dash-incentive-profile">
+                                    <div class="dash-incentive-details">
+                                        <p class="dash-incentive-period"><asp:Label ID="lblIncentivePeriod" runat="server" Text="Your 30 days incentive" /></p>
+                                        <div class="dash-incentive-detail-row">
+                                            <span class="dash-incentive-label">Distributor</span>
+                                            <strong><asp:Label ID="lblIncentiveName" runat="server" Text="-" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-detail-row">
+                                            <span class="dash-incentive-label">State</span>
+                                            <strong><asp:Label ID="lblIncentiveState" runat="server" Text="-" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-detail-row">
+                                            <span class="dash-incentive-label">District</span>
+                                            <strong><asp:Label ID="lblIncentiveDistrict" runat="server" Text="-" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-detail-row">
+                                            <span class="dash-incentive-label">PAN</span>
+                                            <strong><asp:Label ID="lblIncentivePan" runat="server" Text="-" /></strong>
+                                        </div>
+                                    </div>
+                                    <div class="dash-incentive-photo-wrap">
+                                        <div class="dash-incentive-photo-frame">
+                                            <asp:Image ID="imgIncentivePhoto" runat="server" CssClass="dash-incentive-photo" ImageUrl="img/default.png" AlternateText="Profile photo" />
+                                        </div>
+                                        <div class="dash-incentive-updated" aria-live="polite">
+                                            <span class="dash-incentive-updated-icon" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
+                                            <span class="dash-incentive-updated-label">Last Updated</span>
+                                            <strong class="dash-incentive-updated-time"><asp:Label ID="lblIncentiveUpdated" runat="server" Text="" /></strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="dash-incentive-tabs" role="tablist" aria-label="Incentive period">
+                                    <asp:LinkButton ID="lnkIncentive1Day" runat="server" CssClass="dash-incentive-tab is-1day" CommandArgument="1" OnClick="IncentiveTab_Click">
+                                        <span class="dash-incentive-tab-num">1</span><span class="dash-incentive-tab-text">Day</span>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="lnkIncentive10Day" runat="server" CssClass="dash-incentive-tab is-10day" CommandArgument="10" OnClick="IncentiveTab_Click">
+                                        <span class="dash-incentive-tab-num">10</span><span class="dash-incentive-tab-text">Days</span>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="lnkIncentive30Day" runat="server" CssClass="dash-incentive-tab is-30day is-active" CommandArgument="30" OnClick="IncentiveTab_Click">
+                                        <span class="dash-incentive-tab-num">30</span><span class="dash-incentive-tab-text">Days</span>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="lnkIncentiveTillDate" runat="server" CssClass="dash-incentive-tab is-tilldate" CommandArgument="0" OnClick="IncentiveTab_Click">
+                                        <span class="dash-incentive-tab-num"><i class="fa fa-infinity"></i></span><span class="dash-incentive-tab-text">Till Date</span>
+                                    </asp:LinkButton>
+                                </div>
+
+                                <div class="dash-incentive-income">
+                                    <div class="dash-incentive-income-head">
+                                        <span>Income Type</span>
+                                        <span>Amount</span>
+                                    </div>
+                                    <div class="dash-incentive-income-row">
+                                        <span>Saving Direct Income</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblSavingDirectIncome" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-row">
+                                        <span>Level Income</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-row">
+                                        <span>MPremium Direct Income</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-row">
+                                        <span>Team Bonus</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblMatchingIncomeCard" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-row">
+                                        <span>Self Business Bonus</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-row is-wallet">
+                                        <span>Product Wallet Balance</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblProductWalletBalance" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                    <div class="dash-incentive-income-total">
+                                        <span>Total Incentive</span>
+                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblIncentiveTotal" runat="server" Text="0.00" /></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row dash-stats-grid" style="display:none">
                         <div class="col-sm-6 col-xl-3">
                             <div class="card dash-income-card dash-income-compact tone-indigo">
@@ -374,20 +532,6 @@
                         </asp:Panel>
 
                         <div class="dash-tools-grid">
-                            <div id="dvlink" runat="server" visible="True" class="dash-tools-affiliate-card">
-                                <div class="dash-tools-card-head">
-                                    <span class="dash-tools-card-icon" aria-hidden="true"><i class="fa fa-link"></i></span>
-                                    <div class="dash-tools-card-meta">
-                                        <asp:Label ID="Label1" runat="server" Text="Affiliate Link (LEFT)" CssClass="dash-tools-card-title" />
-                                        <span class="dash-tools-card-sub">Share this link to invite new members to your team</span>
-                                    </div>
-                                </div>
-                                <div class="dash-tools-copy-group">
-                                    <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control dash-tools-input" />
-                                    <asp:Button ID="Button1" runat="server" Text="Copy link" CssClass="btn dash-tools-copy-btn" OnClientClick="CopyToClipboard(); return false;" />
-                                </div>
-                            </div>
-
                             <div class="dash-tools-news-card">
                                 <div class="dash-tools-news-head">
                                     <span class="dash-tools-news-icon" aria-hidden="true"><i class="fa fa-bullhorn"></i></span>
@@ -409,21 +553,8 @@
                             </div>
                         </div>
 
-                        <div class="row" style="display:none;">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <asp:Label ID="Label2" runat="server" Text="Affiliate Link (RIGHT)"></asp:Label>
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <div class="form-group">
-                                    <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control" />
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <asp:Button ID="Button2" runat="server" Text="Copy" CssClass="btn btn-primary" OnClientClick="CopyToClipboard2()" />
-                            </div>
-                        </div>
+                        <asp:Button ID="Button1" runat="server" Style="display:none;" />
+                        <asp:Button ID="Button2" runat="server" Style="display:none;" />
                     </div>
 
                     <div class="dash-section-head dash-section-head--income" style="display:none">
@@ -2975,35 +3106,84 @@ Profit Share Budget</p>
             el.textContent = fmt(start) + " - " + fmt(end);
         })();
 
-        function CopyToClipboard() {
+        function copyReferralLink(inputId, btn) {
+            var input = document.getElementById(inputId);
+            if (!input || !input.value) {
+                return;
+            }
 
+            var text = input.value;
 
-            /* Get the text field */
-            var copyText = document.getElementById('<%=TxtLeftLinkLink.ClientID%>');
+            function showCopied() {
+                if (!btn) {
+                    showReferralToast('Link copied to clipboard');
+                    return;
+                }
+                var label = btn.querySelector('span');
+                var icon = btn.querySelector('i');
+                var oldLabel = label ? label.textContent : '';
+                var oldIconClass = icon ? icon.className : '';
+                btn.classList.add('is-copied');
+                if (label) {
+                    label.textContent = 'Copied';
+                }
+                if (icon) {
+                    icon.className = 'fa fa-check';
+                }
+                showReferralToast('Referral link copied');
+                setTimeout(function () {
+                    btn.classList.remove('is-copied');
+                    if (label) {
+                        label.textContent = oldLabel || 'Copy';
+                    }
+                    if (icon) {
+                        icon.className = oldIconClass || 'fa fa-copy';
+                    }
+                }, 1800);
+            }
 
-            /* Select the text field */
-            copyText.select();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(showCopied).catch(function () {
+                    input.select();
+                    document.execCommand('copy');
+                    showCopied();
+                });
+                return;
+            }
 
-            /* Copy the text inside the text field */
-            document.execCommand("Copy");
-
-            /* Alert the copied text */
-            alert("Copied the text: " + copyText.value);
+            input.select();
+            document.execCommand('copy');
+            showCopied();
         }
+
+        function shareReferralWhatsApp(inputId) {
+            var input = document.getElementById(inputId);
+            if (!input || !input.value) {
+                return;
+            }
+            var message = 'Join Maniraya using my referral link: ' + input.value;
+            window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+        }
+
+        function showReferralToast(message) {
+            var toast = document.getElementById('dashReferralToast');
+            if (!toast) {
+                return;
+            }
+            toast.textContent = message;
+            toast.classList.add('is-visible');
+            clearTimeout(window._dashReferralToastTimer);
+            window._dashReferralToastTimer = setTimeout(function () {
+                toast.classList.remove('is-visible');
+            }, 2400);
+        }
+
+        function CopyToClipboard() {
+            copyReferralLink('<%=TxtLeftLinkLink.ClientID%>', null);
+        }
+
         function CopyToClipboard2() {
-
-
-            /* Get the text field */
-            var copyText1 = document.getElementById('<%=TxtRightLink.ClientID%>');
-
-            /* Select the text field */
-            copyText1.select();
-
-            /* Copy the text inside the text field */
-            document.execCommand("Copy");
-
-            /* Alert the copied text */
-            alert("Copied the text: " + copyText1.value);
+            copyReferralLink('<%=TxtRightLink.ClientID%>', null);
         }
 
         function primeclick() {
@@ -3215,6 +3395,8 @@ Profit Share Budget</p>
     <!-- /.modal -->
 
     <!--(Ends) For User Performance-->
+
+    <div id="dashReferralToast" class="dash-referral-toast" role="status" aria-live="polite"></div>
 
 </asp:Content>
 

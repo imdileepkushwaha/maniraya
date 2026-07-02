@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_SavingProductPurchase" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
     <style>
         .saving-purchase-page .saving-product-showcase {
             margin-bottom: 24px;

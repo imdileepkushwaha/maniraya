@@ -1025,6 +1025,744 @@
     }
 }
 
+/* Referral + incentive split row */
+.dash-referral-income-row {
+    margin-bottom: 28px;
+    align-items: stretch;
+}
+
+.dash-referral-income-row > [class*="col-"] {
+    margin-bottom: 20px;
+}
+
+.dash-referral-section--compact {
+    height: 100%;
+    margin-bottom: 0;
+}
+
+.dash-incentive-card {
+    position: relative;
+    height: 100%;
+    background: var(--dash-card, #fff);
+    border: 1px solid var(--dash-border, #e8ecf1);
+    border-radius: var(--dash-radius, 16px);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-incentive-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e52d27, #f59e0b, #22c55e, #3b82f6, #e52d27);
+    z-index: 1;
+}
+
+.dash-incentive-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 12px;
+    margin-top: auto;
+    background: linear-gradient(135deg, #ecfdf5 0%, #fff7ed 35%, #eff6ff 70%, #f5f3ff 100%);
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dash-incentive-tab,
+a.dash-incentive-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    padding: 8px 4px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-decoration: none !important;
+    transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, transform 0.15s ease, color 0.22s ease;
+}
+
+.dash-incentive-tab-num {
+    font-size: 0.98rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.dash-incentive-tab-num .fa {
+    font-size: 0.85rem;
+}
+
+.dash-incentive-tab-text {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* 1 Day — green */
+.dash-incentive-tab.is-1day {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.18) 0%, rgba(187, 247, 208, 0.45) 100%);
+    border-color: rgba(34, 197, 94, 0.35);
+    color: #166534 !important;
+}
+
+.dash-incentive-tab.is-1day .dash-incentive-tab-num {
+    color: #15803d;
+}
+
+.dash-incentive-tab.is-1day:hover {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.32) 0%, rgba(134, 239, 172, 0.55) 100%);
+    border-color: #22c55e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(34, 197, 94, 0.22);
+    color: #14532d !important;
+}
+
+.dash-incentive-tab.is-active.is-1day {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 55%, #4ade80 100%);
+    border-color: #15803d;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    transform: translateY(-2px);
+}
+
+.dash-incentive-tab.is-active.is-1day .dash-incentive-tab-num,
+.dash-incentive-tab.is-active.is-1day .dash-incentive-tab-text {
+    color: #fff !important;
+}
+
+/* 10 Days — amber */
+.dash-incentive-tab.is-10day {
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.2) 0%, rgba(253, 230, 138, 0.5) 100%);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #92400e !important;
+}
+
+.dash-incentive-tab.is-10day .dash-incentive-tab-num {
+    color: #b45309;
+}
+
+.dash-incentive-tab.is-10day:hover {
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.35) 0%, rgba(252, 211, 77, 0.6) 100%);
+    border-color: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(245, 158, 11, 0.28);
+    color: #78350f !important;
+}
+
+.dash-incentive-tab.is-active.is-10day {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 55%, #fbbf24 100%);
+    border-color: #b45309;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.42);
+    transform: translateY(-2px);
+}
+
+.dash-incentive-tab.is-active.is-10day .dash-incentive-tab-num,
+.dash-incentive-tab.is-active.is-10day .dash-incentive-tab-text {
+    color: #fff !important;
+}
+
+/* 30 Days — violet */
+.dash-incentive-tab.is-30day {
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.18) 0%, rgba(221, 214, 254, 0.5) 100%);
+    border-color: rgba(139, 92, 246, 0.35);
+    color: #5b21b6 !important;
+}
+
+.dash-incentive-tab.is-30day .dash-incentive-tab-num {
+    color: #7c3aed;
+}
+
+.dash-incentive-tab.is-30day:hover {
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.32) 0%, rgba(196, 181, 253, 0.6) 100%);
+    border-color: #8b5cf6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(139, 92, 246, 0.25);
+    color: #4c1d95 !important;
+}
+
+.dash-incentive-tab.is-active.is-30day {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 55%, #a78bfa 100%);
+    border-color: #6d28d9;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.dash-incentive-tab.is-active.is-30day .dash-incentive-tab-num,
+.dash-incentive-tab.is-active.is-30day .dash-incentive-tab-text {
+    color: #fff !important;
+}
+
+/* Till Date — blue */
+.dash-incentive-tab.is-tilldate {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.18) 0%, rgba(191, 219, 254, 0.5) 100%);
+    border-color: rgba(59, 130, 246, 0.35);
+    color: #1e40af !important;
+}
+
+.dash-incentive-tab.is-tilldate .dash-incentive-tab-num {
+    color: #2563eb;
+}
+
+.dash-incentive-tab.is-tilldate:hover {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.32) 0%, rgba(147, 197, 253, 0.6) 100%);
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+    color: #1e3a8a !important;
+}
+
+.dash-incentive-tab.is-active.is-tilldate {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 55%, #60a5fa 100%);
+    border-color: #1d4ed8;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.42);
+    transform: translateY(-2px);
+}
+
+.dash-incentive-tab.is-active.is-tilldate .dash-incentive-tab-num,
+.dash-incentive-tab.is-active.is-tilldate .dash-incentive-tab-text {
+    color: #fff !important;
+}
+
+.dash-incentive-logo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    border-bottom: 1px solid #e8ecf1;
+}
+
+.dash-incentive-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.dash-incentive-brand {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #1e293b;
+}
+
+.dash-incentive-profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 118px;
+    gap: 14px;
+    padding: 16px;
+    align-items: start;
+    flex: 1;
+}
+
+.dash-incentive-details {
+    min-width: 0;
+}
+
+.dash-incentive-period {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.dash-incentive-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.dash-incentive-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.dash-incentive-detail-row strong {
+    font-size: 0.86rem;
+    color: #1e293b;
+    word-break: break-word;
+}
+
+.dash-incentive-updated {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+    margin: 0;
+    padding: 8px 6px;
+    text-align: center;
+    background: linear-gradient(180deg, #fff7ed 0%, #fef2f2 100%);
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+}
+
+.dash-incentive-updated-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    font-size: 0.72rem;
+}
+
+.dash-incentive-updated-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #b91c1c;
+    line-height: 1.2;
+}
+
+.dash-incentive-updated-time {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #991b1b;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.dash-incentive-photo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 118px;
+}
+
+.dash-incentive-photo-frame {
+    width: 100%;
+    padding: 4px;
+    background: linear-gradient(145deg, #dbeafe 0%, #eff6ff 55%, #f8fafc 100%);
+    border: 1px solid #93c5fd;
+    border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(59, 130, 246, 0.18);
+}
+
+.dash-incentive-photo {
+    display: block;
+    width: 100%;
+    height: 128px;
+    border-radius: 6px;
+    object-fit: cover;
+    object-position: center top;
+    border: 2px solid #3b82f6;
+    background: #f8fafc;
+}
+
+.dash-incentive-income {
+    padding: 0;
+    flex: 1;
+}
+
+.dash-incentive-income-head,
+.dash-incentive-income-row,
+.dash-incentive-income-total {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+}
+
+.dash-incentive-income-head {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.dash-incentive-income-row {
+    font-size: 0.82rem;
+    color: #334155;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.dash-incentive-income-row strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.84rem;
+    color: #0f172a;
+    white-space: nowrap;
+}
+
+.dash-incentive-income-row.is-wallet {
+    background: #f8fafc;
+}
+
+.dash-incentive-income-total {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    border-top: 2px solid #86efac;
+    font-weight: 700;
+}
+
+.dash-incentive-income-total strong {
+    color: #047857;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 991px) {
+    .dash-referral-section--compact .dash-referral-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575px) {
+    .dash-incentive-profile {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-incentive-photo-wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 118px;
+    }
+
+    .dash-incentive-updated {
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* Referral links section */
+.dash-referral-section {
+    position: relative;
+    margin-bottom: 28px;
+    padding: 24px;
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: var(--dash-radius);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.dash-referral-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e52d27, #f59e0b, #22c55e, #3b82f6, #e52d27);
+}
+
+.dash-referral-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.dash-referral-head-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+
+.dash-referral-head-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #fee2e2 0%, #fff7ed 100%);
+    color: var(--dash-red);
+    font-size: 1.15rem;
+}
+
+.dash-referral-title {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dash-text);
+}
+
+.dash-referral-sub {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--dash-muted);
+    line-height: 1.45;
+}
+
+.dash-referral-id-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid var(--dash-border);
+    font-size: 0.84rem;
+    color: var(--dash-muted);
+    white-space: nowrap;
+}
+
+.dash-referral-id-pill strong {
+    color: var(--dash-text);
+    font-weight: 700;
+}
+
+.dash-referral-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.dash-referral-card {
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid var(--dash-border);
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.dash-referral-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.dash-referral-card.is-left {
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 55%);
+    border-color: rgba(34, 197, 94, 0.22);
+}
+
+.dash-referral-card.is-right {
+    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 55%);
+    border-color: rgba(59, 130, 246, 0.22);
+}
+
+.dash-referral-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.dash-referral-card-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.dash-referral-card.is-left .dash-referral-card-badge {
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803d;
+}
+
+.dash-referral-card.is-right .dash-referral-card-badge {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+}
+
+.dash-referral-card-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--dash-text);
+    border: 1px solid var(--dash-border);
+}
+
+.dash-referral-card-text {
+    margin: 0 0 14px;
+    font-size: 0.86rem;
+    color: var(--dash-muted);
+    line-height: 1.5;
+}
+
+.dash-referral-field {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.dash-referral-input {
+    flex: 1;
+    min-width: 0;
+    height: 44px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--dash-border) !important;
+    background: #fff !important;
+    font-size: 0.82rem !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+}
+
+.dash-referral-input:focus {
+    border-color: #94a3b8 !important;
+    outline: none;
+}
+
+.dash-referral-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 92px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 10px;
+    background: #111827;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.dash-referral-copy-btn:hover {
+    background: #1f2937;
+    transform: translateY(-1px);
+}
+
+.dash-referral-copy-btn.is-copied {
+    background: #15803d;
+}
+
+.dash-referral-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dash-referral-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--dash-border);
+    background: #fff;
+    color: var(--dash-text);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.dash-referral-share-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.dash-referral-share-btn.is-whatsapp {
+    color: #166534;
+    border-color: rgba(34, 197, 94, 0.28);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.dash-referral-share-btn.is-whatsapp:hover {
+    background: rgba(34, 197, 94, 0.14);
+}
+
+.dash-referral-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.dash-referral-tip .fa {
+    margin-top: 2px;
+    color: #d97706;
+}
+
+.dash-referral-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(12px);
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: #111827;
+    color: #fff;
+    font-size: 0.86rem;
+    font-weight: 600;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 9999;
+}
+
+.dash-referral-toast.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 991px) {
+    .dash-referral-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575px) {
+    .dash-referral-section {
+        padding: 18px 16px;
+    }
+
+    .dash-referral-field {
+        flex-direction: column;
+    }
+
+    .dash-referral-copy-btn {
+        width: 100%;
+        min-height: 42px;
+    }
+
+    .dash-referral-share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* Feature sections – Saving / Premium dashboards */
 .dash-feature-row {
     margin-bottom: 24px;
@@ -3107,5 +3845,177 @@ a.saving-pager-btn:focus {
     .dash-saving-report-table-wrap .dash-saving-report-table td {
         padding: 11px 12px;
         font-size: 0.82rem;
+    }
+}
+
+/* Level income report page */
+.dash-income-report-page {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.dash-income-report-search-panel {
+    margin-bottom: 20px;
+}
+
+.dash-income-report-search-grid {
+    margin-bottom: 4px;
+}
+
+.dash-income-report-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+
+.dash-income-report-results-head {
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.dash-income-report-results-copy {
+    flex: 1;
+    min-width: 220px;
+}
+
+.dash-income-report-summary {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.86rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.dash-income-report-stats {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dash-income-report-stat {
+    min-width: 120px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e8ecf1;
+}
+
+.dash-income-report-stat.is-payable {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    border-color: rgba(16, 185, 129, 0.22);
+}
+
+.dash-income-report-stat-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.dash-income-report-stat strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.dash-income-report-stat.is-payable strong {
+    color: #047857;
+}
+
+.dash-income-report-table .dash-income-member-name {
+    display: block;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.dash-income-report-table .dash-income-member-id {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.dash-income-report-table .dash-income-level-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(124, 58, 237, 0.12);
+    color: #6d28d9;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.dash-income-report-table .dash-income-level-per {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.dash-income-report-table .dash-income-payable {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-weight: 700;
+    color: #047857;
+    white-space: nowrap;
+}
+
+.dash-income-report-table .dash-income-payable::before {
+    content: "\f156";
+    font-family: FontAwesome;
+    font-size: 0.82rem;
+}
+
+.dash-income-report-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.dash-income-report-filter label {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.dash-income-report-filter .soh-records-select {
+    min-width: 84px;
+    height: 38px;
+    border-radius: 10px;
+}
+
+@media (max-width: 767px) {
+    .dash-income-report-actions .profile-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dash-income-report-stats {
+        width: 100%;
+    }
+
+    .dash-income-report-stat {
+        flex: 1;
+    }
+
+    .dash-income-report-filter {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
     }
 }

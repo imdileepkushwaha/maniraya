@@ -36,9 +36,10 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadnotification();
                 laoddata();
                 string url = clsUtility.ProjectWebsite;
+                string userId = Session["userid"].ToString();
 
-                TxtLeftLinkLink.Text = "https://maniraya.com/" + "/Register.aspx?UserId=" + Session["userid"].ToString() + "&standingposition=1";
-                TxtRightLink.Text = "https://divyayajurvedawellness.com/" + "/Register.aspx?UserId=" + Session["userid"].ToString() + "&standingposition=2";
+                TxtLeftLinkLink.Text = url + "signup.aspx?UserId=" + userId + "&standingposition=1";
+                TxtRightLink.Text = url + "signup.aspx?UserId=" + userId + "&standingposition=2";
                 //loadaward();
                 //loadvacation();
                 loadnews();
@@ -67,6 +68,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadPV();
                 loadawardlist();
                 GetAllIncome();
+                LoadIncentiveCard();
 
 
             }
@@ -142,22 +144,84 @@ public partial class user_Dashboard : System.Web.UI.Page
 
     void loadTotalSV()
     {
-        DataTable dt = new DataTable();
-        dt = objuser.getTotalSV(Session["userid"].ToString());
-        //LblBinaryIncome.Text = dt.Rows[0]["Binaryincome"].ToString();
-        lblleftjoiningsv.Text = dt.Rows[0]["TotalLeftJoiningSV"].ToString();
-        lblrightjoiningsv.Text = dt.Rows[0]["TotalRightjoiningSV"].ToString();
-        lblleftjoiningcarrysv.Text = dt.Rows[0]["TotalLeftJoiningCarrySV"].ToString();
-        lblrightjoiningcarrysv.Text = dt.Rows[0]["TotalRightjoiningCarrySV"].ToString();
-        lbltotalselfjoiningsv.Text = dt.Rows[0]["TotalSelfjoiningSV"].ToString();
-        lblleftrepurchasesv.Text = dt.Rows[0]["TotalLeftRepurchaseSV"].ToString();
-        lblRightrepurchasesv.Text = dt.Rows[0]["TotalRightRepurchaseSV"].ToString();
-        lblleftrepurchasecarrysv.Text = dt.Rows[0]["TotalLeftRepurchasecarrySV"].ToString();
-        lblRightrepurchasecarrysv.Text = dt.Rows[0]["TotalLeftRepurchasecarrySV"].ToString();
-        lbltotalselfRepurchasesv.Text = dt.Rows[0]["TotalSelfRepurchaseSV"].ToString();
-        lblleftBonanzasv.Text = dt.Rows[0]["BonanzaLeftBV"].ToString();
-        lblRightBonanzasv.Text = dt.Rows[0]["BonanzaRightBV"].ToString();
-        
+        SetLabelDefault(lblleftjoiningsv);
+        SetLabelDefault(lblrightjoiningsv);
+        SetLabelDefault(lblleftjoiningcarrysv);
+        SetLabelDefault(lblrightjoiningcarrysv);
+        SetLabelDefault(lbltotalselfjoiningsv);
+        SetLabelDefault(lblleftrepurchasesv);
+        SetLabelDefault(lblRightrepurchasesv);
+        SetLabelDefault(lblleftrepurchasecarrysv);
+        SetLabelDefault(lblRightrepurchasecarrysv);
+        SetLabelDefault(lbltotalselfRepurchasesv);
+        SetLabelDefault(lblleftBonanzasv);
+        SetLabelDefault(lblRightBonanzasv);
+
+        try
+        {
+            DataTable dt = objuser.getTotalSV(Session["userid"].ToString());
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                return;
+            }
+
+            DataRow row = dt.Rows[0];
+            lblleftjoiningsv.Text = GetColumnValue(row, dt, "TotalLeftJoiningSV", "LeftJoiningSV", "LeftJoiningBV", "TotalLeftBV");
+            lblrightjoiningsv.Text = GetColumnValue(row, dt, "TotalRightjoiningSV", "TotalRightJoiningSV", "RightJoiningSV", "RightJoiningBV", "TotalRightBV");
+            lblleftjoiningcarrysv.Text = GetColumnValue(row, dt, "TotalLeftJoiningCarrySV", "LeftJoiningCarrySV", "CfLeftBv");
+            lblrightjoiningcarrysv.Text = GetColumnValue(row, dt, "TotalRightjoiningCarrySV", "TotalRightJoiningCarrySV", "RightJoiningCarrySV", "CfRightBv");
+            lbltotalselfjoiningsv.Text = GetColumnValue(row, dt, "TotalSelfjoiningSV", "TotalSelfJoiningSV", "SelfJoiningSV", "SelfBv");
+            lblleftrepurchasesv.Text = GetColumnValue(row, dt, "TotalLeftRepurchaseSV", "LeftRepurchaseSV", "TotalLeftRepurchaseBv");
+            lblRightrepurchasesv.Text = GetColumnValue(row, dt, "TotalRightRepurchaseSV", "RightRepurchaseSV", "TotalRightRepurchaseBv");
+            lblleftrepurchasecarrysv.Text = GetColumnValue(row, dt, "TotalLeftRepurchasecarrySV", "LeftRepurchaseCarrySV");
+            lblRightrepurchasecarrysv.Text = GetColumnValue(row, dt, "TotalRightRepurchasecarrySV", "TotalRightRepurchaseCarrySV", "RightRepurchaseCarrySV");
+            lbltotalselfRepurchasesv.Text = GetColumnValue(row, dt, "TotalSelfRepurchaseSV", "SelfRepurchaseSV");
+            lblleftBonanzasv.Text = GetColumnValue(row, dt, "BonanzaLeftBV", "LeftBonanzaBV");
+            lblRightBonanzasv.Text = GetColumnValue(row, dt, "BonanzaRightBV", "RightBonanzaBV");
+        }
+        catch
+        {
+            // Keep default values when SV data is unavailable or schema differs.
+        }
+    }
+
+    void SetLabelDefault(Label label)
+    {
+        if (label != null)
+        {
+            label.Text = "0";
+        }
+    }
+
+    string GetColumnValue(DataRow row, DataTable dt, params string[] columnNames)
+    {
+        if (row == null || dt == null || columnNames == null)
+        {
+            return "0";
+        }
+
+        foreach (string columnName in columnNames)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                continue;
+            }
+
+            if (dt.Columns.Contains(columnName))
+            {
+                return Convert.ToString(row[columnName]);
+            }
+
+            foreach (DataColumn column in dt.Columns)
+            {
+                if (string.Equals(column.ColumnName, columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Convert.ToString(row[column]);
+                }
+            }
+        }
+
+        return "0";
     }
 
     void loadTotalpayout()
@@ -381,11 +445,17 @@ public partial class user_Dashboard : System.Web.UI.Page
         {
             lbluserid.Text = dt.Rows[0]["userid"].ToString();
             lblWelcomeId.Text = dt.Rows[0]["userid"].ToString();
+            lblReferralUserId.Text = dt.Rows[0]["userid"].ToString();
             lblusername.Text = dt.Rows[0]["username"].ToString();
             lblWelcomeName.Text = dt.Rows[0]["username"].ToString();
             LblSponserId.Text = dt.Rows[0]["sponserId"].ToString();
             LblParentId.Text = dt.Rows[0]["parentuserid"].ToString();
             ImgMyPhoto.ImageUrl = "../ProductImage/" + dt.Rows[0]["PhotoImage"].ToString();
+            if (imgIncentivePhoto != null)
+            {
+                string photo = Convert.ToString(dt.Rows[0]["PhotoImage"]);
+                imgIncentivePhoto.ImageUrl = string.IsNullOrWhiteSpace(photo) ? "img/default.png" : "../ProductImage/" + photo;
+            }
             lbljoiningdate.Text = dt.Rows[0]["parentuserid"].ToString();
             LblParentName.Text = dt.Rows[0]["parentname"].ToString();
             LblSponserName.Text = dt.Rows[0]["sponsername"].ToString();
@@ -782,6 +852,319 @@ public partial class user_Dashboard : System.Web.UI.Page
     }
 
     //(Ends)
+
+    int IncentiveDays
+    {
+        get { return ViewState["IncentiveDays"] != null ? (int)ViewState["IncentiveDays"] : 30; }
+        set { ViewState["IncentiveDays"] = value; }
+    }
+
+    protected void IncentiveTab_Click(object sender, EventArgs e)
+    {
+        LinkButton tab = sender as LinkButton;
+        int days;
+        if (tab != null && int.TryParse(tab.CommandArgument, out days))
+        {
+            IncentiveDays = days;
+        }
+
+        LoadIncentiveCard();
+    }
+
+    void LoadIncentiveCard()
+    {
+        if (Session["userid"] == null)
+        {
+            return;
+        }
+
+        string userId = Session["userid"].ToString();
+        LoadIncentiveProfile(userId);
+        LoadIncentiveAmounts(userId, IncentiveDays);
+        UpdateIncentiveTabState();
+    }
+
+    void LoadIncentiveProfile(string userId)
+    {
+        objuser.UserId = userId;
+        DataTable dt = getUserDetail(objuser);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
+
+        DataRow row = dt.Rows[0];
+        lblIncentiveName.Text = Convert.ToString(row["username"]);
+        lblIncentiveState.Text = GetRowText(row, "statename", "StateName");
+        lblIncentiveDistrict.Text = GetRowText(row, "AreaName", "areaname", "address");
+        lblIncentivePan.Text = MaskPan(GetRowText(row, "pannumber", "PanNumber"));
+
+        int days = IncentiveDays;
+        if (days == 0)
+        {
+            lblIncentivePeriod.Text = "Your incentive till date";
+        }
+        else if (days == 1)
+        {
+            lblIncentivePeriod.Text = "Your 1 day incentive";
+        }
+        else
+        {
+            lblIncentivePeriod.Text = "Your " + days + " days incentive";
+        }
+        lblIncentiveUpdated.Text = DateTime.Now.ToString("dd MMM yyyy hh:mm tt");
+    }
+
+    void LoadIncentiveAmounts(string userId, int days)
+    {
+        decimal savingDirect = GetSavingLevelIncome(userId, true, days);
+        decimal levelIncome = GetSavingLevelIncome(userId, false, days);
+        decimal premiumDirect = GetTransactionIncome(userId, "Direct Income", days);
+        decimal matchingIncome = GetTransactionIncome(userId, "Binary Income", days);
+        decimal cashBack = GetCashBackIncome(userId, days);
+        decimal productWallet = GetProductWalletBalance(userId);
+        decimal total = savingDirect + levelIncome + premiumDirect + matchingIncome + cashBack;
+
+        lblSavingDirectIncome.Text = savingDirect.ToString("N2");
+        lblLevelIncomeCard.Text = levelIncome.ToString("N2");
+        lblPremiumDirectIncome.Text = premiumDirect.ToString("N2");
+        lblMatchingIncomeCard.Text = matchingIncome.ToString("N2");
+        lblCashBackIncome.Text = cashBack.ToString("N2");
+        lblProductWalletBalance.Text = productWallet.ToString("N2");
+        lblIncentiveTotal.Text = total.ToString("N2");
+    }
+
+    void UpdateIncentiveTabState()
+    {
+        SetTabState(lnkIncentive1Day, IncentiveDays == 1);
+        SetTabState(lnkIncentive10Day, IncentiveDays == 10);
+        SetTabState(lnkIncentive30Day, IncentiveDays == 30);
+        SetTabState(lnkIncentiveTillDate, IncentiveDays == 0);
+    }
+
+    static void SetTabState(LinkButton tab, bool isActive)
+    {
+        if (tab == null)
+        {
+            return;
+        }
+
+        string css = tab.CssClass ?? string.Empty;
+        css = css.Replace(" is-active", string.Empty);
+        if (isActive)
+        {
+            css += " is-active";
+        }
+
+        tab.CssClass = css.Trim();
+    }
+
+    decimal GetSavingLevelIncome(string userId, bool directOnly, int days)
+    {
+        string levelClause = directOnly ? "sd.LevelNo = 1" : "sd.LevelNo > 1";
+        string sql = @"SELECT ISNULL(SUM(sd.Amount), 0)
+            FROM SavingLevelIncomeDetail sd WITH (NOLOCK)
+            WHERE sd.UserId = '" + SqlEscape(userId) + @"' AND " + levelClause;
+
+        if (days > 0)
+        {
+            sql += " AND CONVERT(date, sd.MentionDate) >= CONVERT(date, DATEADD(day, -" + days + ", GETDATE()))";
+        }
+
+        return ExecuteScalarDecimal(sql);
+    }
+
+    decimal GetTransactionIncome(string userId, string transactionType, int days)
+    {
+        string sql = @"SELECT ISNULL(SUM(t.CrAmount), 0)
+            FROM TransactionDetail t WITH (NOLOCK)
+            WHERE t.UserId = '" + SqlEscape(userId) + @"'
+            AND t.TransactionType = '" + SqlEscape(transactionType) + "'";
+
+        if (days > 0)
+        {
+            sql += " AND CONVERT(date, t.MentionDate) >= CONVERT(date, DATEADD(day, -" + days + ", GETDATE()))";
+        }
+
+        return ExecuteScalarDecimal(sql);
+    }
+
+    decimal GetCashBackIncome(string userId, int days)
+    {
+        string sql = @"SELECT ISNULL(SUM(t.CrAmount), 0)
+            FROM TransactionDetail t WITH (NOLOCK)
+            WHERE t.UserId = '" + SqlEscape(userId) + @"'
+            AND (
+                t.TransactionType = 'Self Business Bonus'
+                OR t.TransactionType = 'Cashback Income'
+                OR t.TransactionType LIKE '%Self Business Bonus%'
+            )";
+
+        if (days > 0)
+        {
+            sql += " AND CONVERT(date, t.MentionDate) >= CONVERT(date, DATEADD(day, -" + days + ", GETDATE()))";
+        }
+
+        decimal txnTotal = ExecuteScalarDecimal(sql);
+        if (txnTotal > 0m)
+        {
+            return txnTotal;
+        }
+
+        if (days != 0)
+        {
+            return 0m;
+        }
+
+        try
+        {
+            SqlParameter[] parameter = { new SqlParameter("@UserId", userId) };
+            DataSet ds = DBHelper.ExecuteQuery("sp_Totalincome", parameter);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Columns.Contains("GoldDIrector1"))
+            {
+                decimal fallback;
+                if (decimal.TryParse(Convert.ToString(ds.Tables[0].Rows[0]["GoldDIrector1"]), out fallback))
+                {
+                    return fallback;
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return 0m;
+    }
+
+    decimal GetProductWalletBalance(string userId)
+    {
+        objuser.UserId = userId;
+        DataTable dt = objuser.getUserDetail(objuser);
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            decimal utilityBalance;
+            if (decimal.TryParse(Convert.ToString(dt.Rows[0]["UtilityBalance"]), out utilityBalance))
+            {
+                return utilityBalance;
+            }
+
+            decimal leadership;
+            if (decimal.TryParse(Convert.ToString(dt.Rows[0]["leadershipincome1"]), out leadership))
+            {
+                return leadership;
+            }
+        }
+
+        try
+        {
+            SqlParameter[] parameter = { new SqlParameter("@UserId", userId) };
+            DataSet ds = DBHelper.ExecuteQuery("sp_Totalincome", parameter);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Columns.Contains("leadershipincome1"))
+            {
+                decimal wallet;
+                if (decimal.TryParse(Convert.ToString(ds.Tables[0].Rows[0]["leadershipincome1"]), out wallet))
+                {
+                    return wallet;
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return 0m;
+    }
+
+    decimal ExecuteScalarDecimal(string sql)
+    {
+        ObjData.StartConnection();
+        try
+        {
+            DataTable dt = ObjData.RunDataTable(sql);
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count > 0)
+            {
+                decimal amount;
+                if (decimal.TryParse(Convert.ToString(dt.Rows[0][0]), out amount))
+                {
+                    return amount;
+                }
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        return 0m;
+    }
+
+    static string GetRowText(DataRow row, params string[] columnNames)
+    {
+        if (row == null || columnNames == null)
+        {
+            return "-";
+        }
+
+        foreach (string columnName in columnNames)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                continue;
+            }
+
+            if (row.Table.Columns.Contains(columnName))
+            {
+                string value = Convert.ToString(row[columnName]).Trim();
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                if (string.Equals(column.ColumnName, columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    string value = Convert.ToString(row[column]).Trim();
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        return value;
+                    }
+                }
+            }
+        }
+
+        return "-";
+    }
+
+    static string MaskPan(string pan)
+    {
+        if (string.IsNullOrWhiteSpace(pan) || pan == "-")
+        {
+            return "-";
+        }
+
+        pan = pan.Trim().ToUpperInvariant();
+        if (pan.Length <= 4)
+        {
+            return pan;
+        }
+
+        if (pan.Length <= 7)
+        {
+            return pan.Substring(0, 2) + "xxx" + pan.Substring(pan.Length - 2);
+        }
+
+        return pan.Substring(0, 4) + "xxx" + pan.Substring(pan.Length - 3);
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
+    }
 
     protected void Button3_Click(object sender, EventArgs e)
     {
