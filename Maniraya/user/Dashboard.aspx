@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=34" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=40" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -306,160 +306,173 @@
                         </div>
                     </div>
 
-                    <div class="row dash-referral-income-row">
-                        <div class="col-lg-8 col-md-12">
-                    <div id="dvlink" runat="server" visible="True" class="dash-referral-section dash-referral-section--compact">
-                        <div class="dash-referral-head">
-                            <div class="dash-referral-head-main">
-                                <span class="dash-referral-head-icon" aria-hidden="true"><i class="fa fa-share-alt"></i></span>
-                                <div>
-                                    <h3 class="dash-referral-title">Referral Links</h3>
-                                    <p class="dash-referral-sub">Share your personal link and grow your left &amp; right team</p>
-                                </div>
-                            </div>
-                            <span class="dash-referral-id-pill">
-                                <i class="fa fa-id-badge"></i>
-                                Your ID: <strong><asp:Label ID="lblReferralUserId" runat="server" Text="-" /></strong>
-                            </span>
-                        </div>
-
-                        <div class="dash-referral-grid">
-                            <div class="dash-referral-card is-left">
-                                <div class="dash-referral-card-top">
-                                    <span class="dash-referral-card-badge">Left Team</span>
-                                    <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
-                                </div>
-                                <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>left</strong> side.</p>
-                                <div class="dash-referral-field">
-                                    <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control dash-referral-input" />
-                                    <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtLeftLinkLink.ClientID%>', this);" title="Copy link">
-                                        <i class="fa fa-copy"></i>
-                                        <span>Copy</span>
-                                    </button>
-                                </div>
-                                <div class="dash-referral-actions">
-                                    <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtLeftLinkLink.ClientID%>');">
-                                        <i class="fa fa-whatsapp"></i> Share on WhatsApp
-                                    </button>
-                                </div>
+                    <div class="dash-incentive-referral-stack">
+                        <div class="dash-incentive-card dash-incentive-card--full" id="dashIncentiveCard">
+                            <div class="dash-incentive-logo-bar">
+                                <!-- <img src="img/logo.png" alt="Maniraya" class="dash-incentive-logo" /> -->
+                                <span class="dash-incentive-brand">MPremium</span>
                             </div>
 
-                            <div class="dash-referral-card is-right">
-                                <div class="dash-referral-card-top">
-                                    <span class="dash-referral-card-badge">Right Team</span>
-                                    <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                            <div class="dash-incentive-layout">
+                                <div class="dash-incentive-profile-side">
+                                    <div class="dash-incentive-profile">
+                                        <div class="dash-incentive-details">
+                                            <p class="dash-incentive-period"><asp:Label ID="lblIncentivePeriod" runat="server" Text="Your 30 days incentive" /></p>
+                                            <div class="dash-incentive-detail-row">
+                                                <span class="dash-incentive-label">Distributor</span>
+                                                <strong><asp:Label ID="lblIncentiveName" runat="server" Text="-" /></strong>
+                                            </div>
+                                            <div class="dash-incentive-detail-row">
+                                                <span class="dash-incentive-label">State</span>
+                                                <strong><asp:Label ID="lblIncentiveState" runat="server" Text="-" /></strong>
+                                            </div>
+                                            <div class="dash-incentive-detail-row">
+                                                <span class="dash-incentive-label">District</span>
+                                                <strong><asp:Label ID="lblIncentiveDistrict" runat="server" Text="-" /></strong>
+                                            </div>
+                                            <div class="dash-incentive-detail-row">
+                                                <span class="dash-incentive-label">PAN</span>
+                                                <strong><asp:Label ID="lblIncentivePan" runat="server" Text="-" /></strong>
+                                            </div>
+                                        </div>
+                                        <div class="dash-incentive-photo-wrap">
+                                            <div class="dash-incentive-photo-frame">
+                                                <asp:Image ID="imgIncentivePhoto" runat="server" CssClass="dash-incentive-photo" ImageUrl="img/default.png" AlternateText="Profile photo" />
+                                            </div>
+                                            <div class="dash-incentive-updated" aria-live="polite">
+                                                <span class="dash-incentive-updated-icon" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
+                                                <span class="dash-incentive-updated-label">Last Updated</span>
+                                                <strong class="dash-incentive-updated-time"><asp:Label ID="lblIncentiveUpdated" runat="server" Text="" /></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="dash-incentive-actions">
+                                        <button type="button" class="dash-incentive-action-btn is-print" onclick="printIncentiveCard();" title="Print incentive summary">
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                            <span>Print</span>
+                                        </button>
+                                        <button type="button" class="dash-incentive-action-btn is-share" onclick="shareIncentiveCard();" title="Share incentive summary">
+                                            <i class="fa fa-share-alt" aria-hidden="true"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>right</strong> side.</p>
-                                <div class="dash-referral-field">
-                                    <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control dash-referral-input" />
-                                    <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtRightLink.ClientID%>', this);" title="Copy link">
-                                        <i class="fa fa-copy"></i>
-                                        <span>Copy</span>
-                                    </button>
-                                </div>
-                                <div class="dash-referral-actions">
-                                    <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtRightLink.ClientID%>');">
-                                        <i class="fa fa-whatsapp"></i> Share on WhatsApp
-                                    </button>
+
+                                <div class="dash-incentive-main-side">
+                                    <div class="dash-incentive-tabs" role="tablist" aria-label="Incentive period">
+                                        <asp:LinkButton ID="lnkIncentive1Day" runat="server" CssClass="dash-incentive-tab is-1day" CommandArgument="1" OnClick="IncentiveTab_Click">
+                                            <span class="dash-incentive-tab-num">24</span><span class="dash-incentive-tab-text">Hrs.</span>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="lnkIncentive10Day" runat="server" CssClass="dash-incentive-tab is-10day" CommandArgument="10" OnClick="IncentiveTab_Click">
+                                            <span class="dash-incentive-tab-num">10</span><span class="dash-incentive-tab-text">Days</span>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="lnkIncentive30Day" runat="server" CssClass="dash-incentive-tab is-30day is-active" CommandArgument="30" OnClick="IncentiveTab_Click">
+                                            <span class="dash-incentive-tab-num">30</span><span class="dash-incentive-tab-text">Days</span>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="lnkIncentiveTillDate" runat="server" CssClass="dash-incentive-tab is-tilldate" CommandArgument="0" OnClick="IncentiveTab_Click">
+                                            <span class="dash-incentive-tab-num"><i class="fa fa-infinity"></i></span><span class="dash-incentive-tab-text">Till Date</span>
+                                        </asp:LinkButton>
+                                    </div>
+
+                                    <div class="dash-incentive-income">
+                                        <div class="dash-incentive-income-head">
+                                            <span>Income Type</span>
+                                            <span>Amount</span>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Saving Direct Income</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblSavingDirectIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Level Income</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>MPremium Direct Income</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Team Bonus</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblMatchingIncomeCard" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Self Business Bonus</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row is-wallet">
+                                            <span>Product Wallet Balance</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblProductWalletBalance" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-total">
+                                            <span>Total Incentive</span>
+                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblIncentiveTotal" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="dash-referral-tip">
-                            <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
-                            <span>Tip: Share the correct link for the team side you want to build. Members register using your ID automatically.</span>
-                        </div>
-                    </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-12">
-                            <div class="dash-incentive-card">
-                                <div class="dash-incentive-logo-bar">
-                                    <!-- <img src="img/logo.png" alt="Maniraya" class="dash-incentive-logo" /> -->
-                                    <span class="dash-incentive-brand">MPremium</span>
-                                </div>
-
-                                <div class="dash-incentive-profile">
-                                    <div class="dash-incentive-details">
-                                        <p class="dash-incentive-period"><asp:Label ID="lblIncentivePeriod" runat="server" Text="Your 30 days incentive" /></p>
-                                        <div class="dash-incentive-detail-row">
-                                            <span class="dash-incentive-label">Distributor</span>
-                                            <strong><asp:Label ID="lblIncentiveName" runat="server" Text="-" /></strong>
-                                        </div>
-                                        <div class="dash-incentive-detail-row">
-                                            <span class="dash-incentive-label">State</span>
-                                            <strong><asp:Label ID="lblIncentiveState" runat="server" Text="-" /></strong>
-                                        </div>
-                                        <div class="dash-incentive-detail-row">
-                                            <span class="dash-incentive-label">District</span>
-                                            <strong><asp:Label ID="lblIncentiveDistrict" runat="server" Text="-" /></strong>
-                                        </div>
-                                        <div class="dash-incentive-detail-row">
-                                            <span class="dash-incentive-label">PAN</span>
-                                            <strong><asp:Label ID="lblIncentivePan" runat="server" Text="-" /></strong>
-                                        </div>
+                        <div id="dvlink" runat="server" visible="True" class="dash-referral-section">
+                            <div class="dash-referral-head">
+                                <div class="dash-referral-head-main">
+                                    <span class="dash-referral-head-icon" aria-hidden="true"><i class="fa fa-share-alt"></i></span>
+                                    <div>
+                                        <h3 class="dash-referral-title">Referral Links</h3>
+                                        <p class="dash-referral-sub">Share your personal link and grow your left &amp; right team</p>
                                     </div>
-                                    <div class="dash-incentive-photo-wrap">
-                                        <div class="dash-incentive-photo-frame">
-                                            <asp:Image ID="imgIncentivePhoto" runat="server" CssClass="dash-incentive-photo" ImageUrl="img/default.png" AlternateText="Profile photo" />
-                                        </div>
-                                        <div class="dash-incentive-updated" aria-live="polite">
-                                            <span class="dash-incentive-updated-icon" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
-                                            <span class="dash-incentive-updated-label">Last Updated</span>
-                                            <strong class="dash-incentive-updated-time"><asp:Label ID="lblIncentiveUpdated" runat="server" Text="" /></strong>
-                                        </div>
+                                </div>
+                                <span class="dash-referral-id-pill">
+                                    <i class="fa fa-id-badge"></i>
+                                    Your ID: <strong><asp:Label ID="lblReferralUserId" runat="server" Text="-" /></strong>
+                                </span>
+                            </div>
+
+                            <div class="dash-referral-grid">
+                                <div class="dash-referral-card is-left">
+                                    <div class="dash-referral-card-top">
+                                        <span class="dash-referral-card-badge">Left Team</span>
+                                        <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
+                                    </div>
+                                    <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>left</strong> side.</p>
+                                    <div class="dash-referral-field">
+                                        <asp:TextBox ID="TxtLeftLinkLink" runat="server" CssClass="form-control dash-referral-input" />
+                                        <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtLeftLinkLink.ClientID%>', this);" title="Copy link">
+                                            <i class="fa fa-copy"></i>
+                                            <span>Copy</span>
+                                        </button>
+                                    </div>
+                                    <div class="dash-referral-actions">
+                                        <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtLeftLinkLink.ClientID%>');">
+                                            <i class="fa fa-whatsapp"></i> Share on WhatsApp
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="dash-incentive-tabs" role="tablist" aria-label="Incentive period">
-                                    <asp:LinkButton ID="lnkIncentive1Day" runat="server" CssClass="dash-incentive-tab is-1day" CommandArgument="1" OnClick="IncentiveTab_Click">
-                                        <span class="dash-incentive-tab-num">1</span><span class="dash-incentive-tab-text">Day</span>
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkIncentive10Day" runat="server" CssClass="dash-incentive-tab is-10day" CommandArgument="10" OnClick="IncentiveTab_Click">
-                                        <span class="dash-incentive-tab-num">10</span><span class="dash-incentive-tab-text">Days</span>
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkIncentive30Day" runat="server" CssClass="dash-incentive-tab is-30day is-active" CommandArgument="30" OnClick="IncentiveTab_Click">
-                                        <span class="dash-incentive-tab-num">30</span><span class="dash-incentive-tab-text">Days</span>
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkIncentiveTillDate" runat="server" CssClass="dash-incentive-tab is-tilldate" CommandArgument="0" OnClick="IncentiveTab_Click">
-                                        <span class="dash-incentive-tab-num"><i class="fa fa-infinity"></i></span><span class="dash-incentive-tab-text">Till Date</span>
-                                    </asp:LinkButton>
+                                <div class="dash-referral-card is-right">
+                                    <div class="dash-referral-card-top">
+                                        <span class="dash-referral-card-badge">Right Team</span>
+                                        <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                                    </div>
+                                    <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>right</strong> side.</p>
+                                    <div class="dash-referral-field">
+                                        <asp:TextBox ID="TxtRightLink" runat="server" CssClass="form-control dash-referral-input" />
+                                        <button type="button" class="dash-referral-copy-btn" onclick="copyReferralLink('<%=TxtRightLink.ClientID%>', this);" title="Copy link">
+                                            <i class="fa fa-copy"></i>
+                                            <span>Copy</span>
+                                        </button>
+                                    </div>
+                                    <div class="dash-referral-actions">
+                                        <button type="button" class="dash-referral-share-btn is-whatsapp" onclick="shareReferralWhatsApp('<%=TxtRightLink.ClientID%>');">
+                                            <i class="fa fa-whatsapp"></i> Share on WhatsApp
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
 
-                                <div class="dash-incentive-income">
-                                    <div class="dash-incentive-income-head">
-                                        <span>Income Type</span>
-                                        <span>Amount</span>
-                                    </div>
-                                    <div class="dash-incentive-income-row">
-                                        <span>Saving Direct Income</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblSavingDirectIncome" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-row">
-                                        <span>Level Income</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-row">
-                                        <span>MPremium Direct Income</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-row">
-                                        <span>Team Bonus</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblMatchingIncomeCard" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-row">
-                                        <span>Self Business Bonus</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-row is-wallet">
-                                        <span>Product Wallet Balance</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblProductWalletBalance" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                    <div class="dash-incentive-income-total">
-                                        <span>Total Incentive</span>
-                                        <strong><i class="fa fa-inr"></i> <asp:Label ID="lblIncentiveTotal" runat="server" Text="0.00" /></strong>
-                                    </div>
-                                </div>
+                            <div class="dash-referral-tip">
+                                <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                                <span>Tip: Share the correct link for the team side you want to build. Members register using your ID automatically.</span>
                             </div>
                         </div>
                     </div>
@@ -3165,6 +3178,256 @@ Profit Share Budget</p>
             window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
         }
 
+        function getIncentiveLabelText(clientId) {
+            var el = document.getElementById(clientId);
+            if (!el) {
+                return '';
+            }
+            return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function setExportText(id, value) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.textContent = value || '-';
+            }
+        }
+
+        function setExportAmount(id, value) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.textContent = '₹ ' + (value || '0.00');
+            }
+        }
+
+        function syncIncentiveExportSheet() {
+            setExportText('exportIncentivePeriod', getIncentiveLabelText('<%= lblIncentivePeriod.ClientID %>'));
+            setExportText('exportIncentiveName', getIncentiveLabelText('<%= lblIncentiveName.ClientID %>'));
+            setExportText('exportIncentiveState', getIncentiveLabelText('<%= lblIncentiveState.ClientID %>'));
+            setExportText('exportIncentiveDistrict', getIncentiveLabelText('<%= lblIncentiveDistrict.ClientID %>'));
+            setExportText('exportIncentivePan', getIncentiveLabelText('<%= lblIncentivePan.ClientID %>'));
+            setExportText('exportIncentiveUserId', getIncentiveLabelText('<%= lblReferralUserId.ClientID %>'));
+            setExportAmount('exportSavingDirect', getIncentiveLabelText('<%= lblSavingDirectIncome.ClientID %>'));
+            setExportAmount('exportLevelIncome', getIncentiveLabelText('<%= lblLevelIncomeCard.ClientID %>'));
+            setExportAmount('exportPremiumDirect', getIncentiveLabelText('<%= lblPremiumDirectIncome.ClientID %>'));
+            setExportAmount('exportTeamBonus', getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'));
+            setExportAmount('exportSelfBonus', getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'));
+            setExportAmount('exportWallet', getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'));
+            setExportAmount('exportTotal', getIncentiveLabelText('<%= lblIncentiveTotal.ClientID %>'));
+            setExportText('exportIncentiveUpdated', getIncentiveLabelText('<%= lblIncentiveUpdated.ClientID %>'));
+
+            var photo = document.getElementById('<%= imgIncentivePhoto.ClientID %>');
+            var exportPhoto = document.getElementById('exportIncentivePhoto');
+            if (photo && exportPhoto) {
+                exportPhoto.src = photo.src;
+            }
+        }
+
+        function buildIncentiveShareText() {
+            syncIncentiveExportSheet();
+            var lines = [
+                'MPremium Incentive Summary',
+                getIncentiveLabelText('<%= lblIncentivePeriod.ClientID %>'),
+                '',
+                'Distributor: ' + getIncentiveLabelText('<%= lblIncentiveName.ClientID %>'),
+                'User ID: ' + getIncentiveLabelText('<%= lblReferralUserId.ClientID %>'),
+                'State: ' + getIncentiveLabelText('<%= lblIncentiveState.ClientID %>'),
+                'District: ' + getIncentiveLabelText('<%= lblIncentiveDistrict.ClientID %>'),
+                'PAN: ' + getIncentiveLabelText('<%= lblIncentivePan.ClientID %>'),
+                '',
+                'Saving Direct Income: ₹ ' + getIncentiveLabelText('<%= lblSavingDirectIncome.ClientID %>'),
+                'Level Income: ₹ ' + getIncentiveLabelText('<%= lblLevelIncomeCard.ClientID %>'),
+                'MPremium Direct Income: ₹ ' + getIncentiveLabelText('<%= lblPremiumDirectIncome.ClientID %>'),
+                'Team Bonus: ₹ ' + getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'),
+                'Self Business Bonus: ₹ ' + getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'),
+                'Product Wallet Balance: ₹ ' + getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'),
+                'Total Incentive: ₹ ' + getIncentiveLabelText('<%= lblIncentiveTotal.ClientID %>'),
+                '',
+                'Last Updated: ' + getIncentiveLabelText('<%= lblIncentiveUpdated.ClientID %>'),
+                'https://mpremium.in/'
+            ];
+
+            return lines.join('\n');
+        }
+
+        function openIncentiveShareModal() {
+            syncIncentiveExportSheet();
+            var modal = document.getElementById('dashIncentiveShareModal');
+            var preview = document.getElementById('dashIncentiveSharePreview');
+            var exportCard = document.getElementById('dashIncentiveExportCard');
+            if (!modal || !preview || !exportCard) {
+                return;
+            }
+
+            preview.innerHTML = '';
+            preview.appendChild(exportCard.cloneNode(true));
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('dash-incentive-share-open');
+        }
+
+        function closeIncentiveShareModal() {
+            var modal = document.getElementById('dashIncentiveShareModal');
+            if (!modal) {
+                return;
+            }
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('dash-incentive-share-open');
+        }
+
+        function loadHtml2Canvas(callback) {
+            if (window.html2canvas) {
+                callback();
+                return;
+            }
+
+            var script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            script.onload = callback;
+            script.onerror = function () {
+                showReferralToast('Unable to load image share tool');
+            };
+            document.head.appendChild(script);
+        }
+
+        function getSharePreviewCard() {
+            var preview = document.getElementById('dashIncentiveSharePreview');
+            if (!preview) {
+                return document.getElementById('dashIncentiveExportCard');
+            }
+            return preview.querySelector('.dash-incentive-export-card') || document.getElementById('dashIncentiveExportCard');
+        }
+
+        function shareIncentiveAsImage() {
+            var card = getSharePreviewCard();
+            if (!card) {
+                return;
+            }
+
+            loadHtml2Canvas(function () {
+                window.html2canvas(card, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true
+                }).then(function (canvas) {
+                    canvas.toBlob(function (blob) {
+                        if (!blob) {
+                            showReferralToast('Unable to create image');
+                            return;
+                        }
+
+                        var fileName = 'mpremium-incentive-' + Date.now() + '.png';
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'image/png' })] })) {
+                            var file = new File([blob], fileName, { type: 'image/png' });
+                            navigator.share({
+                                title: 'MPremium Incentive Summary',
+                                files: [file]
+                            }).catch(function () {
+                                downloadIncentiveImage(canvas, fileName);
+                            });
+                            return;
+                        }
+
+                        downloadIncentiveImage(canvas, fileName);
+                    }, 'image/png');
+                }).catch(function () {
+                    showReferralToast('Unable to create share image');
+                });
+            });
+        }
+
+        function downloadIncentiveImage(canvas, fileName) {
+            var link = document.createElement('a');
+            link.download = fileName;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showReferralToast('Incentive image downloaded');
+        }
+
+        function shareIncentiveWhatsApp() {
+            var text = buildIncentiveShareText();
+            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+        }
+
+        function copyIncentiveSummary() {
+            var text = buildIncentiveShareText();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function () {
+                    showReferralToast('Incentive summary copied');
+                }).catch(function () {
+                    shareIncentiveWhatsApp();
+                });
+                return;
+            }
+            shareIncentiveWhatsApp();
+        }
+
+        function printIncentiveCard() {
+            syncIncentiveExportSheet();
+
+            var card = document.getElementById('dashIncentiveExportCard');
+            if (!card) {
+                return;
+            }
+
+            var iframe = document.getElementById('dashIncentivePrintFrame');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'dashIncentivePrintFrame';
+                iframe.setAttribute('title', 'Print incentive summary');
+                iframe.style.cssText = 'position:fixed;width:0;height:0;border:0;right:0;bottom:0;';
+                document.body.appendChild(iframe);
+            }
+
+            var printDoc = iframe.contentWindow || iframe.contentDocument;
+            if (printDoc.document) {
+                printDoc = printDoc.document;
+            }
+
+            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>MPremium Incentive Summary</title>';
+            html += '<link rel="stylesheet" href="assets/css/dashboard-modern.css?v=40" />';
+            html += '<style>';
+            html += 'body{margin:0;padding:24px;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+            html += '.dash-incentive-export-card{max-width:520px;margin:0 auto;box-shadow:none !important;}';
+            html += '@media print{body{padding:0;} .dash-incentive-export-card{border-radius:0;max-width:100%;}}';
+            html += '</style></head><body>';
+            html += card.outerHTML;
+            html += '</body></html>';
+
+            printDoc.open();
+            printDoc.write(html);
+            printDoc.close();
+
+            var printWindow = iframe.contentWindow;
+            var doPrint = function () {
+                try {
+                    printWindow.focus();
+                    printWindow.print();
+                } catch (e) {
+                    document.body.classList.add('is-printing-incentive');
+                    window.print();
+                    setTimeout(function () {
+                        document.body.classList.remove('is-printing-incentive');
+                    }, 500);
+                }
+            };
+
+            if (printWindow.document.readyState === 'complete') {
+                setTimeout(doPrint, 150);
+            } else {
+                iframe.onload = function () {
+                    setTimeout(doPrint, 150);
+                };
+            }
+        }
+
+        function shareIncentiveCard() {
+            openIncentiveShareModal();
+        }
+
         function showReferralToast(message) {
             var toast = document.getElementById('dashReferralToast');
             if (!toast) {
@@ -3395,6 +3658,90 @@ Profit Share Budget</p>
     <!-- /.modal -->
 
     <!--(Ends) For User Performance-->
+
+    <div id="dashIncentiveExport" class="dash-incentive-export" aria-hidden="true">
+        <div class="dash-incentive-export-card" id="dashIncentiveExportCard">
+            <div class="dash-incentive-export-topbar">
+                <div class="dash-incentive-export-brand-wrap">
+                    <span class="dash-incentive-export-brand">MPremium</span>
+                    <span class="dash-incentive-export-website">https://mpremium.in/</span>
+                </div>
+                <span class="dash-incentive-export-period" id="exportIncentivePeriod"></span>
+            </div>
+
+            <div class="dash-incentive-export-profile">
+                <div class="dash-incentive-export-details">
+                    <div class="dash-incentive-export-detail">
+                        <span>Distributor</span>
+                        <strong id="exportIncentiveName"></strong>
+                    </div>
+                    <div class="dash-incentive-export-detail">
+                        <span>State</span>
+                        <strong id="exportIncentiveState"></strong>
+                    </div>
+                    <div class="dash-incentive-export-detail">
+                        <span>District</span>
+                        <strong id="exportIncentiveDistrict"></strong>
+                    </div>
+                    <div class="dash-incentive-export-detail">
+                        <span>PAN</span>
+                        <strong id="exportIncentivePan"></strong>
+                    </div>
+                    <div class="dash-incentive-export-detail">
+                        <span>User ID</span>
+                        <strong id="exportIncentiveUserId"></strong>
+                    </div>
+                </div>
+                <div class="dash-incentive-export-photo-wrap">
+                    <img id="exportIncentivePhoto" class="dash-incentive-export-photo" src="img/default.png" alt="Profile photo" />
+                </div>
+            </div>
+
+            <div class="dash-incentive-export-income">
+                <div class="dash-incentive-export-income-title">Income Summary</div>
+                <div class="dash-incentive-export-income-head">
+                    <span>Income Type</span>
+                    <span>Amount</span>
+                </div>
+                <div class="dash-incentive-export-income-row"><span>Saving Direct Income</span><strong id="exportSavingDirect"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Level Income</span><strong id="exportLevelIncome"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>MPremium Direct Income</span><strong id="exportPremiumDirect"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Team Bonus</span><strong id="exportTeamBonus"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Self Business Bonus</span><strong id="exportSelfBonus"></strong></div>
+                <div class="dash-incentive-export-income-row is-wallet"><span>Product Wallet Balance</span><strong id="exportWallet"></strong></div>
+                <div class="dash-incentive-export-income-total"><span>Total Incentive</span><strong id="exportTotal"></strong></div>
+            </div>
+
+            <div class="dash-incentive-export-footer">
+                <span><i class="fa fa-clock-o"></i> Last Updated: <strong id="exportIncentiveUpdated"></strong></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashIncentiveShareModal" class="dash-incentive-share-modal" aria-hidden="true">
+        <div class="dash-incentive-share-backdrop" onclick="closeIncentiveShareModal();"></div>
+        <div class="dash-incentive-share-dialog" role="dialog" aria-labelledby="dashIncentiveShareTitle">
+            <div class="dash-incentive-share-dialog-head">
+                <h4 id="dashIncentiveShareTitle">Share Incentive Summary</h4>
+                <button type="button" class="dash-incentive-share-close" onclick="closeIncentiveShareModal();" aria-label="Close">&times;</button>
+            </div>
+            <div id="dashIncentiveSharePreview" class="dash-incentive-share-preview"></div>
+            <div class="dash-incentive-share-actions">
+                <button type="button" class="dash-incentive-share-action is-image" onclick="shareIncentiveAsImage();">
+                    <i class="fa fa-picture-o"></i> Share Image
+                </button>
+                <button type="button" class="dash-incentive-share-action is-whatsapp" onclick="shareIncentiveWhatsApp();">
+                    <i class="fa fa-whatsapp"></i> WhatsApp
+                </button>
+                <button type="button" class="dash-incentive-share-action is-copy" onclick="copyIncentiveSummary();">
+                    <i class="fa fa-copy"></i> Copy Text
+                </button>
+                <button type="button" class="dash-incentive-share-action is-print" onclick="printIncentiveCard(); closeIncentiveShareModal();">
+                    <i class="fa fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="dashReferralToast" class="dash-referral-toast" role="status" aria-live="polite"></div>
 
