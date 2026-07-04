@@ -16,11 +16,16 @@ public partial class user_SavingProductInvoice : Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Session["userid"] == null)
+        bool isAdmin = Session["useradmin"] != null;
+        string sessionUserId = Session["userid"] != null ? Session["userid"].ToString() : null;
+
+        if (string.IsNullOrEmpty(sessionUserId) && !isAdmin)
         {
             Response.Redirect("logout.aspx");
             return;
         }
+
+        string fallbackUrl = isAdmin ? "../admin/SavingProductGSTReport.aspx" : "SavingProductOrderHistory.aspx";
 
         SiteContactHelper.BindInvoiceCompanyInfo(litCompanyContact);
         SiteContactHelper.BindInvoiceCompanyInfo(litCompanyFooter);
@@ -32,30 +37,76 @@ public partial class user_SavingProductInvoice : Page
         litCompanyGstFooter.Text = litCompanyGst.Text;
         lblCompanyStateCode.Text = GetGstStateCode(companyGst, CompanyStateCode);
 
+        // For admins the invoice can belong to any member, so resolve the buyer's user id
+        // from the query string (or the order itself) instead of the logged-in session.
+        string effectiveUserId = sessionUserId;
+        if (isAdmin && string.IsNullOrEmpty(sessionUserId))
+        {
+            effectiveUserId = Convert.ToString(Request.QueryString["userId"]).Trim();
+        }
+
         string orderId = Convert.ToString(Request.QueryString["orderId"]).Trim();
         if (string.IsNullOrWhiteSpace(orderId))
         {
             int recordId;
             if (int.TryParse(Convert.ToString(Request.QueryString["id"]), out recordId) && recordId > 0)
             {
-                orderId = GetOrderIdByRecordId(recordId, Session["userid"].ToString());
+                orderId = GetOrderIdByRecordId(recordId, effectiveUserId);
             }
         }
 
         if (string.IsNullOrWhiteSpace(orderId))
         {
-            Response.Redirect("SavingProductOrderHistory.aspx");
+            Response.Redirect(fallbackUrl);
             return;
         }
 
-        DataTable items = GetInvoiceItems(orderId, Session["userid"].ToString());
+        if (isAdmin && string.IsNullOrWhiteSpace(effectiveUserId))
+        {
+            effectiveUserId = GetUserIdByOrderId(orderId);
+        }
+
+        if (string.IsNullOrWhiteSpace(effectiveUserId))
+        {
+            Response.Redirect(fallbackUrl);
+            return;
+        }
+
+        DataTable items = GetInvoiceItems(orderId, effectiveUserId);
         if (items == null || items.Rows.Count == 0)
         {
-            Response.Redirect("SavingProductOrderHistory.aspx");
+            Response.Redirect(fallbackUrl);
             return;
         }
 
         BindInvoice(orderId, items);
+    }
+
+    string GetUserIdByOrderId(string orderId)
+    {
+        if (string.IsNullOrWhiteSpace(orderId))
+        {
+            return string.Empty;
+        }
+
+        string sql = "SELECT TOP 1 UserId FROM SavingAccountDetail WITH (NOLOCK) WHERE orderid = '"
+            + SqlEscape(orderId) + "'";
+
+        ObjData.StartConnection();
+        try
+        {
+            DataTable dt = ObjData.RunDataTable(sql);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return Convert.ToString(dt.Rows[0]["UserId"]).Trim();
+            }
+
+            return string.Empty;
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
     }
 
     string GetOrderIdByRecordId(int recordId, string userId)

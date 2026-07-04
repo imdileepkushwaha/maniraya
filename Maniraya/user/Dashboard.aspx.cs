@@ -69,6 +69,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadawardlist();
                 GetAllIncome();
                 LoadIncentiveCard();
+                LoadPrizes();
 
 
             }
@@ -84,6 +85,62 @@ public partial class user_Dashboard : System.Web.UI.Page
         {
             Response.Redirect("logout.aspx");
         }
+    }
+
+    void LoadPrizes()
+    {
+        try
+        {
+            DataTable dt = PrizeHelper.GetAllWinners(200);
+            pnlPrizes.Visible = true;
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                rptPrizes.DataSource = dt;
+                rptPrizes.DataBind();
+                lblPrizeCount.Text = dt.Rows.Count.ToString();
+                pnlPrizeGrid.Visible = true;
+                pnlPrizeEmpty.Visible = false;
+            }
+            else
+            {
+                lblPrizeCount.Text = "0";
+                pnlPrizeGrid.Visible = false;
+                pnlPrizeEmpty.Visible = true;
+            }
+        }
+        catch
+        {
+            pnlPrizes.Visible = true;
+            pnlPrizeGrid.Visible = false;
+            pnlPrizeEmpty.Visible = true;
+        }
+    }
+
+    public string GetPrizeMonth(object value)
+    {
+        return PrizeHelper.FormatPrizeMonth(value);
+    }
+
+    public string GetWinnerName(object name, object userId)
+    {
+        string n = Convert.ToString(name).Trim();
+        if (!string.IsNullOrEmpty(n))
+        {
+            return n;
+        }
+
+        return Convert.ToString(userId).Trim();
+    }
+
+    public string GetInitial(object name, object userId)
+    {
+        string source = GetWinnerName(name, userId);
+        if (string.IsNullOrEmpty(source))
+        {
+            return "?";
+        }
+
+        return source.Substring(0, 1).ToUpper();
     }
 
 

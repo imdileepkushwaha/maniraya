@@ -151,6 +151,7 @@
                                     <li><a href="SavingLevelIncomeReport.aspx">Saving Level Income Report</a></li>
                                     <li><a href="SavingDirectIncomeReport.aspx">Saving Direct Income Report</a></li>
                                     <li><a href="PayoutReportSavingLevel.aspx">Saving Level Payout Report</a></li>
+                                    <li><a href="SavingProductGSTReport.aspx">Saving Product GST Reports</a></li>
                                 </ul>
                             </li>
 
@@ -172,6 +173,14 @@
                                     <li><a href="UserRepurchaseReport.aspx">Approve Purchase</a></li>
                                 <li><a href="UserPurchaseDetail.aspx">Purchase Invoice</a></li>
                                     <li><a href="SavingProductOrderDetails.aspx">Saving Purchase Orders</a></li>
+                                </ul>
+                            </li>
+
+                             <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-trophy admin-side-icon"></i> Prize <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="PrizeMaster.aspx">Prize Master</a></li>
+                                    <li><a href="AssignPrize.aspx">Assign Prize</a></li>
                                 </ul>
                             </li>
 

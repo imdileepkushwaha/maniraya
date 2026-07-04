@@ -4505,3 +4505,476 @@ a.saving-pager-btn:focus {
         justify-content: flex-end;
     }
 }
+
+/* ===== Prize / Rewards section ===== */
+.serviceBox .service-icon {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 19px;
+    position: relative;
+}
+
+    .serviceBox .service-icon .heading {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        line-height: 80px;
+        background: #fff;
+        box-shadow: -5px 5px 5px rgba(0,0,0,0.5);
+        font-size: 35px;
+        color: #0fb513;
+        position: absolute;
+        top: 0;
+        left: 0;
+        text-align: center;
+    }
+
+    .serviceBox .service-icon:before {
+        content: "";
+        background: #0fb513;
+        border-radius: 50%;
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        bottom: -10px;
+        right: -10px;
+    }
+
+    .serviceBox .service-icon:after {
+        content: "";
+        width: 4px;
+        height: 0;
+        background: #0fb513;
+        margin: 0 auto;
+        position: absolute;
+        bottom: -55px;
+        left: 0;
+        right: 0;
+        transition: all 0.3s ease 0s;
+    }
+
+.serviceBox .title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    position: relative;
+}
+
+.serviceBox.pink .service-icon:before, .serviceBox.pink .service-icon:after {
+    background: #d41271;
+}
+
+.serviceBox.pink .service-icon:before, .serviceBox.pink .service-icon:after {
+    background: #d41271;
+}
+
+.serviceBox.yellow .service-icon:before, .serviceBox.yellow .service-icon:after {
+    background: #fba21a;
+}
+
+.serviceBox.yellow .service-icon:before, .serviceBox.yellow .service-icon:after {
+    background: #fba21a;
+}
+
+.serviceBox.blue .service-icon:before, .serviceBox.blue .service-icon:after {
+    background: #05b4b7;
+}
+
+.serviceBox.blue .service-icon:before, .serviceBox.blue .service-icon:after {
+    background: #05b4b7;
+}
+
+.dash-prize-section {
+    position: relative;
+    margin: 22px 0;
+    padding: 22px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #114b2e 0%, #1f7a45 55%, #2fa15c 100%);
+    box-shadow: 0 18px 40px -20px rgba(17, 75, 46, 0.75);
+    overflow: hidden;
+}
+
+.dash-prize-section::after {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+    pointer-events: none;
+}
+
+.dash-prize-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+}
+
+.dash-prize-head-icon {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #ffd764;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.dash-prize-head-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.dash-prize-head-text h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+}
+
+.dash-prize-head-text p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.dash-prize-count {
+    flex-shrink: 0;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    color: #114b2e;
+    background: #ffd764;
+    box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.5);
+}
+
+.dash-prize-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 16px;
+}
+
+.dash-prize-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 16px 14px;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 12px 26px -18px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dash-prize-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 34px -18px rgba(0, 0, 0, 0.6);
+}
+
+.dash-prize-ribbon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, #f5a623, #f8d347);
+}
+
+.dash-prize-card-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #1f7a45;
+    background: rgba(47, 161, 92, 0.12);
+    margin-bottom: 12px;
+}
+
+.dash-prize-card-body {
+    flex: 1;
+}
+
+.dash-prize-name {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #16341f;
+    line-height: 1.3;
+}
+
+.dash-prize-month {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1f7a45;
+    background: rgba(47, 161, 92, 0.1);
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.dash-prize-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed #e2e8e5;
+    font-size: 11.5px;
+    color: #7c8a83;
+}
+
+.dash-prize-card-foot span:first-child {
+    color: #1f7a45;
+    font-weight: 600;
+}
+
+.dash-prize-empty {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 26px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.dash-prize-empty i {
+    font-size: 30px;
+    color: #ffd764;
+    margin-bottom: 10px;
+}
+
+.dash-prize-empty p {
+    margin: 0;
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.dash-prize-section--winners {
+    margin-top: 26px;
+}
+
+.dash-winners-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.dash-winner-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 16px 14px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 14px 30px -20px rgba(0, 0, 0, 0.6);
+    border-top: 3px solid #2fa15c;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dash-winner-card::before {
+    content: "\f091";
+    font-family: FontAwesome;
+    position: absolute;
+    top: -14px;
+    right: -10px;
+    font-size: 74px;
+    color: rgba(47, 161, 92, 0.07);
+    pointer-events: none;
+}
+
+.dash-winner-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 38px -20px rgba(0, 0, 0, 0.65);
+}
+
+.dash-winner-rank {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1;
+    min-width: 30px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #1f7a45;
+    background: rgba(47, 161, 92, 0.14);
+}
+
+.dash-winner-card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-winner-avatar {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #1f7a45, #2fa15c);
+    box-shadow: 0 6px 14px -6px rgba(31, 122, 69, 0.7);
+}
+
+.dash-winner-id-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.dash-winner-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #16341f;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash-winner-id {
+    font-size: 12px;
+    color: #7c8a83;
+}
+
+.dash-winner-id i {
+    color: #2fa15c;
+    margin-right: 2px;
+}
+
+.dash-winner-prize {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fff7e6, #fef3d7);
+    border: 1px solid #f5dfa6;
+}
+
+.dash-winner-prize-ico {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #fff;
+    background: linear-gradient(135deg, #f0a91d, #f6c953);
+}
+
+.dash-winner-prize-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #92590c;
+    line-height: 1.25;
+}
+
+.dash-winner-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dash-winner-month {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1f7a45;
+    background: rgba(47, 161, 92, 0.1);
+    border-radius: 999px;
+    padding: 4px 11px;
+}
+
+.dash-winner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #b45309;
+    text-transform: uppercase;
+}
+
+.dash-winner-badge i {
+    color: #f0a91d;
+}
+
+@media (max-width: 640px) {
+    .dash-winners-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: 767px) {
+    .dash-prize-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .dash-prize-head-text h3 {
+        font-size: 17px;
+    }
+}

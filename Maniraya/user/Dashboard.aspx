@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=40" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=44" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -3007,97 +3007,52 @@ Profit Share Budget</p>
                     </div>
                 </div>
 
-
+                <asp:Panel ID="pnlPrizes" runat="server" Visible="true" CssClass="dash-prize-section dash-prize-section--winners">
+                    <div class="dash-prize-head">
+                        <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
+                        <div class="dash-prize-head-text">
+                            <h3>Prize Winners</h3>
+                            <p>Members who have won prizes.</p>
+                        </div>
+                        <span class="dash-prize-count"><asp:Label ID="lblPrizeCount" runat="server" Text="0" /></span>
+                    </div>
+                    <asp:Panel ID="pnlPrizeGrid" runat="server" Visible="false" CssClass="dash-winners-grid">
+                        <asp:Repeater ID="rptPrizes" runat="server">
+                            <ItemTemplate>
+                                <div class="dash-winner-card">
+                                    <span class="dash-winner-rank">#<%# Container.ItemIndex + 1 %></span>
+                                    <div class="dash-winner-card-top">
+                                        <span class="dash-winner-avatar"><%# GetInitial(Eval("UserName"), Eval("UserId")) %></span>
+                                        <div class="dash-winner-id-wrap">
+                                            <span class="dash-winner-name"><%# Server.HtmlEncode(GetWinnerName(Eval("UserName"), Eval("UserId"))) %></span>
+                                            <span class="dash-winner-id"><i class="fa fa-id-badge"></i> <%# Server.HtmlEncode(Convert.ToString(Eval("UserId"))) %></span>
+                                        </div>
+                                    </div>
+                                    <div class="dash-winner-prize">
+                                        <span class="dash-winner-prize-ico"><i class="fa fa-gift"></i></span>
+                                        <span class="dash-winner-prize-name"><%# Server.HtmlEncode(Convert.ToString(Eval("PrizeName"))) %></span>
+                                    </div>
+                                    <div class="dash-winner-foot">
+                                        <span class="dash-winner-month"><i class="fa fa-calendar"></i> <%# GetPrizeMonth(Eval("PrizeMonth")) %></span>
+                                        <span class="dash-winner-badge"><i class="fa fa-trophy"></i> Winner</span>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </asp:Panel>
+                    <asp:Panel ID="pnlPrizeEmpty" runat="server" Visible="false" CssClass="dash-prize-empty">
+                        <i class="fa fa-gift"></i>
+                        <p>No prize winners yet. Winners will appear here once prizes are assigned.</p>
+                    </asp:Panel>
+                </asp:Panel>
 
             </div>
 
         </div>
     </div>
     </div>
-    <style>
-        .serviceBox .service-icon {
-            display: inline-block;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 19px;
-            position: relative;
-        }
 
-            .serviceBox .service-icon .heading {
-                display: inline-block;
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                line-height: 80px;
-                background: #fff;
-                box-shadow: -5px 5px 5px rgba(0,0,0,0.5);
-                font-size: 35px;
-                color: #0fb513;
-                position: absolute;
-                top: 0;
-                left: 0;
-                text-align: center;
-            }
-
-            .serviceBox .service-icon:before {
-                content: "";
-                background: #0fb513;
-                border-radius: 50%;
-                position: absolute;
-                top: -10px;
-                left: -10px;
-                bottom: -10px;
-                right: -10px;
-            }
-
-            .serviceBox .service-icon:after {
-                content: "";
-                width: 4px;
-                height: 0;
-                background: #0fb513;
-                margin: 0 auto;
-                position: absolute;
-                bottom: -55px;
-                left: 0;
-                right: 0;
-                transition: all 0.3s ease 0s;
-            }
-
-        .serviceBox .title {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #000;
-            text-transform: uppercase;
-            margin: 0 0 10px 0;
-            position: relative;
-        }
-
-        .serviceBox.pink .service-icon:before, .serviceBox.pink .service-icon:after {
-            background: #d41271;
-        }
-
-        .serviceBox.pink .service-icon:before, .serviceBox.pink .service-icon:after {
-            background: #d41271;
-        }
-
-        .serviceBox.yellow .service-icon:before, .serviceBox.yellow .service-icon:after {
-            background: #fba21a;
-        }
-
-        .serviceBox.yellow .service-icon:before, .serviceBox.yellow .service-icon:after {
-            background: #fba21a;
-        }
-
-        .serviceBox.blue .service-icon:before, .serviceBox.blue .service-icon:after {
-            background: #05b4b7;
-        }
-
-        .serviceBox.blue .service-icon:before, .serviceBox.blue .service-icon:after {
-            background: #05b4b7;
-        }
-    </style>
+    
     <!-- /.box-body -->
 </asp:Content>
 
