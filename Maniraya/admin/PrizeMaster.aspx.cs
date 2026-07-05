@@ -78,6 +78,28 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
+        if (string.Equals(e.CommandName, "del", StringComparison.OrdinalIgnoreCase))
+        {
+            int deleteId;
+            if (!int.TryParse(Convert.ToString(e.CommandArgument), out deleteId))
+            {
+                ShowAlert("Unable to delete prize.");
+                return;
+            }
+
+            if (PrizeHelper.DeletePrize(deleteId))
+            {
+                ShowAlert("Prize deleted successfully.");
+                BindPrizeGrid();
+            }
+            else
+            {
+                ShowAlert("Unable to delete prize.");
+            }
+
+            return;
+        }
+
         if (!string.Equals(e.CommandName, "edt", StringComparison.OrdinalIgnoreCase))
         {
             return;

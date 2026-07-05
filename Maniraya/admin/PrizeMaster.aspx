@@ -115,13 +115,16 @@
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Action">
-                                        <ItemStyle CssClass="admin-grid-action-cell" HorizontalAlign="Center" Width="110px" />
+                                        <ItemStyle CssClass="admin-grid-action-cell" HorizontalAlign="Center" Width="150px" />
                                         <ItemTemplate>
                                             <asp:LinkButton ID="lbEdit" runat="server" CommandName="edt" CommandArgument="<%# ((GridViewRow)Container).RowIndex %>" CssClass="admin-grid-edit-btn" ToolTip="Edit prize">
                                                 <i class="icon fa fa-pencil-square-o" aria-hidden="true"></i>
                                             </asp:LinkButton>
                                             <asp:LinkButton ID="lnkToggle" runat="server" CommandArgument='<%# Eval("Id") %>' OnClick="lnkToggle_Click" CssClass="admin-grid-edit-btn" ToolTip="Toggle status">
                                                 <i class='<%# Convert.ToBoolean(Eval("Status")) ? "icon fa fa-toggle-on" : "icon fa fa-toggle-off" %>' aria-hidden="true"></i>
+                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="lnkDelete" runat="server" CommandName="del" CommandArgument='<%# Eval("Id") %>' CssClass="admin-grid-edit-btn admin-grid-delete-btn" ToolTip="Delete prize" OnClientClick="return confirm('Delete this prize? This cannot be undone.');">
+                                                <i class="icon fa fa-trash" aria-hidden="true"></i>
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>

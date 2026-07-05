@@ -136,6 +136,17 @@ public static class PrizeHelper
         return RunNonQuery("UPDATE PrizeMaster SET Status = " + (active ? "1" : "0") + " WHERE Id = " + id);
     }
 
+    public static bool DeletePrize(int id)
+    {
+        if (id <= 0)
+        {
+            return false;
+        }
+
+        EnsureTables();
+        return RunNonQuery("DELETE FROM PrizeMaster WHERE Id = " + id);
+    }
+
     // ---------- User lookup ----------
 
     public static DataTable GetUserByUserId(string userId)
@@ -234,7 +245,7 @@ public static class PrizeHelper
                 CASE WHEN ISNULL(Status, 1) = 1 THEN 'Active' ELSE 'Inactive' END AS StatusText,
                 CreatedOn
             FROM PrizeAssignment
-            WHERE 1 = 1";
+            WHERE ISNULL(Status, 1) = 1";
 
         if (!string.IsNullOrWhiteSpace(userIdFilter))
         {
