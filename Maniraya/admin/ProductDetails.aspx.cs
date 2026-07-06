@@ -127,59 +127,65 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         BindGrid();
     }
     
+    string SaveUploadedImage(FileUpload upload)
+    {
+        if (upload == null || !upload.HasFile)
+        {
+            return string.Empty;
+        }
+
+        string extension = Path.GetExtension(upload.FileName);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        extension = extension.ToLowerInvariant();
+        if (extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".webp" && extension != ".gif")
+        {
+            return null;
+        }
+
+        string folder = Server.MapPath("~/ProductImage/");
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        string fileName = Guid.NewGuid().ToString("N").Substring(0, 12) + extension;
+        upload.SaveAs(Path.Combine(folder, fileName));
+        return fileName;
+    }
+
+    bool TrySaveOptionalUploadedImage(FileUpload upload, string label, out string imageName)
+    {
+        imageName = SaveUploadedImage(upload);
+        if (imageName == null)
+        {
+            ShowAlert(label + ": Please upload JPG, PNG, WEBP or GIF image only.");
+            return false;
+        }
+
+        return true;
+    }
+
     public string UploadImage()
     {
-        string Imagename = "";
-        if (ProductImageUpload.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload);
     }
     public string UploadImage2()
     {
-        string Imagename = "";
-        if (ProductImageUpload2.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload2.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload2.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload2);
     }
 
     public string UploadImage3()
     {
-        string Imagename = "";
-        if (ProductImageUpload3.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload3.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload3.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload3);
     }
 
     public string UploadImage4()
     {
-        string Imagename = "";
-        if (ProductImageUpload4.HasFile)
-        {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ProductImageUpload4.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ProductImageUpload4.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
-        }
-        return Imagename;
+        return SaveUploadedImage(ProductImageUpload4);
     }
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
@@ -214,26 +220,46 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             return;
         }
 
-        objState.ProductImage = UploadImage();
-        objState.ProductImage2 = UploadImage2();
-        objState.ProductImage3 = UploadImage3();
-        objState.ProductImage4 = UploadImage4();
-        objState.ProductName = txtstatenameedit.Text;
-        objState.ProductId = lblstateid.Text;
-        objState.Description = Txtshortdiscription.Text;
+        string imageName;
+        if (!TrySaveOptionalUploadedImage(ProductImageUpload, "Image 1", out imageName))
+        {
+            return;
+        }
+        objState.ProductImage = imageName;
+
+        if (!TrySaveOptionalUploadedImage(ProductImageUpload2, "Image 2", out imageName))
+        {
+            return;
+        }
+        objState.ProductImage2 = imageName;
+
+        if (!TrySaveOptionalUploadedImage(ProductImageUpload3, "Image 3", out imageName))
+        {
+            return;
+        }
+        objState.ProductImage3 = imageName;
+
+        if (!TrySaveOptionalUploadedImage(ProductImageUpload4, "Image 4", out imageName))
+        {
+            return;
+        }
+        objState.ProductImage4 = imageName;
+
+        objState.ProductName = txtstatenameedit.Text.Trim();
+        objState.ProductId = lblstateid.Text.Trim();
+        objState.Description = Txtshortdiscription.Text.Trim();
         objState.Amount = amount;
         objState.Status = DDLstStatusEdit.SelectedValue;
         objState.BV = bv;
         objState.MRP = mrp;
-        objState.HSNCODE = TxtHsncode.Text;
-        objState.BATCHNO = Txtbatchno.Text;
+        objState.HSNCODE = TxtHsncode.Text.Trim();
+        objState.BATCHNO = Txtbatchno.Text.Trim();
         objState.CouponCode = Convert.ToString(Math.Round(dp, 0));
         objState.GST = gst;
         string res = Update_Product(objState);
 
-        // Update Full Description (additionalinfo) directly
-        string fullDesc = TxtDescription.Content.Replace("'", "''");
-        string sqlUpdateAddInfo = "update ProductMaster set additionalinfo='" + fullDesc + "' where ProductId='" + objState.ProductId + "'";
+        string fullDesc = (TxtDescription.Content ?? string.Empty).Replace("'", "''");
+        string sqlUpdateAddInfo = "update ProductMaster set additionalinfo='" + fullDesc + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
         ObjData.StartConnection();
         try {
             ObjData.RunInsUpDelQuery(sqlUpdateAddInfo);
@@ -248,6 +274,10 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             string popupScript2 = "Closepopup();";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
             loadProduct(false);
+        }
+        else
+        {
+            ShowAlert("Unable to update product. Please verify the details and try again.");
         }
     }
 
@@ -268,31 +298,45 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             DataSet Ds = ObjData.RunSelectQueryTrans(s2, tr);
             if (Ds.Tables[0].Rows.Count == 1)
             {
-                s2 = "update ProductMaster set ProductName='" + objState.ProductName + "',GST='"+objState.GST+"',Description='" + objState.Description + "',amount='" + objState.Amount + "',status='" + objState.Status + "',BV='" + objState.BV + "',MRP='" + objState.MRP + "',DP='" + objState.CouponCode + "',HSNCODE='" + objState.HSNCODE + "',BATCHNO='"+objState.BATCHNO+"'  where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                s2 = "update ProductMaster set ProductName='" + SqlEscape(objState.ProductName)
+                    + "',GST='" + objState.GST
+                    + "',Description='" + SqlEscape(objState.Description)
+                    + "',amount='" + objState.Amount
+                    + "',status='" + SqlEscape(objState.Status)
+                    + "',BV='" + objState.BV
+                    + "',MRP='" + objState.MRP
+                    + "',DP='" + SqlEscape(objState.CouponCode)
+                    + "',HSNCODE='" + SqlEscape(objState.HSNCODE)
+                    + "',BATCHNO='" + SqlEscape(objState.BATCHNO)
+                    + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
                 ObjData.RunInsUpDelQueryTrans(s2, tr);
-                if (objState.ProductImage != "")
+                if (!string.IsNullOrWhiteSpace(objState.ProductImage))
                 {
-                    s2 = "update ProductMaster set ProductImage='" + objState.ProductImage + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                    s2 = "update ProductMaster set ProductImage='" + SqlEscape(objState.ProductImage) + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
                     ObjData.RunInsUpDelQueryTrans(s2, tr);
                 }
-                if (objState.ProductImage2 != "")
+                if (!string.IsNullOrWhiteSpace(objState.ProductImage2))
                 {
-                    s2 = "update ProductMaster set ProductImage2='" + objState.ProductImage2 + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                    s2 = "update ProductMaster set ProductImage2='" + SqlEscape(objState.ProductImage2) + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
                     ObjData.RunInsUpDelQueryTrans(s2, tr);
                 }
-                if (objState.ProductImage3 != "")
+                if (!string.IsNullOrWhiteSpace(objState.ProductImage3))
                 {
-                    s2 = "update ProductMaster set ProductImage3='" + objState.ProductImage3 + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                    s2 = "update ProductMaster set ProductImage3='" + SqlEscape(objState.ProductImage3) + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
                     ObjData.RunInsUpDelQueryTrans(s2, tr);
                 }
-                if (objState.ProductImage4 != "")
+                if (!string.IsNullOrWhiteSpace(objState.ProductImage4))
                 {
-                    s2 = "update ProductMaster set ProductImage4='" + objState.ProductImage4 + "' where ProductId='" + objState.ProductId + "'";// and PurchaseStatus='0'";
+                    s2 = "update ProductMaster set ProductImage4='" + SqlEscape(objState.ProductImage4) + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
                     ObjData.RunInsUpDelQueryTrans(s2, tr);
                 }
 
                 res = "t";
                 tr.Commit();
+            }
+            else
+            {
+                res = "0";
             }
         }
         catch (Exception ex)
@@ -492,5 +536,10 @@ public partial class admin_ProductDetails : System.Web.UI.Page
     {
         string popupScript = "alert('" + message.Replace("'", "\\'") + "');";
         ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
 }

@@ -2183,6 +2183,10 @@ body.admin-app {
     font-weight: 600;
     color: #475569 !important;
 }
+.form-control{
+    border: 1px solid #dfe3ea !important;
+    border-radius: 10px !important;
+}
 
 .admin-app .content .box .form-control,
 .admin-app .content .box select.form-control {
@@ -2191,8 +2195,8 @@ body.admin-app {
     font-size: 1.25rem;
     color: var(--admin-text) !important;
     background: #fff !important;
-    border: 1px solid #dfe3ea !important;
-    border-radius: 10px !important;
+    border-left: 1px solid #dfe3ea !important;
+    border-radius: 0px ;
     box-shadow: none !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

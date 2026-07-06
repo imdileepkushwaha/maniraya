@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseeStockDetail.aspx.cs" Inherits="FranchiseeStockDetail" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/admin/adminmaster.master" AutoEventWireup="true" CodeFile="FranchiseeStockDetail.aspx.cs" Inherits="FranchiseeStockDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
    <link href="../css/radio/style.css" rel="stylesheet" />
@@ -100,7 +100,7 @@
                                <Columns>
                                     <asp:TemplateField HeaderText="#">
                                         <ItemTemplate>
-                                            <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                            <%# Container.DataItemIndex + 1 %>
                                           
                                         </ItemTemplate>
                                     </asp:TemplateField>

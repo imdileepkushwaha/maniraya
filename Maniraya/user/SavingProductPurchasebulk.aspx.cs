@@ -27,7 +27,7 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
             if (!IsPostBack)
             {
                 txtuserid.Text = Session["userid"].ToString();
-                txtuserid.Enabled = false;
+                //txtuserid.Enabled = false;
                 loadsusername();
                 loadprevproduct();
                 LoadShippingAddress();
@@ -99,16 +99,32 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
     }
     public string UploadImage()
     {
-        string Imagename = "";
-        if (ImageUpload.HasFile)
+        if (!ImageUpload.HasFile)
         {
-            string RandomNumber = DateTime.Now.Ticks.ToString();
-            string fileName = Path.GetFileName(ImageUpload.PostedFile.FileName);
-            Imagename = RandomNumber + fileName;
-            ImageUpload.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
-
+            return string.Empty;
         }
-        return Imagename;
+
+        string extension = Path.GetExtension(ImageUpload.PostedFile.FileName);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        extension = extension.ToLowerInvariant();
+        if (extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".webp" && extension != ".gif")
+        {
+            return string.Empty;
+        }
+
+        string uploadFolder = Server.MapPath("~/ProductImage/");
+        if (!Directory.Exists(uploadFolder))
+        {
+            Directory.CreateDirectory(uploadFolder);
+        }
+
+        string imagename = DateTime.Now.Ticks + extension;
+        ImageUpload.PostedFile.SaveAs(Path.Combine(uploadFolder, imagename));
+        return imagename;
     }
   
     protected void txtuserid_TextChanged(object sender, EventArgs e)
@@ -601,16 +617,16 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
         try
         {
             s2 = "sp_add_SavingAccountDetail";
+            int quantity = objState.Quantity > 0 ? objState.Quantity : 1;
             SqlParameter[] parameter = {
-                new SqlParameter("@orderid",str_orderid),
-                new SqlParameter("@UserId",objState.UserId),
-                new SqlParameter("@Amount",objState.Amount),
-                new SqlParameter("@OnlineTransactionId",objState.TransactionCode),
-                new SqlParameter("@ImageName",objState.ProductImage),
-                new SqlParameter("@EntryBy",objState.MentionBy),
-                new SqlParameter("@Quantity",objState.Quantity),
-
-                };
+                new SqlParameter("@OrderId", str_orderid),
+                new SqlParameter("@UserId", objState.UserId),
+                new SqlParameter("@Amount", objState.Amount),
+                new SqlParameter("@OnlineTransactionId", objState.TransactionCode),
+                new SqlParameter("@ImageName", objState.ProductImage ?? string.Empty),
+                new SqlParameter("@EntryBy", objState.MentionBy),
+                new SqlParameter("@quantity", quantity),
+            };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
             tr.Commit();
         }
@@ -652,18 +668,58 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
             return;
         }
 
-        objproduct.ProductImage = UploadImage();
+        if (string.IsNullOrWhiteSpace(txttransactionid.Text))
+        {
+            Message.Show("Enter UTR No / Transaction ID.");
+            return;
+        }
 
+        if (!ImageUpload.HasFile)
+        {
+            Message.Show("Please upload payment screenshot.");
+            return;
+        }
+
+        string uploadedImage = UploadImage();
+        if (string.IsNullOrWhiteSpace(uploadedImage))
+        {
+            Message.Show("Invalid payment screenshot. Please upload JPG, PNG, WEBP or GIF image.");
+            return;
+        }
+
+        int quantity = 1;
+        if (!string.IsNullOrWhiteSpace(txtquantity.Text))
+        {
+            int.TryParse(txtquantity.Text.Trim(), out quantity);
+        }
+        if (quantity < 1)
+        {
+            quantity = 1;
+        }
+
+        objproduct.ProductImage = uploadedImage;
         objproduct.MentionBy = Session["userid"].ToString();
-        objproduct.UserId = Session["userid"].ToString();
-
+        objproduct.UserId = txtuserid.Text.Trim();
         objproduct.Amount = Convert.ToDecimal(txtamount.Text);
-        objproduct.TransactionCode = txttransactionid.Text;
-        objproduct.Quantity = Convert.ToInt32(txtquantity.Text);
+        objproduct.TransactionCode = txttransactionid.Text.Trim();
+        objproduct.Quantity = quantity;
+
         string res = Insert_ProductPurchase(objproduct);
         if (res == "t")
         {
             string popupScript = "alert('Saving Product Purchase Request Added Successfully');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            txttransactionid.Text = "";
+        }
+        else if (res == "f")
+        {
+            string popupScript = "alert('Another Request Is Pending');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+            txttransactionid.Text = "";
+        }
+        else if (res == "u")
+        {
+            string popupScript = "alert('This Transaction Id already used');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             txttransactionid.Text = "";
         }

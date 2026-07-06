@@ -234,9 +234,89 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"><i class="fa fa-filter"></i> Search Coupons</h3>
+                            </div>
+                            <div class="box-body admin-search-form">
+                                <p class="admin-report-intro">Filter approved coupons by code, user, mobile, or approve date range.</p>
+                                <div class="admin-form-section">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Approve Date Range</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= txtFromDate.ClientID %>">From Date</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-calendar"></i></span>
+                                                    <asp:TextBox ID="txtFromDate" runat="server" CssClass="form-control form_date" placeholder="dd/mm/yyyy" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= txtToDate.ClientID %>">To Date</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-calendar-check-o"></i></span>
+                                                    <asp:TextBox ID="txtToDate" runat="server" CssClass="form-control form_date" placeholder="dd/mm/yyyy" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="admin-form-section admin-form-section-last">
+                                    <h5 class="admin-form-section-title"><i class="fa fa-sliders"></i> Filters</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= txtCouponCode.ClientID %>">Coupon Code</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-ticket"></i></span>
+                                                    <asp:TextBox ID="txtCouponCode" runat="server" CssClass="form-control" placeholder="Search coupon code" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= txtUserId.ClientID %>">User Id / Name</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-id-badge"></i></span>
+                                                    <asp:TextBox ID="txtUserId" runat="server" CssClass="form-control" placeholder="User id or name" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= txtMobile.ClientID %>">Mobile No</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-phone"></i></span>
+                                                    <asp:TextBox ID="txtMobile" runat="server" CssClass="form-control" placeholder="Mobile number" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer admin-report-footer">
+                                <asp:Button ID="btnSearch" runat="server" CssClass="btn btn-primary" Text="Search" OnClick="btnSearch_Click" />
+                                <asp:Button ID="btnReset" runat="server" CssClass="btn btn-default" Text="Reset" OnClick="btnReset_Click" CausesValidation="false" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="box box-primary">
                             <div class="box-header with-border coupon-report-box-header">
                                 <h3 class="box-title"><i class="fa fa-ticket"></i> Approved Coupons</h3>
                                 <div class="box-tools coupon-report-header-tools">
+                                    <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
+                                        AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                                        <asp:ListItem Selected="True">10</asp:ListItem>
+                                        <asp:ListItem>25</asp:ListItem>
+                                        <asp:ListItem>50</asp:ListItem>
+                                        <asp:ListItem>100</asp:ListItem>
+                                        <asp:ListItem>All</asp:ListItem>
+                                    </asp:DropDownList>
+                                    <span class="admin-record-filter-suffix">per page</span>
                                     <p class="coupon-report-count">
                                         <i class="fa fa-print" aria-hidden="true"></i>
                                         <span class="coupon-report-count-label">Printable Tickets</span>
@@ -247,13 +327,21 @@
                                 </div>
                             </div>
                             <div class="box-body">
-                                <p class="admin-report-intro">Approved coupons from <strong>SavingAccountDetail</strong> for lucky draw. Print all tickets, cut along dashed lines, and use them in the draw.</p>
+                                <p class="admin-report-intro">Approved coupons from <strong>SavingAccountDetail</strong> for lucky draw. Print all filtered tickets, cut along dashed lines, and use them in the draw.</p>
 
+                                <asp:Panel ID="pnlLoadError" runat="server" Visible="false" CssClass="alert alert-warning admin-report-alert">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    <asp:Literal ID="litLoadError" runat="server" />
+                                </asp:Panel>
+
+                                <div class="admin-table-paged-shell">
                                 <div class="admin-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server"
                                         CssClass="table table-bordered table-hover dataTable coupon-report-table"
                                         Width="100%" AutoGenerateColumns="False"
+                                        AllowPaging="true"
                                         EmptyDataText="No approved coupons found.">
+                                        <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
                                                 <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
@@ -276,11 +364,16 @@
                                             <asp:TemplateField HeaderText="Qty">
                                                 <ItemTemplate><%# Eval("quantity") %></ItemTemplate>
                                             </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Status">
+                                                <ItemTemplate><%# Eval("status") %></ItemTemplate>
+                                            </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Approve Date">
                                                 <ItemTemplate><%# Eval("approvedate", "{0:dd MMM yyyy}") %></ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
                                     </asp:GridView>
+                                </div>
+                                <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar"></asp:Panel>
                                 </div>
 
                                 <asp:Panel ID="pnlPrintArea" runat="server" CssClass="coupon-print-area" Visible="false">
@@ -318,7 +411,25 @@
 </asp:Content>
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
+    <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript">
+        function initCouponReportDatepickers() {
+            $('.form_date').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true
+            }).on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+        }
+
+        $(function () {
+            initCouponReportDatepickers();
+        });
+
+        Sys.Application.add_load(function () {
+            initCouponReportDatepickers();
+        });
+
         function printAllCoupons() {
             var printArea = document.getElementById('couponPrintArea');
             if (!printArea || !printArea.children.length) {

@@ -260,7 +260,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
                     .Append(SqlEscape(ddDeliveryStatus.SelectedValue)).Append("'");
             }
 
-            sql.Append(" ORDER BY sd.approvedate DESC, sd.id DESC");
+            sql.Append(" ORDER BY sd.id DESC");
 
             ObjData.StartConnection();
             try
@@ -319,7 +319,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
 
         var orderGroups = source.AsEnumerable()
             .GroupBy(row => Convert.ToString(row["orderid"]).Trim(), StringComparer.OrdinalIgnoreCase)
-            .OrderByDescending(group => group.Max(row => GetDateValue(row["approvedate"])));
+            .OrderByDescending(group => group.Max(row => Convert.ToInt32(row["id"])));
 
         foreach (var group in orderGroups)
         {
@@ -329,8 +329,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
             }
 
             DataRow first = group
-                .OrderByDescending(row => GetDateValue(row["approvedate"]))
-                .ThenByDescending(row => Convert.ToInt32(row["id"]))
+                .OrderByDescending(row => Convert.ToInt32(row["id"]))
                 .First();
 
             DataRow groupedRow = grouped.NewRow();
@@ -458,6 +457,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
     static string GetApprovedStatusFilter(string tableAlias)
     {
         return "(" + tableAlias + ".status = 'Approved'"
+            + " OR " + tableAlias + ".status = '1'"
             + " OR LOWER(LTRIM(RTRIM(ISNULL(" + tableAlias + ".status, '')))) IN ('approved', 'approve'))";
     }
 

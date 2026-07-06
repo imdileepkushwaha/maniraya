@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="Dailypayoutdetail.aspx.cs" Inherits="Dailypayoutdetail" %>
+<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="Dailypayoutdetail.aspx.cs" Inherits="Dailypayoutdetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -86,7 +86,7 @@
                                     <Columns>
                                         <asp:TemplateField HeaderText="#">
                                             <ItemTemplate>
-                                                <%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %>
+                                                <%# Container.DataItemIndex + 1 %>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="From Date">

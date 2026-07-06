@@ -151,16 +151,35 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
 
     public void UpdateBal()
     {
-        DataTable dt = new DataTable();
-        if (Session["userid"] != null)
+        if (Session["userid"] == null || lblwallet == null)
         {
-            objusr.UserId = Session["userid"].ToString();
-            dt = objusr.getUserDetail(objusr);
-            if (dt != null && dt.Rows.Count > 0)
+            return;
+        }
+
+        objusr.UserId = Session["userid"].ToString();
+        DataTable dt = objusr.getUserDetail(objusr);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            lblwallet.Text = "Wallet: 0.00";
+            return;
+        }
+
+        lblwallet.Text = "Wallet: " + GetWalletBalanceText(dt.Rows[0]);
+    }
+
+    static string GetWalletBalanceText(DataRow row)
+    {
+        decimal balance = 0m;
+        if (row != null && row.Table != null && row.Table.Columns.Contains("balanceamount") && row["balanceamount"] != DBNull.Value)
+        {
+            string raw = Convert.ToString(row["balanceamount"]).Trim();
+            if (!decimal.TryParse(raw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out balance))
             {
-                lblwallet.Text = "Wallet: " + Math.Round(Convert.ToDecimal(dt.Rows[0]["balanceamount"].ToString()), 2).ToString();
+                decimal.TryParse(raw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.CurrentCulture, out balance);
             }
         }
+
+        return Math.Round(balance, 2).ToString("0.00");
     }
 
     protected void BtnMyaccount_Click(object sender, EventArgs e)
