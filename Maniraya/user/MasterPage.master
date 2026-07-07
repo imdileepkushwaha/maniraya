@@ -177,7 +177,7 @@
 					<li class="slide" >
 						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
-							<li><a class="slide-item" href="SavingProductPurchase.aspx">Purchase Saving Product</a></li>
+							<li><a class="slide-item" href="SavingProductPurchasebulk.aspx">Purchase Saving Product</a></li>
                           <li><a class="slide-item" href="SAvingProductPurchaseReport.aspx">Saving Product Report</a></li>
                           <li><a class="slide-item" href="SavingProductOrderHistory.aspx">Order History</a></li>
 							
