@@ -234,30 +234,31 @@ public static class PrizeHelper
 
         string sql = @"
             SELECT
-                Id,
-                PrizeId,
-                PrizeName,
-                UserId,
-                ISNULL(UserName, '') AS UserName,
-                ISNULL(Mobile, '') AS Mobile,
-                ISNULL(PrizeMonth, '') AS PrizeMonth,
-                ISNULL(Status, 1) AS Status,
-                CASE WHEN ISNULL(Status, 1) = 1 THEN 'Active' ELSE 'Inactive' END AS StatusText,
-                CreatedOn
-            FROM PrizeAssignment
-            WHERE ISNULL(Status, 1) = 1";
+                pa.Id,
+                pa.PrizeId,
+                ISNULL(pm.PrizeName, pa.PrizeName) AS PrizeName,
+                pa.UserId,
+                ISNULL(pa.UserName, '') AS UserName,
+                ISNULL(pa.Mobile, '') AS Mobile,
+                ISNULL(pa.PrizeMonth, '') AS PrizeMonth,
+                ISNULL(pa.Status, 1) AS Status,
+                CASE WHEN ISNULL(pa.Status, 1) = 1 THEN 'Active' ELSE 'Inactive' END AS StatusText,
+                pa.CreatedOn
+            FROM PrizeAssignment pa
+            LEFT JOIN PrizeMaster pm ON pa.PrizeId = pm.Id
+            WHERE ISNULL(pa.Status, 1) = 1";
 
         if (!string.IsNullOrWhiteSpace(userIdFilter))
         {
-            sql += " AND (UserId LIKE '%" + Escape(userIdFilter.Trim()) + "%' OR UserName LIKE '%" + Escape(userIdFilter.Trim()) + "%')";
+            sql += " AND (pa.UserId LIKE '%" + Escape(userIdFilter.Trim()) + "%' OR pa.UserName LIKE '%" + Escape(userIdFilter.Trim()) + "%')";
         }
 
         if (!string.IsNullOrWhiteSpace(monthFilter))
         {
-            sql += " AND PrizeMonth = '" + Escape(monthFilter.Trim()) + "'";
+            sql += " AND pa.PrizeMonth = '" + Escape(monthFilter.Trim()) + "'";
         }
 
-        sql += " ORDER BY Id DESC";
+        sql += " ORDER BY pa.Id DESC";
         return RunSelect(sql);
     }
 
@@ -282,14 +283,15 @@ public static class PrizeHelper
         EnsureTables();
         return RunSelect(@"
             SELECT
-                Id,
-                PrizeName,
-                ISNULL(PrizeMonth, '') AS PrizeMonth,
-                CreatedOn
-            FROM PrizeAssignment
-            WHERE LTRIM(RTRIM(UserId)) = '" + Escape(userId.Trim()) + @"'
-              AND ISNULL(Status, 1) = 1
-            ORDER BY Id DESC");
+                pa.Id,
+                ISNULL(pm.PrizeName, pa.PrizeName) AS PrizeName,
+                ISNULL(pa.PrizeMonth, '') AS PrizeMonth,
+                pa.CreatedOn
+            FROM PrizeAssignment pa
+            LEFT JOIN PrizeMaster pm ON pa.PrizeId = pm.Id
+            WHERE LTRIM(RTRIM(pa.UserId)) = '" + Escape(userId.Trim()) + @"'
+              AND ISNULL(pa.Status, 1) = 1
+            ORDER BY pa.Id DESC");
     }
 
     public static DataTable GetAllWinners(int topCount)
@@ -299,15 +301,16 @@ public static class PrizeHelper
         int top = topCount > 0 ? topCount : 200;
         return RunSelect(@"
             SELECT TOP " + top + @"
-                Id,
-                UserId,
-                ISNULL(UserName, '') AS UserName,
-                PrizeName,
-                ISNULL(PrizeMonth, '') AS PrizeMonth,
-                CreatedOn
-            FROM PrizeAssignment
-            WHERE ISNULL(Status, 1) = 1
-            ORDER BY Id DESC");
+                pa.Id,
+                pa.UserId,
+                ISNULL(pa.UserName, '') AS UserName,
+                ISNULL(pm.PrizeName, pa.PrizeName) AS PrizeName,
+                ISNULL(pa.PrizeMonth, '') AS PrizeMonth,
+                pa.CreatedOn
+            FROM PrizeAssignment pa
+            LEFT JOIN PrizeMaster pm ON pa.PrizeId = pm.Id
+            WHERE ISNULL(pa.Status, 1) = 1
+            ORDER BY pa.Id DESC");
     }
 
     public static string FormatPrizeMonth(object value)
