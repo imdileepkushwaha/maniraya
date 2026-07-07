@@ -1,20 +1,20 @@
 ﻿<%@ Page Title="My Savings Installment" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SavingProductInstallmentDetail.aspx.cs" Inherits="user_SavingProductInstallmentDetail" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
     <link href="assets/css/dashboard-modern.css?v=25" rel="stylesheet" />
 </asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
+<asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
         <h1>My Savings Installment</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
             <li><a href="SAvingProductPurchaseReport.aspx">My Savings</a></li>
             <li class="active">Installments</li>
         </ol>
     </section>
 </asp:Content>
-<asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" Runat="Server">
+<asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
@@ -27,8 +27,8 @@
                         <asp:Label ID="lblCouponCode" runat="server" CssClass="dash-saving-coupon-chip" Visible="false" />
                     </div>
                     <div class="profile-hero-actions">
-                        <a href="SAvingProductPurchaseReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-arrow-left"></i> Back to Savings</a>
-                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i> Dashboard</a>
+                        <a href="SAvingProductPurchaseReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-arrow-left"></i>Back to Savings</a>
+                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i>Dashboard</a>
                     </div>
                 </div>
 
@@ -43,7 +43,7 @@
                     <div class="dash-subpage-panel-body">
                         <p class="dash-saving-report-intro">Pending installments can be paid from the action column when payment is enabled.</p>
                         <div class="dash-saving-report-table-wrap">
-                            <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%" AutoGenerateColumns="False" OnRowDataBound="grdGetHelp_RowDataBound" GridLines="None">
+                            <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%" AutoGenerateColumns="False" OnRowDataBound="grdGetHelp_RowDataBound" GridLines="None" OnRowCommand="GridView1_RowCommand">
                                 <Columns>
                                     <asp:TemplateField HeaderText="S.No">
                                         <ItemTemplate>
@@ -53,22 +53,26 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Installment Date">
                                         <ItemTemplate>
-                                            <span class="dash-saving-date"><asp:Label ID="lblcreatingdate" runat="server" Text='<%# Eval("entrydate", "{0:dd MMM yyyy}") %>'></asp:Label></span>
+                                            <span class="dash-saving-date">
+                                                <asp:Label ID="lblinstallmentdate" runat="server" Text='<%# Eval("installmentdate", "{0:dd MMM yyyy}") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Approve Date">
                                         <ItemTemplate>
-                                            <span class="dash-saving-date"><asp:Label ID="lblreleasedate" runat="server" Text='<%# Eval("approvedate", "{0:dd MMM yyyy, hh:mm tt}") %>'></asp:Label></span>
+                                            <span class="dash-saving-date">
+                                                <asp:Label ID="lblreleasedate" runat="server" Text='<%# Eval("approvedate", "{0:dd MMM yyyy, hh:mm tt}") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Amount">
                                         <ItemTemplate>
-                                            <span class="dash-saving-amount"><i class="fa fa-inr"></i> <asp:Label ID="lblamount" runat="server" Text='<%# Eval("amount") %>'></asp:Label></span>
+                                            <span class="dash-saving-amount"><i class="fa fa-inr"></i>
+                                                <asp:Label ID="lblamount" runat="server" Text='<%# Eval("amount") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Product">
                                         <ItemTemplate>
-                                            <span class="dash-saving-product"><asp:Label ID="lblproductname" runat="server" Text='<%# Eval("productname") %>'></asp:Label></span>
+                                            <span class="dash-saving-product">
+                                                <asp:Label ID="lblproductname" runat="server" Text='<%# Eval("productname") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Status">
@@ -78,14 +82,15 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Transaction Id">
                                         <ItemTemplate>
-                                            <span class="dash-saving-txn"><asp:Label ID="lbltransactionid" runat="server" Text='<%# Eval("OnlineTransactionId") %>'></asp:Label></span>
+                                            <span class="dash-saving-txn">
+                                                <asp:Label ID="lbltransactionid" runat="server" Text='<%# Eval("OnlineTransactionId") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                            <a href="#" class="dash-saving-action-btn is-pay">
-                                                <i class="fa fa-credit-card"></i> Pay
-                                            </a>
+
+                                            <asp:LinkButton ID="lbEdit" CommandName="edt" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" runat="server" CssClass="dash-saving-action-btn is-pay"><i class="fa fa-credit-card"></i> Pay</asp:LinkButton>
+
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
@@ -104,5 +109,75 @@
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
-<asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
+<asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
+
+    <asp:UpdatePanel runat="server" ID="uplMaster" UpdateMode="Always">
+        <ContentTemplate>
+            <div id="myModal" class="modal fade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Pay Installment</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row form-group">
+                                <div class="col-md-12 text-center">
+                                    <asp:Label ID="lblqrcode" runat="server" Text=""></asp:Label>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+
+                                <asp:Label runat="server" ID="lblidedit" Visible="false"></asp:Label>
+                                <div class="col-md-2">Amount</div>
+                                <div class="col-md-3">
+                                    <asp:TextBox ID="txtamountedit" Enabled="false" CssClass="form-control" runat="server"></asp:TextBox>
+                                </div>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2">Installment Date</div>
+                                <div class="col-md-3">
+                                    <asp:TextBox ID="txtinstallmentdateedit" Enabled="false" CssClass="form-control" runat="server"></asp:TextBox>
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-2">UTR No/Transaction Id</div>
+                                <div class="col-md-3">
+                                    <asp:TextBox ID="txttransactionidedit"  CssClass="form-control" runat="server"></asp:TextBox>
+                                </div>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2">Select Image</div>
+                                <div class="col-md-3">
+                                    <asp:FileUpload ID="FileUpload1" accept="image/jpeg,image/png,image/webp,image/gif" runat="server" />
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <asp:Button ID="btnUpdate" runat="server" Text="Submit" OnClientClick="return validate2();" CssClass="btn btn-success" OnClick="btnUpdate_Click" />
+                            <button type="button" class="btn btn-danger" onclick="Closepopup();">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ContentTemplate>
+        <Triggers>
+            <asp:PostBackTrigger ControlID="btnUpdate" />
+        </Triggers>
+    </asp:UpdatePanel>
+    <script type="text/javascript">
+
+
+        function showModal() {
+            $('#myModal').modal({ backdrop: 'static', keyboard: false })
+        }
+        function Closepopup() {
+            $('#myModal').modal('hide');
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '0');
+            $('.modal-backdrop').remove();
+
+
+        }
+    </script>
 </asp:Content>
