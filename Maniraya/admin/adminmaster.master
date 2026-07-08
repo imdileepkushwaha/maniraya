@@ -163,6 +163,7 @@
                                     
                                     <li><a href="SavingProductAssign.aspx">Assign Saving Product</a></li>
                                     <li><a href="SavingProductStockAdd.aspx">Add Saving Product Stock</a></li>
+                                     <li><a href="SavingInstallmentReport.aspx">EMI Purchase Report</a></li>
                                     <li><a href="CouponReport.aspx">Coupon Report</a></li>
                                 </ul>
                             </li>

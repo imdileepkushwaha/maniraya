@@ -1,15 +1,15 @@
-﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
+﻿<%@ Page Title="Saving Product Installment Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingInstallmentReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=66" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-        <h1>Saving Product Purchase Report</h1>
+        <h1>Saving Product Installment Report</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
-            <li><a href="#">Saving Request</a></li>
-            <li class="active">Saving Product Purchase Report</li>
+            <li><a href="#">Installment Request</a></li>
+            <li class="active">Saving Product Installment Report</li>
         </ol>
     </section>
 </asp:Content>
@@ -35,7 +35,7 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Filter saving product purchase requests by date range, user ID, transaction ID / UTR, or approval status.</p>
+                                <p class="admin-report-intro">Filter saving product installment requests by date range, user ID, transaction ID / UTR, or approval status.</p>
                                 <div class="admin-form-section">
                                     <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Date Range</h5>
                                     <div class="row">
@@ -62,7 +62,7 @@
                                 <div class="admin-form-section admin-form-section-last">
                                     <h5 class="admin-form-section-title"><i class="fa fa-sliders"></i> Filters</h5>
                                     <div class="row">
-                                        <div class="col-md-4 col-sm-12">
+                                        <div class="col-md-6 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txtuserid.ClientID %>">User Id</label>
                                                 <div class="admin-input-group">
@@ -71,21 +71,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="<%= ddstatus.ClientID %>">Status</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-info-circle"></i></span>
-                                                    <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
-                                                        <asp:ListItem Value="0">Select Status</asp:ListItem>
-                                                        <asp:ListItem>Pending</asp:ListItem>
-                                                        <asp:ListItem>Approved</asp:ListItem>
-                                                        <asp:ListItem>Rejected</asp:ListItem>
-                                                    </asp:DropDownList>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-12">
+                                        <div class="col-md-6 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txttransactionid.ClientID %>">Transaction Id / UTR No.</label>
                                                 <div class="admin-input-group">
@@ -109,11 +95,11 @@
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-list-alt"></i> Purchase Details</h3>
+                                <h3 class="box-title"><i class="fa fa-list-alt"></i> Installment Details</h3>
                             </div>
                             <div class="box-body">
                                 <div class="admin-table-toolbar">
-                                    <span class="admin-table-caption"><i class="fa fa-table"></i> Saving Product Requests</span>
+                                    <span class="admin-table-caption"><i class="fa fa-table"></i> Saving Product Installment Requests</span>
                                 </div>
                                 <div class="admin-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
@@ -127,14 +113,13 @@
                                                 </HeaderTemplate>  
                                                 <ItemTemplate>  
                                                     <%--<asp:CheckBox="CheckBox2" runat="server" />--%>
-
                                                     <asp:CheckBox ID="CheckBox2" runat="server" />
                                                     <%--<%#Container.DataItemIndex+1 %>--%>
                                                     <asp:Label ID="lblId" runat="server" Visible="false" Text='<%#Eval("id") %>'></asp:Label>
                                                     <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("imagename") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Order Id">
+                                             <asp:TemplateField HeaderText="Order Id">
                                                 <ItemTemplate>
                                                     <asp:Label ID="lblorderid" runat="server" Text='<%#Eval("orderid") %>'></asp:Label>
                                                 </ItemTemplate>
@@ -149,9 +134,9 @@
                                                     <asp:Label ID="lblname" runat="server" Text='<%#Eval("username") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Date of Request">
+                                            <asp:TemplateField HeaderText="Installment Date">
                                                 <ItemTemplate>
-                                                    <asp:Label ID="lblcreatingdate" runat="server" Text='<%#Eval("entrydate","{0:dd/MM/yyyy hh:mm tt}") %>'></asp:Label>
+                                                    <asp:Label ID="lblcreatingdate" runat="server" Text='<%#Eval("installmentdate","{0:dd/MM/yyyy}") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Approve Date">
@@ -191,28 +176,18 @@
                                                 <ItemTemplate>
                                                     <asp:TextBox ID="txtremark" TextMode="MultiLine" CssClass="form-control" runat="server"></asp:TextBox>
                                                     <asp:Label ID="lblremark" runat="server" Text='<%#Eval("remark") %>'></asp:Label>
-
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Approve" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="110px">
+                                            <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
-                                                    <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve" OnClick="btnApprove_click" runat="server">
-                                                        <i class="fa fa-check"></i> Approve
-                                                    </asp:LinkButton>
-                                                </ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Reject" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="100px">
-                                                <ItemTemplate>
-                                                    <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject" OnClick="btnReject_click" runat="server">
-                                                        <i class="fa fa-times"></i> Reject
-                                                    </asp:LinkButton>
-                                                </ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="View" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="100px">
-                                                <ItemTemplate>
-                                                    <a href='SavingProductInstallmentDetail.aspx?oid=<%# Eval("couponcode") %>' class="admin-action-btn is-view" title="View installments">
-                                                        <i class="fa fa-eye"></i> View
-                                                    </a>
+                                                    <div class="admin-action-group">
+                                                        <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve" OnClick="btnApprove_click" runat="server">
+                                                            <i class="fa fa-check"></i> Approve
+                                                        </asp:LinkButton>
+                                                        <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject" OnClick="btnReject_click" runat="server">
+                                                            <i class="fa fa-times"></i> Reject
+                                                        </asp:LinkButton>
+                                                    </div>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>

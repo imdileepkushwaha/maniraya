@@ -35,30 +35,22 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT ud.username, sd.*,pm.productname FROM SavingAccountDetail sd WITH (nolock) LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 ";
+        string str_query = @"SELECT sa.*, ud.username, sd.couponcode,pm.productname FROM SavingAccountInstallmentDetail sa WITH (nolock) LEFT JOIN  SavingAccountDetail sd WITH (nolock) ON sa.OrderId=sd.orderid LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 and sa.status = 'Processing' ";
         if (txtfromdate.Text != "" && txttodate.Text != "")
         {
-            str_query += "  and convert(date, sd.entrydate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sd.entrydate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
+            str_query += "  and convert(date, sa.requestdate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sa.requestdate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
         }
-
-
-
-        if (ddstatus.SelectedValue.ToString() != "0")
-        {
-            str_query += "  and " + BuildSavingStatusFilter(ddstatus.SelectedValue.ToString()) + " ";
-        }
-
         if (txtuserid.Text != "")
         {
-            str_query += "  and sd.UserId = '" + SqlEscape(txtuserid.Text.Trim()) + "' ";
+            str_query += "  and sa.UserId = '" + txtuserid.Text.Trim().Replace("'", "''") + "' ";
         }
 
         if (!string.IsNullOrWhiteSpace(txttransactionid.Text))
         {
-            str_query += "  and sd.OnlineTransactionId LIKE '%" + SqlEscape(txttransactionid.Text.Trim()) + "%' ";
+            str_query += "  and sa.OnlineTransactionId LIKE '%" + txttransactionid.Text.Trim().Replace("'", "''") + "%' ";
         }
 
-        str_query += " order by sd.entrydate  desc";
+        str_query += " order by sa.entrydate  desc";
         DataTable dt = null;
         ObjData.StartConnection();
         try
@@ -126,80 +118,6 @@ public partial class admin_UserReport : System.Web.UI.Page
         ObjData.EndConnection();
         return dt;
     }
-    static string BuildSavingStatusFilter(string selectedStatus)
-    {
-        string status = (selectedStatus ?? string.Empty).Trim();
-        if (string.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
-        {
-            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('pending', '0')
-                OR sd.status IS NULL OR LTRIM(RTRIM(ISNULL(sd.status, ''))) = ''";
-        }
-
-        if (string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase))
-        {
-            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', '1', 'active')";
-        }
-
-        if (string.Equals(status, "Rejected", StringComparison.OrdinalIgnoreCase))
-        {
-            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('rejected', '2', 'cancelled', 'canceled')";
-        }
-
-        return "sd.status = '" + SqlEscape(status) + "'";
-    }
-
-    static string SqlEscape(string value)
-    {
-        return (value ?? string.Empty).Replace("'", "''");
-    }
-
-    static void ApplySavingStatusBadge(Label lblstatus, LinkButton btnApprove, LinkButton btnReject, Label lblremark, TextBox txtremark)
-    {
-        if (lblstatus == null)
-        {
-            return;
-        }
-
-        string status = (lblstatus.Text ?? string.Empty).Trim();
-        string normalized = status.ToLowerInvariant();
-
-        bool isPending = normalized == "pending" || normalized == "0" || normalized == string.Empty;
-        bool isApproved = normalized == "approved" || normalized == "1" || normalized == "active";
-        bool isRejected = normalized == "rejected" || normalized == "2" || normalized == "cancelled" || normalized == "canceled";
-
-        if (isPending)
-        {
-            lblstatus.Text = "Pending";
-            lblstatus.CssClass = "label label-warning";
-            if (btnApprove != null) btnApprove.Visible = true;
-            if (btnReject != null) btnReject.Visible = true;
-            if (txtremark != null) txtremark.Visible = true;
-            if (lblremark != null) lblremark.Visible = false;
-            return;
-        }
-
-        if (isApproved)
-        {
-            lblstatus.Text = "Approved";
-            lblstatus.CssClass = "label label-success";
-            if (btnApprove != null) btnApprove.Visible = false;
-            if (btnReject != null) btnReject.Visible = false;
-            if (txtremark != null) txtremark.Visible = false;
-            if (lblremark != null) lblremark.Visible = true;
-            return;
-        }
-
-        if (isRejected)
-        {
-            lblstatus.Text = "Cancelled";
-            lblstatus.CssClass = "label label-danger";
-            if (btnApprove != null) btnApprove.Visible = false;
-            if (btnReject != null) btnReject.Visible = false;
-            if (txtremark != null) txtremark.Visible = false;
-            if (lblremark != null) lblremark.Visible = true;
-        }
-    }
-
     protected void grdGetHelp_RowDataBound(object sender, GridViewRowEventArgs e)
     {
         if (e.Row.RowType == DataControlRowType.DataRow)
@@ -209,8 +127,45 @@ public partial class admin_UserReport : System.Web.UI.Page
             TextBox txtremark = (TextBox)e.Row.FindControl("txtremark");
             LinkButton btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
             LinkButton btnReject = (LinkButton)e.Row.FindControl("btnReject");
+            lblremark.Visible = false;
+            txtremark.Visible = false;
 
-            ApplySavingStatusBadge(lblstatus, btnApprove, btnReject, lblremark, txtremark);
+            if (lblstatus.Text == "Pending")
+            {
+                lblstatus.Text = "Pending";
+                lblstatus.CssClass = "label label-warning";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+            else if (lblstatus.Text == "Processing")
+            {
+                lblstatus.Text = "Processing";
+                lblstatus.CssClass = "label label-info";
+                btnApprove.Visible = true;
+                btnReject.Visible = true;
+                txtremark.Visible = true;
+            }
+            else
+                if (lblstatus.Text == "Approved")
+            {
+                lblstatus.Text = "Approved";
+                lblstatus.CssClass = "label label-success";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+            else
+
+                    if (lblstatus.Text == "Rejected")
+            {
+                lblstatus.Text = "Cancelled";
+                lblstatus.CssClass = "label label-danger";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+
         }
     }
     protected void btnApprove_click(object sender, EventArgs e)
@@ -250,7 +205,6 @@ public partial class admin_UserReport : System.Web.UI.Page
         loadprevproduct();
     }
 
-
     public string Approve_ProductPurchase(string str_id, string str_approveby, string str_remark)
     {
 
@@ -265,7 +219,7 @@ public partial class admin_UserReport : System.Web.UI.Page
 
         try
         {
-            s2 = "sp_approveSavingAccountDetail";
+            s2 = "sp_approveSavingInstallmentDetail";
             SqlParameter[] parameter = {
                 new SqlParameter("@id",str_id),
                 new SqlParameter("@Approveby",str_approveby),
@@ -302,7 +256,7 @@ public partial class admin_UserReport : System.Web.UI.Page
 
         try
         {
-            s2 = "sp_rejectSavingAccountDetail";
+            s2 = "sp_RejectSavingInstallmentDetail";
             SqlParameter[] parameter = {
                 new SqlParameter("@id",str_id),
                 new SqlParameter("@Approveby",str_approveby),
