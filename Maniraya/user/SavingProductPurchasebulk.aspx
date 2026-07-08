@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchasebulk.aspx.cs" Inherits="user_SavingProductPurchasebulk" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
     <style>
         .saving-purchase-page .saving-product-showcase {
             margin-bottom: 24px;
@@ -154,16 +154,21 @@
             margin-top: 8px;
             padding: 12px 14px;
             border-radius: 10px;
-            background: rgba(59, 130, 246, 0.12);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #bfdbfe;
+            background: #fffbeb;
+            border: 1px solid rgba(229, 169, 6, 0.35);
+            color: #78350f;
             font-size: 13px;
             line-height: 1.5;
         }
 
         .saving-purchase-info-note i {
             margin-top: 2px;
-            color: #93c5fd;
+            flex-shrink: 0;
+            color: #b45309;
+        }
+
+        .saving-purchase-info-note strong {
+            color: #92400e;
         }
 
         @media (max-width: 991px) {
@@ -276,19 +281,179 @@
             border: 1px solid rgba(229, 169, 6, 0.28);
             background: rgba(255, 251, 235, 0.55);
         }
+
+        .saving-shipping-type-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .saving-shipping-type-item {
+            position: relative;
+        }
+
+        .saving-shipping-type-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .saving-shipping-type-item label {
+            display: flex!important;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .saving-shipping-type-item label:hover {
+            border-color: rgba(229, 169, 6, 0.45);
+        }
+
+        .saving-shipping-type-item input[type="radio"]:checked + label {
+            border-color: rgba(229, 169, 6, 0.65);
+            background: linear-gradient(135deg, rgba(246, 207, 99, 0.16) 0%, rgba(255, 251, 235, 0.9) 100%);
+            box-shadow: 0 8px 20px -14px rgba(229, 169, 6, 0.55);
+        }
+
+        .saving-shipping-type-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #92400e;
+            background: rgba(246, 207, 99, 0.22);
+            flex-shrink: 0;
+        }
+
+        .saving-shipping-type-text strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .saving-shipping-type-text span {
+            display: block;
+            font-size: 0.82rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 767px) {
+            .saving-shipping-type-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .saving-payment-type-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .saving-payment-type-item {
+            position: relative;
+        }
+
+        .saving-payment-type-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .saving-payment-type-item label {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .saving-payment-type-item label:hover {
+            border-color: rgba(229, 169, 6, 0.45);
+        }
+
+        .saving-payment-type-item input[type="radio"]:checked + label {
+            border-color: rgba(229, 169, 6, 0.65);
+            background: linear-gradient(135deg, rgba(246, 207, 99, 0.16) 0%, rgba(255, 251, 235, 0.9) 100%);
+            box-shadow: 0 8px 20px -14px rgba(229, 169, 6, 0.55);
+        }
+
+        .saving-online-payment-row {
+            margin-top: 4px;
+        }
+
+        .saving-online-payment-row .topup-qr-card {
+            margin-bottom: 0;
+        }
+
+        .saving-bank-detail-list {
+            margin: 12px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .saving-bank-detail-list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+            font-size: 0.88rem;
+        }
+
+        .saving-bank-detail-list li:last-child {
+            border-bottom: none;
+        }
+
+        .saving-bank-detail-list span {
+            color: #64748b;
+        }
+
+        .saving-bank-detail-list strong {
+            color: #0f172a;
+            text-align: right;
+        }
+
+        @media (max-width: 767px) {
+            .saving-payment-type-options {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <script type="text/javascript">
         function validate() {
-            if (document.getElementById("<%=txttransactionid.ClientID%>").value.trim() === "") {
-                alert('Enter Transaction ID / UTR number');
-                document.getElementById("<%=txttransactionid.ClientID%>").focus();
-                return false;
-            }
-               if (document.getElementById("<%=txtquantity.ClientID%>").value.trim() === "") {
+            if (document.getElementById("<%=txtquantity.ClientID%>").value.trim() === "") {
                 alert('Enter Quantity');
                 document.getElementById("<%=txtquantity.ClientID%>").focus();
                 return false;
             }
+
+            var onlinePayment = document.getElementById("<%=rbOnlinePayment.ClientID%>");
+            if (onlinePayment && onlinePayment.checked) {
+                if (document.getElementById("<%=txttransactionid.ClientID%>").value.trim() === "") {
+                    alert('Enter Transaction ID / UTR number');
+                    document.getElementById("<%=txttransactionid.ClientID%>").focus();
+                    return false;
+                }
+            }
+
             return true;
         }
     </script>
@@ -406,6 +571,31 @@
                             </div>
                         </div>
 
+                        <p class="profile-subsection-title"><i class="fa fa-truck"></i> Shipping Type</p>
+                        <div class="saving-shipping-type-options">
+                            <div class="saving-shipping-type-item">
+                                <asp:RadioButton ID="rbSelfPickup" runat="server" GroupName="ShippingType" />
+                                <label for="<%= rbSelfPickup.ClientID %>">
+                                    <span class="saving-shipping-type-icon"><i class="fa fa-building"></i></span>
+                                    <span class="saving-shipping-type-text">
+                                        <strong>Self Pickup</strong>
+                                        <span>Collect your order from the pickup location</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="saving-shipping-type-item">
+                                <asp:RadioButton ID="rbCourierDelivery" runat="server" GroupName="ShippingType" Checked="true" />
+                                <label for="<%= rbCourierDelivery.ClientID %>">
+                                    <span class="saving-shipping-type-icon"><i class="fa fa-truck"></i></span>
+                                    <span class="saving-shipping-type-text">
+                                        <strong>Courier Delivery</strong>
+                                        <span>Deliver to your shipping address</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <asp:Panel ID="pnlShippingAddressSection" runat="server">
                         <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Shipping Address</p>
                         <asp:HiddenField ID="hfShippingMode" runat="server" Value="view" />
 
@@ -481,46 +671,97 @@
                                     Text="Cancel" CausesValidation="false" OnClick="btnCancelShipping_Click" />
                             </div>
                         </asp:Panel>
+                        </asp:Panel>
 
-                        <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange"></i> UTR No / Transaction ID</label>
-                                    <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
-                                </div>
+                        <p class="profile-subsection-title"><i class="fa fa-credit-card"></i> Payment Method</p>
+                        <div class="saving-payment-type-options">
+                            <div class="saving-payment-type-item">
+                                <asp:RadioButton ID="rbCashPayment" runat="server" GroupName="PaymentMethod" />
+                                <label for="<%= rbCashPayment.ClientID %>">
+                                    <span class="saving-shipping-type-icon"><i class="fa fa-money"></i></span>
+                                    <span class="saving-shipping-type-text">
+                                        <strong>Cash</strong>
+                                        <span>Submit request directly to admin</span>
+                                    </span>
+                                </label>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group profile-upload-field topup-payment-upload">
-                                    <label><i class="fa fa-camera"></i> Payment Screenshot</label>
-                                    <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
-                                        <div class="profile-upload-zone-inner">
-                                            <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
-                                            <p class="profile-upload-title">Drop payment screenshot here</p>
-                                            <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
-                                            <p class="profile-upload-meta">JPG, PNG, WEBP · receipt clearly visible</p>
-                                        </div>
-                                        <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
-                                    </div>
-                                    <div class="profile-upload-selection profile-upload-selection-attach" id="savingPaymentUploadSelection" hidden>
-                                        <div class="profile-upload-selection-preview profile-upload-selection-preview-doc">
-                                            <img id="savingPaymentUploadPreview" src="" alt="Payment screenshot preview" />
-                                        </div>
-                                        <div class="profile-upload-selection-info">
-                                            <span class="profile-upload-filechip" id="savingPaymentUploadFilechip"></span>
-                                            <button type="button" class="profile-upload-clear" id="savingPaymentUploadClear">
-                                                <i class="fa fa-times"></i> Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="saving-payment-type-item">
+                                <asp:RadioButton ID="rbOnlinePayment" runat="server" GroupName="PaymentMethod" Checked="true" />
+                                <label for="<%= rbOnlinePayment.ClientID %>">
+                                    <span class="saving-shipping-type-icon"><i class="fa fa-qrcode"></i></span>
+                                    <span class="saving-shipping-type-text">
+                                        <strong>Online</strong>
+                                        <span>Pay via QR and upload payment proof</span>
+                                    </span>
+                                </label>
                             </div>
                         </div>
 
-                        <div class="saving-purchase-info-note">
+                        <asp:Panel ID="pnlCashPaymentInfo" runat="server" CssClass="saving-purchase-info-note" Style="display:none;">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            <span>After making the payment, enter your UTR/transaction ID and upload a clear screenshot. Your request will be verified by the admin team.</span>
-                        </div>
+                            <span>Cash payment selected. Click <strong>Submit Request</strong> and your purchase will be sent to admin for approval.</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="pnlOnlinePaymentSection" runat="server">
+                            <div class="row saving-online-payment-row">
+                                <div class="col-md-5">
+                                    <p class="profile-subsection-title"><i class="fa fa-qrcode"></i> Scan &amp; Pay</p>
+                                    <asp:Panel ID="pnlNoCompanyAccount" runat="server" Visible="false" CssClass="saving-shipping-card is-empty">
+                                        <p class="saving-shipping-empty-text">Company payment account is not available right now. Please contact support.</p>
+                                    </asp:Panel>
+                                    <asp:Panel ID="pnlCompanyAccount" runat="server">
+                                        <asp:Panel ID="pnlBankSelectWrap" runat="server" Visible="false" CssClass="form-group">
+                                            <label for="<%= ddbankaccount.ClientID %>"><i class="fa fa-bank"></i> Select Account</label>
+                                            <asp:DropDownList ID="ddbankaccount" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddbankaccount_SelectedIndexChanged" />
+                                        </asp:Panel>
+                                        <div class="topup-qr-card">
+                                            <p class="topup-qr-label"><i class="fa fa-qrcode"></i> Scan to Pay</p>
+                                            <asp:Image ID="imgPaymentQr" runat="server" CssClass="topup-qr-image" AlternateText="Payment QR code" />
+                                        </div>
+                                        <ul class="saving-bank-detail-list">
+                                            <li><span>Account Holder</span><strong><asp:Literal ID="litAccountHolder" runat="server" /></strong></li>
+                                            <li><span>Account No</span><strong><asp:Literal ID="litAccountNo" runat="server" /></strong></li>
+                                            <li><span>Bank</span><strong><asp:Literal ID="litBankName" runat="server" /></strong></li>
+                                            <li><span>IFSC</span><strong><asp:Literal ID="litIfscCode" runat="server" /></strong></li>
+                                        </ul>
+                                    </asp:Panel>
+                                </div>
+                                <div class="col-md-7">
+                                    <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
+                                    <div class="form-group">
+                                        <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange"></i> UTR No / Transaction ID</label>
+                                        <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
+                                    </div>
+                                    <div class="form-group profile-upload-field topup-payment-upload">
+                                        <label><i class="fa fa-camera"></i> Payment Screenshot</label>
+                                        <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
+                                            <div class="profile-upload-zone-inner">
+                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                <p class="profile-upload-title">Drop payment screenshot here</p>
+                                                <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
+                                                <p class="profile-upload-meta">JPG, PNG, WEBP · receipt clearly visible</p>
+                                            </div>
+                                            <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+                                        </div>
+                                        <div class="profile-upload-selection profile-upload-selection-attach" id="savingPaymentUploadSelection" hidden>
+                                            <div class="profile-upload-selection-preview profile-upload-selection-preview-doc">
+                                                <img id="savingPaymentUploadPreview" src="" alt="Payment screenshot preview" />
+                                            </div>
+                                            <div class="profile-upload-selection-info">
+                                                <span class="profile-upload-filechip" id="savingPaymentUploadFilechip"></span>
+                                                <button type="button" class="profile-upload-clear" id="savingPaymentUploadClear">
+                                                    <i class="fa fa-times"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="saving-purchase-info-note">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                <span>After making the payment, enter your UTR/transaction ID and upload a clear screenshot. Your request will be verified by the admin team.</span>
+                            </div>
+                        </asp:Panel>
                     </div>
 
                     <div class="box-footer profile-password-actions">
@@ -645,6 +886,83 @@
                 Sys.Application.add_load(scheduleInit);
             } else {
                 document.addEventListener('DOMContentLoaded', scheduleInit);
+            }
+
+            function toggleShippingAddressSection() {
+                var section = document.getElementById('<%= pnlShippingAddressSection.ClientID %>');
+                var courier = document.getElementById('<%= rbCourierDelivery.ClientID %>');
+                if (!section || !courier) {
+                    return;
+                }
+
+                section.style.display = courier.checked ? '' : 'none';
+            }
+
+            function initShippingTypeToggle() {
+                var selfPickup = document.getElementById('<%= rbSelfPickup.ClientID %>');
+                var courier = document.getElementById('<%= rbCourierDelivery.ClientID %>');
+                if (!selfPickup || !courier) {
+                    return;
+                }
+
+                if (selfPickup.getAttribute('data-bound') === '1') {
+                    toggleShippingAddressSection();
+                    return;
+                }
+
+                selfPickup.setAttribute('data-bound', '1');
+                courier.setAttribute('data-bound', '1');
+                selfPickup.addEventListener('change', toggleShippingAddressSection);
+                courier.addEventListener('change', toggleShippingAddressSection);
+                toggleShippingAddressSection();
+            }
+
+            if (window.Sys && Sys.Application) {
+                Sys.Application.add_load(initShippingTypeToggle);
+            } else {
+                document.addEventListener('DOMContentLoaded', initShippingTypeToggle);
+            }
+
+            function togglePaymentSections() {
+                var onlineSection = document.getElementById('<%= pnlOnlinePaymentSection.ClientID %>');
+                var cashInfo = document.getElementById('<%= pnlCashPaymentInfo.ClientID %>');
+                var onlinePayment = document.getElementById('<%= rbOnlinePayment.ClientID %>');
+                if (!onlinePayment) {
+                    return;
+                }
+
+                var isOnline = onlinePayment.checked;
+                if (onlineSection) {
+                    onlineSection.style.display = isOnline ? '' : 'none';
+                }
+                if (cashInfo) {
+                    cashInfo.style.display = isOnline ? 'none' : '';
+                }
+            }
+
+            function initPaymentMethodToggle() {
+                var cashPayment = document.getElementById('<%= rbCashPayment.ClientID %>');
+                var onlinePayment = document.getElementById('<%= rbOnlinePayment.ClientID %>');
+                if (!cashPayment || !onlinePayment) {
+                    return;
+                }
+
+                if (cashPayment.getAttribute('data-bound') === '1') {
+                    togglePaymentSections();
+                    return;
+                }
+
+                cashPayment.setAttribute('data-bound', '1');
+                onlinePayment.setAttribute('data-bound', '1');
+                cashPayment.addEventListener('change', togglePaymentSections);
+                onlinePayment.addEventListener('change', togglePaymentSections);
+                togglePaymentSections();
+            }
+
+            if (window.Sys && Sys.Application) {
+                Sys.Application.add_load(initPaymentMethodToggle);
+            } else {
+                document.addEventListener('DOMContentLoaded', initPaymentMethodToggle);
             }
         })();
     </script>

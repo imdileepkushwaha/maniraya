@@ -154,16 +154,21 @@
             margin-top: 8px;
             padding: 12px 14px;
             border-radius: 10px;
-            background: rgba(59, 130, 246, 0.12);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #2e68b0;
+            background: #fffbeb;
+            border: 1px solid rgba(229, 169, 6, 0.35);
+            color: #78350f;
             font-size: 13px;
             line-height: 1.5;
         }
 
         .saving-purchase-info-note i {
             margin-top: 2px;
-            color: #93c5fd;
+            flex-shrink: 0;
+            color: #b45309;
+        }
+
+        .saving-purchase-info-note strong {
+            color: #92400e;
         }
 
         @media (max-width: 991px) {

@@ -45,7 +45,7 @@ public partial class admin_UserReport : System.Web.UI.Page
 
         if (ddstatus.SelectedValue.ToString() != "0")
         {
-            str_query += "  and sd.status = '" + ddstatus.SelectedValue.ToString() + "' ";
+            str_query += "  and " + BuildSavingStatusFilter(ddstatus.SelectedValue.ToString()) + " ";
         }
 
         if (txtuserid.Text != "")
@@ -120,6 +120,80 @@ public partial class admin_UserReport : System.Web.UI.Page
         ObjData.EndConnection();
         return dt;
     }
+    static string BuildSavingStatusFilter(string selectedStatus)
+    {
+        string status = (selectedStatus ?? string.Empty).Trim();
+        if (string.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('pending', '0')
+                OR sd.status IS NULL OR LTRIM(RTRIM(ISNULL(sd.status, ''))) = ''";
+        }
+
+        if (string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', '1', 'active')";
+        }
+
+        if (string.Equals(status, "Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('rejected', '2', 'cancelled', 'canceled')";
+        }
+
+        return "sd.status = '" + SqlEscape(status) + "'";
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
+    }
+
+    static void ApplySavingStatusBadge(Label lblstatus, LinkButton btnApprove, LinkButton btnReject, Label lblremark, TextBox txtremark)
+    {
+        if (lblstatus == null)
+        {
+            return;
+        }
+
+        string status = (lblstatus.Text ?? string.Empty).Trim();
+        string normalized = status.ToLowerInvariant();
+
+        bool isPending = normalized == "pending" || normalized == "0" || normalized == string.Empty;
+        bool isApproved = normalized == "approved" || normalized == "1" || normalized == "active";
+        bool isRejected = normalized == "rejected" || normalized == "2" || normalized == "cancelled" || normalized == "canceled";
+
+        if (isPending)
+        {
+            lblstatus.Text = "Pending";
+            lblstatus.CssClass = "label label-warning";
+            if (btnApprove != null) btnApprove.Visible = true;
+            if (btnReject != null) btnReject.Visible = true;
+            if (txtremark != null) txtremark.Visible = true;
+            if (lblremark != null) lblremark.Visible = false;
+            return;
+        }
+
+        if (isApproved)
+        {
+            lblstatus.Text = "Approved";
+            lblstatus.CssClass = "label label-success";
+            if (btnApprove != null) btnApprove.Visible = false;
+            if (btnReject != null) btnReject.Visible = false;
+            if (txtremark != null) txtremark.Visible = false;
+            if (lblremark != null) lblremark.Visible = true;
+            return;
+        }
+
+        if (isRejected)
+        {
+            lblstatus.Text = "Cancelled";
+            lblstatus.CssClass = "label label-danger";
+            if (btnApprove != null) btnApprove.Visible = false;
+            if (btnReject != null) btnReject.Visible = false;
+            if (txtremark != null) txtremark.Visible = false;
+            if (lblremark != null) lblremark.Visible = true;
+        }
+    }
+
     protected void grdGetHelp_RowDataBound(object sender, GridViewRowEventArgs e)
     {
         if (e.Row.RowType == DataControlRowType.DataRow)
@@ -129,37 +203,8 @@ public partial class admin_UserReport : System.Web.UI.Page
             TextBox txtremark = (TextBox)e.Row.FindControl("txtremark");
             LinkButton btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
             LinkButton btnReject = (LinkButton)e.Row.FindControl("btnReject");
-            lblremark.Visible = false;
-            txtremark.Visible = false;
 
-            if (lblstatus.Text == "Pending")
-            {
-                lblstatus.Text = "Pending";
-                lblstatus.CssClass = "label label-warning";
-                btnApprove.Visible = true;
-                btnReject.Visible = true;
-                txtremark.Visible = true;
-            }
-            else
-                if (lblstatus.Text == "Approved")
-            {
-                lblstatus.Text = "Approved";
-                lblstatus.CssClass = "label label-success";
-                btnApprove.Visible = false;
-                btnReject.Visible = false;
-                lblremark.Visible = true;
-            }
-            else
-
-                    if (lblstatus.Text == "Rejected")
-            {
-                lblstatus.Text = "Cancelled";
-                lblstatus.CssClass = "label label-danger";
-                btnApprove.Visible = false;
-                btnReject.Visible = false;
-                lblremark.Visible = true;
-            }
-
+            ApplySavingStatusBadge(lblstatus, btnApprove, btnReject, lblremark, txtremark);
         }
     }
     protected void btnApprove_click(object sender, EventArgs e)

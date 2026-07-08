@@ -59,6 +59,47 @@ public static class SavingProductHelper
               AND (DeliveryStatus IS NULL OR LTRIM(RTRIM(DeliveryStatus)) = '')");
     }
 
+    public static void EnsurePaymentMethodColumn()
+    {
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'PaymentMethod') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD PaymentMethod NVARCHAR(50) NULL;
+            END");
+    }
+
+    public static void EnsureShippingTypeColumn()
+    {
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'ShippingType') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD ShippingType NVARCHAR(50) NULL;
+            END");
+    }
+
+    public static bool UpdatePurchaseMeta(string orderId, string paymentMethod, string shippingType)
+    {
+        if (string.IsNullOrWhiteSpace(orderId))
+        {
+            return false;
+        }
+
+        EnsurePaymentMethodColumn();
+        EnsureShippingTypeColumn();
+
+        string sql = "UPDATE SavingAccountDetail SET "
+            + "PaymentMethod = '" + Escape(paymentMethod) + "', "
+            + "ShippingType = '" + Escape(shippingType) + "' "
+            + "WHERE orderid = '" + Escape(orderId.Trim()) + "'";
+
+        return RunNonQuery(sql);
+    }
+
+    static string Escape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
+    }
+
     public static bool HasDeliveryStatusColumn()
     {
         DataTable dt = RunSelect("SELECT COL_LENGTH('SavingAccountDetail', 'DeliveryStatus') AS ColLen");
