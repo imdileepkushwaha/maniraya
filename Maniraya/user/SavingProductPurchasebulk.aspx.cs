@@ -870,7 +870,7 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
         else
         {
             objproduct.ProductImage = string.Empty;
-            objproduct.TransactionCode = "CASH";
+            objproduct.TransactionCode = "CASH-" + DateTime.Now.Ticks;
         }
 
         objproduct.MentionBy = Session["userid"].ToString();
