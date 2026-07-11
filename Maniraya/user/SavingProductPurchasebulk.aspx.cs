@@ -906,6 +906,11 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
         {
             ShowAlert("This Transaction Id already used");
         }
+
+else if (res == "r")
+{
+    ShowAlert("You Already Complete First Purchase kindly go Installment Page");
+}
         else
         {
             ShowAlert("Unable to submit purchase request. Please try again.");
