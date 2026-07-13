@@ -12,7 +12,6 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 {
     Data ObjData = new Data();
     clsProduct objproduct = new clsProduct();
-    clsAccount objaccount = new clsAccount();
     string CouponCode
     {
         get { return ViewState["InstallmentCouponCode"] as string ?? string.Empty; }
@@ -27,62 +26,15 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             return;
         }
 
-        Page.Form.Enctype = "multipart/form-data";
-
         if (!IsPostBack)
         {
             loadprevproduct();
-            LoadCompanyPaymentQr();
-            ApplyPaymentMethodVisibility();
+            loadqrocde();
         }
         else
         {
-            if (string.IsNullOrWhiteSpace(CouponCode))
-            {
-                CouponCode = GetRequestOid();
-            }
-
             ShowCouponChip();
         }
-    }
-
-    protected void Page_PreRender(object sender, EventArgs e)
-    {
-        ApplyPaymentMethodVisibility();
-    }
-
-    bool IsOnlinePayment()
-    {
-        return rbOnlinePayment == null || rbOnlinePayment.Checked;
-    }
-
-    void ApplyPaymentMethodVisibility()
-    {
-        bool isOnline = IsOnlinePayment();
-        if (pnlOnlinePaymentSection != null)
-        {
-            pnlOnlinePaymentSection.Style["display"] = isOnline ? "" : "none";
-        }
-
-        if (pnlCashPaymentInfo != null)
-        {
-            pnlCashPaymentInfo.Style["display"] = isOnline ? "none" : "";
-        }
-    }
-
-    void LoadCompanyPaymentQr()
-    {
-        DataTable dt = objaccount.getCompanyAccountDetail();
-        if (dt == null || dt.Rows.Count == 0)
-        {
-            imgPaymentQr.ImageUrl = ResolveUrl("~/ProductImage/noimage.png");
-            return;
-        }
-
-        string qrImage = Convert.ToString(dt.Rows[0]["BranchName"]);
-        imgPaymentQr.ImageUrl = string.IsNullOrWhiteSpace(qrImage)
-            ? ResolveUrl("~/ProductImage/noimage.png")
-            : ResolveUrl("~/ProductImage/" + qrImage);
     }
 
     string GetRequestOid()
@@ -130,7 +82,35 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
     }
 
 
-    public string Insert_SavingInstallment(clsProduct objState, string str_id)
+    public void loadqrocde()
+    {
+   
+        string str_query = @"select top 1 branchname from CompanyAccountDetail";
+
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch
+        {
+            dt = null;
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        if (dt.Rows.Count > 0)
+        {
+            lblqrcode.Text = @"<img src=""../ProductImage/"+dt.Rows[0]["branchname"].ToString()+@""" style=""height:400px;"">";
+        }
+
+
+    }
+
+    public string Insert_SavingInstallment(clsProduct objState,string str_id)
     {
       
 
@@ -232,6 +212,7 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             {
                 lblstatus.Text = "Rejected";
                 lblstatus.CssClass = "dash-saving-status is-rejected";
+                lbEdit.Visible = true;
             }
         }
     }
@@ -242,145 +223,37 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
     }
     public string UploadImage()
     {
-        HttpPostedFile postedFile = GetPostedPaymentFile();
-        if (postedFile == null)
+        string Imagename = "";
+        if (FileUpload1.HasFile)
         {
-            return string.Empty;
+            string RandomNumber = DateTime.Now.Ticks.ToString();
+            string fileName = Path.GetFileName(FileUpload1.PostedFile.FileName);
+            Imagename = RandomNumber + fileName;
+            FileUpload1.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + Imagename);
+
         }
-
-        string extension = Path.GetExtension(postedFile.FileName);
-        if (string.IsNullOrWhiteSpace(extension))
-        {
-            extension = ".jpg";
-        }
-
-        extension = extension.ToLowerInvariant();
-        if (extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".webp" && extension != ".gif")
-        {
-            return string.Empty;
-        }
-
-        string uploadFolder = Server.MapPath("~/ProductImage/");
-        if (!Directory.Exists(uploadFolder))
-        {
-            Directory.CreateDirectory(uploadFolder);
-        }
-
-        string imagename = DateTime.Now.Ticks + extension;
-        postedFile.SaveAs(Path.Combine(uploadFolder, imagename));
-        return imagename;
-    }
-
-    HttpPostedFile GetPostedPaymentFile()
-    {
-        if (FileUpload1 != null && FileUpload1.HasFile)
-        {
-            return FileUpload1.PostedFile;
-        }
-
-        if (FileUpload1 != null)
-        {
-            string key = FileUpload1.UniqueID;
-            if (!string.IsNullOrEmpty(key) && Request.Files[key] != null && Request.Files[key].ContentLength > 0)
-            {
-                return Request.Files[key];
-            }
-        }
-
-        for (int i = 0; i < Request.Files.Count; i++)
-        {
-            HttpPostedFile file = Request.Files[i];
-            if (file != null && file.ContentLength > 0 && !string.IsNullOrWhiteSpace(file.FileName))
-            {
-                return file;
-            }
-        }
-
-        return null;
-    }
-
-    bool HasPaymentScreenshot()
-    {
-        return GetPostedPaymentFile() != null;
-    }
-
-    string GetInstallmentId()
-    {
-        if (!string.IsNullOrWhiteSpace(hfInstallmentId.Value))
-        {
-            return hfInstallmentId.Value.Trim();
-        }
-
-        return (lblidedit.Text ?? string.Empty).Trim();
-    }
-
-    void ShowInstallmentPayModal()
-    {
-        uplMaster.Update();
-        ScriptManager.RegisterStartupScript(uplMaster, uplMaster.GetType(), Guid.NewGuid().ToString(), "resetInstallmentPayModal(); showModal();", true);
+        return Imagename;
     }
 
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
-        string installmentId = GetInstallmentId();
-        if (string.IsNullOrWhiteSpace(installmentId))
-        {
-            Message.Show("Installment record not found. Please open Pay again.");
-            ShowInstallmentPayModal();
-            return;
-        }
-
-        if (IsOnlinePayment())
-        {
-            if (string.IsNullOrWhiteSpace(txttransactionidedit.Text))
-            {
-                Message.Show("Enter UTR No / Transaction ID.");
-                ShowInstallmentPayModal();
-                return;
-            }
-
-            if (!HasPaymentScreenshot())
-            {
-                Message.Show("Please upload payment screenshot.");
-                ShowInstallmentPayModal();
-                return;
-            }
-
-            objproduct.ProductImage = UploadImage();
-            if (string.IsNullOrWhiteSpace(objproduct.ProductImage))
-            {
-                Message.Show("Invalid payment screenshot. Please upload JPG, PNG, WEBP or GIF image.");
-                ShowInstallmentPayModal();
-                return;
-            }
-
-            objproduct.TransactionCode = txttransactionidedit.Text.Trim();
-        }
-        else
-        {
-            objproduct.ProductImage = string.Empty;
-            objproduct.TransactionCode = "CASH-" + DateTime.Now.Ticks;
-        }
-
-        string res = Insert_SavingInstallment(objproduct, installmentId);
+        objproduct.ProductImage = UploadImage();
+        objproduct.TransactionCode = txttransactionidedit.Text;
+        string res = Insert_SavingInstallment(objproduct,lblidedit.Text);
         if (res == "t")
         {
             loadprevproduct();
-            txttransactionidedit.Text = string.Empty;
-            hfInstallmentId.Value = string.Empty;
-            lblidedit.Text = string.Empty;
             Message.Show("Request Submitted Successfully");
-            ScriptManager.RegisterStartupScript(uplMaster, uplMaster.GetType(), Guid.NewGuid().ToString(), "Closepopup();", true);
+            string popupScript2 = "Closepopup();";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
         }
-        else if (res == "f")
+        else if (res == "t")
         {
             Message.Show("Already in process");
-            ShowInstallmentPayModal();
         }
         else
         {
-            Message.Show("Unable to submit request. Please try again.");
-            ShowInstallmentPayModal();
+            Message.Show("unknown error occurred");
         }
     }
 
@@ -395,17 +268,10 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             Label lblinstallmentdate = (Label)GridView1.Rows[index].FindControl("lblinstallmentdate");
 
             lblidedit.Text = lblid.Text;
-            hfInstallmentId.Value = lblid.Text;
             txtamountedit.Text = lblamount.Text;
             txtinstallmentdateedit.Text = lblinstallmentdate.Text;
-            litPayAmount.Text = lblamount.Text;
-            litPayInstallmentDate.Text = lblinstallmentdate.Text;
-            txttransactionidedit.Text = string.Empty;
-            rbOnlinePayment.Checked = true;
-            rbCashPayment.Checked = false;
-            ApplyPaymentMethodVisibility();
 
-            ShowInstallmentPayModal();
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
         }
     }
 }
