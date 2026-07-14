@@ -2,14 +2,13 @@ using BusinessLogicTier;
 using DataTier;
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class admin_SavingProductOrderDetails : Page
+public partial class admin_SavingInstallmentOrderDetails : Page
 {
     Data ObjData = new Data();
 
@@ -27,7 +26,7 @@ public partial class admin_SavingProductOrderDetails : Page
             return;
         }
 
-        SavingProductHelper.EnsureDeliveryColumns();
+        SavingProductHelper.EnsureInstallmentDeliveryColumns();
 
         if (!IsPostBack)
         {
@@ -191,28 +190,27 @@ public partial class admin_SavingProductOrderDetails : Page
         }
     }
 
-
     DataTable GetConfirmedOrders()
     {
         DataTable dt = new DataTable();
         try
         {
-            bool hasDeliveryStatus = SavingProductHelper.HasDeliveryStatusColumn();
+            bool hasDeliveryStatus = SavingProductHelper.HasInstallmentDeliveryStatusColumn();
             string deliveryStatusSelect = hasDeliveryStatus
-                ? "ISNULL(NULLIF(LTRIM(RTRIM(sd.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
+                ? "ISNULL(NULLIF(LTRIM(RTRIM(sa.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
                 : "'Confirmed' AS DeliveryStatus";
 
             StringBuilder sql = new StringBuilder();
             sql.Append(@"
 SELECT
-    sd.id,
-    sd.orderid,
-    sd.userid,
+    sa.id,
+    sa.orderid,
+    sa.userid,
     ud.username,
     ud.mobile,
     pm.productname,
-    sd.amount,
-    sd.approvedate,
+    sa.amount,
+    sa.approvedate,
     sd.couponcode,
     ").Append(deliveryStatusSelect).Append(@",
     CASE
@@ -235,46 +233,47 @@ SELECT
         WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingPincode
         ELSE ud.Pincode
     END AS ShipPincode
-FROM SavingAccountDetail sd WITH (NOLOCK)
-LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sd.UserId
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
 LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
-WHERE ").Append(GetApprovedStatusFilter("sd"));
+WHERE ").Append(GetApprovedStatusFilter("sa")).Append(" AND sa.InstNo > 1");
 
             if (!string.IsNullOrWhiteSpace(txtOrderId.Text))
             {
-                sql.Append(" AND sd.orderid LIKE '%").Append(SqlEscape(txtOrderId.Text.Trim())).Append("%'");
+                sql.Append(" AND sa.orderid LIKE '%").Append(SqlEscape(txtOrderId.Text.Trim())).Append("%'");
             }
 
             if (!string.IsNullOrWhiteSpace(txtUserId.Text))
             {
                 string userSearch = SqlEscape(txtUserId.Text.Trim());
-                sql.Append(" AND (sd.userid LIKE '%").Append(userSearch)
+                sql.Append(" AND (sa.userid LIKE '%").Append(userSearch)
                     .Append("%' OR ud.username LIKE '%").Append(userSearch).Append("%')");
             }
 
             if (hasDeliveryStatus && !string.IsNullOrWhiteSpace(ddDeliveryStatus.SelectedValue))
             {
-                sql.Append(" AND ISNULL(NULLIF(LTRIM(RTRIM(sd.DeliveryStatus)), ''), 'Confirmed') = '")
+                sql.Append(" AND ISNULL(NULLIF(LTRIM(RTRIM(sa.DeliveryStatus)), ''), 'Confirmed') = '")
                     .Append(SqlEscape(ddDeliveryStatus.SelectedValue)).Append("'");
             }
 
             if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
             {
-                sql.Append(" AND CONVERT(date, sd.entrydate) >= CONVERT(date, '")
+                sql.Append(" AND CONVERT(date, sa.requestdate) >= CONVERT(date, '")
                     .Append(Message.GetIndianDate(txtFromDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
             }
 
             if (!string.IsNullOrWhiteSpace(txtToDate.Text))
             {
-                sql.Append(" AND CONVERT(date, sd.entrydate) <= CONVERT(date, '")
+                sql.Append(" AND CONVERT(date, sa.requestdate) <= CONVERT(date, '")
                     .Append(Message.GetIndianDate(txtToDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
             }
 
-            sql.Append(" ORDER BY sd.id DESC");
+            sql.Append(" ORDER BY sa.id DESC");
 
             ObjData.StartConnection();
             try
@@ -424,7 +423,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
         {
             sb.Append("<span class=\"saving-order-product-count\"><i class=\"fa fa-cubes\"></i> ")
                 .Append(group.Count())
-                .Append(" products</span>");
+                .Append(" installments</span>");
         }
 
         sb.Append("</div>");
@@ -435,7 +434,7 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
     {
         if (rows == null || rows.Length == 0)
         {
-            return "<p class=\"text-muted\">No products found for this order.</p>";
+            return "<p class=\"text-muted\">No installments found for this order.</p>";
         }
 
         StringBuilder sb = new StringBuilder("<ul class=\"saving-order-modal-products\">");
@@ -502,21 +501,21 @@ WHERE ").Append(GetApprovedStatusFilter("sd"));
         DataTable dt = new DataTable();
         try
         {
-            bool hasDeliveryStatus = SavingProductHelper.HasDeliveryStatusColumn();
+            bool hasDeliveryStatus = SavingProductHelper.HasInstallmentDeliveryStatusColumn();
             string deliveryStatusSelect = hasDeliveryStatus
-                ? "ISNULL(NULLIF(LTRIM(RTRIM(sd.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
+                ? "ISNULL(NULLIF(LTRIM(RTRIM(sa.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
                 : "'Confirmed' AS DeliveryStatus";
 
             string sql = @"
 SELECT
-    sd.id,
-    sd.orderid,
-    sd.userid,
+    sa.id,
+    sa.orderid,
+    sa.userid,
     ud.username,
     ud.mobile,
     pm.productname,
-    sd.amount,
-    sd.approvedate,
+    sa.amount,
+    sa.approvedate,
     sd.couponcode,
     " + deliveryStatusSelect + @",
     CASE
@@ -539,16 +538,18 @@ SELECT
         WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingPincode
         ELSE ud.Pincode
     END AS ShipPincode
-FROM SavingAccountDetail sd WITH (NOLOCK)
-LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sd.UserId
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
 LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
-WHERE sd.orderid = '" + SqlEscape(orderId) + @"'
-  AND " + GetApprovedStatusFilter("sd") + @"
-ORDER BY sd.id";
+WHERE sa.orderid = '" + SqlEscape(orderId) + @"'
+  AND " + GetApprovedStatusFilter("sa") + @"
+  AND sa.InstNo > 1
+ORDER BY sa.id";
 
             ObjData.StartConnection();
             try
@@ -620,7 +621,7 @@ ORDER BY sd.id";
             "User ID: " + Server.HtmlEncode(userId) +
             (string.IsNullOrWhiteSpace(mobile) ? string.Empty : " | Mobile: " + Server.HtmlEncode(mobile)) +
             "</div>" +
-            "<div class=\"saving-address-print-footer\">Products:" + productsBlock + "</div>";
+            "<div class=\"saving-address-print-footer\">Installments:" + productsBlock + "</div>";
     }
 
     void BindStatusModal(string orderId)
@@ -665,7 +666,7 @@ ORDER BY sd.id";
 
         if (UpdateDeliveryStatusByOrderId(orderId, newStatus, Session["useradmin"].ToString()))
         {
-            Message.Show("Delivery status updated for all products in this order.");
+            Message.Show("Delivery status updated for all installments in this order.");
             LoadOrders();
         }
         else
@@ -677,9 +678,9 @@ ORDER BY sd.id";
 
     bool UpdateDeliveryStatusByOrderId(string orderId, string deliveryStatus, string updatedBy)
     {
-        if (!SavingProductHelper.HasDeliveryStatusColumn())
+        if (!SavingProductHelper.HasInstallmentDeliveryStatusColumn())
         {
-            SavingProductHelper.EnsureDeliveryColumns();
+            SavingProductHelper.EnsureInstallmentDeliveryColumns();
         }
 
         try
@@ -687,9 +688,10 @@ ORDER BY sd.id";
             ObjData.StartConnection();
             try
             {
-                string sql = "UPDATE SavingAccountDetail SET DeliveryStatus='" + SqlEscape(deliveryStatus)
+                string sql = "UPDATE SavingAccountInstallmentDetail SET DeliveryStatus='" + SqlEscape(deliveryStatus)
                     + "', DeliveryStatusUpdatedOn=GETDATE(), DeliveryStatusUpdatedBy='" + SqlEscape(updatedBy)
-                    + "' WHERE orderid='" + SqlEscape(orderId) + "' AND " + GetApprovedStatusFilter("SavingAccountDetail");
+                    + "' WHERE orderid='" + SqlEscape(orderId) + "' AND " + GetApprovedStatusFilter("SavingAccountInstallmentDetail")
+                    + " AND InstNo > 1";
                 ObjData.RunInsUpDelQuery(sql);
                 return true;
             }

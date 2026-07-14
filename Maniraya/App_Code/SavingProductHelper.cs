@@ -111,6 +111,44 @@ public static class SavingProductHelper
         return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
     }
 
+    public static void EnsureInstallmentDeliveryColumns()
+    {
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatus') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD DeliveryStatus NVARCHAR(50) NULL;
+            END");
+
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatusUpdatedOn') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD DeliveryStatusUpdatedOn DATETIME NULL;
+            END");
+
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatusUpdatedBy') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD DeliveryStatusUpdatedBy NVARCHAR(100) NULL;
+            END");
+
+        RunNonQuery(@"
+            UPDATE SavingAccountInstallmentDetail
+            SET DeliveryStatus = 'Confirmed'
+            WHERE (status = 'Approved' OR LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('approved', 'approve'))
+              AND (DeliveryStatus IS NULL OR LTRIM(RTRIM(DeliveryStatus)) = '')");
+    }
+
+    public static bool HasInstallmentDeliveryStatusColumn()
+    {
+        DataTable dt = RunSelect("SELECT COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatus') AS ColLen");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ColLen"] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
+    }
+
     public static DataTable GetAllProducts()
     {
         EnsureStatusColumn();

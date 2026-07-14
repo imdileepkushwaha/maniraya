@@ -143,6 +143,7 @@ ORDER BY u.username";
         }
 
         FormatExcelTextCell(e.Row, "lblAccountNo", "AccountNo");
+        FormatExcelTextCell(e.Row, "lblIFSCCode", "ifsccode");
         FormatExcelTextCell(e.Row, "lblMobile", "Mobile");
         FormatExcelTextCell(e.Row, "lblUserIdDisplay", "userid");
     }

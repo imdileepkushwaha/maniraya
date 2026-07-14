@@ -318,7 +318,11 @@
                                                 <ItemTemplate>
                                                     <span class="saving-payout-bank-meta"><strong><%# Eval("bankname") %></strong></span>
                                                     <span class="saving-payout-bank-meta"><%# Eval("branchname") %></span>
-                                                    <span class="saving-payout-bank-meta">IFSC: <%# Eval("ifsccode") %></span>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IFSC Code" ItemStyle-CssClass="col-ifsc-excel-text">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lblIFSCCode" runat="server" CssClass="saving-payout-bank-meta" Text='<%# Eval("ifsccode") %>' />
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Account" ItemStyle-CssClass="col-account-excel-text">

@@ -1,4 +1,4 @@
-<%@ Page Title="Saving Purchase Orders" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductOrderDetails.aspx.cs" Inherits="admin_SavingProductOrderDetails" %>
+<%@ Page Title="Saving Installment Orders" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingInstallmentOrderDetails.aspx.cs" Inherits="admin_SavingInstallmentOrderDetails" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link rel="stylesheet" href="assets/css/admin-layout.css?v=68" />
@@ -189,11 +189,11 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-        <h1>Saving Purchase Orders</h1>
+        <h1>Saving Installment Orders</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Purchase Management</a></li>
-            <li class="active">Saving Purchase Orders</li>
+            <li class="active">Saving Installment Orders</li>
         </ol>
     </section>
 </asp:Content>
@@ -222,7 +222,7 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Orders</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Approved saving product orders with shipping address and delivery status tracking.</p>
+                                <p class="admin-report-intro">Approved saving installment orders with shipping address and delivery status tracking.</p>
                                 <div class="row">
                                     <div class="col-md-4 col-sm-12">
                                         <div class="form-group">
@@ -272,7 +272,7 @@
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-truck"></i> Confirmed Saving Orders</h3>
+                                <h3 class="box-title"><i class="fa fa-truck"></i> Confirmed Installment Orders</h3>
                                 <div class="box-tools admin-record-filter-tools">
                                     <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
                                     <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
@@ -293,7 +293,7 @@
                                 <div class="admin-table-paged-shell">
                                     <div class="admin-table-wrap table-responsive">
                                         <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
-                                            AutoGenerateColumns="False" EmptyDataText="No confirmed saving orders found."
+                                            AutoGenerateColumns="False" EmptyDataText="No confirmed installment orders found."
                                             AllowPaging="true"
                                             OnRowDataBound="GridView1_RowDataBound" OnRowCommand="GridView1_RowCommand" DataKeyNames="orderid">
                                             <PagerSettings Visible="false" />
@@ -346,7 +346,7 @@
                                             <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
                                                     <asp:LinkButton ID="btnUpdateStatus" runat="server" CssClass="saving-order-icon-btn is-status"
-                                                        CommandName="updatestatus" CommandArgument='<%# Eval("orderid") %>' ToolTip="Update delivery status for all products in this order">
+                                                        CommandName="updatestatus" CommandArgument='<%# Eval("orderid") %>' ToolTip="Update delivery status for all installments in this order">
                                                         <i class="fa fa-pencil"></i> Status
                                                     </asp:LinkButton>
                                                 </ItemTemplate>
@@ -388,7 +388,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status (All Products)</h4>
+                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status (All Installments)</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
@@ -400,7 +400,7 @@
                                     <asp:TextBox ID="txtModalUserName" runat="server" CssClass="form-control" ReadOnly="true" />
                                 </div>
                                 <div class="form-group">
-                                    <label>Products In Order</label>
+                                    <label>Installments In Order</label>
                                     <asp:Literal ID="litModalProducts" runat="server" Mode="PassThrough" />
                                 </div>
                                 <div class="form-group">
