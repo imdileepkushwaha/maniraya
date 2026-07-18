@@ -33,7 +33,7 @@
                                     <div class="row">
                                         <div class="col-md-3 col-sm-6">
                                             <div class="form-group">
-                                                <label for="<%= txtFromDate.ClientID %>">From Installment Date</label>
+                                                <label for="<%= txtFromDate.ClientID %>">From Date</label>
                                                 <div class="admin-input-group">
                                                     <span class="admin-input-icon"><i class="fa fa-calendar-o"></i></span>
                                                     <asp:TextBox ID="txtFromDate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" />
@@ -42,14 +42,14 @@
                                         </div>
                                         <div class="col-md-3 col-sm-6">
                                             <div class="form-group">
-                                                <label for="<%= txtToDate.ClientID %>">To Installment Date</label>
+                                                <label for="<%= txtToDate.ClientID %>">To Date</label>
                                                 <div class="admin-input-group">
                                                     <span class="admin-input-icon"><i class="fa fa-calendar-check-o"></i></span>
                                                     <asp:TextBox ID="txtToDate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" />
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-sm-6">
+                                        <div class="col-md-2 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= txtUserId.ClientID %>">User Id</label>
                                                 <div class="admin-input-group">
@@ -58,7 +58,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-sm-6">
+                                        <div class="col-md-2 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtInstNo.ClientID %>">Installment No</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
+                                                    <asp:TextBox ID="txtInstNo" CssClass="form-control" runat="server" placeholder="e.g. 2" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= ddStatus.ClientID %>">Status</label>
                                                 <asp:DropDownList ID="ddStatus" CssClass="form-control" runat="server">
@@ -85,6 +94,16 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title"><i class="fa fa-table"></i> Installment List</h3>
                                 <div class="box-tools admin-record-filter-tools">
+                                    <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
+                                        AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                                        <asp:ListItem>10</asp:ListItem>
+                                        <asp:ListItem Selected="True">25</asp:ListItem>
+                                        <asp:ListItem>50</asp:ListItem>
+                                        <asp:ListItem>100</asp:ListItem>
+                                        <asp:ListItem>All</asp:ListItem>
+                                    </asp:DropDownList>
+                                    <span class="admin-record-filter-suffix">per page</span>
                                     <asp:ImageButton ID="btnExcel" runat="server" CssClass="admin-export-excel-btn"
                                         ImageUrl="../user/img/excel123.png" Height="25px" Width="25px"
                                         OnClick="btnExcel_Click" ToolTip="Export to Excel" />
@@ -94,12 +113,15 @@
                                 <div class="admin-table-toolbar">
                                     <span class="admin-table-caption"><i class="fa fa-list"></i> Pending installment records</span>
                                 </div>
+                                <div class="admin-table-paged-shell">
                                 <div class="admin-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
-                                        AutoGenerateColumns="False" EmptyDataText="No installment records found for selected filters.">
+                                        AutoGenerateColumns="False" EmptyDataText="No installment records found for selected filters."
+                                        AllowPaging="true">
+                                        <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
-                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                                <ItemTemplate><%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="User Id">
                                                 <ItemTemplate><%# Eval("userid") %></ItemTemplate>
@@ -129,6 +151,8 @@
                                             </asp:TemplateField>
                                         </Columns>
                                     </asp:GridView>
+                                </div>
+                                <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar"></asp:Panel>
                                 </div>
                             </div>
                         </div>
