@@ -63,7 +63,7 @@
 		<link rel="stylesheet" href="assets/switcher/demo.css">
 
 		<!-- Maniraya layout enhancements (must load after all theme CSS) -->
-		<link href="assets/css/sidebar-enhanced.css?v=14" rel="stylesheet">
+		<link href="assets/css/sidebar-enhanced.css?v=15" rel="stylesheet">
 		<link href="assets/css/content-header-modern.css?v=2" rel="stylesheet">
 		<link href="assets/css/box-modern.css?v=7" rel="stylesheet">
 
@@ -108,7 +108,7 @@
 
                     <li><h3 class="h3color">My Profile</h3></li>
                     <li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-user menu-icon"></i><span class="side-menu__label">My Profile</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-user menu-icon"></i><span class="side-menu__label">My Profile</span><span class="badge badge-warning side-badge">5</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="UserProfile.aspx">View Profile</a></li>
 							<li><a class="slide-item" href="UserEdit.aspx">Edit Profile</a></li>
@@ -141,6 +141,7 @@
 							<li><a class="slide-item" href="DownlineReport.aspx">My Downline</a></li>
 							<li><a class="slide-item" href="binaryreport.aspx">My Treeview</a></li>
                             <li><a class="slide-item" href="leveltree.aspx">Level Tree</a></li>
+                            <li><a class="slide-item" href="TopDirectRanking.aspx">Top Direct Ranking</a></li>
                             	<%--<li><a class="slide-item" href="PoolBinaryReport.aspx">Pool Wise Binary</a></li>
                             	<li><a class="slide-item" href="PoolDownlineReport.aspx">Pool Wise Downline</a></li>
 							<li><a class="slide-item" href="PoolBinaryReport.aspx">Pool Wise Treeview</a></li>--%>
@@ -148,7 +149,7 @@
 					</li>
                     <li style="display:none"><h3>E-Pin Management</h3></li>
 					<li class="slide"  style="display:none">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">E-Pin Management</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">E-Pin Management</span><span class="badge badge-warning side-badge">4</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 						<%--	<li><a class="slide-item" href="EPinAdd.aspx">Generate E-Pin</a></li>--%>
 							<li><a class="slide-item" href="PinRequestAdd.aspx">E-Pin Request</a></li>
@@ -165,7 +166,7 @@
 
                     <li><h3>Purchase</h3></li>
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Purchase Product</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Purchase Product</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<%--<li><a class="slide-item" href="FranchiseeSearchNew.aspx">Purchase Product</a></li>--%>
 							<li><a class="slide-item" href="#">Purchase Report</a></li>
@@ -175,7 +176,7 @@
 					</li>
 
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">5</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="SavingProductPurchasebulk.aspx">Purchase Saving Product</a></li>
                           <li><a class="slide-item" href="SAvingProductPurchaseReport.aspx">Saving Installment Purchase</a></li>
@@ -188,7 +189,7 @@
 					
 					<%-- <li><h3>Repurchase</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">My Repurchase</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">My Repurchase</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="PurchaseItem.aspx">Purchase Product</a></li>
 							<li><a class="slide-item" href="PurchaseReport.aspx">Purchase Report</a></li>
@@ -200,7 +201,7 @@
 					
 					 <li  ><h3>Withdrawal</h3></li>
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet menu-icon"></i><span class="side-menu__label">Withdrawal</span><span class="badge badge-pink side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet menu-icon"></i><span class="side-menu__label">Withdrawal</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="WithdrawlRequstAdd.aspx">Withdrawal Fund</a></li>
 							<li><a class="slide-item" href="WithdrawlRequestReport.aspx">Withdrawal Report</a></li>
@@ -210,7 +211,7 @@
 
                     	 <li  style="display:none"><h3>Deposit Request</h3></li>
 					<li class="slide"  style="display:none">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet menu-icon"></i><span class="side-menu__label">Deposit</span><span class="badge badge-pink side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet menu-icon"></i><span class="side-menu__label">Deposit</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="DepositRequstAdd.aspx">Deposit Request</a></li>
 							<li><a class="slide-item" href="DepositRequestReport.aspx">Deposit Report</a></li>
@@ -218,7 +219,7 @@
 					</li>
                     <li><h3>My Income</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">My Income</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">My Income</span><span class="badge badge-warning side-badge">1</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 						<%--	<li><a class="slide-item" href="">Matching Income</a></li>
                             <li><a class="slide-item" href="#">Bonus Income</a></li>
@@ -233,7 +234,7 @@
 					</li>
                      <li style="display:none"><h3>Topup Request</h3></li>
 					<li class="slide" style="display:none">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">Topup Request</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">Topup Request</span><span class="badge badge-warning side-badge">1</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="TopupRequestAdd.aspx">Topup Request Add</a></li>
 						<%-- <li><a class="slide-item" href="DirectIncomeReport.aspx">Direct Income</a></li>
@@ -245,7 +246,7 @@
 					</li>
 					<%--<li><h3>Deposit</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-import"></i><span class="side-menu__label">Deposit</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-import"></i><span class="side-menu__label">Deposit</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="DepositRequstAdd.aspx">Deposit Request</a></li>
 							<li><a class="slide-item" href="DepositRequestReport.aspx">Deposit Request Report</a></li>
@@ -253,7 +254,7 @@
 					</li>--%>
                     <li><h3>Reports</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Reports</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Reports</span><span class="badge badge-warning side-badge">1</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<%--<<li><a class="slide-item" href="account_Ledger.aspx">Account Ledger</a></li>--%>
 							<li><a class="slide-item" href="TransactionReport.aspx">Transaction Report</a></li>
@@ -261,7 +262,7 @@
 					</li>
 					 <li><h3>Generate Ticket</h3></li>
 	<li class="slide">
-					<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Generate Ticket</span><i class="angle fe fe-chevron-down"></i></a>
+					<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Generate Ticket</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
 					<ul class="slide-menu">
 						<%--<<li><a class="slide-item" href="account_Ledger.aspx">Account Ledger</a></li>--%>
 						<li><a class="slide-item" href="NewMessage.aspx">Generate Ticket</a></li>

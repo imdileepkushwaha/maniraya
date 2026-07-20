@@ -5775,6 +5775,14 @@ body.admin-app .modal.in.admin-modal-scrollable {
     cursor: default;
 }
 
+.admin-report-page .admin-pager-btn.is-ellipsis {
+    opacity: 1;
+    cursor: default;
+    color: #64748b;
+    background: #fff;
+    border-color: #e2e8f0;
+}
+
 .admin-report-page .admin-table-wrap .table > thead > tr > th {
     position: sticky;
     top: 0;

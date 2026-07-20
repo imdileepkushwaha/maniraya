@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=44" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=45" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -3006,6 +3006,50 @@ Profit Share Budget</p>
                         </div>
                     </div>
                 </div>
+
+                <asp:Panel ID="pnlTopDirectRanking" runat="server" Visible="true" CssClass="dash-prize-section dash-ranking-section">
+                    <div class="dash-prize-head">
+                        <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
+                        <div class="dash-prize-head-text">
+                            <h3>Top Direct Ranking</h3>
+                            <p>Overall leaderboard by total active direct referrals.</p>
+                        </div>
+                        <a href="TopDirectRanking.aspx" class="dash-btn dash-btn-outline dash-ranking-view-all">View All</a>
+                    </div>
+                    <asp:Panel ID="pnlTopDirectMyRank" runat="server" Visible="false" CssClass="dash-ranking-my-rank">
+                        <i class="fa fa-user"></i>
+                        <asp:Literal ID="litTopDirectMyRank" runat="server" />
+                    </asp:Panel>
+                    <asp:Panel ID="pnlTopDirectGrid" runat="server" Visible="false" CssClass="dash-ranking-table-wrap">
+                        <asp:GridView ID="grdTopDirectRanking" runat="server"
+                            CssClass="dash-ranking-table" Width="100%"
+                            AutoGenerateColumns="False" GridLines="None"
+                            OnRowDataBound="grdTopDirectRanking_RowDataBound">
+                            <Columns>
+                                <asp:TemplateField HeaderText="Rank">
+                                    <ItemTemplate>
+                                        <asp:Label ID="lblRank" runat="server" CssClass="dash-rank-badge" Text='<%# Eval("RankNo") %>'></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="User ID">
+                                    <ItemTemplate><strong><%# Eval("userid") %></strong></ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="User Name">
+                                    <ItemTemplate><%# Eval("username") %></ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Total Directs">
+                                    <ItemTemplate>
+                                        <span class="dash-direct-count"><%# Eval("DirectCount") %></span>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                            </Columns>
+                        </asp:GridView>
+                    </asp:Panel>
+                    <asp:Panel ID="pnlTopDirectEmpty" runat="server" Visible="false" CssClass="dash-prize-empty">
+                        <i class="fa fa-users"></i>
+                        <p>No ranking data available yet. Active direct referrals will appear here.</p>
+                    </asp:Panel>
+                </asp:Panel>
 
                 <asp:Panel ID="pnlPrizes" runat="server" Visible="true" CssClass="dash-prize-section dash-prize-section--winners">
                     <div class="dash-prize-head">

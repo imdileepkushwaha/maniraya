@@ -205,7 +205,8 @@ body.main-body.app .side-menu .slide {
 }
 
 body.main-body.app .side-menu .slide .side-menu__item {
-    padding: 10px 12px !important;
+    position: relative !important;
+    padding: 10px 52px 10px 12px !important;
     margin: 2px 0 !important;
     border-radius: 10px !important;
     border: 1px solid transparent;
@@ -283,12 +284,17 @@ body.main-body.app .slide.active .side-menu__icon {
     color: var(--sidebar-gold-soft) !important;
 }
 
-/* Chevron */
+/* Chevron — far right; badge sits to its left */
 body.main-body.app .angle {
+    position: absolute !important;
+    top: 50% !important;
+    right: 12px !important;
+    margin-top: -7px !important;
     color: var(--sidebar-text-muted) !important;
     font-size: 14px !important;
     transition: transform 0.3s ease, color 0.2s ease !important;
     opacity: 0.7;
+    z-index: 2;
 }
 
 body.main-body.app .slide.is-expanded .angle {
@@ -297,17 +303,22 @@ body.main-body.app .slide.is-expanded .angle {
     opacity: 1;
 }
 
-/* Badges */
+/* Badges — left of chevron so both stay visible */
 body.main-body.app .side-badge {
+    position: absolute !important;
+    top: 50% !important;
+    right: 34px !important;
+    margin-top: -9px !important;
     font-size: 10px !important;
     font-weight: 600 !important;
     padding: 3px 7px !important;
     border-radius: 20px !important;
-    right: 12px !important;
+    line-height: 1.2 !important;
     background: linear-gradient(135deg, var(--sidebar-gold), var(--sidebar-gold-deep)) !important;
     color: #0f1729 !important;
     box-shadow: 0 2px 8px rgba(229, 169, 6, 0.35);
     letter-spacing: 0.02em;
+    z-index: 1;
 }
 
 body.main-body.app .side-badge.badge-warning,

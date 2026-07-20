@@ -1,7 +1,7 @@
 <%@ Page Title="Coupon Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="CouponReport.aspx.cs" Inherits="admin_CouponReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=74" />
     <style>
         .coupon-report-box-header {
             display: flex;
@@ -201,6 +201,76 @@
             color: #94a3b8;
         }
 
+        .admin-report-page .admin-table-pager-bar {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 14px 16px;
+            border-top: 1px solid #e8edf3;
+            background: #f8fafc;
+        }
+
+        .admin-report-page .admin-pager-info {
+            width: 100%;
+            margin-bottom: 6px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .admin-report-page .admin-pager-btn,
+        .admin-report-page a.admin-pager-btn {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 36px;
+            padding: 0 12px;
+            margin: 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1;
+            color: #475569 !important;
+            text-decoration: none !important;
+            background: #fff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+        }
+
+        .admin-report-page a.admin-pager-btn:hover,
+        .admin-report-page a.admin-pager-btn:focus {
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+            background: #f8fafc !important;
+        }
+
+        .admin-report-page .admin-pager-btn.is-active {
+            color: #fff !important;
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.28);
+        }
+
+        .admin-report-page .admin-pager-btn.is-disabled {
+            color: #cbd5e1 !important;
+            background: #fff !important;
+            border-color: #e2e8f0 !important;
+            opacity: 1 !important;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .admin-report-page .admin-pager-btn.is-ellipsis {
+            color: #64748b !important;
+            cursor: default;
+            pointer-events: none;
+        }
+
         @media (max-width: 767px) {
             .coupon-print-grid {
                 grid-template-columns: 1fr;
@@ -238,11 +308,19 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Coupons</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Filter approved coupons by code, user, mobile, or approve date range.</p>
+                                <p class="admin-report-intro">Filter approved coupons by code, user, mobile, approve month, or date range.</p>
                                 <div class="admin-form-section">
                                     <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Approve Date Range</h5>
                                     <div class="row">
-                                        <div class="col-md-6 col-sm-12">
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= ddlApproveMonth.ClientID %>">Approve Month</label>
+                                                <asp:DropDownList ID="ddlApproveMonth" runat="server" CssClass="form-control"
+                                                    AutoPostBack="true" OnSelectedIndexChanged="ddlApproveMonth_SelectedIndexChanged">
+                                                </asp:DropDownList>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txtFromDate.ClientID %>">From Date</label>
                                                 <div class="admin-input-group">
@@ -251,7 +329,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-sm-12">
+                                        <div class="col-md-4 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txtToDate.ClientID %>">To Date</label>
                                                 <div class="admin-input-group">
@@ -344,7 +422,7 @@
                                         <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
-                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                                <ItemTemplate><%# GetSerialNumber(Container.DataItemIndex) %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Coupon Code">
                                                 <ItemTemplate><span class="coupon-code"><%# Eval("couponcode") %></span></ItemTemplate>
@@ -394,6 +472,7 @@
                                                         <div class="coupon-ticket-row"><span>User Name</span><strong><%# Eval("username") %></strong></div>
                                                         <div class="coupon-ticket-row"><span>User ID</span><strong><%# Eval("userid") %></strong></div>
                                                         <div class="coupon-ticket-row"><span>Mobile No</span><strong><%# Eval("mobile") %></strong></div>
+                                                        <div class="coupon-ticket-row"><span>Approve Date</span><strong><%# Eval("approvedate") %></strong></div>
                                                     </div>
                                                     <div class="coupon-ticket-foot">Cut here · Lucky Draw Coupon</div>
                                                 </div>

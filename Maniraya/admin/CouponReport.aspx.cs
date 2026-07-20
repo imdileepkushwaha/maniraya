@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -26,6 +27,7 @@ public partial class admin_CouponReport : System.Web.UI.Page
 
         if (!IsPostBack)
         {
+            PopulateApproveMonthFilter();
             LoadCouponReport();
         }
         else if (CouponData != null)
@@ -48,8 +50,85 @@ public partial class admin_CouponReport : System.Web.UI.Page
         txtMobile.Text = string.Empty;
         txtFromDate.Text = string.Empty;
         txtToDate.Text = string.Empty;
+        if (ddlApproveMonth.Items.Count > 0)
+        {
+            ddlApproveMonth.SelectedIndex = 0;
+        }
         GridView1.PageIndex = 0;
         LoadCouponReport();
+    }
+
+    protected void ddlApproveMonth_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GridView1.PageIndex = 0;
+        LoadCouponReport();
+    }
+
+    void PopulateApproveMonthFilter()
+    {
+        ddlApproveMonth.Items.Clear();
+        ddlApproveMonth.Items.Add(new ListItem("All Months", ""));
+
+        DataTable dt = GetAvailableApproveMonths();
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            DateTime currentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            ddlApproveMonth.Items.Add(new ListItem(
+                currentMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture),
+                currentMonth.ToString("yyyy-MM", CultureInfo.InvariantCulture)));
+            return;
+        }
+
+        foreach (DataRow row in dt.Rows)
+        {
+            int year;
+            int month;
+            if (!int.TryParse(Convert.ToString(row["Y"]), out year) || !int.TryParse(Convert.ToString(row["M"]), out month))
+            {
+                continue;
+            }
+
+            DateTime monthDate = new DateTime(year, month, 1);
+            ddlApproveMonth.Items.Add(new ListItem(
+                monthDate.ToString("MMMM yyyy", CultureInfo.InvariantCulture),
+                monthDate.ToString("yyyy-MM", CultureInfo.InvariantCulture)));
+        }
+    }
+
+    DataTable GetAvailableApproveMonths()
+    {
+        string approvedFilter = GetApprovedStatusFilter("sd");
+        // Only coupon approve months — do not use UserDetail join dates
+        // (old RegDate/MentionDate e.g. 2018 were polluting the dropdown).
+        string sql = @"
+SELECT DISTINCT
+    YEAR(CONVERT(date, sd.approvedate)) AS Y,
+    MONTH(CONVERT(date, sd.approvedate)) AS M
+FROM SavingAccountDetail sd WITH (NOLOCK)
+WHERE sd.approvedate IS NOT NULL
+  AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''
+  AND " + approvedFilter + @"
+ORDER BY Y DESC, M DESC";
+
+        DataTable dt = new DataTable();
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(sql);
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            dt = new DataTable();
+        }
+
+        return dt ?? new DataTable();
     }
 
     protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
@@ -150,6 +229,16 @@ public partial class admin_CouponReport : System.Web.UI.Page
         return 10;
     }
 
+    protected int GetSerialNumber(int dataItemIndex)
+    {
+        if (!GridView1.AllowPaging)
+        {
+            return dataItemIndex + 1;
+        }
+
+        return (GridView1.PageIndex * GridView1.PageSize) + dataItemIndex + 1;
+    }
+
     void BuildExternalPager()
     {
         pnlPager.Controls.Clear();
@@ -178,34 +267,69 @@ public partial class admin_CouponReport : System.Web.UI.Page
         pnlPager.Controls.Add(new LiteralControl(
             "<span class=\"admin-pager-info\">Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + "</span>"));
 
-        AddPagerLink("First", 0, currentPage > 0, false);
+        // First | Prev | 1 2 3 4 5 | ... | Next | Last
+        AddPagerLink("First", "nav_first", 0, currentPage > 0, false);
+        AddPagerLink("Prev", "nav_prev", currentPage - 1, currentPage > 0, false);
 
-        for (int i = 0; i < totalPages; i++)
+        const int windowSize = 5;
+        int startPage = Math.Max(0, currentPage - (windowSize / 2));
+        int endPage = Math.Min(totalPages - 1, startPage + windowSize - 1);
+        startPage = Math.Max(0, endPage - windowSize + 1);
+
+        if (startPage > 0)
         {
-            AddPagerLink((i + 1).ToString(), i, true, i == currentPage);
+            AddPagerEllipsis("ell_start");
         }
 
-        AddPagerLink("Last", totalPages - 1, currentPage < totalPages - 1, false);
+        for (int i = startPage; i <= endPage; i++)
+        {
+            AddPagerLink((i + 1).ToString(), "nav_page_" + i, i, true, i == currentPage);
+        }
+
+        if (endPage < totalPages - 1)
+        {
+            AddPagerEllipsis("ell_end");
+        }
+
+        AddPagerLink("Next", "nav_next", currentPage + 1, currentPage < totalPages - 1, false);
+        AddPagerLink("Last", "nav_last", totalPages - 1, currentPage < totalPages - 1, false);
     }
 
-    void AddPagerLink(string text, int pageIndex, bool enabled, bool isActive)
+    void AddPagerEllipsis(string controlId)
+    {
+        Literal ellipsis = new Literal();
+        ellipsis.ID = controlId;
+        ellipsis.Text = "<span class=\"admin-pager-btn is-ellipsis\">...</span>";
+        pnlPager.Controls.Add(ellipsis);
+    }
+
+    void AddPagerLink(string text, string controlId, int pageIndex, bool enabled, bool isActive)
     {
         if (isActive)
         {
-            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-active\">" + text + "</span>"));
+            Literal active = new Literal();
+            active.ID = controlId + "_active";
+            active.Text = "<span class=\"admin-pager-btn is-active\">" + text + "</span>";
+            pnlPager.Controls.Add(active);
             return;
         }
 
         if (!enabled)
         {
-            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-disabled\">" + text + "</span>"));
+            Literal disabled = new Literal();
+            disabled.ID = controlId + "_disabled";
+            disabled.Text = "<span class=\"admin-pager-btn is-disabled\">" + text + "</span>";
+            pnlPager.Controls.Add(disabled);
             return;
         }
 
         LinkButton link = new LinkButton();
+        link.ID = controlId;
         link.Text = text;
         link.CssClass = "admin-pager-btn";
+        link.CommandName = "Page";
         link.CommandArgument = pageIndex.ToString();
+        link.CausesValidation = false;
         link.Click += ExternalPager_Click;
         pnlPager.Controls.Add(link);
     }
@@ -246,6 +370,8 @@ public partial class admin_CouponReport : System.Web.UI.Page
         {
             sql.Append(" AND ud.mobile LIKE '%").Append(SqlEscape(txtMobile.Text.Trim())).Append("%'");
         }
+
+        AppendApproveMonthFilter(sql);
 
         if (!string.IsNullOrWhiteSpace(txtFromDate.Text) && !string.IsNullOrWhiteSpace(txtToDate.Text))
         {
@@ -302,6 +428,28 @@ public partial class admin_CouponReport : System.Web.UI.Page
         }
 
         return dt ?? new DataTable();
+    }
+
+    void AppendApproveMonthFilter(StringBuilder sql)
+    {
+        string monthValue = (ddlApproveMonth.SelectedValue ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(monthValue))
+        {
+            return;
+        }
+
+        DateTime monthStart;
+        if (!DateTime.TryParseExact(monthValue + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out monthStart))
+        {
+            return;
+        }
+
+        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
+        sql.Append(" AND CONVERT(date, sd.approvedate) >= CONVERT(date,'")
+            .Append(monthStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+            .Append("') AND CONVERT(date, sd.approvedate) <= CONVERT(date,'")
+            .Append(monthEnd.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+            .Append("')");
     }
 
     static string GetApprovedStatusFilter(string tableAlias)

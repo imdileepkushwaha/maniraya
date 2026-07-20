@@ -70,6 +70,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 GetAllIncome();
                 LoadIncentiveCard();
                 LoadPrizes();
+                LoadTopDirectRanking();
 
 
             }
@@ -114,6 +115,176 @@ public partial class user_Dashboard : System.Web.UI.Page
             pnlPrizeGrid.Visible = false;
             pnlPrizeEmpty.Visible = true;
         }
+    }
+
+    void LoadTopDirectRanking()
+    {
+        try
+        {
+            pnlTopDirectRanking.Visible = true;
+            DataTable dt = GetTopDirectRanking(10);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                grdTopDirectRanking.DataSource = dt;
+                grdTopDirectRanking.DataBind();
+                pnlTopDirectGrid.Visible = true;
+                pnlTopDirectEmpty.Visible = false;
+            }
+            else
+            {
+                pnlTopDirectGrid.Visible = false;
+                pnlTopDirectEmpty.Visible = true;
+            }
+
+            BindTopDirectMyRank();
+        }
+        catch
+        {
+            pnlTopDirectRanking.Visible = true;
+            pnlTopDirectGrid.Visible = false;
+            pnlTopDirectEmpty.Visible = true;
+            pnlTopDirectMyRank.Visible = false;
+        }
+    }
+
+    DataTable GetTopDirectRanking(int topCount)
+    {
+        string sql = @"
+;WITH Ranked AS (
+    SELECT
+        LTRIM(RTRIM(s.UserId)) AS userid,
+        ISNULL(s.UserName, '') AS username,
+        COUNT(d.UserId) AS DirectCount
+    FROM UserDetail d WITH (NOLOCK)
+    INNER JOIN UserDetail s WITH (NOLOCK)
+        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
+      AND ISNULL(d.ActiveStatus, 0) = 1
+      AND ISNULL(s.ActiveStatus, 0) = 1
+    GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
+)
+SELECT TOP (" + topCount + @")
+    ROW_NUMBER() OVER (ORDER BY DirectCount DESC, userid ASC) AS RankNo,
+    userid,
+    username,
+    DirectCount
+FROM Ranked
+ORDER BY DirectCount DESC, userid ASC";
+
+        DataTable dt = new DataTable();
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(sql);
+        }
+        catch
+        {
+            dt = new DataTable();
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        return dt ?? new DataTable();
+    }
+
+    void BindTopDirectMyRank()
+    {
+        pnlTopDirectMyRank.Visible = false;
+        string currentUserId = Convert.ToString(Session["userid"]).Trim();
+        if (string.IsNullOrWhiteSpace(currentUserId))
+        {
+            return;
+        }
+
+        string sql = @"
+;WITH Ranked AS (
+    SELECT
+        LTRIM(RTRIM(s.UserId)) AS userid,
+        COUNT(d.UserId) AS DirectCount,
+        ROW_NUMBER() OVER (ORDER BY COUNT(d.UserId) DESC, LTRIM(RTRIM(s.UserId)) ASC) AS RankNo
+    FROM UserDetail d WITH (NOLOCK)
+    INNER JOIN UserDetail s WITH (NOLOCK)
+        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
+      AND ISNULL(d.ActiveStatus, 0) = 1
+      AND ISNULL(s.ActiveStatus, 0) = 1
+    GROUP BY LTRIM(RTRIM(s.UserId))
+)
+SELECT RankNo, DirectCount
+FROM Ranked
+WHERE userid = '" + SqlEscape(currentUserId) + "'";
+
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                DataTable dt = ObjData.RunDataTable(sql);
+                pnlTopDirectMyRank.Visible = true;
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    litTopDirectMyRank.Text = string.Format(
+                        "Your overall rank: <strong>#{0}</strong> with <strong>{1}</strong> active direct(s).",
+                        Convert.ToString(dt.Rows[0]["RankNo"]),
+                        Convert.ToString(dt.Rows[0]["DirectCount"]));
+                }
+                else
+                {
+                    litTopDirectMyRank.Text = "You are not in the ranking yet (0 active directs).";
+                }
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            pnlTopDirectMyRank.Visible = false;
+        }
+    }
+
+    protected void grdTopDirectRanking_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType != DataControlRowType.DataRow)
+        {
+            return;
+        }
+
+        Label lblRank = (Label)e.Row.FindControl("lblRank");
+        if (lblRank != null)
+        {
+            int rankNo;
+            if (int.TryParse(lblRank.Text, out rankNo))
+            {
+                if (rankNo == 1)
+                {
+                    lblRank.CssClass = "dash-rank-badge is-gold";
+                }
+                else if (rankNo == 2)
+                {
+                    lblRank.CssClass = "dash-rank-badge is-silver";
+                }
+                else if (rankNo == 3)
+                {
+                    lblRank.CssClass = "dash-rank-badge is-bronze";
+                }
+            }
+        }
+
+        string currentUserId = Convert.ToString(Session["userid"]).Trim();
+        DataRowView row = e.Row.DataItem as DataRowView;
+        if (row != null && string.Equals(Convert.ToString(row["userid"]).Trim(), currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            e.Row.CssClass = (e.Row.CssClass + " dash-rank-self-row").Trim();
+        }
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
 
     public string GetPrizeMonth(object value)
@@ -479,19 +650,28 @@ public partial class user_Dashboard : System.Web.UI.Page
     void loadnotification()
     {
         objuser.UserId = Session["userid"].ToString();
-        DataTable dt = new DataTable();
+        DataTable dt = objuser.getUserDetail(objuser);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            pnlnotification.Visible = false;
+            return;
+        }
 
-        dt = objuser.getUserDetail(objuser);
-        if (dt.Rows[0]["AccountHolderName"].ToString() == "" || dt.Rows[0]["AccountNo"].ToString() == "" || dt.Rows[0]["IFSCCode"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "" || dt.Rows[0]["BankName"].ToString() == "0" || dt.Rows[0]["BranchName"].ToString() == "" || dt.Rows[0]["PanNumber"].ToString() == "")
+        DataRow row = dt.Rows[0];
+        if (Convert.ToString(row["AccountHolderName"]) == ""
+            || Convert.ToString(row["AccountNo"]) == ""
+            || Convert.ToString(row["IFSCCode"]) == ""
+            || Convert.ToString(row["BankName"]) == ""
+            || Convert.ToString(row["BankName"]) == "0"
+            || Convert.ToString(row["BranchName"]) == ""
+            || Convert.ToString(row["PanNumber"]) == "")
         {
             pnlnotification.Visible = true;
-
         }
         else
         {
             pnlnotification.Visible = false;
         }
-
     }
     void laoddata()
     {
@@ -1216,11 +1396,6 @@ public partial class user_Dashboard : System.Web.UI.Page
         }
 
         return pan.Substring(0, 4) + "xxx" + pan.Substring(pan.Length - 3);
-    }
-
-    static string SqlEscape(string value)
-    {
-        return (value ?? string.Empty).Replace("'", "''");
     }
 
     protected void Button3_Click(object sender, EventArgs e)
