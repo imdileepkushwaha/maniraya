@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Item" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="FranchiseeSearchNew.aspx.cs" Inherits="FranchiseeSearchNew" %>
+<%@ Page Title="Purchase Item" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="FranchiseeSearchNew.aspx.cs" Inherits="FranchiseeSearchNew" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     
@@ -376,7 +376,7 @@
         <h1>Franchisee Detail
         </h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">My Repurchase</a></li>
             <li class="active">Franchisee Detail</li>
 

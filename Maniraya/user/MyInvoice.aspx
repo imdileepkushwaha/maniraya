@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="MyInvoice.aspx.cs" Inherits="user_MyInvoice" %>
+<%@ Page Title="" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="MyInvoice.aspx.cs" Inherits="user_MyInvoice" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <%--  <link rel="stylesheet" href="invoicecss/invoicecss.css">--%>
@@ -19,7 +19,7 @@
     <section class="content-header">
         <h1>Invoice</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">Invoice</a></li>
         </ol>
     </section>
@@ -169,27 +169,27 @@
               
               <tr id="trCgst" runat="server" >
                 <th>CGST : <asp:Label ID="LblCgstPer" runat="server" Visible="true" Text=""></asp:Label></th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblCGST" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblCGST" runat="server" Text=""></asp:Label></td>
               </tr>
               <tr id="trSgst" runat="server"  >
                 <th>SGST : <asp:Label ID="LblSgstPer" runat="server" Visible="true" Text=""></asp:Label></th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblSGSt" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblSGSt" runat="server" Text=""></asp:Label></td>
               </tr>
                  <tr id="trIgst" runat="server" visible="false" style="display:none;">
                 <th>IGST : <asp:Label ID="LblIgstPer" runat="server" Visible="false" Text=""></asp:Label></th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblIGST" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblIGST" runat="server" Text=""></asp:Label></td>
               </tr>
 				 <tr >
                 <th style="width:50%">Subtotal:</th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblTotal" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblTotal" runat="server" Text=""></asp:Label></td>
               </tr>
                   <tr>
                 <th>Shipping Charge :</th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblShipping" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblShipping" runat="server" Text=""></asp:Label></td>
               </tr>
               <tr>
                 <th>Total :</th>
-                <td><i class="fa fa-inr"></i> <asp:Label ID="LblGTotal" runat="server" Text=""></asp:Label></td>
+                <td><i class="fa fa-rupee-sign"></i> <asp:Label ID="LblGTotal" runat="server" Text=""></asp:Label></td>
               </tr>
             </table>
 			   <p class="lead">Amount in words: <asp:Label ID="LblAmountinWorld" runat="server" Text=""> </asp:Label> Rupees Only</p>

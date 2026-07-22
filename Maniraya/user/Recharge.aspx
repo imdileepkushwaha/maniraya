@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Recharge" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Recharge.aspx.cs" Inherits="admin_Recharge" %>
+<%@ Page Title="Recharge" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Recharge.aspx.cs" Inherits="admin_Recharge" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -114,7 +114,7 @@
             Recharge
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#"> Recharge</a></li>
         <li class="active">Recharge</li>
       </ol>
@@ -205,7 +205,7 @@
 
                                         <div class="input-group">
                                             <asp:TextBox ID="TxtAmount" onkeypress="return isNumber(event)" class="form-control" MaxLength="10" placeholder="Amount" runat="server" autocomplete="off"></asp:TextBox>
-                                            <span class="input-group-addon"><i class="fa fa-inr fa-fw"></i></span>
+                                            <span class="input-group-addon"><i class="fa fa-rupee-sign fa-fw"></i></span>
                                         </div>
 
                                         <div class="input-group">
@@ -340,7 +340,7 @@
             <!-- /.box-body -->
             <!-- Loading (remove the following to stop the loading)-->
             <div class="overlay">
-              <i class="fa fa-refresh fa-spin"></i>
+              <i class="fa fa-sync-alt fa-spin"></i>
             </div>
             <!-- end loading -->
           </div>

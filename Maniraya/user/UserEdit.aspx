@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="UserEdit.aspx.cs" Inherits="admin_UserEdit" %>
+<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="UserEdit.aspx.cs" Inherits="admin_UserEdit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=2" rel="stylesheet" />
@@ -84,7 +84,7 @@
         <ContentTemplate>
             <div class="profile-page">
                 <div class="profile-hero">
-                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-pencil"></i></div>
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-pencil-alt"></i></div>
                     <div class="profile-hero-info">
                         <h2>Edit Profile</h2>
                         <p class="profile-hero-meta">Member ID: <strong><%= Session["userid"] %></strong></p>
@@ -192,7 +192,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Address &amp; Location</p>
+                            <p class="profile-subsection-title"><i class="fa fa-map-marker-alt"></i> Address &amp; Location</p>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">

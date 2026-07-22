@@ -1,7 +1,7 @@
-﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_SavingProductPurchase" %>
+<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchase.aspx.cs" Inherits="user_SavingProductPurchase" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <style>
         .saving-purchase-page .saving-product-showcase {
             margin-bottom: 24px;
@@ -308,7 +308,7 @@
     <section class="content-header">
         <h1>Purchase Saving Product</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Saving</a></li>
             <li class="active">Purchase Saving Product</li>
         </ol>
@@ -367,11 +367,11 @@
                                     <div class="saving-product-price-grid">
                                         <div class="saving-product-price-item">
                                             <span>MRP</span>
-                                            <strong>₹ <asp:Literal ID="litMrp" runat="server" /></strong>
+                                            <strong>? <asp:Literal ID="litMrp" runat="server" /></strong>
                                         </div>
                                         <div class="saving-product-price-item">
                                             <span>DP</span>
-                                            <strong>₹ <asp:Literal ID="litDp" runat="server" /></strong>
+                                            <strong>? <asp:Literal ID="litDp" runat="server" /></strong>
                                         </div>
                                         <div class="saving-product-price-item is-highlight">
                                             <span>Pay Amount</span>
@@ -401,12 +401,12 @@
                                 <asp:TextBox ID="txtproductname" Enabled="false" CssClass="form-control" runat="server" />
                             </div>
                             <div class="form-group">
-                                <label for="<%= txtamount.ClientID %>"><i class="fa fa-inr"></i> Amount</label>
+                                <label for="<%= txtamount.ClientID %>"><i class="fa fa-rupee-sign"></i> Amount</label>
                                 <asp:TextBox ID="txtamount" Enabled="false" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>
 
-                        <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Shipping Address</p>
+                        <p class="profile-subsection-title"><i class="fa fa-map-marker-alt"></i> Shipping Address</p>
                         <asp:HiddenField ID="hfShippingMode" runat="server" Value="view" />
 
                         <asp:Panel ID="pnlShippingView" runat="server" CssClass="saving-shipping-card">
@@ -482,11 +482,11 @@
                             </div>
                         </asp:Panel>
 
-                        <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
+                        <p class="profile-subsection-title"><i class="fa fa-check-square"></i> Payment Proof</p>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange"></i> UTR No / Transaction ID</label>
+                                    <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
                                     <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
                                 </div>
                             </div>
@@ -495,10 +495,10 @@
                                     <label><i class="fa fa-camera"></i> Payment Screenshot</label>
                                     <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
                                         <div class="profile-upload-zone-inner">
-                                            <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                            <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                             <p class="profile-upload-title">Drop payment screenshot here</p>
                                             <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
-                                            <p class="profile-upload-meta">JPG, PNG, WEBP · receipt clearly visible</p>
+                                            <p class="profile-upload-meta">JPG, PNG, WEBP � receipt clearly visible</p>
                                         </div>
                                         <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
                                     </div>
@@ -572,7 +572,7 @@
 
                 previewUrl = URL.createObjectURL(file);
                 preview.src = previewUrl;
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

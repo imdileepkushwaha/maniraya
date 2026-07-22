@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItemRepurchase.aspx.cs" Inherits="user_PurchaseItemRepurchase" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItemRepurchase.aspx.cs" Inherits="user_PurchaseItemRepurchase" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 
@@ -508,7 +508,7 @@ div.ex5 {
         </h3>
         <div class="row">
             <div class="col-md-5"> <ol class="breadcrumb" >
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home </a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home </a></li>
             <li><a href="#"> / My Repurchase</a></li>
             <li class="active">/ Purchase Item</li>
         
@@ -521,11 +521,11 @@ div.ex5 {
                              <div class="box-header with-border">
                            
                             <div style="float: right; color:white;">
-                                Your Main Balance  :   <i class="fa fa-inr"></i>
+                                Your Main Balance  :   <i class="fa fa-rupee-sign"></i>
                                 <asp:Label ID="Lblbalance" runat="server" Text="Balance"></asp:Label>
                             </div>
                                    <div style="float: right; color:white;">
-                                Your Shopping Balance  :   <i class="fa fa-inr"></i>
+                                Your Shopping Balance  :   <i class="fa fa-rupee-sign"></i>
                                 <asp:Label ID="LblUtility" runat="server" Text="Balance"></asp:Label>
                             </div>
                                  </div></div></div>
@@ -1122,7 +1122,7 @@ div.ex5 {
                                                           <h6> <asp:Label ID="LblProductName" runat="server" Text=""></asp:Label></h6>
                                                    </div>
                                                    <div>
-                                                       <h6>MRP : <i class="fa fa-inr"></i>
+                                                       <h6>MRP : <i class="fa fa-rupee-sign"></i>
                                                            <asp:Label ID="LblMRP" runat="server" Text=""></asp:Label></h6>
                                                    </div>
                                                    <div>
@@ -1130,7 +1130,7 @@ div.ex5 {
                                                            <asp:Label ID="LblBv" runat="server" Text=""></asp:Label></h6>
                                                    </div>
                                                     <div>
-                                                       <h6>Amount : <i class="fa fa-inr"></i>
+                                                       <h6>Amount : <i class="fa fa-rupee-sign"></i>
                                                               <asp:Label ID="LblAmount" runat="server" Text=""></asp:Label>
                                                           </h6>
                                                    </div>
@@ -1141,7 +1141,7 @@ div.ex5 {
 
                                                    <div class="product_price" style="display:none;">
                                                        <a href="#">DP
-          <i class="fa fa-inr"></i>
+          <i class="fa fa-rupee-sign"></i>
                                                            <span class="price_new">
                                                          <asp:Label ID="LblDP" runat="server" Text=""></asp:Label>    </span></a>
 

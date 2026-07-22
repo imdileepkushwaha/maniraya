@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="AutoPoolIncomeReport.aspx.cs" Inherits="AutoPoolIncomeReport" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="AutoPoolIncomeReport.aspx.cs" Inherits="AutoPoolIncomeReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
      Auto Pool Report   
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
         <li><a href="#">Closing</a></li>
         <li class="active">    Auto Pool Report</li>
       </ol>

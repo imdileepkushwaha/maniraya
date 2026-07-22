@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="JoiningPackage.aspx.cs" Inherits="user_JoiningPackage" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="JoiningPackage.aspx.cs" Inherits="user_JoiningPackage" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -7,7 +7,7 @@
         <h1>Joining Package
         </h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">Joining Package</a></li>
             <li class="active">Joining Package  </li>
 

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Recharge Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="RechargeReport.aspx.cs" Inherits="admin_UserReport" %>
+<%@ Page Title="Recharge Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="RechargeReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
             Recharge Report
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#"> Recharge</a></li>
         <li class="active">Recharge Report</li>
       </ol>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Deposit Request Report" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="EpinRequestReport.aspx.cs" Inherits="EpinRequestReport" %>
+<%@ Page Title="Deposit Request Report" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="EpinRequestReport.aspx.cs" Inherits="EpinRequestReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
        E-Pin Request Report
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
         <li><a href="#">E-Pin Request Report </a></li>
         <li class="active">E-Pin Request Report  </li>
       </ol>

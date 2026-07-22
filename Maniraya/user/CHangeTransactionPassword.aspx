@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Change Password" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="CHangeTransactionPassword.aspx.cs" Inherits="CHangeTransactionPassword" %>
+<%@ Page Title="Change Password" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="CHangeTransactionPassword.aspx.cs" Inherits="CHangeTransactionPassword" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
      <script type="text/javascript">
@@ -36,7 +36,7 @@
     Change Transaction Password
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>         
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>         
         <li class="active"> Change Transaction Password</li>
       
       </ol>

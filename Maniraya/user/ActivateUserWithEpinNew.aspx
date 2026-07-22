@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Transfer E-Pin" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="ActivateUserWithEpinNew.aspx.cs" Inherits="ActivateUserWithEpinNew" %>
+<%@ Page Title="Transfer E-Pin" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="ActivateUserWithEpinNew.aspx.cs" Inherits="ActivateUserWithEpinNew" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -28,7 +28,7 @@
         <h1 style="color:white;">Activate User With E-Pin 
         </h1>
         <ol class="breadcrumb">
-             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home > </a></li>
+             <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home > </a></li>
             <li><a href="#">E-Pin Management > </a></li>
             <li class="active">User Activation</li>
         </ol>

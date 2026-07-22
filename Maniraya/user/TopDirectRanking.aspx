@@ -68,7 +68,7 @@
     <section class="content-header">
         <h1>Top Direct Ranking</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">My Team</a></li>
             <li class="active">Top Direct Ranking</li>
         </ol>
@@ -88,7 +88,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="UserDirectAssociates.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-users"></i> My Direct</a>
-                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down"></i> My Downline</a>
+                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down-alt"></i> My Downline</a>
                     </div>
                 </div>
 

@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>Saving Order History</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Purchase</a></li>
             <li><a href="#">Saving Product</a></li>
             <li class="active">Order History</li>
@@ -28,7 +28,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="SavingProductPurchase.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-shopping-cart"></i> Buy Product</a>
-                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i> Saving Dashboard</a>
+                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-university"></i> Saving Dashboard</a>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@
                                             <div class="soh-order-actions">
                                                 <asp:HyperLink ID="lnkInvoice" runat="server" CssClass="soh-invoice-btn" Target="_blank"
                                                     NavigateUrl='<%# "SavingProductInvoice.aspx?orderId=" + HttpUtility.UrlEncode(Convert.ToString(Eval("orderid"))) %>'>
-                                                    <i class="fa fa-file-text-o"></i> Download Invoice
+                                                    <i class="fa fa-file-alt"></i> Download Invoice
                                                 </asp:HyperLink>
                                                 <asp:Label ID="lblInvoiceUnavailable" runat="server" Text="Invoice after approval" CssClass="soh-invoice-pending" />
                                             </div>

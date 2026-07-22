@@ -16,16 +16,21 @@ public partial class user_SavingProductInvoice : Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        bool hasPublicAccess = HasValidInvoiceAccessKey();
         bool isAdmin = Session["useradmin"] != null;
         string sessionUserId = Session["userid"] != null ? Session["userid"].ToString() : null;
 
-        if (string.IsNullOrEmpty(sessionUserId) && !isAdmin)
+        if (string.IsNullOrEmpty(sessionUserId) && !isAdmin && !hasPublicAccess)
         {
             Response.Redirect("logout.aspx");
             return;
         }
 
         string fallbackUrl = isAdmin ? "../admin/SavingProductGSTReport.aspx" : "SavingProductOrderHistory.aspx";
+        if (hasPublicAccess && string.IsNullOrEmpty(sessionUserId) && !isAdmin)
+        {
+            fallbackUrl = "logout.aspx";
+        }
 
         SiteContactHelper.BindInvoiceCompanyInfo(litCompanyContact);
         SiteContactHelper.BindInvoiceCompanyInfo(litCompanyFooter);
@@ -37,10 +42,10 @@ public partial class user_SavingProductInvoice : Page
         litCompanyGstFooter.Text = litCompanyGst.Text;
         lblCompanyStateCode.Text = GetGstStateCode(companyGst, CompanyStateCode);
 
-        // For admins the invoice can belong to any member, so resolve the buyer's user id
-        // from the query string (or the order itself) instead of the logged-in session.
+        // For admins / WhatsApp public link the invoice can belong to any member, so resolve
+        // the buyer's user id from the query string (or the order itself).
         string effectiveUserId = sessionUserId;
-        if (isAdmin && string.IsNullOrEmpty(sessionUserId))
+        if ((isAdmin || hasPublicAccess) && string.IsNullOrEmpty(sessionUserId))
         {
             effectiveUserId = Convert.ToString(Request.QueryString["userId"]).Trim();
         }
@@ -61,7 +66,7 @@ public partial class user_SavingProductInvoice : Page
             return;
         }
 
-        if (isAdmin && string.IsNullOrWhiteSpace(effectiveUserId))
+        if ((isAdmin || hasPublicAccess) && string.IsNullOrWhiteSpace(effectiveUserId))
         {
             effectiveUserId = GetUserIdByOrderId(orderId);
         }
@@ -80,6 +85,19 @@ public partial class user_SavingProductInvoice : Page
         }
 
         BindInvoice(orderId, items);
+    }
+
+    bool HasValidInvoiceAccessKey()
+    {
+        string configuredKey = ChatwayWhatsAppHelper.InvoiceAccessKey;
+        if (string.IsNullOrWhiteSpace(configuredKey))
+        {
+            return false;
+        }
+
+        string requestKey = Convert.ToString(Request.QueryString["accessKey"]).Trim();
+        return !string.IsNullOrWhiteSpace(requestKey)
+            && string.Equals(requestKey, configuredKey, StringComparison.Ordinal);
     }
 
     string GetUserIdByOrderId(string orderId)

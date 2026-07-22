@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="UserDirectAssociates.aspx.cs" Inherits="user_UserDirectAssociates" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="UserDirectAssociates.aspx.cs" Inherits="user_UserDirectAssociates" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
@@ -26,7 +26,7 @@
                         <p class="profile-hero-meta">View your personally sponsored members on left and right team</p>
                     </div>
                     <div class="profile-hero-actions">
-                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down"></i> My Downline</a>
+                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down-alt"></i> My Downline</a>
                         <a href="BinaryReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-sitemap"></i> My Treeview</a>
                     </div>
                 </div>

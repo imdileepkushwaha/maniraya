@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="CancelCheckForm.aspx.cs" Inherits="user_CancelCheckForm" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="CancelCheckForm.aspx.cs" Inherits="user_CancelCheckForm" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 
@@ -43,7 +43,7 @@
         <h1 style="color:white">Cancel Cheque/Passbook
         </h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home > </a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home > </a></li>
             <li><a href="#">KYC > s</a></li>
             <li class="active">Cancel Cheque/Passbook</li>
 

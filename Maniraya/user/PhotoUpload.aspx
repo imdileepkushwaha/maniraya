@@ -1,8 +1,8 @@
-﻿<%@ Page Title="Withdrawl Request" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="PhotoUpload.aspx.cs" Inherits="PhotoUpload" %>
+<%@ Page Title="Withdrawl Request" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="PhotoUpload.aspx.cs" Inherits="PhotoUpload" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=3" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
      <script type="text/javascript">
          function validate() {
 
@@ -64,7 +64,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="UserProfile.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-user"></i> View Profile</a>
-                        <a href="UserEdit.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-pencil"></i> Edit Profile</a>
+                        <a href="UserEdit.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-pencil-alt"></i> Edit Profile</a>
                     </div>
                 </div>
                 <div class="profile-sections">
@@ -93,10 +93,10 @@
                                                 <label><i class="fa fa-image"></i> Choose Image</label>
                                                 <div class="profile-upload-zone" id="profileUploadZone">
                                                     <div class="profile-upload-zone-inner">
-                                                        <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                        <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                         <p class="profile-upload-title">Drag &amp; drop your photo here</p>
                                                         <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from device</span></p>
-                                                        <p class="profile-upload-meta">JPG, PNG, WEBP · Recommended under 2 MB</p>
+                                                        <p class="profile-upload-meta">JPG, PNG, WEBP � Recommended under 2 MB</p>
                                                     </div>
                                                     <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
                                                 </div>
@@ -212,7 +212,7 @@
 
                 previewUrl = URL.createObjectURL(file);
                 preview.src = previewUrl;
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

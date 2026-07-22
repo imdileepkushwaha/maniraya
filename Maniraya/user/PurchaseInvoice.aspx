@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseInvoice.aspx.cs" Inherits="user_PurchaseInvoice" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseInvoice.aspx.cs" Inherits="user_PurchaseInvoice" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/team-associates.css?v=2" rel="stylesheet" />
@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="form-group team-table-group">
-                            <span class="team-table-caption"><i class="fa fa-file-text-o"></i> Invoice List</span>
+                            <span class="team-table-caption"><i class="fa fa-file-alt"></i> Invoice List</span>
                             <div class="team-table-wrap table-responsive">
                                 <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable team-table" Width="100%"
                                     AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">

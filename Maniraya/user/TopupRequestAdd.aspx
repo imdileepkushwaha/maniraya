@@ -1,8 +1,8 @@
-﻿
+
 <%@ Page Title="Topup Request" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="TopupRequestAdd.aspx.cs" Inherits="user_TopupRequestAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <script type="text/javascript">
         function validate() {
             if (document.getElementById("<%=RDBTNAdmin.ClientID%>").checked == true) {
@@ -173,7 +173,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="<%= txtamount.ClientID %>"><i class="fa fa-inr"></i> Amount</label>
+                                    <label for="<%= txtamount.ClientID %>"><i class="fa fa-rupee-sign"></i> Amount</label>
                                     <asp:TextBox ID="txtamount" ReadOnly="true" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" placeholder="Select a plan" />
                                     <asp:Label ID="lblmssg" Visible="false" runat="server" CssClass="topup-amount-hint"></asp:Label>
                                 </div>
@@ -185,7 +185,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="<%= ddbankaccountno.ClientID %>"><i class="fa fa-bank"></i> Select Account</label>
+                                        <label for="<%= ddbankaccountno.ClientID %>"><i class="fa fa-university"></i> Select Account</label>
                                         <asp:DropDownList ID="ddbankaccountno" AutoPostBack="true" OnSelectedIndexChanged="ddbankaccountno_SelectedIndexChanged" CssClass="form-control" runat="server">
                                             <asp:ListItem Value="0">Select Account</asp:ListItem>
                                         </asp:DropDownList>
@@ -228,11 +228,11 @@
                                 </div>
                             </div>
 
-                            <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
+                            <p class="profile-subsection-title"><i class="fa fa-check-square"></i> Payment Proof</p>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="<%= TxtTransactionId.ClientID %>"><i class="fa fa-exchange"></i> Transaction ID</label>
+                                        <label for="<%= TxtTransactionId.ClientID %>"><i class="fa fa-exchange-alt"></i> Transaction ID</label>
                                         <asp:TextBox ID="TxtTransactionId" runat="server" CssClass="form-control" placeholder="Enter UTR / transaction reference" />
                                     </div>
                                 </div>
@@ -247,10 +247,10 @@
                                         <label><i class="fa fa-camera"></i> Payment Screenshot</label>
                                         <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="topupPaymentUploadZone">
                                             <div class="profile-upload-zone-inner">
-                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                 <p class="profile-upload-title">Drop payment screenshot here</p>
                                                 <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
-                                                <p class="profile-upload-meta">JPG, PNG, WEBP · UTR / receipt clearly visible</p>
+                                                <p class="profile-upload-meta">JPG, PNG, WEBP � UTR / receipt clearly visible</p>
                                             </div>
                                             <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
                                         </div>
@@ -365,7 +365,7 @@
 
                 previewUrl = URL.createObjectURL(file);
                 preview.src = previewUrl;
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

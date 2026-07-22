@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Tree View" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="TreeView.aspx.cs" Inherits="admin_DownlineReport" %>
+<%@ Page Title="Tree View" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="TreeView.aspx.cs" Inherits="admin_DownlineReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
       Tree View    
       </h1>
       <ol class="breadcrumb">
-      <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home > </a></li>
+      <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home > </a></li>
             <li><a href="#">My Team > </a></li>
             <li class="active">My Treeview</li>
       </ol>

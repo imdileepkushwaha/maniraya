@@ -19,6 +19,7 @@
 
 		<!-- Icons css -->
 		<link href="assets/plugins/icons/icons.css" rel="stylesheet">
+		<link href="assets/css/fa-compat.css?v=1" rel="stylesheet">
 
 		<!--  Right-sidemenu css -->
 		<link href="assets/plugins/sidebar/sidebar.css" rel="stylesheet">

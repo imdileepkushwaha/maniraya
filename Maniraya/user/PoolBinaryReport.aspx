@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Binary Report" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="PoolBinaryReport.aspx.cs" Inherits="PoolBinaryReport" %>
+<%@ Page Title="Binary Report" Language="C#" MasterPageFile="Masterpage.master" AutoEventWireup="true" CodeFile="PoolBinaryReport.aspx.cs" Inherits="PoolBinaryReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
         Pool Wise Binary Report  
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home ></a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home ></a></li>
             <li><a href="#">My Team ></a></li>
         <li class="active">Pool Wise Binary  </li>
       

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="UnityTreeOne.aspx.cs" Inherits="UnityTreeOne" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="UnityTreeOne.aspx.cs" Inherits="UnityTreeOne" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -134,7 +134,7 @@
                         </div>
 
                         <div class="binary-user-section">
-                            <h5 class="binary-user-section-title"><i class="fa fa-line-chart"></i> BV &amp; Purchase</h5>
+                            <h5 class="binary-user-section-title"><i class="fa fa-chart-line"></i> BV &amp; Purchase</h5>
                             <div class="binary-user-grid">
                                 <div class="binary-user-field">
                                     <span class="binary-user-field-label">Left PT</span>

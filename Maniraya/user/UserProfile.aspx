@@ -1,4 +1,4 @@
-﻿<%@ Page Title="View Profile" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="UserProfile.aspx.cs" Inherits="UserProfile" %>
+<%@ Page Title="View Profile" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="UserProfile.aspx.cs" Inherits="UserProfile" %>
 
 
 
@@ -179,7 +179,7 @@
 
                     <div class="profile-hero-actions">
 
-                        <a href="UserEdit.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-pencil"></i> Edit Profile</a>
+                        <a href="UserEdit.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-pencil-alt"></i> Edit Profile</a>
 
                         <a href="CHangePassword.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-lock"></i> Change Password</a>
 
@@ -301,7 +301,7 @@
 
 
 
-                            <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Location</p>
+                            <p class="profile-subsection-title"><i class="fa fa-map-marker-alt"></i> Location</p>
 
                             <div class="row">
 

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="UserBankDetail.aspx.cs" Inherits="UserBankDetail" %>
+<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="UserBankDetail.aspx.cs" Inherits="UserBankDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -54,7 +54,7 @@
     <section class="content-header">
         <h1>Bank Details</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">Bank Details</a></li>
         </ol>
     </section>

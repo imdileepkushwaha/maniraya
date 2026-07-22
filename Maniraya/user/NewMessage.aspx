@@ -1,8 +1,8 @@
-﻿<%@ Page Title="New Message" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="NewMessage.aspx.cs" Inherits="Associate_Details" %>
+<%@ Page Title="New Message" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="NewMessage.aspx.cs" Inherits="Associate_Details" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
@@ -50,7 +50,7 @@
                                 <label><i class="fa fa-paperclip"></i> Attachment <span class="text-muted">(optional)</span></label>
                                 <div class="profile-upload-zone profile-upload-zone-compact profile-upload-zone-attach" id="messageAttachZone">
                                     <div class="profile-upload-zone-inner">
-                                        <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-paperclip"></i></span>
+                                        <span class="profile-upload-icon profile-upload-icon--clip" aria-hidden="true"><i class="fa fa-paperclip"></i></span>
                                         <p class="profile-upload-title">Drag &amp; drop file here</p>
                                         <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from device</span></p>
                                         <p class="profile-upload-meta">PDF, DOC, DOCX, XLS, XLSX, TXT, JPG, PNG allowed</p>
@@ -61,7 +61,7 @@
                                 <div class="profile-upload-selection profile-upload-selection-attach" id="messageAttachSelection" hidden>
                                     <div class="profile-upload-selection-preview profile-upload-selection-preview-doc">
                                         <img id="messageAttachPreviewImg" src="" alt="Attachment preview" hidden />
-                                        <span class="profile-upload-doc-icon" id="messageAttachDocIcon" aria-hidden="true"><i class="fa fa-file-text-o"></i></span>
+                                        <span class="profile-upload-doc-icon" id="messageAttachDocIcon" aria-hidden="true"><i class="fa fa-file-alt"></i></span>
                                     </div>
                                     <div class="profile-upload-selection-info">
                                         <span class="profile-upload-filechip" id="messageAttachFilechip"></span>
@@ -131,7 +131,7 @@
                 previewImg.removeAttribute('src');
                 previewImg.hidden = true;
                 docIcon.hidden = false;
-                docIcon.innerHTML = '<i class="fa fa-file-text-o"></i>';
+                docIcon.innerHTML = '<i class="fa fa-file-alt"></i>';
                 filechip.textContent = '';
                 selection.hidden = true;
                 zone.classList.remove('is-hidden');
@@ -161,7 +161,7 @@
                     docIcon.innerHTML = '<i class="fa ' + getDocIconClass(ext) + '"></i>';
                 }
 
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

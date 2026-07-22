@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="user_Dashboard" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="Dashboard.aspx.cs" Inherits="user_Dashboard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 
@@ -251,7 +251,7 @@
                                 <span id="dashDateRange"></span>
                             </div>
                             <button type="button" class="dash-icon-btn" onclick="location.reload();" title="Refresh">
-                                <i class="fa fa-refresh"></i>
+                                <i class="fa fa-sync-alt"></i>
                             </button>
                             <a href="UserProfile.aspx" class="dash-icon-btn" title="Settings">
                                 <i class="fa fa-sliders"></i>
@@ -276,7 +276,7 @@
                             <div class="dash-feature-card tone-saving">
                                 <div class="dash-feature-head">
                                     <div class="dash-feature-title">
-                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-bank"></i></span>
+                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-university"></i></span>
                                         <div>
                                             <h3>Saving Dashboard</h3>
                                             <p>Your savings products &amp; balance overview</p>
@@ -292,7 +292,7 @@
                             <div class="dash-feature-card tone-premium">
                                 <div class="dash-feature-head">
                                     <div class="dash-feature-title">
-                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-diamond"></i></span>
+                                        <span class="dash-feature-icon" aria-hidden="true"><i class="fa fa-gem"></i></span>
                                         <div>
                                             <h3>MPremium Dashboard</h3>
                                             <p>Your premium plans &amp; package overview</p>
@@ -340,7 +340,7 @@
                                                 <asp:Image ID="imgIncentivePhoto" runat="server" CssClass="dash-incentive-photo" ImageUrl="img/default.png" AlternateText="Profile photo" />
                                             </div>
                                             <div class="dash-incentive-updated" aria-live="polite">
-                                                <span class="dash-incentive-updated-icon" aria-hidden="true"><i class="fa fa-clock-o"></i></span>
+                                                <span class="dash-incentive-updated-icon" aria-hidden="true"><i class="fa fa-clock"></i></span>
                                                 <span class="dash-incentive-updated-label">Last Updated</span>
                                                 <strong class="dash-incentive-updated-time"><asp:Label ID="lblIncentiveUpdated" runat="server" Text="" /></strong>
                                             </div>
@@ -382,31 +382,31 @@
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>Saving Direct Income</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblSavingDirectIncome" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblSavingDirectIncome" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>Level Income</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>MPremium Direct Income</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>Team Bonus</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblMatchingIncomeCard" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblMatchingIncomeCard" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>Self Business Bonus</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row is-wallet">
                                             <span>Product Wallet Balance</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblProductWalletBalance" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblProductWalletBalance" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-total">
                                             <span>Total Incentive</span>
-                                            <strong><i class="fa fa-inr"></i> <asp:Label ID="lblIncentiveTotal" runat="server" Text="0.00" /></strong>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblIncentiveTotal" runat="server" Text="0.00" /></strong>
                                         </div>
                                     </div>
                                 </div>
@@ -572,7 +572,7 @@
 
                     <div class="dash-section-head dash-section-head--income" style="display:none">
                         <div class="dash-section-head-main">
-                            <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-line-chart"></i></span>
+                            <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-chart-line"></i></span>
                             <div class="dash-section-head-copy">
                                 <h3 class="dash-section-title">Income Overview</h3>
                                 <p class="dash-section-sub">Track all your earnings in one place</p>
@@ -584,7 +584,7 @@
 
                               <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-red">
-							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-money"></i></span>
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-money-bill-alt"></i></span>
 							<div class="card-body">
 								<p class="dash-income-label">Saving Income</p>
 								<h3 class="dash-income-value"><asp:Label ID="lblselfincome" runat="server" Text="Label"></asp:Label></h3>
@@ -608,10 +608,10 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Matching Income</p><br>
 										<div class="" style="display:none">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblDirddectincome" runat="server" Text="00.00" Visible="false"></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-rupee-sign"></i> &nbsp <asp:Label ID="lblDirddectincome" runat="server" Text="00.00" Visible="false"></asp:Label></h3>
 										</div>
                                         <div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-inr"></i> &nbsp <asp:Label ID="lblMatching11" runat="server" Text="00.00" Visible="false"></asp:Label>
+											<h3 class="font-weight-semibold text-left mb-0 text-white"><i class="fa fa-rupee-sign"></i> &nbsp <asp:Label ID="lblMatching11" runat="server" Text="00.00" Visible="false"></asp:Label>
 												<asp:Label ID="lblMatchinggg" runat="server" Text="00.00" ></asp:Label>
 											</h3>
 										</div>
@@ -913,7 +913,7 @@
 							<div class="card-body">
 								<div class="clearfix">
 									<div class="float-right">
-										<i class="fa fa-inr text-secondary icon-size" style="color:green"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size" style="color:green"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Current Package</p><br />
@@ -1154,12 +1154,12 @@
 							<div class="card-body">
 								<div class="clearfix">
 									<div class="float-right">
-										<i class="fa fa-inr text-secondary icon-size"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Total Income</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="lblTotalincome" runat="server" Text="Label" ></asp:Label> <i class="fa fa-inr"></i> </h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="lblTotalincome" runat="server" Text="Label" ></asp:Label> <i class="fa fa-rupee-sign"></i> </h3>
 										</div>
 									</div>
 								</div><br>
@@ -1220,7 +1220,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Cash Wallet</p><br />
 										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-success">   <asp:Label ID="Totalbalance" runat="server" Text="Label"></asp:Label> <i class="fa fa-inr"></i> </h4>
+											<h4 class="font-weight-semibold text-left mb-0 text-success">   <asp:Label ID="Totalbalance" runat="server" Text="Label"></asp:Label> <i class="fa fa-rupee-sign"></i> </h4>
 										</div>
 									</div>
 								</div><br>
@@ -1235,12 +1235,12 @@
 							<div class="card-body">
 								<div class="clearfix">
 									<div class="float-right">
-										<i class="fa fa-inr text-secondary icon-size"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Cash Back Income</p><br />
 										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LbllevelROiIncome" runat="server" Text="0" ></asp:Label> <i class="fa fa-inr"></i> </h4>
+											<h4 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LbllevelROiIncome" runat="server" Text="0" ></asp:Label> <i class="fa fa-rupee-sign"></i> </h4>
 										</div>
 									</div>
 								</div><br>
@@ -1301,7 +1301,7 @@
 
                              <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-teal">
-							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
 								<p class="dash-income-label">Left SV (Re-Purchase)</p>
 								<h3 class="dash-income-value is-number"><asp:Label ID="lblleftrepurchasesv" runat="server" Text="Label"></asp:Label></h3>
@@ -1315,7 +1315,7 @@
 
                             <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-teal">
-							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
 								<p class="dash-income-label">Right SV (Re-Purchase)</p>
 								<h3 class="dash-income-value is-number"><asp:Label ID="lblRightrepurchasesv" runat="server" Text="Label"></asp:Label></h3>
@@ -1329,7 +1329,7 @@
 
                                        <div class="col-sm-12 col-lg-6 col-xl-4">
 						<div class="card dash-income-card dash-income-compact tone-teal">
-							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-refresh"></i></span>
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
 								<p class="dash-income-label">Self SV (Re-Purchase)</p>
 								<h3 class="dash-income-value is-number"><asp:Label ID="lbltotalselfRepurchasesv" runat="server" Text="Label"></asp:Label></h3>
@@ -1489,12 +1489,12 @@
 							<div class="card-body">
 								<div class="clearfix">
 									<div class="float-right">
-										<i class="fa fa-inr text-secondary icon-size"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Autopool Income</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success"> <i class="fa fa-inr"></i> <asp:Label ID="LblPoolIncome" runat="server" Text="Label"></asp:Label>  </h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success"> <i class="fa fa-rupee-sign"></i> <asp:Label ID="LblPoolIncome" runat="server" Text="Label"></asp:Label>  </h3>
 										</div>
 									</div>
 								</div><br>
@@ -1509,12 +1509,12 @@
 							<div class="card-body">
 								<div class="clearfix">
 									<div class="float-right">
-										<i class="fa fa-inr text-secondary icon-size"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Level Income</p><br />
 										<div class="">
-											<h4 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="lbl878" runat="server" Text="0" ></asp:Label> <i class="fa fa-inr"></i> </h4>
+											<h4 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="lbl878" runat="server" Text="0" ></asp:Label> <i class="fa fa-rupee-sign"></i> </h4>
 										</div>
 									</div>
 								</div><br>
@@ -1534,12 +1534,12 @@
 								<div class="clearfix">
 									<div class="float-right">
 
-										<i class="fa fa-inr text-secondary icon-size" style="color:green"></i>
+										<i class="fa fa-rupee-sign text-secondary icon-size" style="color:green"></i>
 									</div>
 									<div class="float-left">
 										<p class="mb-0 text-left">Group Income</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LBlGroupIncome" runat="server" Text="Label"></asp:Label> <i class="fa fa-inr"></i> </h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LBlGroupIncome" runat="server" Text="Label"></asp:Label> <i class="fa fa-rupee-sign"></i> </h3>
 										</div>
 									</div>
 								</div><br />
@@ -1591,7 +1591,7 @@
                                     </div>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                             </div>
 
@@ -1608,7 +1608,7 @@ Profit Share Budget</p>
                                         </h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                
                             </div>
@@ -1670,7 +1670,7 @@ Profit Share Budget</p>
                                         <asp:Label ID="lblwalletBalance" runat="server" Text="Label"></asp:Label></h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="UserWallet.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1683,7 +1683,7 @@ Profit Share Budget</p>
                                          <asp:Label ID="lblshoppingWallet" runat="server" Text="Label"></asp:Label></h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="UserWallet.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1801,7 +1801,7 @@ Profit Share Budget</p>
                                     </h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="GiftBalanceReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1819,7 +1819,7 @@ Profit Share Budget</p>
 									</h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="GiftBalanceReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1837,7 +1837,7 @@ Profit Share Budget</p>
                                     
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="AutoPoolIncomeReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1853,7 +1853,7 @@ Profit Share Budget</p>
                                     </h3>
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="LevelIncomeReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -1990,7 +1990,7 @@ Profit Share Budget</p>
                                      </h3>                                   
                                 </div>
                                 <div class="icon">
-                                    <i class="fa fa-inr"></i>
+                                    <i class="fa fa-rupee-sign"></i>
                                 </div>
                                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
@@ -2109,7 +2109,7 @@ Profit Share Budget</p>
                                             <a href="WithdrawlRequstAdd.aspx" style="text-decoration: none;">
                                                 <div class="panel-body no-padding dashboardbox">
                                                     <div class="partition-azure padding-20 text-center core-icon">
-                                                        <i class="fa fa-inr fa-3x icon-big"></i>
+                                                        <i class="fa fa-rupee-sign fa-3x icon-big"></i>
                                                     </div>
                                                     <div class="core-content">
                                                     </div>
@@ -2127,7 +2127,7 @@ Profit Share Budget</p>
                                             <a href="DepositRequstAdd.aspx" style="text-decoration: none;">
                                                 <div class="panel-body no-padding dashboardbox">
                                                     <div class="partition-azure padding-20 text-center core-icon">
-                                                        <i class="fa fa-inr fa-3x icon-big"></i>
+                                                        <i class="fa fa-rupee-sign fa-3x icon-big"></i>
                                                     </div>
                                                     <div class="core-content">
                                                     </div>
@@ -2146,7 +2146,7 @@ Profit Share Budget</p>
                                             <a href="UserWallet.aspx" style="text-decoration: none;">
                                                 <div class="panel-body no-padding dashboardbox">
                                                     <div class="partition-azure padding-20 text-center core-icon">
-                                                        <i class="fa fa-inr fa-3x icon-big"></i>
+                                                        <i class="fa fa-rupee-sign fa-3x icon-big"></i>
                                                     </div>
                                                     <div class="core-content">
                                                     </div>
@@ -2180,7 +2180,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="LblCurrentPV" runat="server" Text="Label"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2195,7 +2195,7 @@ Profit Share Budget</p>
 
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2209,7 +2209,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="LblTotalPV" runat="server" Text="Label"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2236,7 +2236,7 @@ Profit Share Budget</p>
                                     <%-- <asp:Label ID="LblRechargewallet" runat="server" Text="Label"></asp:Label>--%></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2251,7 +2251,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="LblUtilityWallet" runat="server" Text="Label"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2268,7 +2268,7 @@ Profit Share Budget</p>
                                   </h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2289,7 +2289,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="Label3" runat="server" Text="0.00"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2313,7 +2313,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="LblTodayBuissness" runat="server" Text="Label"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2328,7 +2328,7 @@ Profit Share Budget</p>
 
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2342,7 +2342,7 @@ Profit Share Budget</p>
                                     <asp:Label ID="LblUtilitywalletPurchase" runat="server" Text="Label"></asp:Label></h3>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -2361,7 +2361,7 @@ Profit Share Budget</p>
 
                             </div>
                             <div class="icon">
-                                <i class="fa fa-inr"></i>
+                                <i class="fa fa-rupee-sign"></i>
                             </div>
                             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
@@ -3712,7 +3712,7 @@ Profit Share Budget</p>
             </div>
 
             <div class="dash-incentive-export-footer">
-                <span><i class="fa fa-clock-o"></i> Last Updated: <strong id="exportIncentiveUpdated"></strong></span>
+                <span><i class="fa fa-clock"></i> Last Updated: <strong id="exportIncentiveUpdated"></strong></span>
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Transaction Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="TransactionReport.aspx.cs" Inherits="admin_UserReport" %>
+<%@ Page Title="Transaction Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="TransactionReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
@@ -20,7 +20,7 @@
         <ContentTemplate>
             <div class="profile-page team-page transaction-report-page">
                 <div class="profile-hero">
-                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-exchange"></i></div>
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-exchange-alt"></i></div>
                     <div class="profile-hero-info">
                         <h2>Transaction Report</h2>
                         <p class="profile-hero-meta">Track wallet credits, debits, and transaction history for your account.</p>
@@ -51,7 +51,7 @@
                             </div>
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group">
-                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check-o"></i> To Date</label>
+                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check"></i> To Date</label>
                                     <asp:TextBox ID="txttodate" CssClass="form-control form_date" runat="server" placeholder="dd/MM/yyyy"></asp:TextBox>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <div class="team-stat-card team-stat-balance">
-                                    <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-inr"></i></span>
+                                    <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-rupee-sign"></i></span>
                                     <div class="team-stat-content">
                                         <p class="team-stat-label">Balance</p>
                                         <asp:TextBox ID="LblCurrentWallet" CssClass="form-control team-stat-input" runat="server" Enabled="false"></asp:TextBox>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="RepurchaseLevelIncome.aspx.cs" Inherits="user_RepurchaseLevelIncome" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="RepurchaseLevelIncome.aspx.cs" Inherits="user_RepurchaseLevelIncome" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
      Repurchase Level Report  
       </h1>
       <ol class="breadcrumb">
-    <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home > </a></li>
+    <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home > </a></li>
             <li><a href="#">My Income > </a></li>
         <li class="active">Repurchase Level Report </li>
       

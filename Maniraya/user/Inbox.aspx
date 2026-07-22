@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Inbox" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="Inbox.aspx.cs" Inherits="Associate_Details" %>
+<%@ Page Title="Inbox" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="Inbox.aspx.cs" Inherits="Associate_Details" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
@@ -26,7 +26,7 @@
                 <p class="profile-hero-meta">View messages and support replies</p>
             </div>
             <div class="profile-hero-actions">
-                <a href="NewMessage.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-pencil"></i> Compose Mail</a>
+                <a href="NewMessage.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-pencil-alt"></i> Compose Mail</a>
             </div>
         </div>
 
@@ -110,7 +110,7 @@
     <asp:Panel ID="pnlModal" runat="server" CssClass="inbox-message-modal" Style="display: none;">
         <div class="inbox-message-head">
             <div class="inbox-message-head-main">
-                <span class="inbox-message-head-icon" aria-hidden="true"><i class="fa fa-envelope-open"></i></span>
+                <span class="inbox-message-head-icon" aria-hidden="true"><i class="fa fa-envelopepen"></i></span>
                 <div>
                     <h3>Message Detail</h3>
                     <p>Full message information</p>

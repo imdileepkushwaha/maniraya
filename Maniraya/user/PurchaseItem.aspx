@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Item" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItem.aspx.cs" Inherits="admin_PurchaseItem" %>
+<%@ Page Title="Purchase Item" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItem.aspx.cs" Inherits="admin_PurchaseItem" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script>
@@ -406,7 +406,7 @@
         <div class="row">
             <div class="col-md-5">
                 <ol class="breadcrumb">
-                    <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+                    <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
                     <li><a href="#">My Repurchase</a></li>
                     <li class="active">Purchase Item</li>
 
@@ -417,11 +417,11 @@
                     <div class="box-header with-border">
 
                         <div style="float: right; color: white; display:none">
-                            Your Main Balance  :   <i class="fa fa-inr"></i>
+                            Your Main Balance  :   <i class="fa fa-rupee-sign"></i>
                             <asp:Label ID="Lblbalance" runat="server" Text="Balance"></asp:Label>
                         </div>
                         <div style="float: right; color: white;">
-                            Your Shopping Balance  :   <i class="fa fa-inr"></i>
+                            Your Shopping Balance  :   <i class="fa fa-rupee-sign"></i>
                             <asp:Label ID="LblUtility" runat="server" Text="Balance"></asp:Label>
                         </div>
                     </div>
@@ -598,7 +598,7 @@
                                                     <div class="price col-md-6">
                                                         <h5>
                                                             <asp:Label ID="lblstatename" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label></h5>
-                                                        <h6 class="price-text-color"><i class="fa fa-inr"></i>
+                                                        <h6 class="price-text-color"><i class="fa fa-rupee-sign"></i>
                                                             <asp:Label ID="lblstatename1" runat="server" Text='<%#Eval("Amount") %>' ForeColor="#ff0000"></asp:Label>
                                                         </h5>
                                                     </div>
@@ -763,7 +763,7 @@
                                                     <asp:Label ID="LblProductName" runat="server" Text=""></asp:Label></h4>
                                             </div>
                                             <div>
-                                                <h5>MRP : <i class="fa fa-inr"></i>
+                                                <h5>MRP : <i class="fa fa-rupee-sign"></i>
                                                     <asp:Label ID="LblMRP" runat="server" Text=""></asp:Label></h5>
                                             </div>
                                             <div>
@@ -777,7 +777,7 @@
 
                                             <div class="product_price">
                                                 <a href="#">Amount After Discount
-          <i class="fa fa-inr"></i>
+          <i class="fa fa-rupee-sign"></i>
                                                     <span class="price_new">
                                                         <asp:Label ID="LblAmount" runat="server" Text=""></asp:Label></span></a>
 

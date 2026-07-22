@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/user/usermaster.master" AutoEventWireup="true" CodeFile="DHTBookingdetailaspx.aspx.cs" Inherits="user_DHTBookingdetailaspx" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/user/usermaster.master" AutoEventWireup="true" CodeFile="DHTBookingdetailaspx.aspx.cs" Inherits="user_DHTBookingdetailaspx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
      DTH Booking Report  
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">DTH Booking</a></li>
         <li class="active">DTH Booking Report   </li>
       
@@ -196,7 +196,7 @@
                                        <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
                                               <span onclick="return confirm_click();">
-                                            <asp:LinkButton ID="btnSuccess" Visible="false" CssClass="btn btn-success" CommandName="mySuccess" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Success" runat="server"><i class="icon fa fa-check-square-o" aria-hidden="true"></i></asp:LinkButton>
+                                            <asp:LinkButton ID="btnSuccess" Visible="false" CssClass="btn btn-success" CommandName="mySuccess" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Success" runat="server"><i class="icon fa fa-check-square" aria-hidden="true"></i></asp:LinkButton>
                                             <asp:LinkButton ID="btnDispute" CssClass="btn purple" CommandName="myDispute" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Dispute" runat="server"><i class="icon fa fa-legal" aria-hidden="true"></i></asp:LinkButton>
                                             <asp:LinkButton ID="btnFail" CssClass="btn btn-danger" Visible="false" CommandName="myFail" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Fail" runat="server"><i class="icon fa fa-window-close-o" aria-hidden="true"></i></asp:LinkButton>
                                       </span>

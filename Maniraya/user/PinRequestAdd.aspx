@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Deposit Request" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PinRequestAdd.aspx.cs" Inherits="user_PinRequestAdd" %>
+<%@ Page Title="Deposit Request" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PinRequestAdd.aspx.cs" Inherits="user_PinRequestAdd" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
@@ -50,7 +50,7 @@
      E-Pin Request  
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home ></a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home ></a></li>
             <li><a href="#">E-Pin Management ></a></li>
         <li class="active">E-Pin Request </li>
       

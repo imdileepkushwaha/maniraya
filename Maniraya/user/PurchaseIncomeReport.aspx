@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Income Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="PurchaseIncomeReport.aspx.cs" Inherits="admin_PurchaseIncomeReport" %>
+<%@ Page Title="Purchase Income Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="PurchaseIncomeReport.aspx.cs" Inherits="admin_PurchaseIncomeReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
      Purchase Income Report
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">My Income</a></li>
         <li class="active">Purchase Income Report   </li>
       

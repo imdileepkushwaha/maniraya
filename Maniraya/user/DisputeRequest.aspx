@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Dispute Request" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="DisputeRequest.aspx.cs" Inherits="admin_DisputeRequest" %>
+<%@ Page Title="Dispute Request" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="DisputeRequest.aspx.cs" Inherits="admin_DisputeRequest" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
       Dispute Request 
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
         <li><a href="#">Admin Request</a></li>
         <li class="active">Dispute Request</li>
       </ol>

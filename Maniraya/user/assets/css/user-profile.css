@@ -480,6 +480,7 @@
 }
 
 .profile-upload-icon {
+    position: relative;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -491,6 +492,41 @@
     background: linear-gradient(135deg, rgba(232, 107, 90, 0.16) 0%, rgba(232, 107, 90, 0.06) 100%);
     border: 1px solid rgba(232, 107, 90, 0.2);
     box-shadow: 0 8px 20px rgba(232, 107, 90, 0.12);
+}
+
+/* Font Awesome kit/version mismatch breaks fa-cloud-upload — use SVG so icon always shows */
+.profile-upload-icon > i {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.profile-upload-icon::before {
+    content: "";
+    display: block;
+    width: 1.35em;
+    height: 1.35em;
+    background-color: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V6'/%3E%3Cpath d='M8 10l4-4 4 4'/%3E%3Cpath d='M20 16.5A3.5 3.5 0 0 0 16.5 13H15a5 5 0 1 0-9.9 1.1A3.5 3.5 0 0 0 6.5 21H17a3 3 0 0 0 3-3.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V6'/%3E%3Cpath d='M8 10l4-4 4 4'/%3E%3Cpath d='M20 16.5A3.5 3.5 0 0 0 16.5 13H15a5 5 0 1 0-9.9 1.1A3.5 3.5 0 0 0 6.5 21H17a3 3 0 0 0 3-3.5z'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.profile-upload-icon:has(.fa-paperclip)::before,
+.profile-upload-icon.profile-upload-icon--clip::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48'/%3E%3C/svg%3E");
 }
 
 .profile-upload-title {

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="DownlineReport.aspx.cs" Inherits="admin_DownlineReport" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="DownlineReport.aspx.cs" Inherits="admin_DownlineReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
@@ -8,7 +8,7 @@
       <section class="content-header">
       <h1>Downline Report</h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home > </a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home > </a></li>
             <li><a href="#">My Team > </a></li>
             <li class="active">My Downline</li>
       
@@ -22,7 +22,7 @@
 
             <div class="profile-page team-page">
                 <div class="profile-hero">
-                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-level-down"></i></div>
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-level-down-alt"></i></div>
                     <div class="profile-hero-info">
                         <h2>My Downline</h2>
                         <p class="profile-hero-meta">Explore your complete downline members on both left and right legs</p>

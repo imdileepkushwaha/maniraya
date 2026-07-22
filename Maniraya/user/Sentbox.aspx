@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Sentbox" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Sentbox.aspx.cs" Inherits="Associate_Details" %>
+<%@ Page Title="Sentbox" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Sentbox.aspx.cs" Inherits="Associate_Details" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script src="js/jquery-1.10.2.js"></script>
@@ -9,7 +9,7 @@
             Sent Box
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Customer Care</a></li>
         <li class="active">Sent Box</li>
       </ol>

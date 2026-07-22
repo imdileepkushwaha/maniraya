@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Withdrawl Request Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="WithdrawlRequestReport.aspx.cs" Inherits="admin_UserReport" %>
+<%@ Page Title="Withdrawl Request Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="WithdrawlRequestReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>Withdrawl Request Report</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Withdrawl</a></li>
             <li class="active">Withdrawl Report</li>
         </ol>
@@ -51,7 +51,7 @@
                             </div>
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group">
-                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check-o"></i> To Date</label>
+                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check"></i> To Date</label>
                                     <asp:TextBox runat="server" CssClass="form-control form_date" ID="txttodate" placeholder="dd/mm/yyyy"></asp:TextBox>
                                 </div>
                             </div>

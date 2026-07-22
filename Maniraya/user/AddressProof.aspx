@@ -1,7 +1,7 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="AddressProof.aspx.cs" Inherits="user_AddressProof" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="AddressProof.aspx.cs" Inherits="user_AddressProof" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link href="assets/css/user-profile.css?v=6" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <script type="text/javascript">
         function validate() {
             if (document.getElementById("<%=hdstatus.ClientID%>").value == "Active") {
@@ -71,7 +71,7 @@
                                         </div>
                                         <div class="col-md-6" id="divStatus" runat="server" visible="false">
                                             <div class="form-group">
-                                                <label><i class="fa fa-check-square-o"></i> Approval Status</label>
+                                                <label><i class="fa fa-check-square"></i> Approval Status</label>
                                                 <div class="profile-kyc-status-wrap">
                                                     <asp:Label ID="lblApprovalStatus" runat="server" CssClass="profile-kyc-badge"></asp:Label>
                                                 </div>
@@ -86,10 +86,10 @@
                                     </div>
                                     <div class="profile-upload-grid">
                                         <div class="form-group profile-upload-field">
-                                            <label><i class="fa fa-file-image-o"></i> Front Side</label>
+                                            <label><i class="fa fa-file-image"></i> Front Side</label>
                                             <div class="profile-upload-zone profile-upload-zone-compact" id="aadharFrontZone">
                                                 <div class="profile-upload-zone-inner">
-                                                    <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                    <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                     <p class="profile-upload-title">Upload front side</p>
                                                     <p class="profile-upload-hint">or <span class="profile-upload-browse">browse</span></p>
                                                 </div>
@@ -108,10 +108,10 @@
                                             </div>
                                         </div>
                                         <div class="form-group profile-upload-field">
-                                            <label><i class="fa fa-file-image-o"></i> Back Side</label>
+                                            <label><i class="fa fa-file-image"></i> Back Side</label>
                                             <div class="profile-upload-zone profile-upload-zone-compact" id="aadharBackZone">
                                                 <div class="profile-upload-zone-inner">
-                                                    <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                    <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                     <p class="profile-upload-title">Upload back side</p>
                                                     <p class="profile-upload-hint">or <span class="profile-upload-browse">browse</span></p>
                                                 </div>
@@ -152,7 +152,7 @@
                             <h3 class="box-title">Address Details</h3>
                         </div>
                         <div class="box-body profile-form-grid">
-                            <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Residential Address</p>
+                            <p class="profile-subsection-title"><i class="fa fa-map-marker-alt"></i> Residential Address</p>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -296,7 +296,7 @@
 
                 previewUrls[config.key] = URL.createObjectURL(file);
                 preview.src = previewUrls[config.key];
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

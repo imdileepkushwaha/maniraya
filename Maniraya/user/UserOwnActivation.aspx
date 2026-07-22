@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Joining Package Activation" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="UserOwnActivation.aspx.cs" Inherits="UserOwnActivation" %>
+<%@ Page Title="Joining Package Activation" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="UserOwnActivation.aspx.cs" Inherits="UserOwnActivation" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
@@ -18,7 +18,7 @@
      Joining Package Activation 
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">My Wallet</a></li>
         <li class="active">Joining Package Activation </li>
       

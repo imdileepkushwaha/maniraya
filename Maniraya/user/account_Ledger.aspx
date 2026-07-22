@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Account Ledger" Language="C#" MasterPageFile="~/User/MasterPage.master" AutoEventWireup="true" CodeFile="account_Ledger.aspx.cs" Inherits="User_account_Ledger" %>
+<%@ Page Title="Account Ledger" Language="C#" MasterPageFile="~/User/MasterPage.master" AutoEventWireup="true" CodeFile="account_Ledger.aspx.cs" Inherits="User_account_Ledger" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 
@@ -49,7 +49,7 @@
     <section class="content-header">
         <h1>Account Ledger</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">Report</a></li>
             <li class="active">Account Ledger</li>
         </ol>
@@ -76,7 +76,7 @@
                         <p class="profile-hero-meta">Review every credit and debit movement across your wallets.</p>
                     </div>
                     <div class="profile-hero-actions">
-                        <a href="TransactionReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-exchange"></i> Transactions</a>
+                        <a href="TransactionReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-exchange-alt"></i> Transactions</a>
                         <a href="UserWallet.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-credit-card"></i> My Wallet</a>
                         <a href="Dashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-home"></i> Dashboard</a>
                     </div>
@@ -103,7 +103,7 @@
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <div class="form-group">
-                                    <label for="<%= txtToDate.ClientID %>"><i class="fa fa-calendar-check-o"></i> To Date</label>
+                                    <label for="<%= txtToDate.ClientID %>"><i class="fa fa-calendar-check"></i> To Date</label>
                                     <asp:TextBox ID="txtToDate" runat="server" placeholder="To Date" CssClass="form-control"></asp:TextBox>
                                     <cc1:CalendarExtender ID="CalToDate" runat="server" TargetControlID="txtToDate" Format="dd-MMM-yyyy"></cc1:CalendarExtender>
                                 </div>

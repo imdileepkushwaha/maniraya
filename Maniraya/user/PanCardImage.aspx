@@ -1,7 +1,7 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PanCardImage.aspx.cs" Inherits="user_PanCardImage" %>
+<%@ Page Title="" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="PanCardImage.aspx.cs" Inherits="user_PanCardImage" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=5" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <script type="text/javascript">
         function validate() {
             if (document.getElementById("<%=hdstatus.ClientID%>").value == "Active") {
@@ -70,7 +70,7 @@
                                         </div>
                                         <div class="col-md-6" id="divStatus" runat="server" visible="false">
                                             <div class="form-group">
-                                                <label><i class="fa fa-check-square-o"></i> Approval Status</label>
+                                                <label><i class="fa fa-check-square"></i> Approval Status</label>
                                                 <div class="profile-kyc-status-wrap">
                                                     <asp:Label ID="lblApprovalStatus" runat="server" CssClass="profile-kyc-badge"></asp:Label>
                                                 </div>
@@ -84,13 +84,13 @@
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group profile-upload-field">
-                                                <label><i class="fa fa-file-image-o"></i> Upload PAN Card</label>
+                                                <label><i class="fa fa-file-image"></i> Upload PAN Card</label>
                                                 <div class="profile-upload-zone" id="panUploadZone">
                                                     <div class="profile-upload-zone-inner">
-                                                        <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                        <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                         <p class="profile-upload-title">Drag &amp; drop PAN card image here</p>
                                                         <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from device</span></p>
-                                                        <p class="profile-upload-meta">JPG, PNG, WEBP · Clear photo of front side</p>
+                                                        <p class="profile-upload-meta">JPG, PNG, WEBP � Clear photo of front side</p>
                                                     </div>
                                                     <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
                                                 </div>
@@ -193,7 +193,7 @@
 
                 previewUrl = URL.createObjectURL(file);
                 preview.src = previewUrl;
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

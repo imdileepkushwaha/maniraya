@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Level Income Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="BonusIncomeReport.aspx.cs" Inherits="LevelIncomeReport" %>
+<%@ Page Title="Level Income Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="BonusIncomeReport.aspx.cs" Inherits="LevelIncomeReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
      Bonus Income Report  
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home > </a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home > </a></li>
             <li><a href="#">My Income > </a></li>
         <li class="active">Bonus Income </li>
       

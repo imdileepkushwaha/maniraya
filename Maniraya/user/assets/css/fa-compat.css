@@ -1,0 +1,160 @@
+/**
+ * Font Awesome 4 class aliases for FA5 Free.
+ * Kit + all.min.css drop FA4 names (fa-money, fa-calendar-check-o, etc.).
+ */
+.fa,
+.fas {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+}
+
+.far {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 400 !important;
+}
+
+.fab {
+    font-family: "Font Awesome 5 Brands" !important;
+    font-weight: 400 !important;
+}
+
+.profile-hero-avatar > i,
+.dash-subpage-panel-icon > i {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
+/* FA4 -> FA5 solid glyphs used across user pages */
+.fa-money:before { content: "\f3d1"; }                 /* money-bill-alt */
+.fa-calendar-check-o:before { content: "\f274"; }      /* calendar-check */
+.fa-level-down:before { content: "\f3be"; }            /* level-down-alt */
+.fa-pie-chart:before { content: "\f200"; }             /* chart-pie */
+.fa-line-chart:before { content: "\f201"; }            /* chart-line */
+.fa-diamond:before { content: "\f3a5"; }               /* gem */
+.fa-exchange:before { content: "\f362"; }              /* exchange-alt */
+.fa-pencil:before { content: "\f303"; }                /* pencil-alt */
+.fa-bank:before { content: "\f19c"; }                  /* university */
+.fa-sign-out:before { content: "\f2f5"; }              /* sign-out-alt */
+.fa-refresh:before { content: "\f2f1"; }               /* sync-alt */
+.fa-clock-o:before { content: "\f017"; }
+.fa-file-text-o:before,
+.fa-file-text:before { content: "\f15c"; }             /* file-alt */
+.fa-check-square-o:before { content: "\f14a"; }
+.fa-square-o:before { content: "\f0c8"; }
+.fa-trash-o:before { content: "\f2ed"; }               /* trash-alt */
+.fa-map-marker:before { content: "\f3c5"; }            /* map-marker-alt */
+.fa-envelope-o:before { content: "\f0e0"; }
+.fa-comment-o:before { content: "\f075"; }
+.fa-comments-o:before { content: "\f086"; }
+.fa-user-circle-o:before { content: "\f2bd"; }
+.fa-star-o:before { content: "\f005"; }
+.fa-heart-o:before { content: "\f004"; }
+.fa-inr:before,
+.fa-rupee:before { content: "\f156"; }                 /* rupee-sign */
+.fa-mobile-phone:before { content: "\f3cd"; }          /* mobile-alt */
+.fa-dashboard:before,
+.fa-tachometer:before { content: "\f3fd"; }            /* tachometer-alt */
+.fa-warning:before { content: "\f071"; }
+.fa-remove:before,
+.fa-close:before { content: "\f00d"; }
+.fa-group:before { content: "\f0c0"; }
+.fa-picture-o:before,
+.fa-photo:before { content: "\f03e"; }
+.fa-file-image-o:before,
+.fa-file-photo-o:before,
+.fa-file-picture-o:before { content: "\f1c5"; }
+.fa-file-pdf-o:before { content: "\f1c1"; }
+.fa-file-o:before { content: "\f15b"; }
+.fa-folder-o:before { content: "\f07b"; }
+.fa-folder-open-o:before { content: "\f07c"; }
+.fa-bell-o:before { content: "\f0f3"; }
+.fa-building-o:before { content: "\f1ad"; }
+.fa-calendar-o:before { content: "\f133"; }
+.fa-circle-o:before { content: "\f111"; }
+.fa-dot-circle-o:before { content: "\f192"; }
+.fa-thumbs-o-up:before { content: "\f164"; }
+.fa-thumbs-o-down:before { content: "\f165"; }
+.fa-lightbulb-o:before { content: "\f0eb"; }
+.fa-newspaper-o:before { content: "\f1ea"; }
+.fa-paper-plane-o:before,
+.fa-send-o:before { content: "\f1d8"; }
+.fa-bar-chart-o:before,
+.fa-bar-chart:before { content: "\f080"; }
+.fa-area-chart:before { content: "\f1fe"; }
+.fa-cloud-upload:before { content: "\f382"; }          /* cloud-upload-alt */
+.fa-cloud-download:before { content: "\f381"; }        /* cloud-download-alt */
+.fa-external-link:before { content: "\f35d"; }         /* external-link-alt */
+.fa-arrows:before { content: "\f0b2"; }
+.fa-arrows-v:before { content: "\f338"; }
+.fa-arrows-h:before { content: "\f337"; }
+.fa-long-arrow-left:before { content: "\f30a"; }
+.fa-long-arrow-right:before { content: "\f30b"; }
+.fa-long-arrow-up:before { content: "\f30c"; }
+.fa-long-arrow-down:before { content: "\f30d"; }
+.fa-caret-square-o-down:before { content: "\f150"; }
+.fa-caret-square-o-up:before { content: "\f151"; }
+.fa-caret-square-o-right:before { content: "\f152"; }
+.fa-caret-square-o-left:before { content: "\f191"; }
+.fa-hand-o-right:before { content: "\f0a4"; }
+.fa-hand-o-left:before { content: "\f0a5"; }
+.fa-hand-o-up:before { content: "\f0a6"; }
+.fa-hand-o-down:before { content: "\f0a7"; }
+.fa-arrow-circle-o-left:before { content: "\f0a8"; }
+.fa-arrow-circle-o-right:before { content: "\f0a9"; }
+.fa-arrow-circle-o-up:before { content: "\f0aa"; }
+.fa-arrow-circle-o-down:before { content: "\f0ab"; }
+.fa-toggle-on:before { content: "\f205"; }
+.fa-toggle-off:before { content: "\f204"; }
+.fa-sliders:before { content: "\f1de"; }
+.fa-unsorted:before,
+.fa-sort:before { content: "\f0dc"; }
+.fa-sort-desc:before { content: "\f0dd"; }
+.fa-sort-asc:before { content: "\f0de"; }
+.fa-mail-forward:before { content: "\f064"; }
+.fa-mail-reply:before { content: "\f3e5"; }
+.fa-chain:before { content: "\f0c1"; }
+.fa-cut:before { content: "\f0c4"; }
+.fa-copy:before { content: "\f0c5"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-navicon:before,
+.fa-reorder:before { content: "\f0c9"; }
+.fa-gears:before { content: "\f085"; }
+.fa-legal:before { content: "\f0e3"; }
+.fa-support:before,
+.fa-life-ring:before,
+.fa-life-bouy:before,
+.fa-life-buoy:before,
+.fa-life-saver:before { content: "\f1cd"; }
+.fa-header:before { content: "\f1dc"; }
+.fa-futbol-o:before,
+.fa-soccer-ball-o:before { content: "\f1e3"; }
+.fa-smile-o:before { content: "\f118"; }
+.fa-frown-o:before { content: "\f119"; }
+.fa-meh-o:before { content: "\f11a"; }
+.fa-keyboard-o:before { content: "\f11c"; }
+.fa-flag-o:before { content: "\f024"; }
+.fa-lemon-o:before { content: "\f094"; }
+.fa-hospital-o:before { content: "\f0f8"; }
+.fa-bell-slash-o:before { content: "\f1f6"; }
+.fa-send:before { content: "\f1d8"; }
+.fa-cab:before { content: "\f1ba"; }
+.fa-file-archive-o:before,
+.fa-file-zip-o:before { content: "\f1c6"; }
+.fa-file-audio-o:before,
+.fa-file-sound-o:before { content: "\f1c7"; }
+.fa-file-video-o:before,
+.fa-file-movie-o:before { content: "\f1c8"; }
+.fa-file-code-o:before { content: "\f1c9"; }
+.fa-file-word-o:before { content: "\f1c2"; }
+.fa-file-excel-o:before { content: "\f1c3"; }
+.fa-file-powerpoint-o:before { content: "\f1c4"; }

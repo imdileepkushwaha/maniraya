@@ -54,7 +54,7 @@
     <section class="content-header">
         <h1>Team Member Installments</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="TeamSavingInstallmentReport.aspx">Team Installment Report</a></li>
             <li class="active">Installment Detail</li>
         </ol>
@@ -92,7 +92,7 @@
                 <asp:Panel ID="pnlContent" runat="server" Visible="false">
                     <div class="dash-subpage-panel dash-saving-report-panel">
                         <div class="dash-subpage-panel-head">
-                            <span class="dash-subpage-panel-icon tone-amber" aria-hidden="true"><i class="fa fa-money"></i></span>
+                            <span class="dash-subpage-panel-icon tone-amber" aria-hidden="true"><i class="fa fa-money-bill-alt"></i></span>
                             <div>
                                 <h3>All Installments</h3>
                                 <p>Unpaid, processing and paid EMI records (view only)</p>
@@ -153,7 +153,7 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Amount">
                                             <ItemTemplate>
-                                                <span class="dash-saving-amount"><i class="fa fa-inr"></i> <%# Eval("amount") %></span>
+                                                <span class="dash-saving-amount"><i class="fa fa-rupee-sign"></i> <%# Eval("amount") %></span>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Product">

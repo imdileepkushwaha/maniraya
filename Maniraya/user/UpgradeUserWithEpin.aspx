@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Upgrade User With E-Pin" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="UpgradeUserWithEpin.aspx.cs" Inherits="UpgradeUserWithEpin" %>
+<%@ Page Title="Upgrade User With E-Pin" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="UpgradeUserWithEpin.aspx.cs" Inherits="UpgradeUserWithEpin" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -23,7 +23,7 @@
         <h1>Upgrade User With E-Pin 
         </h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">My Wallet</a></li>
             <li class="active">Upgrade User With E-Pin</li>
         </ol>

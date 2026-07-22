@@ -226,8 +226,9 @@ public partial class admin_UserReport : System.Web.UI.Page
         string res = Approve_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString(), txtremark.Text);
         if (res == "t")
         {
-
-            string popupScript = "alert('Purchase Approved Successfully');";
+            string waStatus;
+            TrySendWhatsAppInvoice(gvRow, ChatwayWhatsAppHelper.InvoiceMessageType.FirstPurchase, out waStatus);
+            string popupScript = "alert('Purchase Approved Successfully" + FormatWhatsAppAlertSuffix(waStatus) + "');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             loadprevproduct();
 
@@ -409,6 +410,9 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     protected void btnPayAll_Click(object sender, EventArgs e)
     {
+        int whatsAppSent = 0;
+        int whatsAppFailed = 0;
+
         foreach (GridViewRow r in GridView1.Rows)
         {
             CheckBox CheckBox2 = (CheckBox)r.FindControl("CheckBox2");
@@ -423,37 +427,60 @@ public partial class admin_UserReport : System.Web.UI.Page
 
 
                 string res = Approve_ProductPurchase(lblgalleryid.Text, Session["useradmin"].ToString(), txtremark.Text);
-                //if (res == "t")
-                //{
-
-                //    string popupScript = "alert('Purchase Approved Successfully');";
-                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                //    loadprevproduct();
-
-                //}
-                //else if (res == "f")
-                //{
-
-                //    string popupScript = "alert('Purchase Already Processed');";
-                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                //    loadprevproduct();
-
-                //}
-                //else
-                //{
-                //    string popupScript = "alert('Something wrong ');";
-                //    ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-                //    loadprevproduct();
-
-                //}
-                //loadprevproduct();
+                if (res == "t")
+                {
+                    string waStatus;
+                    if (TrySendWhatsAppInvoice(r, ChatwayWhatsAppHelper.InvoiceMessageType.FirstPurchase, out waStatus))
+                    {
+                        whatsAppSent++;
+                    }
+                    else if (ChatwayWhatsAppHelper.IsEnabled)
+                    {
+                        whatsAppFailed++;
+                    }
+                }
             }
         }
-       
-            string popupScript = "alert('Purchase Approved Successfully');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            loadprevproduct();
 
-       
+        string alertText = "Purchase Approved Successfully";
+        if (ChatwayWhatsAppHelper.IsEnabled)
+        {
+            alertText += ". WhatsApp queued: " + whatsAppSent;
+            if (whatsAppFailed > 0)
+            {
+                alertText += ", failed: " + whatsAppFailed;
+            }
+        }
+
+        string popupScript = "alert('" + alertText.Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        loadprevproduct();
+    }
+
+    bool TrySendWhatsAppInvoice(GridViewRow row, ChatwayWhatsAppHelper.InvoiceMessageType messageType, out string statusMessage)
+    {
+        statusMessage = string.Empty;
+        if (row == null)
+        {
+            statusMessage = "Row missing.";
+            return false;
+        }
+
+        Label lblUserId = (Label)row.FindControl("lblurrorderid");
+        Label lblOrderId = (Label)row.FindControl("lblorderid");
+        string userId = lblUserId != null ? Convert.ToString(lblUserId.Text).Trim() : string.Empty;
+        string orderId = lblOrderId != null ? Convert.ToString(lblOrderId.Text).Trim() : string.Empty;
+
+        return ChatwayWhatsAppHelper.TrySendInvoiceAfterApprove(userId, orderId, messageType, out statusMessage);
+    }
+
+    static string FormatWhatsAppAlertSuffix(string waStatus)
+    {
+        if (string.IsNullOrWhiteSpace(waStatus) || !ChatwayWhatsAppHelper.IsEnabled)
+        {
+            return string.Empty;
+        }
+
+        return ". " + waStatus.Replace("'", "");
     }
 }

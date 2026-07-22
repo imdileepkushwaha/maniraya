@@ -1,7 +1,7 @@
-﻿<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchasebulk.aspx.cs" Inherits="user_SavingProductPurchasebulk" %>
+<%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchasebulk.aspx.cs" Inherits="user_SavingProductPurchasebulk" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
+    <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <style>
         .saving-purchase-page .saving-product-showcase {
             margin-bottom: 24px;
@@ -463,7 +463,7 @@
     <section class="content-header">
         <h1>Purchase Saving Product</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Saving</a></li>
             <li class="active">Purchase Saving Product</li>
         </ol>
@@ -522,11 +522,11 @@
                                     <div class="saving-product-price-grid">
                                         <div class="saving-product-price-item">
                                             <span>MRP</span>
-                                            <strong>₹ <asp:Literal ID="litMrp" runat="server" /></strong>
+                                            <strong>? <asp:Literal ID="litMrp" runat="server" /></strong>
                                         </div>
                                         <div class="saving-product-price-item">
                                             <span>DP</span>
-                                            <strong>₹ <asp:Literal ID="litDp" runat="server" /></strong>
+                                            <strong>? <asp:Literal ID="litDp" runat="server" /></strong>
                                         </div>
                                         <div class="saving-product-price-item is-highlight">
                                             <span>Pay Amount</span>
@@ -556,7 +556,7 @@
                                 <asp:TextBox ID="txtproductname" Enabled="false" CssClass="form-control" runat="server" />
                             </div>
                             <div class="form-group">
-                                <label for="<%= txtamount.ClientID %>"><i class="fa fa-inr"></i> Amount</label>
+                                <label for="<%= txtamount.ClientID %>"><i class="fa fa-rupee-sign"></i> Amount</label>
                                 <asp:TextBox ID="txtamount" Enabled="false" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>
@@ -566,7 +566,7 @@
                                 <asp:TextBox ID="txtquantity" AutoPostBack="true" Text="1" OnTextChanged="txtquantity_TextChanged" CssClass="form-control" runat="server" />
                             </div>
                             <div class="form-group">
-                                <label for="<%= txttotalamount.ClientID %>"><i class="fa fa-inr"></i> Total Amount</label>
+                                <label for="<%= txttotalamount.ClientID %>"><i class="fa fa-rupee-sign"></i> Total Amount</label>
                                 <asp:TextBox ID="txttotalamount" Enabled="false" Text="1000" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>
@@ -596,7 +596,7 @@
                         </div>
 
                         <asp:Panel ID="pnlShippingAddressSection" runat="server">
-                        <p class="profile-subsection-title"><i class="fa fa-map-marker"></i> Shipping Address</p>
+                        <p class="profile-subsection-title"><i class="fa fa-map-marker-alt"></i> Shipping Address</p>
                         <asp:HiddenField ID="hfShippingMode" runat="server" Value="view" />
 
                         <asp:Panel ID="pnlShippingView" runat="server" CssClass="saving-shipping-card">
@@ -678,7 +678,7 @@
                             <div class="saving-payment-type-item">
                                 <asp:RadioButton ID="rbCashPayment" runat="server" GroupName="PaymentMethod" />
                                 <label for="<%= rbCashPayment.ClientID %>">
-                                    <span class="saving-shipping-type-icon"><i class="fa fa-money"></i></span>
+                                    <span class="saving-shipping-type-icon"><i class="fa fa-money-bill-alt"></i></span>
                                     <span class="saving-shipping-type-text">
                                         <strong>Cash</strong>
                                         <span>Submit request directly to admin</span>
@@ -711,7 +711,7 @@
                                     </asp:Panel>
                                     <asp:Panel ID="pnlCompanyAccount" runat="server">
                                         <asp:Panel ID="pnlBankSelectWrap" runat="server" Visible="false" CssClass="form-group">
-                                            <label for="<%= ddbankaccount.ClientID %>"><i class="fa fa-bank"></i> Select Account</label>
+                                            <label for="<%= ddbankaccount.ClientID %>"><i class="fa fa-university"></i> Select Account</label>
                                             <asp:DropDownList ID="ddbankaccount" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddbankaccount_SelectedIndexChanged" />
                                         </asp:Panel>
                                         <div class="topup-qr-card">
@@ -727,19 +727,19 @@
                                     </asp:Panel>
                                 </div>
                                 <div class="col-md-7">
-                                    <p class="profile-subsection-title"><i class="fa fa-check-square-o"></i> Payment Proof</p>
+                                    <p class="profile-subsection-title"><i class="fa fa-check-square"></i> Payment Proof</p>
                                     <div class="form-group">
-                                        <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange"></i> UTR No / Transaction ID</label>
+                                        <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
                                         <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
                                     </div>
                                     <div class="form-group profile-upload-field topup-payment-upload">
                                         <label><i class="fa fa-camera"></i> Payment Screenshot</label>
                                         <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
                                             <div class="profile-upload-zone-inner">
-                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload"></i></span>
+                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
                                                 <p class="profile-upload-title">Drop payment screenshot here</p>
                                                 <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
-                                                <p class="profile-upload-meta">JPG, PNG, WEBP · receipt clearly visible</p>
+                                                <p class="profile-upload-meta">JPG, PNG, WEBP � receipt clearly visible</p>
                                             </div>
                                             <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
                                         </div>
@@ -813,7 +813,7 @@
 
                 previewUrl = URL.createObjectURL(file);
                 preview.src = previewUrl;
-                filechip.textContent = file.name + ' · ' + formatFileSize(file.size);
+                filechip.textContent = file.name + ' � ' + formatFileSize(file.size);
                 selection.hidden = false;
                 zone.classList.add('is-hidden');
                 return true;

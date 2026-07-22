@@ -1,4 +1,4 @@
-﻿<%@ Page Title="My Savings" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SAvingProductPurchaseReport.aspx.cs" Inherits="user_SavingProductPurchaseReport" %>
+<%@ Page Title="My Savings" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SAvingProductPurchaseReport.aspx.cs" Inherits="user_SavingProductPurchaseReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=9" rel="stylesheet" />
@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>My Savings</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="SavingDashboard.aspx">Saving</a></li>
             <li class="active">My Savings</li>
         </ol>
@@ -27,7 +27,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="SavingProductPurchase.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-shopping-cart"></i> Buy Product</a>
-                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-bank"></i> Saving Dashboard</a>
+                        <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-university"></i> Saving Dashboard</a>
                         <a href="Dashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-arrow-left"></i> Back</a>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Amount">
                                         <ItemTemplate>
-                                            <span class="dash-saving-amount"><i class="fa fa-inr"></i> <asp:Label ID="lblamount" runat="server" Text='<%# Eval("amount") %>'></asp:Label></span>
+                                            <span class="dash-saving-amount"><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblamount" runat="server" Text='<%# Eval("amount") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Product">
@@ -89,7 +89,7 @@
                                     <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
                                             <a href='SavingProductInstallmentDetail.aspx?oid=<%# Eval("couponcode") %>' class="dash-saving-action-btn is-view">
-                                                <i class="fa fa-calendar-check-o"></i> Installments
+                                                <i class="fa fa-calendar-check"></i> Installments
                                             </a>
                                         </ItemTemplate>
                                     </asp:TemplateField>

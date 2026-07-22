@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="DTHBooking.aspx.cs" Inherits="user_DTHBooking" %>
+<%@ Page Title="" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="DTHBooking.aspx.cs" Inherits="user_DTHBooking" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
      <script type="text/javascript">
@@ -78,7 +78,7 @@
        <section class="content-header">
         <h1>DTH Booking entry</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">DTH Booking</a></li>
             <li class="active">DTH Booking entry</li>
         </ol>

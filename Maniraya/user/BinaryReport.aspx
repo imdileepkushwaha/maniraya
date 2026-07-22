@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Binary Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="BinaryReport.aspx.cs" Inherits="admin_BinaryReport" %>
+<%@ Page Title="Binary Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="BinaryReport.aspx.cs" Inherits="admin_BinaryReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
@@ -27,7 +27,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="UserDirectAssociates.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-users"></i> My Direct</a>
-                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down"></i> My Downline</a>
+                        <a href="DownlineReport.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-level-down-alt"></i> My Downline</a>
                     </div>
                 </div>
                 <div class="box box-primary">

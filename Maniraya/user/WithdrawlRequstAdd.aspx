@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Withdrawl Request" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="WithdrawlRequstAdd.aspx.cs" Inherits="user_WithdrawlRequstAdd" %>
+<%@ Page Title="Withdrawl Request" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="WithdrawlRequstAdd.aspx.cs" Inherits="user_WithdrawlRequstAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="../css/radio/style.css" rel="stylesheet" />
@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>Withdrawl Request</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Withdrawl</a></li>
             <li class="active">Withdrawl Fund</li>
         </ol>
@@ -43,7 +43,7 @@
                 <div class="box box-primary">
                     <div class="box-header with-border box-header-enhanced box-header-tone-5">
                         <div class="box-header-main">
-                            <span class="box-header-icon" aria-hidden="true"><i class="fa fa-money"></i></span>
+                            <span class="box-header-icon" aria-hidden="true"><i class="fa fa-money-bill-alt"></i></span>
                             <div class="box-header-text">
                                 <h3 class="box-title">Withdrawl Details</h3>
                                 <p class="box-subtitle">Enter the amount you wish to withdraw</p>
@@ -81,7 +81,7 @@
                             </div>
                         </div>
 
-                        <p class="profile-subsection-title"><i class="fa fa-inr"></i> Amount</p>
+                        <p class="profile-subsection-title"><i class="fa fa-rupee-sign"></i> Amount</p>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -91,7 +91,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="<%= txtamount.ClientID %>"><i class="fa fa-pencil"></i> Enter Amount</label>
+                                    <label for="<%= txtamount.ClientID %>"><i class="fa fa-pencil-alt"></i> Enter Amount</label>
                                     <asp:TextBox ID="txtamount" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" OnTextChanged="txtamount_TextChanged" AutoPostBack="true" placeholder="0.00" />
                                 </div>
                             </div>
@@ -131,7 +131,7 @@
                                 <span class="withdrawl-net-amount-hint">Amount credited after charges &amp; TDS</span>
                             </div>
                             <div class="withdrawl-net-amount-field">
-                                <i class="fa fa-inr" aria-hidden="true"></i>
+                                <i class="fa fa-rupee-sign" aria-hidden="true"></i>
                                 <asp:TextBox ID="txttotalamount" Enabled="false" runat="server" onkeypress="return isNumberKey(event);" CssClass="form-control" />
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Money Transfer" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="MoneyTransfer.aspx.cs" Inherits="user_MoneyTransfer" %>
+<%@ Page Title="Money Transfer" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="MoneyTransfer.aspx.cs" Inherits="user_MoneyTransfer" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
@@ -79,7 +79,7 @@
         <h1>Money Transfer   
         </h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">Money Transfer </a></li>
             <li class="active">Money Transfer </li>
 
@@ -256,8 +256,8 @@
                                                                         <asp:BoundField DataField="ifsc" HeaderText="IFSC" />
                                                                         <asp:TemplateField HeaderText="Action">
                                                                             <ItemTemplate>
-                                                                                <asp:LinkButton ID="LnkPay" runat="server" CommandName="LnkPay" CssClass="btn btn-success btn-round fa fa-inr" ToolTip="Money Transfer"></asp:LinkButton>
-                                                                                <asp:LinkButton ID="LnkDelete" runat="server" CommandName="LnkDelete" CssClass="btn btn-danger btn-round fa fa-trash-o" OnClientClick="if ( !confirm('Are you sure you want to delete this user?')) return false;" ToolTip="Delete"></asp:LinkButton>
+                                                                                <asp:LinkButton ID="LnkPay" runat="server" CommandName="LnkPay" CssClass="btn btn-success btn-round fa fa-rupee-sign" ToolTip="Money Transfer"></asp:LinkButton>
+                                                                                <asp:LinkButton ID="LnkDelete" runat="server" CommandName="LnkDelete" CssClass="btn btn-danger btn-round fa fa-trash-alt" OnClientClick="if ( !confirm('Are you sure you want to delete this user?')) return false;" ToolTip="Delete"></asp:LinkButton>
                                                                             </ItemTemplate>
                                                                         </asp:TemplateField>
                                                                     </Columns>
@@ -396,7 +396,7 @@ Company will not be liable for any wrong transactions.
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <asp:LinkButton ID="btnResend" OnClick="btnResend_Click" runat="server" CssClass="btn btn-info btn-xs"><i class="fa fa-refresh"></i> Resend</asp:LinkButton>
+                                        <asp:LinkButton ID="btnResend" OnClick="btnResend_Click" runat="server" CssClass="btn btn-info btn-xs"><i class="fa fa-sync-alt"></i> Resend</asp:LinkButton>
                                     </div>
                                 </div>
                             </div>

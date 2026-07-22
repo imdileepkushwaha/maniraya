@@ -104,7 +104,7 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
         if (dt.Rows.Count > 0)
         {
-            lblqrcode.Text = @"<img src=""../ProductImage/"+dt.Rows[0]["branchname"].ToString()+@""" style=""height:400px;"">";
+            lblqrcode.Text = @"<img src=""../ProductImage/" + dt.Rows[0]["branchname"].ToString() + @""" alt=""Payment QR"" />";
         }
 
 
@@ -237,17 +237,44 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
-        objproduct.ProductImage = UploadImage();
-        objproduct.TransactionCode = txttransactionidedit.Text;
-        string res = Insert_SavingInstallment(objproduct,lblidedit.Text);
+        bool isOnline = rbOnlinePayment != null && rbOnlinePayment.Checked;
+
+        if (isOnline)
+        {
+            if (string.IsNullOrWhiteSpace(txttransactionidedit.Text))
+            {
+                Message.Show("Please enter UTR No / Transaction ID.");
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+                return;
+            }
+
+            if (!FileUpload1.HasFile)
+            {
+                Message.Show("Please upload payment screenshot.");
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+                return;
+            }
+
+            objproduct.ProductImage = UploadImage();
+            objproduct.TransactionCode = txttransactionidedit.Text.Trim();
+        }
+        else
+        {
+            objproduct.ProductImage = string.Empty;
+            objproduct.TransactionCode = "CASH-" + DateTime.Now.Ticks;
+        }
+
+        string res = Insert_SavingInstallment(objproduct, lblidedit.Text);
         if (res == "t")
         {
             loadprevproduct();
-            Message.Show("Request Submitted Successfully");
+            Message.Show(isOnline
+                ? "Request Submitted Successfully"
+                : "Cash installment request sent to admin successfully");
             string popupScript2 = "Closepopup();";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript2, true);
         }
-        else if (res == "t")
+        else if (res == "f")
         {
             Message.Show("Already in process");
         }
@@ -270,6 +297,9 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             lblidedit.Text = lblid.Text;
             txtamountedit.Text = lblamount.Text;
             txtinstallmentdateedit.Text = lblinstallmentdate.Text;
+            if (rbOnlinePayment != null) rbOnlinePayment.Checked = true;
+            if (rbCashPayment != null) rbCashPayment.Checked = false;
+            if (txttransactionidedit != null) txttransactionidedit.Text = string.Empty;
 
             ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
         }

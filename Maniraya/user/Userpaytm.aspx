@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Userpaytm.aspx.cs" Inherits="Userpaytm" %>
+<%@ Page Title="Edit User Details" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="Userpaytm.aspx.cs" Inherits="Userpaytm" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
    
@@ -7,7 +7,7 @@
     <section class="content-header">
         <h1>PAYTM/UPI Detail</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i>Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i>Home</a></li>
             <li><a href="#">PAYTM/UPI Detail</a></li>
         </ol>
     </section>

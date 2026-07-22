@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Level Income Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="LevelIncomeReport.aspx.cs" Inherits="LevelIncomeReport" %>
+<%@ Page Title="Level Income Report" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="LevelIncomeReport.aspx.cs" Inherits="LevelIncomeReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>Level Income Report</h1>
         <ol class="breadcrumb">
-            <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">My Income</a></li>
             <li class="active">Level Income</li>
         </ol>
@@ -20,7 +20,7 @@
         <ContentTemplate>
             <div class="profile-page dash-subpage dash-income-report-page">
                 <div class="profile-hero dash-subpage-hero dash-subpage-hero--premium">
-                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-line-chart"></i></div>
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-chart-line"></i></div>
                     <div class="profile-hero-info">
                         <h2>Level Income Report</h2>
                         <p class="profile-hero-meta">View level-wise commission earned from your network with expected payout dates and status.</p>
@@ -48,7 +48,7 @@
                             </div>
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group">
-                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check-o"></i> To Date</label>
+                                    <label for="<%= txttodate.ClientID %>"><i class="fa fa-calendar-check"></i> To Date</label>
                                     <asp:TextBox ID="txttodate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy"></asp:TextBox>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                             </div>
                             <div class="dash-income-report-stat is-payable">
                                 <span class="dash-income-report-stat-label">Total Amount</span>
-                                <strong><i class="fa fa-inr"></i> <asp:Literal ID="litTotalPayable" runat="server" Text="0.00" /></strong>
+                                <strong><i class="fa fa-rupee-sign"></i> <asp:Literal ID="litTotalPayable" runat="server" Text="0.00" /></strong>
                             </div>
                         </asp:Panel>
                         <div class="dash-income-report-filter">

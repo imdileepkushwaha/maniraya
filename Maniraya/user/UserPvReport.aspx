@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Purchase Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="UserPvReport.aspx.cs" Inherits="UserPvReport" %>
+<%@ Page Title="Purchase Report" Language="C#" MasterPageFile="usermaster.master" AutoEventWireup="true" CodeFile="UserPvReport.aspx.cs" Inherits="UserPvReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
           User Purchase PV Report
       </h1>
       <ol class="breadcrumb">
-     <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
+     <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
             <li><a href="#">Accounts</a></li>
         <li class="active">User Purchase PV Report </li>
       
