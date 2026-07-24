@@ -140,7 +140,7 @@
 							<%--<li><a class="slide-item" href="UserAdd.aspx">Add User</a></li>--%>
 							<li><a class="slide-item" href="UserDirectAssociates.aspx">My Direct</a></li>
 							<li><a class="slide-item" href="DownlineReport.aspx">My Downline</a></li>
-							<li><a class="slide-item" href="binaryreport.aspx">My Treeview</a></li>
+							<%--<li><a class="slide-item" href="binaryreport.aspx">My Treeview</a></li>--%>
                             <li><a class="slide-item" href="leveltree.aspx">Level Tree</a></li>
                             <li><a class="slide-item" href="TopDirectRanking.aspx">Top Direct Ranking</a></li>
                             	<%--<li><a class="slide-item" href="PoolBinaryReport.aspx">Pool Wise Binary</a></li>
@@ -177,12 +177,13 @@
 					</li>
 
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">5</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">6</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="SavingProductPurchasebulk.aspx">Purchase Saving Product</a></li>
                           <li><a class="slide-item" href="SAvingProductPurchaseReport.aspx">Saving Installment Purchase</a></li>
                           <li><a class="slide-item" href="SavingProductInstallmentList.aspx">Installment List</a></li>
                           <li><a class="slide-item" href="TeamSavingInstallmentReport.aspx">Team Installment Report</a></li>
+                          <li><a class="slide-item" href="TeamPendingInstallmentReport.aspx">Team Pending Installment</a></li>
                           <li><a class="slide-item" href="SavingProductOrderHistory.aspx">Order History</a></li>
 							
 						</ul>

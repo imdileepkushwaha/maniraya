@@ -58,6 +58,9 @@
             color: #0f766e;
             font-size: 15px;
         }
+        .dash-direct-count--total {
+            color: #334155;
+        }
         .dash-rank-self-row td {
             background: #ecfdf5 !important;
         }
@@ -115,7 +118,7 @@
                             <asp:Literal ID="litMyRank" runat="server" />
                         </asp:Panel>
 
-                        <p class="dash-saving-report-intro">Ranking is based on total <strong>Active</strong> direct members (<code>ActiveStatus = 1</code>) sponsored under each Active user (overall / all-time).</p>
+                        <p class="dash-saving-report-intro">Ranking is based on <strong>Active Directs</strong> (<code>SavingStatus = 1</code>). Table also shows total directs for each member.</p>
 
                         <div class="dash-saving-report-table-wrap">
                             <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%"
@@ -140,7 +143,12 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Total Directs">
                                         <ItemTemplate>
-                                            <span class="dash-direct-count"><%# Eval("DirectCount") %></span>
+                                            <span class="dash-direct-count dash-direct-count--total"><%# Eval("TotalDirectCount") %></span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Active Directs">
+                                        <ItemTemplate>
+                                            <span class="dash-direct-count"><%# Eval("ActiveDirectCount") %></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>

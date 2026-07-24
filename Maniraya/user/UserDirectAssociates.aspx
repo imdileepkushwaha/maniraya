@@ -33,16 +33,6 @@
                 <div class="box box-primary">
                     <div class="box-header with-border">
                         <h3 class="box-title">Direct Associates</h3>
-                        <div class="col-md-2" style="display:none">
-                            <div class="form-group">
-                                <label>Position</label>
-                                <asp:DropDownList ID="DDlstPosition" runat="server" CssClass="form-control">
-                                    <asp:ListItem Value="0">Both</asp:ListItem>
-                                    <asp:ListItem Value="1">Left</asp:ListItem>
-                                    <asp:ListItem Value="2">Right</asp:ListItem>
-                                </asp:DropDownList>
-                            </div>
-                        </div>
                     </div>
                     <div class="box-body team-box-body">
                         <div class="row team-stat-grid">
@@ -67,8 +57,20 @@
                         </div>
 
                         <div class="team-toolbar">
-                            <div class="team-toolbar-actions">
-                                <div class="form-group">
+                            <div class="team-toolbar-actions" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;flex:1;">
+                                <div class="form-group" style="margin:0;min-width:180px;flex:1 1 180px;">
+                                    <label for="<%= txtSearch.ClientID %>">Search (User ID / Name / Mobile)</label>
+                                    <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Type to search..."></asp:TextBox>
+                                </div>
+                                <div class="form-group" style="margin:0;min-width:140px;">
+                                    <label for="<%= DDlstPosition.ClientID %>">Position</label>
+                                    <asp:DropDownList ID="DDlstPosition" runat="server" CssClass="form-control">
+                                        <asp:ListItem Value="0" Selected="True">Both</asp:ListItem>
+                                        <asp:ListItem Value="1">Left</asp:ListItem>
+                                        <asp:ListItem Value="2">Right</asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
+                                <div class="form-group" style="margin:0;">
                                     <asp:Button ID="btnSubmit" CssClass="btn btn-primary" runat="server" Text="Search" OnClick="btnSubmit_Click" />
                                     <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Cancel" OnClick="btnCancel_Click" />
                                 </div>

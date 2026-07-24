@@ -1,57 +1,351 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using BusinessLogicTier;
 using System.Data;
-using System.Web.Services;
-using System.Text;
 using System.Globalization;
+using System.Text;
+using System.Web.UI;
+using BusinessLogicTier;
+using DataTier;
 
-public partial class admin_Dashboard : System.Web.UI.Page
+public partial class admin_Dashboard : Page
 {
     clsdashboard objA = new clsdashboard();
     clsAccount objaccount = new clsAccount();
+    Data ObjData = new Data();
 
-   
+    const string ApprovedStatusSql = @"(
+        status = 'Approved'
+        OR status = '1'
+        OR LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('approved', 'approve')
+    )";
+
+    const string PendingStatusSql = @"(
+        LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('pending', 'processing')
+    )";
+
     protected void Page_Load(object sender, EventArgs e)
     {
-      
-        if (Session["useradmin"] != null)
-        {
-            if (!IsPostBack)
-            {
-                Filldashboard();
-                BindPurchaseChart();
-                BindUserChart();
-                GetDashboard();
-            }
-        }
-        else
+        if (Session["useradmin"] == null)
         {
             Response.Redirect("logout.aspx");
+            return;
         }
-    }
-    private void Filldashboard()
-    {
-        DataSet Ds = objA.Getdashboardnew();
-        if (Ds.Tables[0].Rows.Count > 0)
+
+        if (!IsPostBack)
         {
-            LblUserCount.Text = Ds.Tables[0].Rows[0][0].ToString();
-            LblProductCount.Text = Ds.Tables[1].Rows[0][0].ToString();
-            //LblPurchaseAmount.Text = Ds.Tables[2].Rows[0][0].ToString();
-            LblActiveEpin.Text = Ds.Tables[3].Rows[0][0].ToString();
-            LblDepositlTotal.Text = Ds.Tables[4].Rows[0][0].ToString();
-            LblDepositPending.Text = Ds.Tables[5].Rows[0][0].ToString();
-            LblWithdrawlTotal.Text = Ds.Tables[6].Rows[0][0].ToString();
-            LblWithdrawlPending.Text = Ds.Tables[7].Rows[0][0].ToString();
-            LblNewsCount.Text = Ds.Tables[8].Rows[0][0].ToString();
-            LblPurchaseProductCount.Text = Ds.Tables[9].Rows[0][0].ToString();
-            LblPurchaseAmount.Text = Ds.Tables[10].Rows[0][0].ToString();
+            FillAllDashboardStats();
+            BindPurchaseChart();
+            BindUserChart();
         }
     }
+
+    void FillAllDashboardStats()
+    {
+        SetZeroDefaults();
+
+        // Info boxes (deposit / withdraw / news / purchase pending) — simple counts.
+        try
+        {
+            DataSet ds = objA.Getdashboardnew();
+            if (ds != null && ds.Tables.Count >= 11)
+            {
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    LblUserCount.Text = FormatNumber(ds.Tables[0].Rows[0][0]);
+                }
+
+                if (ds.Tables[1].Rows.Count > 0)
+                {
+                    LblProductCount.Text = FormatNumber(ds.Tables[1].Rows[0][0]);
+                }
+
+                if (ds.Tables[3].Rows.Count > 0)
+                {
+                    LblActiveEpin.Text = FormatNumber(ds.Tables[3].Rows[0][0]); // ProductMaster count
+                }
+
+                if (ds.Tables[4].Rows.Count > 0)
+                {
+                    LblDepositlTotal.Text = FormatNumber(ds.Tables[4].Rows[0][0]);
+                }
+
+                if (ds.Tables[5].Rows.Count > 0)
+                {
+                    LblDepositPending.Text = FormatNumber(ds.Tables[5].Rows[0][0]);
+                }
+
+                if (ds.Tables[6].Rows.Count > 0)
+                {
+                    LblWithdrawlTotal.Text = FormatNumber(ds.Tables[6].Rows[0][0]);
+                }
+
+                if (ds.Tables[7].Rows.Count > 0)
+                {
+                    LblWithdrawlPending.Text = FormatNumber(ds.Tables[7].Rows[0][0]);
+                }
+
+                if (ds.Tables[8].Rows.Count > 0)
+                {
+                    LblNewsCount.Text = FormatNumber(ds.Tables[8].Rows[0][0]);
+                }
+
+                if (ds.Tables[9].Rows.Count > 0)
+                {
+                    LblPurchaseProductCount.Text = FormatNumber(ds.Tables[9].Rows[0][0]);
+                }
+
+                if (ds.Tables[10].Rows.Count > 0)
+                {
+                    LblPurchaseAmount.Text = FormatNumber(ds.Tables[10].Rows[0][0]);
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        // Main small-boxes from live tables (do not depend on Admin_Dashboard SP).
+        string sql = @"
+SELECT
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK)) AS TotalUsers,
+
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK)
+     WHERE ISNULL(ActiveStatus, 0) = 1) AS TotalActiveUsers,
+
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK)
+     WHERE ISNULL(ActiveStatus, 0) = 1
+       AND (
+            CONVERT(date, ISNULL(ActivateDate, MentionDate)) = CONVERT(date, GETDATE())
+            OR CONVERT(date, MentionDate) = CONVERT(date, GETDATE())
+       )) AS TodayActiveUsers,
+
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @")
+    +
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalBusiness,
+
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND CONVERT(date, COALESCE(approvedate, entrydate, mentiondate)) = CONVERT(date, GETDATE()))
+    +
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND CONVERT(date, COALESCE(approvedate, entrydate, mentiondate)) = CONVERT(date, GETDATE())) AS TodayBusiness,
+
+    (SELECT ISNULL(SUM(ISNULL(CrAmount, 0)), 0) FROM TransactionDetail WITH (NOLOCK)
+     WHERE ISNULL(CrAmount, 0) > 0
+       AND (
+            TransactionType LIKE '%Income%'
+            OR TransactionType LIKE '%Bonus%'
+            OR TransactionType LIKE '%Commission%'
+            OR TransactionType LIKE '%Reward%'
+       )) AS TotalBonus,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalWithdrawal,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND CONVERT(date, COALESCE(approvedate, mentiondate, entrydate)) = CONVERT(date, GETDATE())) AS TodayWithdrawal,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + PendingStatusSql + @") AS PendingWithdrawal,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM DepositRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalDeposit,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM DepositRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND CONVERT(date, COALESCE(approvedate, mentiondate, entrydate)) = CONVERT(date, GETDATE())) AS TodayDeposit,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalPayout,
+
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND CONVERT(date, COALESCE(approvedate, mentiondate, entrydate)) = CONVERT(date, GETDATE())) AS TodayPayout,
+
+    (SELECT COUNT(1) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalFirstPurchase,
+
+    (SELECT COUNT(1) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND YEAR(COALESCE(approvedate, entrydate, mentiondate)) = YEAR(GETDATE())
+       AND MONTH(COALESCE(approvedate, entrydate, mentiondate)) = MONTH(GETDATE())) AS MonthFirstPurchase,
+
+    (SELECT COUNT(1) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalInstallmentPaid,
+
+    (SELECT COUNT(1) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND YEAR(COALESCE(approvedate, entrydate, mentiondate)) = YEAR(GETDATE())
+       AND MONTH(COALESCE(approvedate, entrydate, mentiondate)) = MONTH(GETDATE())) AS MonthInstallmentPaid,
+
+    (SELECT COUNT(1) FROM AwardAchiverUser WITH (NOLOCK)) AS AwardRewardCount,
+
+    (SELECT COUNT(1) FROM ProductMaster WITH (NOLOCK)) AS ProductCount
+";
+
+        if (!TryBindMainStats(sql))
+        {
+            // Fallback without approvedate/mentiondate on some tables.
+            string fallbackSql = @"
+SELECT
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK)) AS TotalUsers,
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK) WHERE ISNULL(ActiveStatus, 0) = 1) AS TotalActiveUsers,
+    (SELECT COUNT(1) FROM UserDetail WITH (NOLOCK)
+     WHERE ISNULL(ActiveStatus, 0) = 1
+       AND CONVERT(date, MentionDate) = CONVERT(date, GETDATE())) AS TodayActiveUsers,
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @")
+    +
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalBusiness,
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @" AND CONVERT(date, entrydate) = CONVERT(date, GETDATE()))
+    +
+    (SELECT ISNULL(SUM(ISNULL(amount, 0)), 0) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @" AND CONVERT(date, entrydate) = CONVERT(date, GETDATE())) AS TodayBusiness,
+    (SELECT ISNULL(SUM(ISNULL(CrAmount, 0)), 0) FROM TransactionDetail WITH (NOLOCK)
+     WHERE ISNULL(CrAmount, 0) > 0
+       AND (TransactionType LIKE '%Income%' OR TransactionType LIKE '%Bonus%' OR TransactionType LIKE '%Commission%')) AS TotalBonus,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalWithdrawal,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @" AND CONVERT(date, mentiondate) = CONVERT(date, GETDATE())) AS TodayWithdrawal,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + PendingStatusSql + @") AS PendingWithdrawal,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM DepositRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalDeposit,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM DepositRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @" AND CONVERT(date, mentiondate) = CONVERT(date, GETDATE())) AS TodayDeposit,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalPayout,
+    (SELECT ISNULL(SUM(ISNULL(Amount, 0)), 0) FROM WithdrawlRequest WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @" AND CONVERT(date, mentiondate) = CONVERT(date, GETDATE())) AS TodayPayout,
+    (SELECT COUNT(1) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalFirstPurchase,
+    (SELECT COUNT(1) FROM SavingAccountDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND YEAR(entrydate) = YEAR(GETDATE()) AND MONTH(entrydate) = MONTH(GETDATE())) AS MonthFirstPurchase,
+    (SELECT COUNT(1) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @") AS TotalInstallmentPaid,
+    (SELECT COUNT(1) FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+     WHERE " + ApprovedStatusSql + @"
+       AND YEAR(entrydate) = YEAR(GETDATE()) AND MONTH(entrydate) = MONTH(GETDATE())) AS MonthInstallmentPaid,
+    (SELECT COUNT(1) FROM AwardAchiverUser WITH (NOLOCK)) AS AwardRewardCount,
+    (SELECT COUNT(1) FROM ProductMaster WITH (NOLOCK)) AS ProductCount
+";
+            TryBindMainStats(fallbackSql);
+        }
+    }
+
+    bool TryBindMainStats(string sql)
+    {
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                DataTable dt = ObjData.RunDataTable(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                DataRow row = dt.Rows[0];
+                LblUserCount.Text = FormatNumber(row["TotalUsers"]);
+                Lbltotalteamactive.Text = FormatNumber(row["TotalActiveUsers"]);
+                Lbltodayteamactive.Text = FormatNumber(row["TodayActiveUsers"]);
+                Lbltotakbusiness.Text = FormatAmount(row["TotalBusiness"]);
+                Lbltotakbusinesstoday.Text = FormatAmount(row["TodayBusiness"]);
+                lbltotalbonus.Text = FormatAmount(row["TotalBonus"]);
+                Lblwithdrawal.Text = FormatAmount(row["TotalWithdrawal"]);
+                Lblwithdrawaltoday.Text = FormatAmount(row["TodayWithdrawal"]);
+                lblpendingwithdraw.Text = FormatAmount(row["PendingWithdrawal"]);
+                Lbldeposit.Text = FormatAmount(row["TotalDeposit"]);
+                Lbldeposittoday.Text = FormatAmount(row["TodayDeposit"]);
+                lbltotalpayout.Text = FormatAmount(row["TotalPayout"]);
+                lbltotalpayouttoday.Text = FormatAmount(row["TodayPayout"]);
+                LblTotalFirstPurchase.Text = FormatNumber(row["TotalFirstPurchase"]);
+                LblMonthFirstPurchase.Text = FormatNumber(row["MonthFirstPurchase"]);
+                LblTotalInstallmentPaid.Text = FormatNumber(row["TotalInstallmentPaid"]);
+                LblMonthInstallmentPaid.Text = FormatNumber(row["MonthInstallmentPaid"]);
+                lable1.Text = FormatNumber(row["AwardRewardCount"]);
+                LblActiveEpin.Text = FormatNumber(row["ProductCount"]);
+                return true;
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    void SetZeroDefaults()
+    {
+        LblUserCount.Text = "0";
+        Lbltotalteamactive.Text = "0";
+        Lbltodayteamactive.Text = "0";
+        Lbltotakbusiness.Text = "0";
+        Lbltotakbusinesstoday.Text = "0";
+        lbltotalbonus.Text = "0";
+        Lblwithdrawal.Text = "0";
+        Lblwithdrawaltoday.Text = "0";
+        lblpendingwithdraw.Text = "0";
+        Lbldeposit.Text = "0";
+        Lbldeposittoday.Text = "0";
+        lbltotalpayout.Text = "0";
+        lbltotalpayouttoday.Text = "0";
+        LblTotalFirstPurchase.Text = "0";
+        LblMonthFirstPurchase.Text = "0";
+        LblTotalInstallmentPaid.Text = "0";
+        LblMonthInstallmentPaid.Text = "0";
+        lable1.Text = "0";
+        LblActiveEpin.Text = "0";
+        LblDepositlTotal.Text = "0";
+        LblDepositPending.Text = "0";
+        LblWithdrawlTotal.Text = "0";
+        LblWithdrawlPending.Text = "0";
+        LblNewsCount.Text = "0";
+        LblPurchaseProductCount.Text = "0";
+        LblProductCount.Text = "0";
+        LblPurchaseAmount.Text = "0";
+    }
+
+    static string FormatNumber(object value)
+    {
+        decimal n;
+        if (decimal.TryParse(Convert.ToString(value), NumberStyles.Any, CultureInfo.InvariantCulture, out n)
+            || decimal.TryParse(Convert.ToString(value), out n))
+        {
+            return Math.Round(n, 0, MidpointRounding.AwayFromZero).ToString("N0", CultureInfo.InvariantCulture);
+        }
+
+        return "0";
+    }
+
+    static string FormatAmount(object value)
+    {
+        decimal n;
+        if (decimal.TryParse(Convert.ToString(value), NumberStyles.Any, CultureInfo.InvariantCulture, out n)
+            || decimal.TryParse(Convert.ToString(value), out n))
+        {
+            if (n == Math.Truncate(n))
+            {
+                return n.ToString("N0", CultureInfo.InvariantCulture);
+            }
+
+            return n.ToString("N2", CultureInfo.InvariantCulture);
+        }
+
+        return "0";
+    }
+
     private void BindPurchaseChart()
     {
         DataTable dsChartData = new DataTable();
@@ -59,7 +353,7 @@ public partial class admin_Dashboard : System.Web.UI.Page
 
         try
         {
-            string m = DateTime.Now.ToString("MMM", CultureInfo.InvariantCulture);;
+            string m = DateTime.Now.ToString("MMM", CultureInfo.InvariantCulture);
             dsChartData = objA.GetBindChartrechrge();
 
             strScript.Append(@"<script type='text/javascript'>  
@@ -78,7 +372,7 @@ public partial class admin_Dashboard : System.Web.UI.Page
             strScript.Remove(strScript.Length - 1, 1);
             strScript.Append("]);");
 
-            strScript.Append("var options = { title : 'Recharge Amount weekwise', vAxis: {title: 'Amount'},  hAxis: {title: '"+m+"'}, seriesType: 'bars', series: {3: {type: 'area'}} };");
+            strScript.Append("var options = { title : 'Recharge Amount weekwise', vAxis: {title: 'Amount'},  hAxis: {title: '" + m + "'}, seriesType: 'bars', series: {3: {type: 'area'}} };");
             strScript.Append(" var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));  chart.draw(data, options); } google.setOnLoadCallback(drawVisualization);");
             strScript.Append(" </script>");
 
@@ -94,32 +388,6 @@ public partial class admin_Dashboard : System.Web.UI.Page
         }
     }
 
-      
-   
-
-    private void GetDashboard()
-    {
-        DataTable dt = new DataTable();
-        objaccount.UserId = Session["useradmin"].ToString();
-        dt = objaccount.getAdminDashboard(objaccount);
-        if (dt.Rows.Count > 0)
-        {
-            Lbltotalteamactive.Text = dt.Rows[0]["ActiveDirect"].ToString();
-            Lbltodayteamactive.Text = dt.Rows[0]["TodayActiveDirect"].ToString();
-            Lbltotakbusiness.Text = dt.Rows[0]["TotalBV"].ToString();
-            Lbltotakbusinesstoday.Text = dt.Rows[0]["TodayTotalBV"].ToString();
-           // lblpendingwithdraw.Text = dt.Rows[0]["pendingwithdraw"].ToString();
-
-            //lbltotalbonus.Text = dt.Rows[0]["bonus"].ToString();
-            Lblwithdrawal.Text = dt.Rows[0]["withdrawal"].ToString();
-            Lblwithdrawaltoday.Text = dt.Rows[0]["Todaywithdrawal"].ToString();
-            Lbldeposit.Text = dt.Rows[0]["deposit"].ToString();
-            Lbldeposittoday.Text = dt.Rows[0]["Todaydeposit"].ToString();
-            lbltotalpayout.Text = dt.Rows[0]["Todaypayout"].ToString();
-            lbltotalpayouttoday.Text = dt.Rows[0]["Todaypayouttoday"].ToString();
-        }
-    }
-
     private void BindUserChart()
     {
         DataTable dsChartData1 = new DataTable();
@@ -127,7 +395,6 @@ public partial class admin_Dashboard : System.Web.UI.Page
 
         try
         {
-            string m = DateTime.Now.ToString("MMM", CultureInfo.InvariantCulture); ;
             dsChartData1 = objA.GetBindChartuser();
 
             int totalJoins = 0;
@@ -182,12 +449,8 @@ public partial class admin_Dashboard : System.Web.UI.Page
                 };
                 var chart1 = new google.visualization.ComboChart(document.getElementById('Div1'));
                 chart1.draw(data, options1);
-                
-                // Set total joins count dynamically
                 var badge = document.getElementById('lblTotalJoinsThisWeek');
-                if (badge) {
-                    badge.innerText = '" + totalJoins + @"';
-                }
+                if (badge) { badge.innerText = '" + totalJoins + @"'; }
             }
             google.setOnLoadCallback(drawVisualization);");
             strScript1.Append(" </script>");
@@ -202,5 +465,5 @@ public partial class admin_Dashboard : System.Web.UI.Page
             dsChartData1.Dispose();
             strScript1.Clear();
         }
-    }  
+    }
 }

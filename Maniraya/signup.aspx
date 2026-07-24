@@ -337,7 +337,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                            <div class="signup-position-block">
+                                            <div class="signup-position-block" style="display: none;">
                                                 <label class="signup-label">Select Position</label>
                                                 <p class="signup-position-hint">Choose your placement in the sponsor's team structure.</p>
                                                 <div class="signup-position-picker" role="group" aria-label="Select Position">

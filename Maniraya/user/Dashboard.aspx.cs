@@ -159,7 +159,7 @@ public partial class user_Dashboard : System.Web.UI.Page
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.ActiveStatus, 0) = 1
+      AND ISNULL(d.SavingStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
 )
@@ -208,7 +208,7 @@ ORDER BY DirectCount DESC, userid ASC";
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.ActiveStatus, 0) = 1
+      AND ISNULL(d.SavingStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId))
 )

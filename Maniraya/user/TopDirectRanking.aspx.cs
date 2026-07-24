@@ -35,7 +35,7 @@ public partial class user_TopDirectRanking : Page
         GridView1.DataBind();
 
         lblResultSummary.Text = (dt != null && dt.Rows.Count > 0)
-            ? "Showing Top " + dt.Rows.Count + " members by total direct referrals."
+            ? "Showing Top " + dt.Rows.Count + " members by active direct referrals."
             : "No ranking data found.";
 
         BindMyRankInfo();
@@ -59,22 +59,24 @@ public partial class user_TopDirectRanking : Page
     SELECT
         LTRIM(RTRIM(s.UserId)) AS userid,
         ISNULL(s.UserName, '') AS username,
-        COUNT(d.UserId) AS DirectCount
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount
     FROM UserDetail d WITH (NOLOCK)
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.ActiveStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
 )
 SELECT TOP (" + topCount + @")
-    ROW_NUMBER() OVER (ORDER BY DirectCount DESC, userid ASC) AS RankNo,
+    ROW_NUMBER() OVER (ORDER BY ActiveDirectCount DESC, TotalDirectCount DESC, userid ASC) AS RankNo,
     userid,
     username,
-    DirectCount
+    TotalDirectCount,
+    ActiveDirectCount,
+    ActiveDirectCount AS DirectCount
 FROM Ranked
-ORDER BY DirectCount DESC, userid ASC";
+ORDER BY ActiveDirectCount DESC, TotalDirectCount DESC, userid ASC";
 
         DataTable dt = new DataTable();
         try
@@ -110,17 +112,21 @@ ORDER BY DirectCount DESC, userid ASC";
 ;WITH Ranked AS (
     SELECT
         LTRIM(RTRIM(s.UserId)) AS userid,
-        COUNT(d.UserId) AS DirectCount,
-        ROW_NUMBER() OVER (ORDER BY COUNT(d.UserId) DESC, LTRIM(RTRIM(s.UserId)) ASC) AS RankNo
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
+        ROW_NUMBER() OVER (
+            ORDER BY SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) DESC,
+                     COUNT(d.UserId) DESC,
+                     LTRIM(RTRIM(s.UserId)) ASC
+        ) AS RankNo
     FROM UserDetail d WITH (NOLOCK)
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.ActiveStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId))
 )
-SELECT RankNo, DirectCount
+SELECT RankNo, TotalDirectCount, ActiveDirectCount
 FROM Ranked
 WHERE userid = '" + SqlEscape(currentUserId) + "'";
 
@@ -134,14 +140,15 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
                 {
                     pnlMyRank.Visible = true;
                     litMyRank.Text = string.Format(
-                        " Your overall rank: <strong>#{0}</strong> with <strong>{1}</strong> total direct(s).",
+                        " Your overall rank: <strong>#{0}</strong> | Active Directs: <strong>{1}</strong> | Total Directs: <strong>{2}</strong>.",
                         Convert.ToString(dt.Rows[0]["RankNo"]),
-                        Convert.ToString(dt.Rows[0]["DirectCount"]));
+                        Convert.ToString(dt.Rows[0]["ActiveDirectCount"]),
+                        Convert.ToString(dt.Rows[0]["TotalDirectCount"]));
                 }
                 else
                 {
                     pnlMyRank.Visible = true;
-                    litMyRank.Text = " You are not in the ranking yet (0 directs).";
+                    litMyRank.Text = " You are not in the ranking yet (0 active directs).";
                 }
             }
             finally

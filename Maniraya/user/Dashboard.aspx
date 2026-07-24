@@ -1029,7 +1029,7 @@
 								<p class="dash-income-label">Total Left Team</p>
 								<h3 class="dash-income-value is-number"><asp:Label ID="LblTotalLeft" runat="server" Text="Label"></asp:Label></h3>
 								<div class="dash-income-meta">
-									<span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInactiveleft" runat="server" Text="Label"></asp:Label></span>
+									<!-- <span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInactiveleft" runat="server" Text="Label"></asp:Label></span> -->
 									<asp:Label ID="Lblactiveleft" runat="server" Text="Label" Visible="false"></asp:Label>
 									<asp:Button ID="Button3" runat="server" Text="Refresh" CssClass="dash-metric-refresh" OnClick="Button3_Click" />
 								</div>
@@ -1044,7 +1044,7 @@
 								<p class="dash-income-label">Total Right Team</p>
 								<h3 class="dash-income-value is-number"><asp:Label ID="LblTotalright" runat="server" Text="Label"></asp:Label></h3>
 								<div class="dash-income-meta">
-									<span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInActiveRight" runat="server" Text="Label"></asp:Label></span>
+									<!-- <span class="dash-income-tag dash-income-tag--down">Inactive <asp:Label ID="LblInActiveRight" runat="server" Text="Label"></asp:Label></span> -->
 									<asp:Label ID="LblActiveRight" runat="server" Text="Label" Visible="false"></asp:Label>
 								</div>
 							</div>
@@ -3012,7 +3012,7 @@ Profit Share Budget</p>
                         <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
                         <div class="dash-prize-head-text">
                             <h3>Top Direct Ranking</h3>
-                            <p>Overall leaderboard by total active direct referrals.</p>
+                            <p>Overall leaderboard by SavingStatus active directs.</p>
                         </div>
                         <a href="TopDirectRanking.aspx" class="dash-btn dash-btn-outline dash-ranking-view-all">View All</a>
                     </div>

@@ -75,7 +75,7 @@
             <div class="icon">
               <i class="ion ion-person-add"></i>
             </div>
-            <a href="UserReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="SavingProductPurchaseReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
            
@@ -88,7 +88,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
 
@@ -120,7 +120,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="SavingProductPurchaseReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
            <div class="col-lg-3 col-xs-6">
@@ -135,7 +135,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
            <div class="col-lg-3 col-xs-6">
@@ -150,7 +150,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
                   <div class="col-lg-3 col-xs-6">
@@ -165,7 +165,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
 
@@ -181,7 +181,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="DepositRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
            <div class="col-lg-3 col-xs-6">
@@ -196,7 +196,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="DepositRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
            <div class="col-lg-3 col-xs-6" >
@@ -211,7 +211,7 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
 
@@ -227,9 +227,60 @@
             <div class="icon">
               <i class="fa fa-table"></i>
             </div>
-            <a href="TransactionReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="WithdrawlRequestReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
+
+        <!-- Saving Product KPIs -->
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3><asp:Label ID="LblTotalFirstPurchase" runat="server" Text="0"></asp:Label></h3>
+              <p>Total First Purchase</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-shopping-cart"></i>
+            </div>
+            <a href="SavingProductPurchaseReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3><asp:Label ID="LblMonthFirstPurchase" runat="server" Text="0"></asp:Label></h3>
+              <p>This Month First Purchase</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-calendar"></i>
+            </div>
+            <a href="SavingProductPurchaseReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-maroon">
+            <div class="inner">
+              <h3><asp:Label ID="LblTotalInstallmentPaid" runat="server" Text="0"></asp:Label></h3>
+              <p>Total Installment Paid</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-money"></i>
+            </div>
+            <a href="SavingInstallmentReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-maroon">
+            <div class="inner">
+              <h3><asp:Label ID="LblMonthInstallmentPaid" runat="server" Text="0"></asp:Label></h3>
+              <p>This Month Installment Paid</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-calendar-check-o"></i>
+            </div>
+            <a href="SavingInstallmentReport.aspx" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+
              <div class="col-lg-3 col-xs-6" style="display:none;">
           <!-- small box -->
           <div class="small-box bg-yellow">
