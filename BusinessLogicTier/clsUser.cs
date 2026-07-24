@@ -555,7 +555,7 @@ namespace BusinessLogicTier
                                 (case when ud.AadharImgStatus=0 then 'Pending' when ud.AadharImgStatus=1 then 'Approved' when ud.AadharImgStatus=2 then 'Rejected' end)AadharImgStatuss,  
                                 epin.planId,plm.PlanName as packageName,ud.SponserId,isnull(ud1.userName,'Company')sponserName,ud.PanNumber,sm.stateName,ud.Pincode,ud.epinGenerationStatus,CASE WHEN isnull(ud.GSTimage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.GSTimage END AS GSTimage,ud.gstnumber,isnull(ud.IsGSTDeductedOfUnverified,0) as IsGSTDeductedOfUnverifie,
 (case when ud.IsGstApplicable=0 then 'Pending' when ud.IsGstApplicable=1 then 'Approved' when ud.IsGstApplicable=2 then 'Rejected' end)IsGstApplicable 
-                                FROM userdetail ud LEFT JOIN citymaster cm ON ud.Cityid=cm.CityId inner join statemaster sm on sm.stateId=cm.stateId 
+                                FROM userdetail ud LEFT JOIN citymaster cm ON ud.Cityid=cm.CityId left join statemaster sm on sm.stateId=cm.stateId 
                                 left join Logindetail ld on ud.userid=ld.username left join EPinMaster epin on epin.UsedUserId=ud.userID 
                                 left join PlanMaster plm on plm.id=epin.planId left join userdetail ud1 on ud.sponserId=ud1.userId 
                                 where 1=1 ";
@@ -564,25 +564,21 @@ namespace BusinessLogicTier
             {
                 str_query += "  and ud.MentionDate  > '" + objUser.FromDate + "'   and ud.MentionDate   < '" + objUser.ToDate + "' ";
             }
-            //if (objUser.UserName != "")
-            if (!string.IsNullOrEmpty(objUser.UserName))
+            if (!string.IsNullOrWhiteSpace(objUser.UserName))
             {
-                str_query += "  and ud.username = '" + objUser.UserName + "' ";
+                str_query += "  and ud.username LIKE '%" + (objUser.UserName ?? string.Empty).Trim().Replace("'", "''") + "%' ";
             }
-            //if (objUser.UserId != "")
-            if (!string.IsNullOrEmpty(objUser.UserId))
+            if (!string.IsNullOrWhiteSpace(objUser.UserId))
             {
-                str_query += "  and ud.UserId = '" + objUser.UserId + "' ";
+                str_query += "  and ud.UserId = '" + (objUser.UserId ?? string.Empty).Trim().Replace("'", "''") + "' ";
             }
-            //if (objUser.Mobile != "")
-            if (!string.IsNullOrEmpty(objUser.Mobile))
+            if (!string.IsNullOrWhiteSpace(objUser.Mobile))
             {
-                str_query += "  and ud.mobile = '" + objUser.Mobile + "' ";
+                str_query += "  and ud.mobile = '" + (objUser.Mobile ?? string.Empty).Trim().Replace("'", "''") + "' ";
             }
-            //if (objUser.Email != "")
-            if (!string.IsNullOrEmpty(objUser.Email))
+            if (!string.IsNullOrWhiteSpace(objUser.Email))
             {
-                str_query += "  and ud.email = '" + objUser.Email + "' ";
+                str_query += "  and ud.email = '" + (objUser.Email ?? string.Empty).Trim().Replace("'", "''") + "' ";
             }
             if (objUser.CityId != "0" && !string.IsNullOrEmpty(objUser.CityId))
             {
@@ -590,7 +586,7 @@ namespace BusinessLogicTier
             }
             if (!string.IsNullOrEmpty(objUser.Pincode))
             {
-                str_query += "  and ud.Pincode = '" + objUser.Pincode + "' ";
+                str_query += "  and ud.Pincode = '" + (objUser.Pincode ?? string.Empty).Trim().Replace("'", "''") + "' ";
             }
 
             if (!string.IsNullOrEmpty(objUser.StateId) && objUser.StateId != "0")
@@ -607,7 +603,7 @@ namespace BusinessLogicTier
             }
             if (!string.IsNullOrEmpty(objUser.PanCardNo))
             {
-                str_query += "  and ud.PanNumber = '" + objUser.PanCardNo + "' ";
+                str_query += "  and ud.PanNumber = '" + (objUser.PanCardNo ?? string.Empty).Trim().Replace("'", "''") + "' ";
             }
 
 

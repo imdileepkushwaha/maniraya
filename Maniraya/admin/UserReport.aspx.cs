@@ -1,8 +1,10 @@
 ﻿using BusinessLogicTier;
+using DataTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -11,6 +13,7 @@ public partial class admin_UserReport : System.Web.UI.Page
     clsState objState = new clsState();
     clsUser objUser = new clsUser();
     clsplan cPlan = new clsplan();
+    Data ObjData = new Data();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -303,60 +306,165 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     void loaduser()
     {
-        objUser.UserId = txtuserid.Text;
-        objUser.UserName = txtname.Text;
-        objUser.Mobile = txtmobile.Text;
-        objUser.Email = txtemail.Text;
-        objUser.CityId = ddcity.SelectedValue.ToString();
-        objUser.AreaName= ddarea.SelectedValue.ToString();
-        objUser.Pincode = txtPinCode.Text;
+        string userId = (txtuserid.Text ?? string.Empty).Trim();
+        string userName = (txtname.Text ?? string.Empty).Trim();
+        string mobile = (txtmobile.Text ?? string.Empty).Trim();
+        string email = (txtemail.Text ?? string.Empty).Trim();
+        string cityId = ddcity.SelectedValue;
+        string pincode = (txtPinCode.Text ?? string.Empty).Trim();
+        string stateId = ddstate.SelectedValue;
+        string planId = ddlPackage.SelectedValue;
+        string sponserId = ddlSponsor.SelectedValue;
+        string panNumber = (txtPanNumber.Text ?? string.Empty).Trim();
 
-        objUser.StateId = ddstate.SelectedValue;
-        objUser.plan_Id = ddlPackage.SelectedValue;
-        objUser.SponserId = ddlSponsor.SelectedValue;
-        objUser.PanCardNo = txtPanNumber.Text;
+        // Name / User ID / Mobile / PAN search should not be limited to today's date range.
+        bool identitySearch =
+            !string.IsNullOrWhiteSpace(userName) ||
+            !string.IsNullOrWhiteSpace(userId) ||
+            !string.IsNullOrWhiteSpace(mobile) ||
+            !string.IsNullOrWhiteSpace(panNumber);
 
-        if (txtfromdate.Text != "")
+        DateTime fromDate = DateTime.MinValue;
+        DateTime toDate = DateTime.MinValue;
+        if (!identitySearch && !string.IsNullOrWhiteSpace(txtfromdate.Text))
         {
-            objUser.FromDate = Message.GetIndianDate(txtfromdate.Text);
+            fromDate = Message.GetIndianDate(txtfromdate.Text);
         }
-        else
+        if (!identitySearch && !string.IsNullOrWhiteSpace(txttodate.Text))
         {
-            objUser.FromDate = DateTime.MinValue;
+            toDate = Message.GetIndianDate(txttodate.Text).AddDays(1);
         }
-        if (txttodate.Text != "")
-        {
-            objUser.ToDate = Message.GetIndianDate(txttodate.Text).AddDays(1);
-        }
-        else
-        {
-            objUser.ToDate = DateTime.MinValue;
-        }
-        objUser.Email = "";
 
         string noOfRows = "";
         if (ddlRecordFilter.SelectedItem.Text == "All")
             noOfRows = "";
-
-       //else if (ddlRecordFilter.SelectedItem.Text == "5")
-        //    noOfRows = "top 5";
-
         else if (ddlRecordFilter.SelectedItem.Text == "25")
             noOfRows = "top 25";
-
         else if (ddlRecordFilter.SelectedItem.Text == "50")
             noOfRows = "top 50";
-
         else if (ddlRecordFilter.SelectedItem.Text == "100")
             noOfRows = "top 100";
-
         else if (ddlRecordFilter.SelectedItem.Text == "500")
             noOfRows = "top 500";
 
-        DataTable dt = new DataTable();
-        dt = objUser.getUserReportPage(objUser, noOfRows);
+        DataTable dt = GetUserReportData(noOfRows, userId, userName, mobile, email, cityId, pincode, stateId, planId, sponserId, panNumber, fromDate, toDate);
         GridView1.DataSource = dt;
         GridView1.DataBind();
+    }
+
+    DataTable GetUserReportData(
+        string noOfRows,
+        string userId,
+        string userName,
+        string mobile,
+        string email,
+        string cityId,
+        string pincode,
+        string stateId,
+        string planId,
+        string sponserId,
+        string panNumber,
+        DateTime fromDate,
+        DateTime toDate)
+    {
+        StringBuilder sql = new StringBuilder();
+        sql.Append(@"SELECT ").Append(noOfRows).Append(@"
+    ud.status, ud.userid, ud.username, ud.Mobile, ud.Email, ud.Gender, ud.Address, cm.CityName, ud.MentionDate, ld.password,
+    ISNULL(ud.balanceamount, 0) AS balanceamount, ISNULL(ud.utilityBalance, 0) AS utilityBalance, ld.status AS activeStatus,
+    (CASE WHEN ud.SignUpImgStatus IS NOT NULL THEN ud.SignUpFormImage ELSE NULL END) SignUpFormImage,
+    (CASE WHEN ud.SignUpImgStatus = 0 THEN 'Pending' WHEN ud.SignUpImgStatus = 1 THEN 'Approved' WHEN ud.SignUpImgStatus = 2 THEN 'Rejected' END) SignUpImgStatuss,
+    (CASE WHEN ud.PanImgStatus IS NOT NULL THEN ud.PanImage ELSE NULL END) PanImage,
+    (CASE WHEN ud.PanImgStatus = 0 THEN 'Pending' WHEN ud.PanImgStatus = 1 THEN 'Approved' WHEN ud.PanImgStatus = 2 THEN 'Rejected' END) PanImgStatuss,
+    (CASE WHEN ud.ChequeImgStatus IS NOT NULL THEN ud.CancelCheque ELSE NULL END) CancelCheque,
+    (CASE WHEN ud.ChequeImgStatus = 0 THEN 'Pending' WHEN ud.ChequeImgStatus = 1 THEN 'Approved' WHEN ud.ChequeImgStatus = 2 THEN 'Rejected' END) ChequeImgStatuss,
+    (CASE WHEN ud.AadharImgStatus IS NOT NULL THEN ud.AadharImage ELSE NULL END) AadharImage,
+    (CASE WHEN ud.AadharImgStatus IS NOT NULL THEN ud.AadharImageBack ELSE NULL END) AadharImageBack,
+    (CASE WHEN ud.AadharImgStatus = 0 THEN 'Pending' WHEN ud.AadharImgStatus = 1 THEN 'Approved' WHEN ud.AadharImgStatus = 2 THEN 'Rejected' END) AadharImgStatuss,
+    epin.planId, plm.PlanName AS packageName, ud.SponserId, ISNULL(ud1.userName, 'Company') sponserName, ud.PanNumber, sm.stateName, ud.Pincode, ud.epinGenerationStatus,
+    CASE WHEN ISNULL(ud.GSTimage, '') = '' THEN 'img/default.png' ELSE '../ProductImage/' + ud.GSTimage END AS GSTimage,
+    ud.gstnumber, ISNULL(ud.IsGSTDeductedOfUnverified, 0) AS IsGSTDeductedOfUnverifie,
+    (CASE WHEN ud.IsGstApplicable = 0 THEN 'Pending' WHEN ud.IsGstApplicable = 1 THEN 'Approved' WHEN ud.IsGstApplicable = 2 THEN 'Rejected' END) IsGstApplicable
+FROM userdetail ud WITH (NOLOCK)
+LEFT JOIN citymaster cm WITH (NOLOCK) ON ud.Cityid = cm.CityId
+LEFT JOIN statemaster sm WITH (NOLOCK) ON sm.stateId = cm.stateId
+LEFT JOIN Logindetail ld WITH (NOLOCK) ON ud.userid = ld.username
+LEFT JOIN EPinMaster epin WITH (NOLOCK) ON epin.UsedUserId = ud.userID
+LEFT JOIN PlanMaster plm WITH (NOLOCK) ON plm.id = epin.planId
+LEFT JOIN userdetail ud1 WITH (NOLOCK) ON ud.sponserId = ud1.userId
+WHERE 1 = 1");
+
+        if (fromDate != DateTime.MinValue && toDate != DateTime.MinValue)
+        {
+            sql.Append(" AND ud.MentionDate > '").Append(fromDate.ToString("yyyy-MM-dd HH:mm:ss")).Append("'");
+            sql.Append(" AND ud.MentionDate < '").Append(toDate.ToString("yyyy-MM-dd HH:mm:ss")).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(userName))
+        {
+            sql.Append(" AND ud.username LIKE '%").Append(SqlEscape(userName)).Append("%'");
+        }
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            sql.Append(" AND LTRIM(RTRIM(ud.UserId)) = '").Append(SqlEscape(userId)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(mobile))
+        {
+            sql.Append(" AND LTRIM(RTRIM(ud.mobile)) = '").Append(SqlEscape(mobile)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            sql.Append(" AND ud.email LIKE '%").Append(SqlEscape(email)).Append("%'");
+        }
+        if (!string.IsNullOrWhiteSpace(cityId) && cityId != "0")
+        {
+            sql.Append(" AND ud.cityid = '").Append(SqlEscape(cityId)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(pincode))
+        {
+            sql.Append(" AND ud.Pincode = '").Append(SqlEscape(pincode)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(stateId) && stateId != "0")
+        {
+            sql.Append(" AND cm.stateId = '").Append(SqlEscape(stateId)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(planId) && planId != "0")
+        {
+            sql.Append(" AND epin.planId = '").Append(SqlEscape(planId)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(sponserId) && sponserId != "0")
+        {
+            sql.Append(" AND ud.SponserId = '").Append(SqlEscape(sponserId)).Append("'");
+        }
+        if (!string.IsNullOrWhiteSpace(panNumber))
+        {
+            sql.Append(" AND ud.PanNumber = '").Append(SqlEscape(panNumber)).Append("'");
+        }
+
+        sql.Append(" ORDER BY ud.MentionDate DESC");
+
+        DataTable dt = new DataTable();
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(sql.ToString());
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            dt = new DataTable();
+        }
+
+        return dt ?? new DataTable();
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
     protected void ddcountryedit_SelectedIndexChanged(object sender, EventArgs e)
     {

@@ -32,17 +32,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ARA_StringHunt">
-      <HintPath>..\..\..\Akar_Umoney\Bin\ARA_StringHunt.dll</HintPath>
+      <HintPath>..\Maniraya\Bin\ARA_StringHunt.dll</HintPath>
     </Reference>
     <Reference Include="CyberPlatOpenSSL">
-      <HintPath>..\..\..\Akar_Umoney\Bin\CyberPlatOpenSSL.dll</HintPath>
+      <HintPath>..\Maniraya\Bin\CyberPlatOpenSSL.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Akar_Umoney\Bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Maniraya\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp">
-      <HintPath>..\..\..\RoundpayProject\My Project\ROUNDPAYMLMNEW\ROUNDPAYMLM\Bin\RestSharp.dll</HintPath>
+      <HintPath>..\Maniraya\Bin\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
