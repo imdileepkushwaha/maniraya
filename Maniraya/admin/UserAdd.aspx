@@ -194,18 +194,27 @@
                                 </div>
                             </div>
 
-                            <div class="row" style="display: none">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <asp:RadioButton ID="RdBtnFree" runat="server" Text="Free Registration" GroupName="A" AutoPostBack="true" OnCheckedChanged="RdBtnFree_CheckedChanged" />
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <asp:RadioButton ID="RdBtnEpin" runat="server" Text="E-Pin Registration" GroupName="A" AutoPostBack="true" OnCheckedChanged="RdBtnEpin_CheckedChanged" />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                            <div class="admin-form-section">
+                                <h5 class="admin-form-section-title"><i class="fa fa-check-square-o"></i> Registration Type</h5>
+                                <div class="admin-reg-type-grid">
+                                    <label class="admin-reg-type-card">
+                                        <asp:RadioButton ID="RdBtnFree" runat="server" GroupName="A" AutoPostBack="true"
+                                            OnCheckedChanged="RdBtnFree_CheckedChanged" CssClass="admin-reg-type-input" Text="" />
+                                        <span class="admin-reg-type-icon tone-free" aria-hidden="true"><i class="fa fa-gift"></i></span>
+                                        <span class="admin-reg-type-copy">
+                                            <span class="admin-reg-type-title">Free Registration</span>
+                                            <span class="admin-reg-type-desc">Register without using an E-Pin</span>
+                                        </span>
+                                    </label>
+                                    <label class="admin-reg-type-card">
+                                        <asp:RadioButton ID="RdBtnEpin" runat="server" GroupName="A" AutoPostBack="true"
+                                            OnCheckedChanged="RdBtnEpin_CheckedChanged" CssClass="admin-reg-type-input" Text="" />
+                                        <span class="admin-reg-type-icon tone-epin" aria-hidden="true"><i class="fa fa-key"></i></span>
+                                        <span class="admin-reg-type-copy">
+                                            <span class="admin-reg-type-title">E-Pin Registration</span>
+                                            <span class="admin-reg-type-desc">Use sponsor E-Pin and plan details</span>
+                                        </span>
+                                    </label>
                                 </div>
                             </div>
 
@@ -216,19 +225,13 @@
                                         <div class="col-md-6 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= DDLstPlan.ClientID %>">Select Plan</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-list-alt"></i></span>
-                                                    <asp:DropDownList ID="DDLstPlan" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="DDLstPlan_SelectedIndexChanged" runat="server"></asp:DropDownList>
-                                                </div>
+                                                <asp:DropDownList ID="DDLstPlan" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="DDLstPlan_SelectedIndexChanged" runat="server"></asp:DropDownList>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= ddepin.ClientID %>">Select E-Pin</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-key"></i></span>
-                                                    <asp:DropDownList ID="ddepin" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddepin_SelectedIndexChanged" runat="server"></asp:DropDownList>
-                                                </div>
+                                                <asp:DropDownList ID="ddepin" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddepin_SelectedIndexChanged" runat="server"></asp:DropDownList>
                                             </div>
                                         </div>
                                     </div>

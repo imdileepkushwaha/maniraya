@@ -39,7 +39,7 @@
 		<%--<link href="../sarah/assets/css/layout.css" rel="stylesheet" type="text/css" />--%>
 
     <link rel="stylesheet" href="../myassets/assets/css/maniraya-loader.css?v=1" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=71" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
     <link rel="stylesheet" href="assets/css/admin-theme.css?v=2" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -153,6 +153,15 @@
                                     <li><a href="SavingDirectIncomeReport.aspx">Saving Direct Income Report</a></li>
                                     <li><a href="PayoutReportSavingLevel.aspx">Saving Level Payout Report</a></li>
                                     <li><a href="SavingProductGSTReport.aspx">Saving Product GST Reports</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-money admin-side-icon"></i> Epin Management <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="epinadd.aspx">Epin Add</a></li>
+                                    <li><a href="epintransfer.aspx">Epin Tranfer</a></li>
+                                    <li><a href="epinreport.aspx">Epin Report</a></li>
                                 </ul>
                             </li>
 

@@ -61,6 +61,27 @@
         .dash-direct-count--total {
             color: #334155;
         }
+        .dash-direct-rank-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 84px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            white-space: nowrap;
+            background: #e2e8f0;
+            color: #334155;
+        }
+        .dash-direct-rank-pill.is-member { background: #e2e8f0; color: #475569; }
+        .dash-direct-rank-pill.is-distributor { background: #dbeafe; color: #1d4ed8; }
+        .dash-direct-rank-pill.is-bronze { background: #ffedd5; color: #9a3412; }
+        .dash-direct-rank-pill.is-silver { background: #e2e8f0; color: #334155; }
+        .dash-direct-rank-pill.is-gold { background: #fef3c7; color: #92400e; }
+        .dash-direct-rank-pill.is-diamond { background: #ede9fe; color: #5b21b6; }
         .dash-rank-self-row td {
             background: #ecfdf5 !important;
         }
@@ -139,6 +160,12 @@
                                     <asp:TemplateField HeaderText="User Name">
                                         <ItemTemplate>
                                             <span class="dash-income-member-name"><%# Eval("username") %></span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Direct Rank">
+                                        <ItemTemplate>
+                                            <asp:Label ID="lblDirectRankTitle" runat="server" CssClass="dash-direct-rank-pill"
+                                                Text='<%# Eval("DirectRank") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Total Directs">

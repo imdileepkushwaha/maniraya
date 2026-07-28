@@ -47,14 +47,14 @@ public partial class user_SavingProductInvoice : Page
         string effectiveUserId = sessionUserId;
         if ((isAdmin || hasPublicAccess) && string.IsNullOrEmpty(sessionUserId))
         {
-            effectiveUserId = Convert.ToString(Request.QueryString["userId"]).Trim();
+            effectiveUserId = QueryStringValue(Request, "userId");
         }
 
-        string orderId = Convert.ToString(Request.QueryString["orderId"]).Trim();
+        string orderId = QueryStringValue(Request, "orderId");
         if (string.IsNullOrWhiteSpace(orderId))
         {
             int recordId;
-            if (int.TryParse(Convert.ToString(Request.QueryString["id"]), out recordId) && recordId > 0)
+            if (int.TryParse(QueryStringValue(Request, "id"), out recordId) && recordId > 0)
             {
                 orderId = GetOrderIdByRecordId(recordId, effectiveUserId);
             }
@@ -87,6 +87,16 @@ public partial class user_SavingProductInvoice : Page
         BindInvoice(orderId, items);
     }
 
+    static string QueryStringValue(System.Web.HttpRequest request, string key)
+    {
+        if (request == null || request.QueryString == null)
+        {
+            return string.Empty;
+        }
+
+        return (request.QueryString[key] ?? string.Empty).Trim();
+    }
+
     bool HasValidInvoiceAccessKey()
     {
         string configuredKey = ChatwayWhatsAppHelper.InvoiceAccessKey;
@@ -95,9 +105,9 @@ public partial class user_SavingProductInvoice : Page
             return false;
         }
 
-        string requestKey = Convert.ToString(Request.QueryString["accessKey"]).Trim();
+        string requestKey = QueryStringValue(Request, "accessKey");
         return !string.IsNullOrWhiteSpace(requestKey)
-            && string.Equals(requestKey, configuredKey, StringComparison.Ordinal);
+           && string.Equals(requestKey, configuredKey, StringComparison.Ordinal);
     }
 
     string GetUserIdByOrderId(string orderId)

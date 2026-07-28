@@ -96,7 +96,32 @@ ORDER BY ActiveDirectCount DESC, TotalDirectCount DESC, userid ASC";
             dt = new DataTable();
         }
 
-        return dt ?? new DataTable();
+        return AppendDirectRankColumn(dt ?? new DataTable());
+    }
+
+    DataTable AppendDirectRankColumn(DataTable dt)
+    {
+        if (dt == null)
+        {
+            return new DataTable();
+        }
+
+        if (!dt.Columns.Contains("DirectRank"))
+        {
+            dt.Columns.Add("DirectRank", typeof(string));
+        }
+
+        foreach (DataRow row in dt.Rows)
+        {
+            int activeDirectCount = 0;
+            if (row["ActiveDirectCount"] != null && row["ActiveDirectCount"] != DBNull.Value)
+            {
+                int.TryParse(Convert.ToString(row["ActiveDirectCount"]), out activeDirectCount);
+            }
+            row["DirectRank"] = DirectRankHelper.GetRank(activeDirectCount);
+        }
+
+        return dt;
     }
 
     void BindMyRankInfo()
@@ -138,17 +163,22 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
                 DataTable dt = ObjData.RunDataTable(sql);
                 if (dt != null && dt.Rows.Count > 0)
                 {
+                    int activeDirectCount = 0;
+                    int.TryParse(Convert.ToString(dt.Rows[0]["ActiveDirectCount"]), out activeDirectCount);
+                    string directRank = DirectRankHelper.GetRank(activeDirectCount);
+
                     pnlMyRank.Visible = true;
                     litMyRank.Text = string.Format(
-                        " Your overall rank: <strong>#{0}</strong> | Active Directs: <strong>{1}</strong> | Total Directs: <strong>{2}</strong>.",
+                        " Your overall rank: <strong>#{0}</strong> | Direct Rank: <strong>{1}</strong> | Active Directs: <strong>{2}</strong> | Total Directs: <strong>{3}</strong>.",
                         Convert.ToString(dt.Rows[0]["RankNo"]),
+                        directRank,
                         Convert.ToString(dt.Rows[0]["ActiveDirectCount"]),
                         Convert.ToString(dt.Rows[0]["TotalDirectCount"]));
                 }
                 else
                 {
                     pnlMyRank.Visible = true;
-                    litMyRank.Text = " You are not in the ranking yet (0 active directs).";
+                    litMyRank.Text = " You are not in the ranking yet (0 active directs). Direct Rank: <strong>Member</strong>.";
                 }
             }
             finally
@@ -188,6 +218,38 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
                     lblRank.CssClass = "dash-rank-badge is-bronze";
                 }
             }
+        }
+
+        Label lblDirectRankTitle = (Label)e.Row.FindControl("lblDirectRankTitle");
+        if (lblDirectRankTitle != null)
+        {
+            string rankName = (lblDirectRankTitle.Text ?? string.Empty).Trim();
+            string css = "dash-direct-rank-pill";
+            if (string.Equals(rankName, DirectRankHelper.RankDiamond, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " is-diamond";
+            }
+            else if (string.Equals(rankName, DirectRankHelper.RankGold, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " is-gold";
+            }
+            else if (string.Equals(rankName, DirectRankHelper.RankSilver, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " is-silver";
+            }
+            else if (string.Equals(rankName, DirectRankHelper.RankBronze, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " is-bronze";
+            }
+            else if (string.Equals(rankName, DirectRankHelper.RankDistributor, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " is-distributor";
+            }
+            else
+            {
+                css += " is-member";
+            }
+            lblDirectRankTitle.CssClass = css;
         }
 
         string currentUserId = Convert.ToString(Session["userid"]).Trim();

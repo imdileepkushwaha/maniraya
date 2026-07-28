@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=45" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=46" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -3051,6 +3051,11 @@ Profit Share Budget</p>
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="User Name">
                                     <ItemTemplate><%# Eval("username") %></ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Direct Rank">
+                                    <ItemTemplate>
+                                        <asp:Label ID="lblDirectRankTitle" runat="server" CssClass="dash-direct-rank-pill" Text='<%# Eval("DirectRank") %>'></asp:Label>
+                                    </ItemTemplate>
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="Total Directs">
                                     <ItemTemplate>

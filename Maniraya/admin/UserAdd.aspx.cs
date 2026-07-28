@@ -19,7 +19,7 @@ public partial class admin_UserAdd : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-            if (Session["Useradmin"] != null)
+            if (Session["useradmin"] != null || Session["Useradmin"] != null)
             {
                 // txtsponserid.Text = Session["Userid"].ToString();
                 // txtsponserid.Enabled = false;
@@ -156,16 +156,41 @@ public partial class admin_UserAdd : System.Web.UI.Page
     }
     void loadAmountepin()
     {
-        DataTable dt = new DataTable();
-        objepin.GenerateUserId = txtsponserid.Text;
-       
-        dt = objepin.getEPinForPinTransfer(objepin);
-        DDLstPlan.DataSource = dt;
-        DDLstPlan.DataTextField = "Planname";
-        DDLstPlan.DataValueField = "Planamount";
-        DDLstPlan.DataBind();
-        ListItem li = new ListItem("Select Plan", "0");
-        DDLstPlan.Items.Insert(0, li);
+        DDLstPlan.Items.Clear();
+        DataTable dt = null;
+
+        // Prefer amounts that have Active E-Pins for the selected sponsor.
+        if (!string.IsNullOrWhiteSpace(txtsponserid.Text))
+        {
+            objepin.GenerateUserId = txtsponserid.Text.Trim();
+            dt = objepin.getEPinForRegnew(objepin);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    string amount = Convert.ToString(row["amount"]);
+                    if (!string.IsNullOrWhiteSpace(amount))
+                    {
+                        DDLstPlan.Items.Add(new ListItem(amount, amount));
+                    }
+                }
+            }
+        }
+
+        // Fallback: all plans from PlanMaster (Joining package filter was returning empty).
+        if (DDLstPlan.Items.Count == 0)
+        {
+            dt = objepin.getEPinForGenerateepin(objepin);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DDLstPlan.DataSource = dt;
+                DDLstPlan.DataTextField = "Planname";
+                DDLstPlan.DataValueField = "Planamount";
+                DDLstPlan.DataBind();
+            }
+        }
+
+        DDLstPlan.Items.Insert(0, new ListItem("Select Plan", "0"));
     }   
     void loadcountry()
     {
@@ -285,7 +310,9 @@ public partial class admin_UserAdd : System.Web.UI.Page
         objUser.PanCardNo = txtPanNumber.Text;
 
 
-        objUser.MentionBy = Session["Useradmin"].ToString();
+        objUser.MentionBy = Session["useradmin"] != null
+            ? Session["useradmin"].ToString()
+            : Convert.ToString(Session["Useradmin"]);
         objUser.SponserId = txtsponserid.Text;
         objUser.EpinNo = ddepin.SelectedValue.ToString();
         objUser.OtherCity = TxtOtherCity.Text;
@@ -452,32 +479,37 @@ public partial class admin_UserAdd : System.Web.UI.Page
     protected void txtsponserid_TextChanged(object sender, EventArgs e)
     {
         loadsUsername();
+        loadAmountepin();
         loadepin();
     }
     void loadepin()
     {
         ddepin.Items.Clear();
-        objepin.GenerateUserId = txtsponserid.Text;
-        objepin.Amount = Convert.ToDecimal(DDLstPlan.SelectedValue);
-        DataTable dt = new DataTable();
-        dt = objepin.getEPinForRegamount(objepin);
-        ddepin.DataSource = dt;
-        ddepin.DataTextField = "EpinNo";
-        ddepin.DataValueField = "EpinNo";
-        ddepin.DataBind();
-        ListItem li = new ListItem("Select E-Pin", "0");
-        ddepin.Items.Insert(0, li);
+        ListItem defaultItem = new ListItem("Select E-Pin", "0");
+        ddepin.Items.Insert(0, defaultItem);
 
-        //ddepin.Items.Clear();
-        //objepin.GenerateUserId = txtsponserid.Text;
-        //DataTable dt = new DataTable();
-        //dt = objepin.getEPinForReg(objepin);
-        //ddepin.DataSource = dt;
-        //ddepin.DataTextField = "EpinNo";
-        //ddepin.DataValueField = "EpinNo";
-        //ddepin.DataBind();
-        //ListItem li = new ListItem("Select E-Pin", "0");
-        //ddepin.Items.Insert(0, li);
+        if (string.IsNullOrWhiteSpace(txtsponserid.Text) || DDLstPlan.SelectedValue == "0" || string.IsNullOrWhiteSpace(DDLstPlan.SelectedValue))
+        {
+            return;
+        }
+
+        decimal amount;
+        if (!decimal.TryParse(DDLstPlan.SelectedValue, out amount))
+        {
+            return;
+        }
+
+        objepin.GenerateUserId = txtsponserid.Text.Trim();
+        objepin.Amount = amount;
+        DataTable dt = objepin.getEPinForRegamount(objepin);
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            ddepin.DataSource = dt;
+            ddepin.DataTextField = "EpinNo";
+            ddepin.DataValueField = "EpinNo";
+            ddepin.DataBind();
+            ddepin.Items.Insert(0, defaultItem);
+        }
     }
     protected void ddepin_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -509,6 +541,9 @@ public partial class admin_UserAdd : System.Web.UI.Page
     protected void RdBtnEpin_CheckedChanged(object sender, EventArgs e)
     {
         pnlpin.Visible = true;
+        loadAmountepin();
+        loadepin();
+        txtamount.Text = "";
     }
     protected void ddcity_SelectedIndexChanged(object sender, EventArgs e)
     {
