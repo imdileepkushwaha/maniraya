@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using DataTier;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -14,6 +15,141 @@ public partial class UserBankDetail : System.Web.UI.Page
     clsUser objUser = new clsUser();
     clsBank objbank = new clsBank();
     Data ObjData = new Data();
+
+    public bool GetChequePassbookEditStatus()
+    {
+        clsVerfification obj = new clsVerfification();
+        DataTable dt = obj.getProfileEditableStatus(Session["userid"].ToString());
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return Convert.ToBoolean(dt.Rows[0]["IsChequePassbookEditabled"].ToString());
+        }
+
+        return false;
+    }
+
+    string NormalizePassbookFileName(string imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+            return string.Empty;
+
+        string value = imagePath.Trim();
+        value = value.Replace("../ProductImage/", "")
+                     .Replace("~/ProductImage/", "")
+                     .Replace("ProductImage/", "");
+
+        if (string.Equals(value, "img/default.png", StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+
+        return value;
+    }
+
+    void BindPassbookPreview(string cancelChequeFile)
+    {
+        string fileName = NormalizePassbookFileName(cancelChequeFile);
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            imgPassbook.Visible = false;
+            imgPassbook.ImageUrl = string.Empty;
+            if (lblPassbookPreviewText != null)
+            {
+                lblPassbookPreviewText.Text = "No passbook uploaded yet.";
+                lblPassbookPreviewText.Visible = true;
+            }
+            return;
+        }
+
+        string ext = Path.GetExtension(fileName).ToLowerInvariant();
+        if (ext == ".pdf")
+        {
+            // Image control cannot render PDF; show text + keep downloadable path in tooltip.
+            imgPassbook.Visible = false;
+            imgPassbook.ImageUrl = string.Empty;
+            if (lblPassbookPreviewText != null)
+            {
+                lblPassbookPreviewText.Text = "PDF uploaded. Open from admin approval screen.";
+                lblPassbookPreviewText.Visible = true;
+            }
+            return;
+        }
+
+        imgPassbook.ImageUrl = "../ProductImage/" + fileName;
+        imgPassbook.Visible = true;
+        if (lblPassbookPreviewText != null)
+            lblPassbookPreviewText.Visible = false;
+    }
+
+    void LoadPassbookSection(DataTable userDt)
+    {
+        try
+        {
+            // CancelCheque stored as file name in DB; map it to ProductImage/ for preview.
+            string cancelChequeFile = userDt.Rows[0]["CancelCheque"] == null ? "" : userDt.Rows[0]["CancelCheque"].ToString();
+            string chequeImgStatus = userDt.Rows[0]["ChequeImgStatus"] == null ? "" : userDt.Rows[0]["ChequeImgStatus"].ToString();
+
+            BindPassbookPreview(cancelChequeFile);
+
+            if (chequeImgStatus == "0")
+            {
+                lblPassbookApprovalStatus.Text = "Pending";
+                lblPassbookApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-pending";
+            }
+            else if (chequeImgStatus == "1")
+            {
+                lblPassbookApprovalStatus.Text = "Approved";
+                lblPassbookApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-approved";
+            }
+            else if (chequeImgStatus == "2")
+            {
+                lblPassbookApprovalStatus.Text = "Rejected";
+                lblPassbookApprovalStatus.CssClass = "profile-kyc-badge profile-kyc-rejected";
+            }
+            else
+            {
+                lblPassbookApprovalStatus.Text = "-";
+                lblPassbookApprovalStatus.CssClass = "profile-kyc-badge";
+            }
+
+            bool canUpload = GetChequePassbookEditStatus();
+            fuPassbook.Visible = canUpload;
+            btnPassbookSubmit.Visible = canUpload;
+            div_passbook_update.Visible = canUpload;
+            div_passbook_noupdate.Visible = !canUpload;
+        }
+        catch
+        {
+            lblPassbookApprovalStatus.Text = "-";
+            lblPassbookApprovalStatus.CssClass = "profile-kyc-badge";
+            if (lblPassbookPreviewText != null) lblPassbookPreviewText.Visible = true;
+            imgPassbook.Visible = false;
+            div_passbook_update.Visible = false;
+            div_passbook_noupdate.Visible = true;
+        }
+    }
+
+    string UploadPassbookImage()
+    {
+        if (!fuPassbook.HasFile)
+        {
+            return string.Empty;
+        }
+
+        // Basic safety: only allow common image/document types.
+        string ext = Path.GetExtension(fuPassbook.FileName ?? string.Empty).ToLowerInvariant();
+        string[] allowed = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+        if (Array.IndexOf(allowed, ext) < 0)
+        {
+            throw new Exception("Invalid file type. Upload JPG/PNG/PDF only.");
+        }
+
+        string randomNumber = DateTime.Now.Ticks.ToString();
+        string fileName = Path.GetFileName(fuPassbook.PostedFile.FileName);
+        string finalName = randomNumber + fileName;
+
+        // Reuse existing KYC storage folder.
+        fuPassbook.PostedFile.SaveAs(Server.MapPath("~/ProductImage/") + finalName);
+        return finalName;
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -98,6 +234,9 @@ public partial class UserBankDetail : System.Web.UI.Page
             txtbranchname.Text = dt.Rows[0]["branchname"].ToString(); ;
             ddbank.SelectedValue = dt.Rows[0]["bankname"].ToString(); ;
             hdstatus.Value = dt.Rows[0]["status"].ToString();
+
+            // Load CancelCheque/Passbook preview + approval status + upload availability.
+            LoadPassbookSection(dt);
         }
     }
 
@@ -227,6 +366,64 @@ public partial class UserBankDetail : System.Web.UI.Page
                 string popupScript = "alert('User Details Updated Successfully.');";
                 ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             }
+    }
+
+    protected void btnPassbookSubmit_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!GetChequePassbookEditStatus())
+            {
+                string url = "alert('You cannot upload passbook. Please contact admin.');";
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), url, true);
+                return;
+            }
+
+            if (!fuPassbook.HasFile)
+            {
+                string url = "alert('Please select passbook file.');";
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), url, true);
+                return;
+            }
+
+            string passbookFile = UploadPassbookImage();
+            if (string.IsNullOrWhiteSpace(passbookFile))
+            {
+                string url = "alert('Upload failed. Please try again.');";
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), url, true);
+                return;
+            }
+
+            objUser.UserId = Session["userid"].ToString();
+            objUser.CancelCheck = passbookFile;
+            objUser.MentionBy = Session["userid"].ToString();
+
+            // After upload, disable further editing for active users.
+            // Existing KYC flow uses IsChequePassbookEditabled = 0/1.
+            objUser.EditStatus = (hdstatus.Value != null && (hdstatus.Value == "1" || hdstatus.Value.Equals("Active", StringComparison.OrdinalIgnoreCase)))
+                ? "0"
+                : "1";
+
+            string rs = objUser.Update_UserCancelCheque(objUser);
+            if (rs == "t")
+            {
+                // Show uploaded file immediately, then reload status/permissions from DB.
+                BindPassbookPreview(passbookFile);
+                loaddata();
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(),
+                    "alert('Passbook uploaded successfully. Waiting for admin approval.');", true);
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(),
+                    "alert('Unknown error occurred while uploading passbook.');", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(),
+                "alert('" + ex.Message.Replace("'", "") + "');", true);
+        }
     }
 
     protected void ddcountry_SelectedIndexChanged(object sender, EventArgs e)

@@ -43,6 +43,26 @@ public partial class UploadKYC : System.Web.UI.Page
     }
 
    
+    string GetStoredImageName(string imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+            return string.Empty;
+
+        string value = imagePath.Trim();
+        value = value.Replace("../ProductImage/", "").Replace("~/ProductImage/", "").Replace("ProductImage/", "");
+        if (string.Equals(value, "img/default.png", StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+        return value;
+    }
+
+    string GetDisplayImageUrl(string imagePath)
+    {
+        string fileName = GetStoredImageName(imagePath);
+        if (string.IsNullOrWhiteSpace(fileName))
+            return "img/default.png";
+        return "../ProductImage/" + fileName;
+    }
+
     void loadsusername()
     {
         DataTable dt = new DataTable();
@@ -54,26 +74,26 @@ public partial class UploadKYC : System.Web.UI.Page
             objaccount.UserId = txtuserid.Text;
 
             #region SIGNUP
-            ImageShow.ImageUrl = dt.Rows[0]["SignUpForm"].ToString();
-            ViewState["Image"] = dt.Rows[0]["SignUpForm"].ToString();
+            ImageShow.ImageUrl = GetDisplayImageUrl(dt.Rows[0]["SignUpForm"].ToString());
+            ViewState["Image"] = GetStoredImageName(dt.Rows[0]["SignUpForm"].ToString());
 
             if (dt.Rows[0]["SignUpImgStatus"].ToString() == "0")
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Pending";
-                lblApprovalStatus.CssClass = "Pending";
+                lblApprovalStatus.CssClass = "admin-kyc-status Pending";
             }
             else if (dt.Rows[0]["SignUpImgStatus"].ToString() == "1")
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Approved";
-                lblApprovalStatus.CssClass = "Approved";
+                lblApprovalStatus.CssClass = "admin-kyc-status Approved";
             }
             else if (dt.Rows[0]["SignUpImgStatus"].ToString() == "2")
             {
                 divStatus.Visible = true;
                 lblApprovalStatus.Text = "Rejected";
-                lblApprovalStatus.CssClass = "Rejected";
+                lblApprovalStatus.CssClass = "admin-kyc-status Rejected";
             }
             else
                 divStatus.Visible = false;
@@ -81,27 +101,27 @@ public partial class UploadKYC : System.Web.UI.Page
             #endregion
 
             #region PAN
-            ImageButton1.ImageUrl = dt.Rows[0]["PanImage"].ToString();
-            ViewState["PANImage"] = dt.Rows[0]["PanImage"].ToString();
+            ImageButton1.ImageUrl = GetDisplayImageUrl(dt.Rows[0]["PanImage"].ToString());
+            ViewState["PANImage"] = GetStoredImageName(dt.Rows[0]["PanImage"].ToString());
             txtpanno.Text = dt.Rows[0]["PanNumber"].ToString();
 
             if (dt.Rows[0]["PanImgStatus"].ToString() == "0")
             {
                 divpanstatus.Visible = true;
                 lblpanstatus.Text = "Pending";
-                lblpanstatus.CssClass = "Pending";
+                lblpanstatus.CssClass = "admin-kyc-status Pending";
             }
             else if (dt.Rows[0]["PanImgStatus"].ToString() == "1")
             {
                 divpanstatus.Visible = true;
                 lblpanstatus.Text = "Approved";
-                lblpanstatus.CssClass = "Approved";
+                lblpanstatus.CssClass = "admin-kyc-status Approved";
             }
             else if (dt.Rows[0]["PanImgStatus"].ToString() == "2")
             {
                 divpanstatus.Visible = true;
                 lblpanstatus.Text = "Rejected";
-                lblpanstatus.CssClass = "Rejected";
+                lblpanstatus.CssClass = "admin-kyc-status Rejected";
             }
             else
                 divpanstatus.Visible = false;
@@ -109,26 +129,26 @@ public partial class UploadKYC : System.Web.UI.Page
             #endregion
 
             #region Cheque
-            ImageButton2.ImageUrl = dt.Rows[0]["CancelCheque"].ToString();
-            ViewState["ChequeImage"] = dt.Rows[0]["CancelCheque"].ToString();
+            ImageButton2.ImageUrl = GetDisplayImageUrl(dt.Rows[0]["CancelCheque"].ToString());
+            ViewState["ChequeImage"] = GetStoredImageName(dt.Rows[0]["CancelCheque"].ToString());
 
             if (dt.Rows[0]["ChequeImgStatus"].ToString() == "0")
             {
                 divchequestatus.Visible = true;
                 lblchequestatus.Text = "Pending";
-                lblchequestatus.CssClass = "Pending";
+                lblchequestatus.CssClass = "admin-kyc-status Pending";
             }
             else if (dt.Rows[0]["ChequeImgStatus"].ToString() == "1")
             {
                 divchequestatus.Visible = true;
                 lblchequestatus.Text = "Approved";
-                lblchequestatus.CssClass = "Approved";
+                lblchequestatus.CssClass = "admin-kyc-status Approved";
             }
             else if (dt.Rows[0]["ChequeImgStatus"].ToString() == "2")
             {
                 divchequestatus.Visible = true;
                 lblchequestatus.Text = "Rejected";
-                lblchequestatus.CssClass = "Rejected";
+                lblchequestatus.CssClass = "admin-kyc-status Rejected";
             }
             else
                 divchequestatus.Visible = false;
@@ -136,28 +156,28 @@ public partial class UploadKYC : System.Web.UI.Page
             #endregion
 
             #region Aadhar
-            ImageButton3.ImageUrl = dt.Rows[0]["AadharImage"].ToString();
-            ImageButton4.ImageUrl = dt.Rows[0]["AadharImageBack"].ToString();
-            ViewState["AadharImageFront"] = dt.Rows[0]["AadharImage"].ToString();
-            ViewState["AadharImageBack"] = dt.Rows[0]["AadharImageBack"].ToString();
+            ImageButton3.ImageUrl = GetDisplayImageUrl(dt.Rows[0]["AadharImage"].ToString());
+            ImageButton4.ImageUrl = GetDisplayImageUrl(dt.Rows[0]["AadharImageBack"].ToString());
+            ViewState["AadharImageFront"] = GetStoredImageName(dt.Rows[0]["AadharImage"].ToString());
+            ViewState["AadharImageBack"] = GetStoredImageName(dt.Rows[0]["AadharImageBack"].ToString());
             txtaadharno.Text = dt.Rows[0]["adharnumber"].ToString();
             if (dt.Rows[0]["AadharImgStatus"].ToString() == "0")
             {
                 divaadharstatus.Visible = true;
                 lblaadharstatus.Text = "Pending";
-                lblaadharstatus.CssClass = "Pending";
+                lblaadharstatus.CssClass = "admin-kyc-status Pending";
             }
             else if (dt.Rows[0]["AadharImgStatus"].ToString() == "1")
             {
                 divaadharstatus.Visible = true;
                 lblaadharstatus.Text = "Approved";
-                lblaadharstatus.CssClass = "Approved";
+                lblaadharstatus.CssClass = "admin-kyc-status Approved";
             }
             else if (dt.Rows[0]["AadharImgStatus"].ToString() == "2")
             {
                 divaadharstatus.Visible = true;
                 lblaadharstatus.Text = "Rejected";
-                lblaadharstatus.CssClass = "Rejected";
+                lblaadharstatus.CssClass = "admin-kyc-status Rejected";
             }
             else
                 divaadharstatus.Visible = false;
