@@ -1314,7 +1314,7 @@
 
                               <div class="row dash-metrics-grid">
 
-                             <div class="col-sm-12 col-lg-6 col-xl-4">
+                             <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
@@ -1328,7 +1328,7 @@
 						</div>
 					</div>
 
-                            <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
@@ -1342,7 +1342,7 @@
 						</div>
 					</div>
 
-                                       <div class="col-sm-12 col-lg-6 col-xl-4">
+                                       <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
 							<div class="card-body">
