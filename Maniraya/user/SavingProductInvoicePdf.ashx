@@ -55,12 +55,27 @@ public class SavingProductInvoicePdf : IHttpHandler
                 return;
             }
 
-            string fileName = "Invoice_" + orderId.Replace(" ", "_") + ".pdf";
+            // Verify PDF magic so WhatsApp never gets HTML/text labeled as PDF.
+            if (pdf.Length < 5
+                || pdf[0] != (byte)'%'
+                || pdf[1] != (byte)'P'
+                || pdf[2] != (byte)'D'
+                || pdf[3] != (byte)'F')
+            {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "text/plain";
+                context.Response.Write("Generated content is not a valid PDF");
+                return;
+            }
+
+            string safeOrder = orderId.Replace(" ", "_").Replace("\"", "").Replace("'", "");
+            string fileName = "Invoice_" + safeOrder + ".pdf";
             context.Response.Clear();
             context.Response.Buffer = true;
             context.Response.ContentType = "application/pdf";
             context.Response.AddHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
             context.Response.AddHeader("Content-Length", pdf.Length.ToString(CultureInfo.InvariantCulture));
+            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
             context.Response.BinaryWrite(pdf);
             context.Response.Flush();
             context.ApplicationInstance.CompleteRequest();

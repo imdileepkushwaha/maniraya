@@ -62,20 +62,12 @@ public static class ChatwayWhatsAppHelper
 
         string message = GetMessageTemplate(messageType);
 
-        // Chatway live success sample used:
-        // file_url=.../SavingProductInvoice.aspx?orderId=...  (no accessKey)
-        // file_name uses .pdf so WhatsApp shows a PDF document name.
-        // Static InvoiceFiles/*.pdf currently returns 403 on mpremium.in.
+        // WhatsApp needs a REAL PDF body. SavingProductInvoice.aspx is HTML — naming it
+        // Invoice.pdf caused "Format error. Failed to open file." on phones.
+        // Use SavingProductInvoicePdf.ashx (application/pdf) + accessKey for Chatway fetch.
         string fileName = "Invoice.pdf";
-        string fileUrl = BuildInvoiceFileUrl(orderId, null, false);
-        WriteLog("USING invoice page url=" + fileUrl);
-
-        // Optionally attach accessKey version as richer public URL when enabled.
-        if (IncludeAccessKeyInPrimaryUrl())
-        {
-            fileUrl = BuildInvoiceFileUrl(orderId, userId, true);
-            WriteLog("USING invoice page url with accessKey=" + fileUrl);
-        }
+        string fileUrl = BuildInvoiceFileUrl(orderId, userId, true);
+        WriteLog("USING invoice PDF url=" + fileUrl);
 
         if (PreferStaticPdfUrl())
         {
@@ -90,7 +82,7 @@ public static class ChatwayWhatsAppHelper
             }
             else
             {
-                WriteLog("PDF SAVE FAIL " + pdfError + " keeping aspx url=" + fileUrl);
+                WriteLog("PDF SAVE FAIL " + pdfError + " keeping ashx url=" + fileUrl);
             }
         }
 
@@ -175,8 +167,7 @@ public static class ChatwayWhatsAppHelper
             string responseText;
             bool ok = ExecuteSendFileRequest(username, token, apiBase, numberWithPlus, message, fileUrl, fileName, timeoutMs, out responseText);
 
-            bool isStaticPdf = fileUrl.IndexOf("/InvoiceFiles/", StringComparison.OrdinalIgnoreCase) >= 0
-                || fileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+            bool isPdfEndpoint = IsPdfFileUrl(fileUrl);
 
             // Retry without '+' (some accounts prefer plain 91...).
             if (!ok && IsGenericChatwayError(responseText))
@@ -185,8 +176,8 @@ public static class ChatwayWhatsAppHelper
                 ok = ExecuteSendFileRequest(username, token, apiBase, apiNumber, message, fileUrl, fileName, timeoutMs, out responseText);
             }
 
-            // Retry without accessKey/userId (closest to original working sample).
-            if (!ok && !isStaticPdf && IsGenericChatwayError(responseText))
+            // Retry without accessKey only for legacy HTML invoice pages (not PDF endpoints).
+            if (!ok && !isPdfEndpoint && IsGenericChatwayError(responseText))
             {
                 string oid = orderIdFromFileUrl(fileUrl);
                 if (string.IsNullOrWhiteSpace(oid))
@@ -347,9 +338,22 @@ public static class ChatwayWhatsAppHelper
             || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase);
     }
 
+    static bool IsPdfFileUrl(string fileUrl)
+    {
+        if (string.IsNullOrWhiteSpace(fileUrl))
+        {
+            return false;
+        }
+
+        return fileUrl.IndexOf("/InvoiceFiles/", StringComparison.OrdinalIgnoreCase) >= 0
+            || fileUrl.IndexOf("SavingProductInvoicePdf.ashx", StringComparison.OrdinalIgnoreCase) >= 0
+            || fileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+    }
+
     static bool IncludeAccessKeyInPrimaryUrl()
     {
-        string value = GetSetting("ChatwayIncludeAccessKeyInUrl", "false");
+        // Default true — PDF ashx requires accessKey for Chatway (no login session).
+        string value = GetSetting("ChatwayIncludeAccessKeyInUrl", "true");
         return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
             || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
             || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase);
