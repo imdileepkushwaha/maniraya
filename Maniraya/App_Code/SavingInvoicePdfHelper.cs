@@ -171,45 +171,44 @@ public static class SavingInvoicePdfHelper
         // ── Outer sheet border ──
         pdf.StrokeRect(left - 2f, 26f, width + 4f, SimplePdfBuilder.PageHeight - 52f, Border[0], Border[1], Border[2], 0.8f);
 
-        // ── Green header bar ──
-        float headerH = 92f;
+        // ── Green header bar (taller so Order Id / address do not clip or overlap) ──
+        float headerH = 112f;
         float headerBottom = y - headerH;
         pdf.FillRect(left, headerBottom, width, headerH, Green[0], Green[1], Green[2]);
 
         // Logo mark
-        pdf.FillStrokeRect(left + 12f, y - 52f, 34f, 34f, 0.20f, 0.72f, 0.40f, 1f, 1f, 1f, 1.2f);
-        pdf.TextCenter("M", left + 29f, y - 42f, 16f, true, 1f, 1f, 1f);
+        pdf.FillStrokeRect(left + 12f, y - 48f, 32f, 32f, 0.20f, 0.72f, 0.40f, 1f, 1f, 1f, 1.2f);
+        pdf.TextCenter("M", left + 28f, y - 38f, 15f, true, 1f, 1f, 1f);
 
-        pdf.Text("Maniraya Enterprises", left + 56f, y - 28f, 14f, true, 1f, 1f, 1f);
+        float leftColX = left + 54f;
+        float leftColMaxW = Math.Max(180f, width - 200f);
+        pdf.Text("Maniraya Enterprises", leftColX, y - 26f, 13f, true, 1f, 1f, 1f);
 
-        float companyInfoY = y - 44f;
-        companyInfoY = DrawWrappedWhite(pdf, companyAddress, left + 56f, companyInfoY, 250f, 7.5f, 9.5f) - 2f;
+        float companyInfoY = y - 40f;
+        companyInfoY = DrawWrappedWhite(pdf, companyAddress, leftColX, companyInfoY, leftColMaxW, 7f, 9f) - 3f;
         string contactBits = JoinNonEmpty(
             string.IsNullOrWhiteSpace(companyPhone) ? null : "Ph: " + companyPhone,
             string.IsNullOrWhiteSpace(companyEmail) ? null : companyEmail,
             string.IsNullOrWhiteSpace(companyWebsite) ? null : companyWebsite);
         if (!string.IsNullOrWhiteSpace(contactBits))
         {
-            pdf.Text(Truncate(contactBits, 70), left + 56f, companyInfoY, 7.5f, false, 0.95f, 0.98f, 0.95f);
-            companyInfoY -= 10f;
+            companyInfoY = DrawWrappedWhite(pdf, contactBits, leftColX, companyInfoY, leftColMaxW, 7f, 9f) - 3f;
         }
 
         pdf.Text("GSTIN/UIN: " + (string.IsNullOrWhiteSpace(companyGst) ? "-" : companyGst)
             + "  |  State: Karnataka, Code: " + companyStateCode,
-            left + 56f, companyInfoY, 7.5f, false, 0.95f, 0.98f, 0.95f);
+            leftColX, companyInfoY, 7f, false, 0.95f, 0.98f, 0.95f);
 
-        // Right side: INVOICE + meta
-        pdf.TextRight("INVOICE", right - 14f, y - 28f, 22f, true, 1f, 1f, 1f);
-        pdf.FillStrokeRect(right - 128f, y - 48f, 114f, 14f, 0.20f, 0.72f, 0.40f, 1f, 1f, 1f, 0.7f);
-        pdf.TextCenter("ORIGINAL FOR RECIPIENT", right - 71f, y - 44f, 6.5f, true, 1f, 1f, 1f);
+        // Right side: INVOICE + meta (no Due Date; Invoice Date → Paid Date)
+        pdf.TextRight("INVOICE", right - 14f, y - 26f, 20f, true, 1f, 1f, 1f);
+        pdf.FillStrokeRect(right - 128f, y - 46f, 114f, 14f, 0.20f, 0.72f, 0.40f, 1f, 1f, 1f, 0.7f);
+        pdf.TextCenter("ORIGINAL FOR RECIPIENT", right - 71f, y - 42f, 6.5f, true, 1f, 1f, 1f);
 
         float metaY = y - 62f;
         pdf.TextRight("Invoice No: " + invoiceNo, right - 14f, metaY, 8f, false, 1f, 1f, 1f);
-        metaY -= 11f;
-        pdf.TextRight("Invoice Date: " + invoiceDate.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture), right - 14f, metaY, 8f, false, 1f, 1f, 1f);
-        metaY -= 11f;
-        pdf.TextRight("Due Date: " + invoiceDate.AddDays(15).ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture), right - 14f, metaY, 8f, false, 1f, 1f, 1f);
-        metaY -= 11f;
+        metaY -= 12f;
+        pdf.TextRight("Paid Date: " + invoiceDate.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture), right - 14f, metaY, 8f, false, 1f, 1f, 1f);
+        metaY -= 12f;
         pdf.TextRight("Order Id: " + orderId, right - 14f, metaY, 8f, false, 1f, 1f, 1f);
 
         y = headerBottom - 12f;
@@ -327,17 +326,17 @@ public static class SavingInvoicePdfHelper
         // ── Bottom: terms + totals ──
         float bottomLeftW = width * 0.55f;
         float bottomRightW = width - bottomLeftW - 10f;
-        float termsH = 105f;
+        float termsH = 118f;
         float termsBottom = y - termsH;
 
         pdf.StrokeRect(left, termsBottom, bottomLeftW, termsH, Border[0], Border[1], Border[2], 0.6f);
         pdf.Text("ADDITIONAL INFORMATION:", left + 8f, y - 12f, 7.5f, true, Muted[0], Muted[1], Muted[2]);
-        float ty = y - 24f;
+        float ty = y - 26f;
         ty = pdf.TextWrapped(
             "Thank you for your business. We appreciate your trust in our services.",
-            left + 8f, ty, bottomLeftW - 16f, 7.5f, 9.5f, false, TextDark[0], TextDark[1], TextDark[2]) - 4f;
+            left + 8f, ty, bottomLeftW - 16f, 7.5f, 10f, false, TextDark[0], TextDark[1], TextDark[2]) - 4f;
         pdf.Text("Terms & Conditions:", left + 8f, ty, 7.5f, true, TextDark[0], TextDark[1], TextDark[2]);
-        ty -= 11f;
+        ty -= 12f;
         string[] terms =
         {
             "Subject to Karnataka Jurisdiction.",
@@ -348,7 +347,7 @@ public static class SavingInvoicePdfHelper
         foreach (string term in terms)
         {
             pdf.Text("- " + term, left + 8f, ty, 7f, false, TextDark[0], TextDark[1], TextDark[2]);
-            ty -= 10f;
+            ty -= 11f;
         }
 
         string support = Safe(SiteContactHelper.BuildSupportContactLine());
@@ -563,7 +562,7 @@ public static class SavingInvoicePdfHelper
             y -= lineHeight;
         }
 
-        return y + lineHeight;
+        return y;
     }
 
     static float DrawMutedWrapped(SimplePdfBuilder pdf, string text, float x, float y, float maxWidth, float size, float lineHeight)
@@ -579,7 +578,7 @@ public static class SavingInvoicePdfHelper
             y -= lineHeight;
         }
 
-        return y + lineHeight;
+        return y;
     }
 
     static DateTime GetInvoiceDate(DataTable items)

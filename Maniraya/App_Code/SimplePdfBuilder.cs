@@ -93,7 +93,7 @@ public class SimplePdfBuilder
     }
 
     /// <summary>
-    /// Draws wrapped text; returns Y of the last baseline used.
+    /// Draws wrapped text; returns Y ready for the next line below the last drawn baseline.
     /// </summary>
     public float TextWrapped(string text, float x, float y, float maxWidth, float size, float lineHeight, bool bold = false, float r = 0.12f, float g = 0.16f, float b = 0.22f)
     {
@@ -103,7 +103,7 @@ public class SimplePdfBuilder
             y -= lineHeight;
         }
 
-        return y + lineHeight;
+        return y;
     }
 
     public IList<string> Wrap(string text, float maxWidth, float size, bool bold = false)
