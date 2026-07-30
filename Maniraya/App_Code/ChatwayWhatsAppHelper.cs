@@ -382,8 +382,16 @@ public static class ChatwayWhatsAppHelper
         builder.Append(baseUrl.Contains("?") ? "&" : "?");
         builder.Append("orderId=").Append(HttpUtility.UrlEncode((orderId ?? string.Empty).Trim()));
 
-        // Keep URL close to Chatway working sample; userId optional.
-		bool includeUserId = string.Equals(GetSetting("ChatwayIncludeUserIdInUrl", "false"), "true", StringComparison.OrdinalIgnoreCase);
+        // PDF ashx needs userId on live — without it the endpoint returns 500 and Chatway fails.
+        bool includeUserId = true;
+        string includeUserIdSetting = GetSetting("ChatwayIncludeUserIdInUrl", "true");
+        if (string.Equals(includeUserIdSetting, "0", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(includeUserIdSetting, "false", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(includeUserIdSetting, "no", StringComparison.OrdinalIgnoreCase))
+        {
+            includeUserId = false;
+        }
+
         if (includeUserId && !string.IsNullOrWhiteSpace(userId))
         {
             builder.Append("&userId=").Append(HttpUtility.UrlEncode(userId.Trim()));
