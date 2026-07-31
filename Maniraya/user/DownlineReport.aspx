@@ -60,12 +60,12 @@
                                 <div class="team-stat-card team-stat-left">
                                     <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
                                     <div class="team-stat-content">
-                                        <p class="team-stat-label">Left Team</p>
-                                        <h3 class="team-stat-value"><asp:Label ID="LblTotalLeft" runat="server" Text="0"></asp:Label></h3>
+                                        <p class="team-stat-label">My Team</p>
+                                        <h3 class="team-stat-value"><asp:Label ID="LblDownline" runat="server" Text="0"></asp:Label></h3>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" style="display:none">
                                 <div class="team-stat-card team-stat-right">
                                     <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                                     <div class="team-stat-content">
@@ -77,9 +77,9 @@
                         </div>
 
                         <div class="downline-team-split">
-                            <div class="downline-team-panel is-left">
+                            <div class="downline-team">
                                 <div class="downline-team-panel-head">
-                                    <h4><i class="fa fa-arrow-left" aria-hidden="true"></i> Left Team Members</h4>
+                                    <h4><i class="fa fa-arrow-left" aria-hidden="true"></i> Team Members</h4>
                                 </div>
                                 <div class="team-table-wrap table-responsive">
                                     <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable team-table" Width="100%"
@@ -105,9 +105,9 @@
                                                     <asp:Label ID="lblstatus" runat="server" Text='<%# Eval("Status") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Parent ID">
+                                            <asp:TemplateField HeaderText="Sponsor ID">
                                                 <ItemTemplate>
-                                                    <asp:Label ID="lblsponserid" runat="server" Text='<%# Eval("ParentUserId") %>'></asp:Label>
+                                                    <asp:Label ID="lblsponserid" runat="server" Text='<%# Eval("sponserid") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
@@ -115,7 +115,7 @@
                                 </div>
                             </div>
 
-                            <div class="downline-team-panel is-right">
+                            <div class="downline-team-panel is-right" style="display:none">
                                 <div class="downline-team-panel-head">
                                     <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> Right Team Members</h4>
                                 </div>

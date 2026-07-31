@@ -1035,17 +1035,51 @@ namespace BusinessLogicTier
         {
             string str_query = "";
 
-            str_query = @"; WITH MyCTE
-AS ( SELECT id,userid,username,   ParentUserId,1 AS userlevel
-FROM userdetail
-WHERE UserId ='" + objUser.UserId + @"'
-UNION ALL
-SELECT UserDetail.id,userdetail.userid,userdetail.username,  userdetail.ParentUserId ,MyCTE.userlevel+1 
-FROM userdetail
-INNER JOIN MyCTE ON userdetail.parentuserid = MyCTE.userid
-WHERE userdetail.userid !='" + objUser.UserId + @"' )
-SELECT MyCTE.*,ud.username as parentname
-FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid ";
+            str_query = @";WITH MyCTE AS
+(
+    -- Root User
+    SELECT 
+        ud.id,
+        ud.userid,
+        ud.username,
+        ud.ParentUserId,
+        0 AS userlevel,
+        ud.StandingPosition,
+        CASE 
+            WHEN ISNULL(ud.Status, 0) = 1 THEN 'active'
+            ELSE 'deactive'
+        END AS Status,
+        ud.SponserId
+    FROM UserDetail ud
+    WHERE ud.UserId = 'MP000001'
+
+    UNION ALL
+
+    -- Downline Users
+    SELECT 
+        ud.id,
+        ud.userid,
+        ud.username,
+        ud.ParentUserId,
+        cte.userlevel + 1 AS userlevel,
+        ud.StandingPosition,
+        CASE 
+            WHEN ISNULL(ud.Status, 0) = 1 THEN 'active'
+            ELSE 'deactive'
+        END AS Status,
+        ud.SponserId
+    FROM UserDetail ud
+    INNER JOIN MyCTE cte 
+        ON ud.SponserId = cte.UserId
+    WHERE ud.UserId <> 'MP000001'
+)
+SELECT 
+    cte.*,
+    parent.username AS parentname
+FROM MyCTE cte
+LEFT JOIN UserDetail parent 
+    ON cte.SponserId = parent.UserId
+OPTION (MAXRECURSION 0); ";
 
 
 

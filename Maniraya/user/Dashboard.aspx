@@ -477,33 +477,8 @@
                         </div>
                     </div>
 
-                    <div class="row dash-stats-grid" style="display:none">
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card dash-income-card dash-income-compact tone-indigo">
-                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
-                                <div class="card-body">
-                                    <p class="dash-income-label">Total Team</p>
-                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblStatTeam" runat="server" Text="0" /></h3>
-                                    <div class="dash-income-meta">
-                                        <span class="dash-income-tag dash-income-tag--muted">Network members</span>
-                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-xl-3" style="display:none">
-                            <div class="card dash-income-card dash-income-compact tone-green">
-                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-briefcase"></i></span>
-                                <div class="card-body">
-                                    <p class="dash-income-label">Active Team</p>
-                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblStatActiveTeam" runat="server" Text="0" /></h3>
-                                    <div class="dash-income-meta">
-                                        <span class="dash-income-tag dash-income-tag--up">Active members</span>
-                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row dash-stats-grid">
+                       
                         <div class="col-sm-6 col-xl-3" style="display:none">
                             <div class="card dash-income-card dash-income-compact tone-gold">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-user-plus"></i></span>
@@ -964,7 +939,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Total Team</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LblDownline" runat="server" Text="Label" ></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LblssDownline" runat="server" Text="Label" ></asp:Label></h3>
 										</div>
 									</div>
 								</div><br />
@@ -984,7 +959,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Total Active Team</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="LblActiveDownline" runat="server" Text="Label" ></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="LblActssiveDownline" runat="server" Text="Label" ></asp:Label></h3>
 										</div>
 									</div>
 								</div><br>
@@ -1021,7 +996,32 @@
 							</div>
 						</div>
 					</div>
-
+                           <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-indigo">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Total Team</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="LblDownline" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--muted">Network members</span>
+                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-green">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-briefcase"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Active Team</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="LblActiveDownline" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--up">Active members</span>
+                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                           <div class="col-sm-12 col-lg-6 col-xl-4">
                             <asp:Panel ID="pnlDirectRank" runat="server" Visible="true" CssClass="card dash-income-card dash-income-compact tone-gold">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-trophy"></i></span>
@@ -1037,7 +1037,7 @@
                             </asp:Panel>
 					</div>
 
-                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                        <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">
@@ -1052,7 +1052,7 @@
 						</div>
 					</div>
 
-                          <div class="col-sm-12 col-lg-6 col-xl-4">
+                          <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">

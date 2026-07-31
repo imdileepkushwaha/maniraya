@@ -19,9 +19,10 @@ public partial class admin_DownlineReport : System.Web.UI.Page
             {
                 txtuserid.Text = Session["userid"].ToString();
                 txtuserid.Enabled = false;
+                Getsalary();
                 filldashboard();
                 loadLeftuser();
-                loadRightuser();
+               
             }
             else
             {
@@ -33,26 +34,61 @@ public partial class admin_DownlineReport : System.Web.UI.Page
     {
         objUser.UserId = txtuserid.Text;
         DataTable dt = new DataTable();
-        dt = objUser.getUserDownlineLeft(objUser);
+        dt = objUser.getUserDownline(objUser);
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
-    void loadRightuser()
+ 
+
+    public void Getsalary()
     {
-        objUser.UserId = txtuserid.Text;
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDownlineRight(objUser);
-        GridView2.DataSource = dt;
-        GridView2.DataBind();
+        //objuser.UserId = Session["Userid"].ToString();
+        //DataSet Dt = objuser.getUserdashboardnew(objuser);
+        //if (Dt.Tables[0].Rows.Count > 0)
+        //{
+        //    Lblsalary.Text = Dt.Tables[1].Rows[0][0].ToString();
+        //    LblBinaryIncome.Text = Dt.Tables[0].Rows[0][0].ToString();
+        //    LblBinaryPoint.Text = Dt.Tables[2].Rows[0][0].ToString() + " Left : " + Dt.Tables[3].Rows[0][0].ToString() + " Right";
+        //    LblsalaryPoint.Text = Dt.Tables[4].Rows[0][0].ToString() + " Left : " + Dt.Tables[4].Rows[0][1].ToString() + " Right";
+        //    lblLeftBV.Text = Math.Round(Convert.ToDecimal(Dt.Tables[5].Rows[0][0].ToString()), 0).ToString() + " Left : " + Math.Round(Convert.ToDecimal(Dt.Tables[5].Rows[0][1].ToString()), 0).ToString() + " Right";
+        //    lblBVvalue.Text = Math.Round(Convert.ToDecimal(Dt.Tables[5].Rows[0][0].ToString()) * 850, 0).ToString() + " : " + Math.Round(Convert.ToDecimal(Dt.Tables[5].Rows[0][1].ToString()) * 850, 0).ToString(); 
+        //}
+        //DataTable Dt = objuser.getUserDownlineDirect(Session["Userid"].ToString());
+        //if (Dt.Rows.Count > 0)
+        //{
+        //    LblDirect.Text = Dt.Rows[0]["Direct"].ToString();
+        //    LblActiveDirect.Text = Dt.Rows[0]["ActiveDirect"].ToString();
+        //    LblDownline.Text = Dt.Rows[0]["Downline"].ToString();
+        //    LblActiveDownline.Text = Dt.Rows[0]["ActiveDownline"].ToString();
+
+        //    LblDirectIncome.Text = Dt.Rows[0]["DirectIncome"].ToString();
+        //    Lbllevelincome.Text = Dt.Rows[0]["LevelIncome"].ToString();
+        //    Lblsalary.Text = Dt.Rows[0]["ROIIncome"].ToString();
+        //    LblBinaryPoint.Text = Dt.Rows[0]["BoosterIncome"].ToString();
+        //    LblLevelNo.Text = Dt.Rows[0]["LevelNo"].ToString();
+        //    LblBoostPFS.Text = Dt.Rows[0]["BoostStatus"].ToString();
+        //}
+        DataTable Dt = objUser.getUserDasboardproc(Session["Userid"].ToString());
+        if (Dt.Rows.Count > 0)
+        {
+          //  LblDirect.Text = Dt.Rows[0]["TotalDirect"].ToString();
+          //  LblActiveDirect.Text = Dt.Rows[0]["ActiveDirect"].ToString();
+            LblDownline.Text = Dt.Rows[0]["TotalTeam"].ToString();
+          
+
+
+
+            // LblGroup.Text = Dt.Rows[0]["CurrentGroup"].ToString();
+            //  Lblactivatedate2.Text = Dt.Rows[0]["Activatedate"].ToString();
+            //   LBlGroupIncome.Text = Dt.Rows[0]["GroupIncome"].ToString();
+        }
     }
-
-
     void filldashboard()
     {
         objUser.UserId = Session["userid"].ToString();
         DataTable LeftDt = objUser.getUserDownlineLeft(objUser);
         DataTable RightDt = objUser.getUserDownlineRight(objUser);
-        LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
+     //   LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
         LblTotalright.Text = RightDt.Rows.Count.ToString();
         //DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
         //DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
@@ -85,8 +121,8 @@ public partial class admin_DownlineReport : System.Web.UI.Page
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
         loadLeftuser();
-        loadRightuser();
-        LblTotalLeft.Text = GridView1.Rows.Count.ToString();
+       // loadRightuser();
+       // LblTotalLeft.Text = GridView1.Rows.Count.ToString();
         LblTotalright.Text = GridView2.Rows.Count.ToString();
     }
     protected void btnCancel_Click(object sender, EventArgs e)

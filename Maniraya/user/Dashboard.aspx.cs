@@ -596,22 +596,22 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
     void filldashboard()
     {
         objuser.UserId = Session["userid"].ToString();
-        DataTable LeftDt = objuser.getUserDownlineLeft(objuser);
-        DataTable RightDt = objuser.getUserDownlineRight(objuser);
-        LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
-        LblTotalright.Text = RightDt.Rows.Count.ToString();
-        DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
-        DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
-        DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
-        DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
-        Lblactiveleft.Text = Sactiveusers.Length.ToString();
-        LblActiveRight.Text = Sdeactiveusers.Length.ToString();
-        LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
-        LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
-        DataTable LeftDirectt = objuser.getUserleftDirect(objuser);
-        DataTable RightDirectt = objuser.getUserrightDirect(objuser);
-        LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
-        LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
+       // DataTable LeftDt = objuser.getUserDownlineLeft(objuser);
+    //    DataTable RightDt = objuser.getUserDownlineRight(objuser);
+      //  LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
+      //  LblTotalright.Text = RightDt.Rows.Count.ToString();
+      //  DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
+      //  DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
+      //  DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
+      //  DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
+      //  Lblactiveleft.Text = Sactiveusers.Length.ToString();
+      //  LblActiveRight.Text = Sdeactiveusers.Length.ToString();
+      //  LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
+      //  LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
+       // DataTable LeftDirectt = objuser.getUserleftDirect(objuser);
+       // DataTable RightDirectt = objuser.getUserrightDirect(objuser);
+       // LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
+       // LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
         string Fromdate = string.Empty;
         string Todatedate = string.Empty;
 
