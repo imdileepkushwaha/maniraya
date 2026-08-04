@@ -27,6 +27,7 @@
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+        <div class="admin-report-page">
                   <div class="row">
             <div class="col-md-12">
 
@@ -40,6 +41,7 @@
                       <asp:ListItem>25</asp:ListItem>
                       <asp:ListItem>50</asp:ListItem>
                       <asp:ListItem>100</asp:ListItem>
+                      <asp:ListItem>500</asp:ListItem>
                       <asp:ListItem>All</asp:ListItem>
                   </asp:DropDownList>
                   <span class="admin-record-filter-suffix">per page</span>
@@ -123,8 +125,7 @@
         </asp:TemplateField>
                                     <asp:TemplateField HeaderText="#">
                                         <ItemTemplate>
-                                            <%# Container.DataItemIndex + 1 %>
-                                          
+                                            <%# (GridView1.AllowPaging ? (GridView1.PageIndex * GridView1.PageSize) : 0) + Container.DataItemIndex + 1 %>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Purchase Id">
@@ -211,16 +212,25 @@
                                     </asp:TemplateField>
                                    <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                                <asp:LinkButton ID="btnApprove" CommandName="approve" OnClick="btnApprove_click" runat="server"> Approve |</asp:LinkButton> 
-                                             <asp:LinkButton ID="btnReject" CommandName="reject" OnClick="btnReject_click" runat="server">Reject</asp:LinkButton>
-                                            </ItemTemplate>
-                                            </asp:TemplateField>
+                                            <div class="admin-action-group">
+                                                <asp:LinkButton ID="btnApprove" CssClass="admin-action-btn is-approve" CommandName="approve"
+                                                    OnClientClick="return confirm('Are you sure you want to Approve this purchase?');"
+                                                    OnClick="btnApprove_click" runat="server">
+                                                    <i class="fa fa-check"></i> Approve
+                                                </asp:LinkButton>
+                                                <asp:LinkButton ID="btnReject" CssClass="admin-action-btn is-reject" CommandName="reject"
+                                                    OnClientClick="return confirm('Are you sure you want to Reject this purchase?');"
+                                                    OnClick="btnReject_click" runat="server">
+                                                    <i class="fa fa-times"></i> Reject
+                                                </asp:LinkButton>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                       <asp:TemplateField HeaderText="Invoice">
                                         <ItemTemplate>
-                                            
-                                            <asp:HyperLink ID="HyperLink1" runat="server" Text="Invoice" class="btn btn-outline-dark btn-text w-100" NavigateUrl='<%# string.Format("FranchiseeInvoice.aspx?OrderNo={0}",
-                    HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>' Target="_blank"></asp:HyperLink>                                   
-                                            
+                                            <asp:HyperLink ID="HyperLink1" runat="server" CssClass="admin-action-btn is-view"
+                                                NavigateUrl='<%# string.Format("FranchiseeInvoice.aspx?OrderNo={0}", HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>'
+                                                Target="_blank"><i class="fa fa-file-text-o"></i> Invoice</asp:HyperLink>
                                         </ItemTemplate>
                                     </asp:TemplateField>
 
@@ -237,12 +247,7 @@
 
 
                </div>
-
-
-
-           
-
-            
+        </div>
              </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
