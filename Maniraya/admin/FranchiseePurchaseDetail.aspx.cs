@@ -90,7 +90,7 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
         }
 
         int pageSize = GetPageSize();
-        if (pageSize <= 0 || ddlRecordFilter.SelectedItem.Text == "All")
+        if (pageSize <= 0)
         {
             GridView1.AllowPaging = false;
             GridView1.PageSize = dt.Rows.Count > 0 ? dt.Rows.Count : 10;
@@ -116,8 +116,17 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
 
     int GetPageSize()
     {
+        string selected = ddlRecordFilter.SelectedItem != null
+            ? ddlRecordFilter.SelectedItem.Text.Trim()
+            : "10";
+
+        if (string.Equals(selected, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
         int pageSize;
-        if (int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        if (int.TryParse(selected, out pageSize) && pageSize > 0)
         {
             return pageSize;
         }
@@ -158,7 +167,7 @@ public partial class FranchiseePurchaseDetail : System.Web.UI.Page
             str_query += " and P.FranchiseeID='" + objstate.VendorId + "'";
         }
         str_query += " and P.mentionby='admin'";
-        str_query += " and isnull(P.isdistributer,0)=0 order BY P.PurchaseId";
+        str_query += " and isnull(P.isdistributer,0)=0 order BY P.PurchaseId DESC";
         DataTable dt = null;
 
         ObjData.StartConnection();
