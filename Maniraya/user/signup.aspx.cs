@@ -250,40 +250,74 @@ public partial class signup : System.Web.UI.Page
     }
     public void FillDays()
     {
-        //Clear Days
+        int previousDay = 0;
+        if (ddlDay.SelectedItem != null)
+        {
+            int.TryParse(ddlDay.SelectedValue, out previousDay);
+        }
+        if (previousDay <= 0)
+        {
+            previousDay = DateTime.Now.Day;
+        }
+
         ddlDay.Items.Clear();
 
-        //getting numbner of days in selected month & year
-        int noofdays = DateTime.DaysInMonth(Convert.ToInt32(ddlYear.SelectedValue), Convert.ToInt32(ddlMonth.SelectedValue));
+        int year = Convert.ToInt32(ddlYear.SelectedValue);
+        int month = Convert.ToInt32(ddlMonth.SelectedValue);
+        int noofdays = DateTime.DaysInMonth(year, month);
 
-        //Fill days
         for (int i = 1; i <= noofdays; i++)
         {
             ddlDay.Items.Add(i.ToString());
         }
-        ddlDay.Items.FindByValue(System.DateTime.Now.Day.ToString()).Selected = true;// Set current date as selected
 
+        // Months like Jun/Apr/Sep/Nov have 30 days; Feb has 28/29.
+        // Never force today's day (e.g. 31) when it does not exist in the selected month.
+        int dayToSelect = Math.Min(previousDay, noofdays);
+        ListItem dayItem = ddlDay.Items.FindByValue(dayToSelect.ToString());
+        if (dayItem != null)
+        {
+            dayItem.Selected = true;
+        }
+        else if (ddlDay.Items.Count > 0)
+        {
+            ddlDay.SelectedIndex = 0;
+        }
     }
-
-
-
 
     public void FillDays2()
     {
-        //Clear Days
+        int previousDay = 0;
+        if (ddlDay2.SelectedItem != null)
+        {
+            int.TryParse(ddlDay2.SelectedValue, out previousDay);
+        }
+        if (previousDay <= 0)
+        {
+            previousDay = DateTime.Now.Day;
+        }
 
         ddlDay2.Items.Clear();
-        //getting numbner of days in selected month & year
 
-        int noofdays2 = DateTime.DaysInMonth(Convert.ToInt32(ddlYear2.SelectedValue), Convert.ToInt32(ddlMonth2.SelectedValue));
+        int year = Convert.ToInt32(ddlYear2.SelectedValue);
+        int month = Convert.ToInt32(ddlMonth2.SelectedValue);
+        int noofdays2 = DateTime.DaysInMonth(year, month);
 
-        //Fill days
         for (int i = 1; i <= noofdays2; i++)
         {
             ddlDay2.Items.Add(i.ToString());
         }
 
-        ddlDay2.Items.FindByValue(System.DateTime.Now.Day.ToString()).Selected = true;// Set current date as selected
+        int dayToSelect = Math.Min(previousDay, noofdays2);
+        ListItem dayItem = ddlDay2.Items.FindByValue(dayToSelect.ToString());
+        if (dayItem != null)
+        {
+            dayItem.Selected = true;
+        }
+        else if (ddlDay2.Items.Count > 0)
+        {
+            ddlDay2.SelectedIndex = 0;
+        }
     }
     protected void ddlYear_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -523,8 +557,14 @@ public partial class signup : System.Web.UI.Page
         {
             objUser.DateOfBirth = DateTime.MinValue;
         */
-        objUser.DateOfBirth = Convert.ToDateTime(ddlDay.SelectedValue.ToString() + "/" + ddlMonth.SelectedItem.ToString() + "/" + ddlYear.SelectedItem.ToString());
-        objUser.NomDateOfBirth = Convert.ToDateTime(ddlDay2.SelectedValue.ToString() + "/" + ddlMonth2.SelectedItem.ToString() + "/" + ddlYear2.SelectedItem.ToString());
+        objUser.DateOfBirth = new DateTime(
+            Convert.ToInt32(ddlYear.SelectedValue),
+            Convert.ToInt32(ddlMonth.SelectedValue),
+            Convert.ToInt32(ddlDay.SelectedValue));
+        objUser.NomDateOfBirth = new DateTime(
+            Convert.ToInt32(ddlYear2.SelectedValue),
+            Convert.ToInt32(ddlMonth2.SelectedValue),
+            Convert.ToInt32(ddlDay2.SelectedValue));
         objUser.Password = txtuserpassword.Text;
         objUser.MentionBy = "Outside";
         if(txtsponserid.Text!="")

@@ -158,7 +158,7 @@
                                                 <asp:Label ID="Lblstatus" runat="server"></asp:Label>
                                             </ItemTemplate>
                                         </asp:TemplateField>
-                                        <asp:TemplateField HeaderText="Invoice" Visible="false">
+                                        <asp:TemplateField HeaderText="Invoice" Visible="true">
                                             <ItemTemplate>
                                                 <asp:HyperLink ID="HyperLink1" runat="server" Text="Invoice" CssClass="btn btn-outline-dark btn-text w-100"
                                                     NavigateUrl='<%# string.Format("JoiningInvoice.aspx?OrderNo={0}", HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>' Target="_blank"></asp:HyperLink>

@@ -50,8 +50,11 @@ public partial class user_SavingProductInvoice : Page
             effectiveUserId = QueryStringValue(Request, "userId");
         }
 
+        int installmentId = 0;
+        int.TryParse(QueryStringValue(Request, "installmentId"), out installmentId);
+
         string orderId = QueryStringValue(Request, "orderId");
-        if (string.IsNullOrWhiteSpace(orderId))
+        if (string.IsNullOrWhiteSpace(orderId) && installmentId <= 0)
         {
             int recordId;
             if (int.TryParse(QueryStringValue(Request, "id"), out recordId) && recordId > 0)
@@ -60,31 +63,59 @@ public partial class user_SavingProductInvoice : Page
             }
         }
 
-        if (string.IsNullOrWhiteSpace(orderId))
+        if (string.IsNullOrWhiteSpace(orderId) && installmentId <= 0)
         {
             Response.Redirect(fallbackUrl);
             return;
         }
 
-        if ((isAdmin || hasPublicAccess) && string.IsNullOrWhiteSpace(effectiveUserId))
+        DataTable items;
+        if (installmentId > 0)
         {
-            effectiveUserId = GetUserIdByOrderId(orderId);
+            items = GetInvoiceItemsByInstallmentId(installmentId, effectiveUserId);
+            if (items != null && items.Rows.Count > 0)
+            {
+                if (string.IsNullOrWhiteSpace(orderId))
+                {
+                    orderId = Convert.ToString(items.Rows[0]["orderid"]).Trim();
+                }
+                if (string.IsNullOrWhiteSpace(effectiveUserId))
+                {
+                    effectiveUserId = Convert.ToString(items.Rows[0]["userid"]).Trim();
+                }
+            }
+        }
+        else
+        {
+            if ((isAdmin || hasPublicAccess) && string.IsNullOrWhiteSpace(effectiveUserId))
+            {
+                effectiveUserId = GetUserIdByOrderId(orderId);
+            }
+
+            if (string.IsNullOrWhiteSpace(effectiveUserId))
+            {
+                Response.Redirect(fallbackUrl);
+                return;
+            }
+
+            items = GetInvoiceItems(orderId, effectiveUserId);
         }
 
-        if (string.IsNullOrWhiteSpace(effectiveUserId))
-        {
-            Response.Redirect(fallbackUrl);
-            return;
-        }
-
-        DataTable items = GetInvoiceItems(orderId, effectiveUserId);
         if (items == null || items.Rows.Count == 0)
         {
             Response.Redirect(fallbackUrl);
             return;
         }
 
-        BindInvoice(orderId, items);
+        if (string.IsNullOrWhiteSpace(effectiveUserId))
+        {
+            effectiveUserId = Convert.ToString(items.Rows[0]["userid"]).Trim();
+        }
+
+        string invoiceKey = installmentId > 0
+            ? orderId + "-I" + installmentId.ToString(CultureInfo.InvariantCulture)
+            : orderId;
+        BindInvoice(invoiceKey, items);
     }
 
     static string QueryStringValue(System.Web.HttpRequest request, string key)
@@ -169,7 +200,18 @@ SELECT
     sd.amount,
     sd.status,
     sd.entrydate,
-    sd.approvedate,
+    (
+        SELECT TOP 1 sa.approvedate
+        FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+        WHERE sa.OrderId = sd.orderid
+          AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+          AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+          AND sa.approvedate IS NOT NULL
+        ORDER BY
+            CASE WHEN ISNULL(sa.InstNo, 0) = 1 THEN 0 ELSE 1 END,
+            sa.InstNo ASC,
+            sa.Id ASC
+    ) AS approvedate,
     sd.productid,
     1 AS quantity,
     ISNULL(sd.CGST, 0) AS CGSTPER,
@@ -227,6 +269,100 @@ WHERE sd.orderid = '" + SqlEscape(orderId) + @"'
        OR LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', 'approve', '1', 'active'))
 ORDER BY sd.couponcode, sd.id";
 
+        return LoadAndEnrichInvoiceItems(sql);
+    }
+
+    DataTable GetInvoiceItemsByInstallmentId(int installmentId, string userId)
+    {
+        string userFilter = string.IsNullOrWhiteSpace(userId)
+            ? string.Empty
+            : " AND LTRIM(RTRIM(sa.UserId)) = '" + SqlEscape(userId.Trim()) + "'";
+
+        // Product/name/amount from installment.productid; GST/coupon from matching account row.
+        string sql = @"
+SELECT
+    sa.id,
+    sa.orderid,
+    sa.userid,
+    sa.amount,
+    sa.status,
+    sa.entrydate,
+    sa.approvedate,
+    COALESCE(NULLIF(sa.productid, 0), sd.productid) AS productid,
+    1 AS quantity,
+    ISNULL(sd.CGST, 0) AS CGSTPER,
+    ISNULL(sd.SGST, 0) AS SGSTPER,
+    ISNULL(sd.IGST, 0) AS IGSTPER,
+    ISNULL(NULLIF(LTRIM(RTRIM(pm.HSNCode)), ''), '-') AS hsncode,
+    ISNULL(NULLIF(LTRIM(RTRIM(sd.couponcode)), ''), '-') AS couponcode,
+    ISNULL(NULLIF(LTRIM(RTRIM(pm.productname)), ''), 'Saving Product') AS productname,
+    pm.MRP,
+    pm.DP,
+    ud.username,
+    ud.mobile,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Email)), ''), '') AS email,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.PanNumber)), ''), '') AS pannumber,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Address)), ''), '') AS BillAddress,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.AreaName)), ''), '') AS BillArea,
+    ISNULL(C.CityName, '') AS BillCity,
+    ISNULL(S.StateName, '') AS BillState,
+    ISNULL(S.StateId, 0) AS BillStateId,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Pincode)), ''), '') AS BillPincode,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.Shippingaddress
+        ELSE ud.Address
+    END AS ShipAddress,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingAreaName
+        ELSE ud.AreaName
+    END AS ShipArea,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN CS.CityName
+        ELSE C.CityName
+    END AS ShipCity,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN SS.StateName
+        ELSE S.StateName
+    END AS ShipState,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN SS.StateId
+        ELSE S.StateId
+    END AS ShipStateId,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingPincode
+        ELSE ud.Pincode
+    END AS ShipPincode
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.productid,
+        sd0.couponcode,
+        sd0.CGST,
+        sd0.SGST,
+        sd0.IGST
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = sa.orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) sd
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
+LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
+LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
+LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
+WHERE sa.id = " + installmentId + @"
+  AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+" + userFilter;
+
+        return LoadAndEnrichInvoiceItems(sql);
+    }
+
+    DataTable LoadAndEnrichInvoiceItems(string sql)
+    {
         DataTable dt = null;
         ObjData.StartConnection();
         try
@@ -615,6 +751,7 @@ ORDER BY sd.couponcode, sd.id";
 
     static DateTime GetInvoiceDate(DataTable items)
     {
+        // Prefer ApproveDate from SavingAccountInstallmentDetail (selected in query).
         DateTime latestDate = DateTime.MinValue;
         foreach (DataRow row in items.Rows)
         {
@@ -623,7 +760,16 @@ ORDER BY sd.couponcode, sd.id";
             {
                 latestDate = approvedDate;
             }
+        }
 
+        if (latestDate.Year > 1900)
+        {
+            return latestDate;
+        }
+
+        // Fallback only when installment ApproveDate is missing.
+        foreach (DataRow row in items.Rows)
+        {
             DateTime entryDate = GetDateValue(row["entrydate"]);
             if (entryDate.Year > 1900 && entryDate > latestDate)
             {

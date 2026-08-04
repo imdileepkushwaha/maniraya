@@ -5154,3 +5154,165 @@ a.saving-pager-btn:focus {
         flex-wrap: wrap;
     }
 }
+
+/* Coupon-wise cards on user dashboard */
+.dash-coupon-section {
+    margin: 8px 0 22px;
+}
+
+.dash-coupon-grid {
+    margin: 0 -10px !important;
+}
+
+.dash-coupon-grid > [class*="col-"] {
+    padding: 0 10px;
+    margin-bottom: 18px;
+}
+
+.dash-coupon-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    padding: 18px 18px 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e8ecf1;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-coupon-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.dash-coupon-card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-coupon-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    color: #fff;
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    box-shadow: 0 6px 14px rgba(13, 148, 136, 0.28);
+}
+
+.dash-coupon-card-code-wrap {
+    min-width: 0;
+}
+
+.dash-coupon-card-label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.dash-coupon-card-code {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    word-break: break-all;
+    line-height: 1.25;
+}
+
+.dash-coupon-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.dash-coupon-stat {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eef2f6;
+}
+
+.dash-coupon-stat.is-paid {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.dash-coupon-stat.is-unpaid {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.dash-coupon-stat.is-current {
+    grid-column: 1 / -1;
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.dash-coupon-stat-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.dash-coupon-stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #0f172a;
+}
+
+.dash-coupon-stat.is-paid .dash-coupon-stat-value {
+    color: #15803d;
+}
+
+.dash-coupon-stat.is-unpaid .dash-coupon-stat-value {
+    color: #b45309;
+}
+
+.dash-coupon-stat.is-current .dash-coupon-stat-value {
+    color: #1d4ed8;
+}
+
+.dash-coupon-card-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: auto;
+    min-height: 40px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #0f766e !important;
+    text-decoration: none !important;
+    background: #ecfdf5;
+    border: 1px solid #99f6e4;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dash-coupon-card-link:hover,
+.dash-coupon-card-link:focus {
+    color: #fff !important;
+    background: #0d9488;
+    border-color: #0d9488;
+    text-decoration: none !important;
+}
+
+@media (max-width: 575px) {
+    .dash-coupon-card-stats {
+        grid-template-columns: 1fr;
+    }
+}

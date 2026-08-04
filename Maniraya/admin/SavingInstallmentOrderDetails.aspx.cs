@@ -234,9 +234,20 @@ SELECT
         ELSE ud.Pincode
     END AS ShipPincode
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.couponcode,
+        sd0.productid
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = sa.orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) sd
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
@@ -539,9 +550,20 @@ SELECT
         ELSE ud.Pincode
     END AS ShipPincode
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.couponcode,
+        sd0.productid
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = sa.orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) sd
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId

@@ -36,7 +36,7 @@
                     </div>
                     <div class="box-body team-box-body">
                         <div class="row team-stat-grid">
-                            <div class="col-md-6">
+                            <div class="col-md-6" style="display:none">
                                 <div class="team-stat-card team-stat-left">
                                     <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
                                     <div class="team-stat-content">
@@ -45,7 +45,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" style="display:none">
                                 <div class="team-stat-card team-stat-right">
                                     <span class="team-stat-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                                     <div class="team-stat-content">
@@ -62,7 +62,7 @@
                                     <label for="<%= txtSearch.ClientID %>">Search (User ID / Name / Mobile)</label>
                                     <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Type to search..."></asp:TextBox>
                                 </div>
-                                <div class="form-group" style="margin:0;min-width:140px;">
+                                <div class="form-group" style="margin:0;min-width:140px; display:none"" >
                                     <label for="<%= DDlstPosition.ClientID %>">Position</label>
                                     <asp:DropDownList ID="DDlstPosition" runat="server" CssClass="form-control">
                                         <asp:ListItem Value="0" Selected="True">Both</asp:ListItem>
@@ -103,7 +103,7 @@
                                         <asp:BoundField DataField="UserId" HeaderText="User ID" />
                                         <asp:BoundField DataField="UserName" HeaderText="User Name" />
                                         <asp:BoundField DataField="planname" HeaderText="Package" />
-                                        <asp:BoundField DataField="StandingPosition" HeaderText="Standing Position" />
+                                       <%-- <asp:BoundField DataField="StandingPosition" HeaderText="Standing Position" />--%>
                                         <asp:BoundField DataField="Mobile" HeaderText="Mobile" />
                                         <asp:BoundField DataField="mentiondate" HeaderText="D. O. J." />
                                         <asp:TemplateField HeaderText="Status">

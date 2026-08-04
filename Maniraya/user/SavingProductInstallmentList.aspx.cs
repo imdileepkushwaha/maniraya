@@ -20,7 +20,29 @@ public partial class user_SavingProductInstallmentList : Page
         if (!IsPostBack)
         {
             LoadCoupons();
+            ApplyCouponQueryString();
             LoadInstallments();
+        }
+    }
+
+    void ApplyCouponQueryString()
+    {
+        string coupon = Convert.ToString(Request.QueryString["coupon"]).Trim();
+        if (string.IsNullOrEmpty(coupon) || ddCouponCode == null || ddCouponCode.Items.Count == 0)
+        {
+            return;
+        }
+
+        ListItem item = ddCouponCode.Items.FindByValue(coupon);
+        if (item == null)
+        {
+            item = ddCouponCode.Items.FindByText(coupon);
+        }
+
+        if (item != null)
+        {
+            ddCouponCode.ClearSelection();
+            item.Selected = true;
         }
     }
 

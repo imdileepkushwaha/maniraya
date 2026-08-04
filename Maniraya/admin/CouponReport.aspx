@@ -308,7 +308,7 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Coupons</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Filter approved coupons by Approve Month and Draw Type (Mega / Super), plus code, user, or mobile.</p>
+                                <p class="admin-report-intro">Filter approved coupons by Approve Month and Draw Type: <strong>Super Draw</strong> = installment approvals day 1–10 (InstNo ≠ 1); <strong>Mega Draw</strong> = installment approvals full month.</p>
                                 <div class="admin-form-section">
                                     <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Approve Month &amp; Draw</h5>
                                     <div class="row">
@@ -416,7 +416,7 @@
                                 </div>
                             </div>
                             <div class="box-body">
-                                <p class="admin-report-intro">Approved coupons from <strong>SavingAccountDetail</strong> for lucky draw. Print all filtered tickets, cut along dashed lines, and use them in the draw.</p>
+                                <p class="admin-report-intro">Approved installments only from <strong>SavingAccountInstallmentDetail</strong>. Super Draw: day 1–10 (InstNo ≠ 1). Mega Draw: full month. Print tickets for the draw.</p>
 
                                 <asp:Panel ID="pnlLoadError" runat="server" Visible="false" CssClass="alert alert-warning admin-report-alert">
                                     <i class="fa fa-exclamation-triangle"></i>

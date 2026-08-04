@@ -340,7 +340,9 @@ body.main-body.app .box.box-primary .table-responsive,
 .content-wrapper .box.box-primary .table-responsive {
     border: 1px solid var(--box-border);
     border-radius: 8px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* GridView / dataTable */
