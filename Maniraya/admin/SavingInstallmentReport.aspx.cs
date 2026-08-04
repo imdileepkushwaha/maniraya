@@ -35,7 +35,12 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT sa.*, ud.username, sd.couponcode,pm.productname FROM SavingAccountInstallmentDetail sa WITH (nolock) LEFT JOIN  SavingAccountDetail sd WITH (nolock) ON sa.OrderId=sd.orderid LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 and sa.status = 'Processing' ";
+        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+WHERE 1 = 1 AND sa.status = 'Processing' ";
         if (txtfromdate.Text != "" && txttodate.Text != "")
         {
             str_query += "  and convert(date, sa.requestdate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sa.requestdate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
@@ -415,12 +420,19 @@ public partial class admin_UserReport : System.Web.UI.Page
             return false;
         }
 
+        Label lblInstallmentId = (Label)row.FindControl("lblId");
         Label lblUserId = (Label)row.FindControl("lblurrorderid");
         Label lblOrderId = (Label)row.FindControl("lblorderid");
         string userId = lblUserId != null ? Convert.ToString(lblUserId.Text).Trim() : string.Empty;
         string orderId = lblOrderId != null ? Convert.ToString(lblOrderId.Text).Trim() : string.Empty;
+        int installmentId = 0;
+        if (lblInstallmentId != null)
+        {
+            int.TryParse(Convert.ToString(lblInstallmentId.Text).Trim(), out installmentId);
+        }
 
-        return ChatwayWhatsAppHelper.TrySendInvoiceAfterApprove(userId, orderId, messageType, out statusMessage);
+        // Installment-scoped invoice uses SavingAccountInstallmentDetail.productid.
+        return ChatwayWhatsAppHelper.TrySendInvoiceAfterApprove(userId, orderId, installmentId, messageType, out statusMessage);
     }
 
     static string FormatWhatsAppAlertSuffix(string waStatus)

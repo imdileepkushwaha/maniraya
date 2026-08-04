@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=46" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=48" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -305,6 +305,53 @@
                             </div>
                         </div>
                     </div>
+
+                    <asp:Panel ID="pnlCouponCards" runat="server" Visible="false" CssClass="dash-coupon-section">
+                        <div class="dash-section-head dash-section-head--member">
+                            <div class="dash-section-head-main">
+                                <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-ticket-alt"></i></span>
+                                <div class="dash-section-head-copy">
+                                    <h3 class="dash-section-title">My Coupons</h3>
+                                    <p class="dash-section-sub">Coupon-wise paid &amp; unpaid installment summary</p>
+                                </div>
+                            </div>
+                            <span class="dash-section-head-tag">Saving</span>
+                        </div>
+                        <div class="row dash-coupon-grid">
+                            <asp:Repeater ID="rptCouponCards" runat="server">
+                                <ItemTemplate>
+                                    <div class="col-sm-12 col-md-6 col-xl-4">
+                                        <div class="dash-coupon-card">
+                                            <div class="dash-coupon-card-top">
+                                                <span class="dash-coupon-card-icon" aria-hidden="true"><i class="fa fa-barcode"></i></span>
+                                                <div class="dash-coupon-card-code-wrap">
+                                                    <span class="dash-coupon-card-label">Coupon Code</span>
+                                                    <strong class="dash-coupon-card-code"><%# Eval("CouponCode") %></strong>
+                                                </div>
+                                            </div>
+                                            <div class="dash-coupon-card-stats">
+                                                <div class="dash-coupon-stat is-paid">
+                                                    <span class="dash-coupon-stat-label">Paid Installment</span>
+                                                    <strong class="dash-coupon-stat-value"><%# Eval("PaidCount") %></strong>
+                                                </div>
+                                                <div class="dash-coupon-stat is-unpaid">
+                                                    <span class="dash-coupon-stat-label">Unpaid Installment</span>
+                                                    <strong class="dash-coupon-stat-value"><%# Eval("UnpaidCount") %></strong>
+                                                </div>
+                                                <div class="dash-coupon-stat is-current">
+                                                    <span class="dash-coupon-stat-label">This Month Pending</span>
+                                                    <strong class="dash-coupon-stat-value"><%# Eval("CurrentMonthPending") %></strong>
+                                                </div>
+                                            </div>
+                                            <a href='<%# GetCouponReportUrl(Eval("CouponCode")) %>' class="dash-coupon-card-link">
+                                                More Info <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </div>
+                    </asp:Panel>
 
                     <div class="dash-incentive-referral-stack">
                         <div class="dash-incentive-card dash-incentive-card--full" id="dashIncentiveCard">
@@ -431,7 +478,7 @@
                             <div class="dash-referral-grid">
                                 <div class="dash-referral-card is-left">
                                     <div class="dash-referral-card-top">
-                                        <span class="dash-referral-card-badge">Left Team</span>
+                                        <span class="dash-referral-card-badge">Join Team</span>
                                         <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
                                     </div>
                                     <p class="dash-referral-card-text">New members joining from this link will be placed on your <strong>left</strong> side.</p>
@@ -449,7 +496,7 @@
                                     </div>
                                 </div>
 
-                                <div class="dash-referral-card is-right">
+                                <div class="dash-referral-card is-right" style="display:none">
                                     <div class="dash-referral-card-top">
                                         <span class="dash-referral-card-badge">Right Team</span>
                                         <span class="dash-referral-card-icon" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
@@ -477,33 +524,8 @@
                         </div>
                     </div>
 
-                    <div class="row dash-stats-grid" style="display:none">
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card dash-income-card dash-income-compact tone-indigo">
-                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
-                                <div class="card-body">
-                                    <p class="dash-income-label">Total Team</p>
-                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblStatTeam" runat="server" Text="0" /></h3>
-                                    <div class="dash-income-meta">
-                                        <span class="dash-income-tag dash-income-tag--muted">Network members</span>
-                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-xl-3" style="display:none">
-                            <div class="card dash-income-card dash-income-compact tone-green">
-                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-briefcase"></i></span>
-                                <div class="card-body">
-                                    <p class="dash-income-label">Active Team</p>
-                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblStatActiveTeam" runat="server" Text="0" /></h3>
-                                    <div class="dash-income-meta">
-                                        <span class="dash-income-tag dash-income-tag--up">Active members</span>
-                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row dash-stats-grid">
+                       
                         <div class="col-sm-6 col-xl-3" style="display:none">
                             <div class="card dash-income-card dash-income-compact tone-gold">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-user-plus"></i></span>
@@ -964,7 +986,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Total Team</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LblDownline" runat="server" Text="Label" ></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success"> <asp:Label ID="LblssDownline" runat="server" Text="Label" ></asp:Label></h3>
 										</div>
 									</div>
 								</div><br />
@@ -984,7 +1006,7 @@
 									<div class="float-left">
 										<p class="mb-0 text-left">Total Active Team</p><br />
 										<div class="">
-											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="LblActiveDownline" runat="server" Text="Label" ></asp:Label></h3>
+											<h3 class="font-weight-semibold text-left mb-0 text-success">  <asp:Label ID="LblActssiveDownline" runat="server" Text="Label" ></asp:Label></h3>
 										</div>
 									</div>
 								</div><br>
@@ -1021,7 +1043,32 @@
 							</div>
 						</div>
 					</div>
-
+                           <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-indigo">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Total Team</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="LblDownline" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--muted">Network members</span>
+                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-green">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-briefcase"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Active Team</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="LblActiveDownline" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--up">Active members</span>
+                                        <a href="DownlineReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                           <div class="col-sm-12 col-lg-6 col-xl-4">
                             <asp:Panel ID="pnlDirectRank" runat="server" Visible="true" CssClass="card dash-income-card dash-income-compact tone-gold">
                                 <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-trophy"></i></span>
@@ -1037,7 +1084,7 @@
                             </asp:Panel>
 					</div>
 
-                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                        <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">
@@ -1052,7 +1099,7 @@
 						</div>
 					</div>
 
-                          <div class="col-sm-12 col-lg-6 col-xl-4">
+                          <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
 							<div class="card-body">

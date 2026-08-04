@@ -1,537 +1,105 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItemRepurchase.aspx.cs" Inherits="user_PurchaseItemRepurchase" %>
+<%@ Page Title="Purchase Item" Language="C#" MasterPageFile="~/user/MasterPage.master" AutoEventWireup="true" CodeFile="PurchaseItemRepurchase.aspx.cs" Inherits="user_PurchaseItemRepurchase" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-
-<style>
-div.ex1 {
-  background-color: lightblue;
-  width: 110px;
-  height: 110px;
-  overflow: scroll;
-}
-
-div.ex2 {
-  background-color: lightblue;
-  width: 110px;
-  height: 110px;
-  overflow: hidden;
-}
-
-div.ex3 {
-    width: 100%;
-  height: 110px;
-  overflow: auto;
-}
-
-div.ex4 {
-  background-color: lightblue;
-  width: 110px;
-  height: 110px;
-  overflow: clip;
-}
-
-div.ex5 {
-  background-color: lightblue;
-  width: 110px;
-  height: 110px;
-  overflow: visible;
-}
-</style>
-
+    <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
+    <link href="assets/css/box-modern.css?v=4" rel="stylesheet" />
+    <link href="assets/css/repurchase-modern.css?v=1" rel="stylesheet" />
+    <style type="text/css">
+        .product_item { display: block; background: #fff; border: 1px solid #e8ecf1; padding: 12px; border-radius: 12px; position: relative; overflow: hidden; }
+        .product_sale { position: absolute; z-index: 2; right: -34px; transform: rotate(45deg); font-size: 12px; margin-top: 18px; }
+        .product_sale p { margin: 0; color: #fff; background: #e86b5a; padding: 3px 34px; }
+        .product_image { position: relative; overflow: hidden; margin-bottom: 10px; }
+        .product_image img { max-width: 100%; height: auto; }
+        .product_values { width: 100%; }
+        .product_desc .ex3 { width: 100%; max-height: 110px; overflow: auto; color: #64748b; }
+        .col-item { height: 100%; }
+    </style>
     <script type="text/javascript">
         function gettotal() {
-
-            var Quantity = 0, Amount = 0, TotalAMount = 0;
-            if (document.getElementById("<%=TxtQuantity.ClientID%>").value != "") {
-                Quantity = document.getElementById("<%=TxtQuantity.ClientID%>").value;
-            }
-            if (document.getElementById("<%=TxtAmount.ClientID%>").value != "") {
-                Amount = document.getElementById("<%=TxtAmount.ClientID%>").value;
-            }
-            var TotalAMount = Quantity * Amount;
-
-
-            document.getElementById("<%=TxtTotalAmount.ClientID%>").innerText = TotalAMount;
+            var Quantity = 0, Amount = 0;
+            var qtyEl = document.getElementById("<%=TxtQuantity.ClientID%>");
+            var amtEl = document.getElementById("<%=TxtAmount.ClientID%>");
+            var totalEl = document.getElementById("<%=TxtTotalAmount.ClientID%>");
+            if (qtyEl && qtyEl.value != "") Quantity = qtyEl.value;
+            if (amtEl && amtEl.value != "") Amount = amtEl.value;
+            if (totalEl) totalEl.innerText = Quantity * Amount;
         }
 
         function validate() {
-            if (document.getElementById("<%=TxtQuantity.ClientID%>").value == "") {
-
+            var qty = document.getElementById("<%=TxtQuantity.ClientID%>");
+            if (!qty || qty.value == "") {
                 alert('Enter Quantity');
-                document.getElementById("<%=TxtQuantity.ClientID%>").focus();
-                  return false;
-              }
+                if (qty) qty.focus();
+                return false;
+            }
+            return true;
+        }
 
-            //  if (document.getElementById("<%=TxtTransactionId.ClientID%>").value == "") {
+        function validate2() {
+            var mode = document.getElementById("<%=ddmode.ClientID%>");
+            var txn = document.getElementById("<%=TxtTransactionId.ClientID%>");
+            var uploadMsg = document.getElementById("<%=TextBox1.ClientID%>");
+            var fileName = document.getElementById("<%=HDFilename.ClientID%>");
+            var state = document.getElementById("<%=ddstate.ClientID%>");
+            var city = document.getElementById("<%=ddcity.ClientID%>");
 
-            //    alert('Enter Transaction Id');
-              //  document.getElementById("<%=TxtTransactionId.ClientID%>").focus();
-             //     return false;
-             // }
-
-
-            //  if (document.getElementById("<%=ImageUpload.ClientID%>").value == "") {
-
-             //   alert('Upload Payment Slip');
-             //   document.getElementById("<%=TxtTransactionId.ClientID%>").focus();
-             //     return false;
-             // }
-			   if (document.getElementById("<%=ddstate.ClientID%>").value == "0") {
+            if (state && state.value == "0") {
                 alert('Select State');
-                document.getElementById("<%=ddstate.ClientID%>").focus();
+                state.focus();
                 return false;
             }
-            if (document.getElementById("<%=ddcity.ClientID%>").value == "0") {
+            if (city && city.value == "0") {
                 alert('Select City');
-                document.getElementById("<%=ddcity.ClientID%>").focus();
+                city.focus();
                 return false;
             }
-          }
-
-          function validate2() {
-
-
-              if (document.getElementById("<%=ddmode.ClientID%>").value == "Select") {
-                  alert('Select Payment Mode');
-                  document.getElementById("<%=ddmode.ClientID%>").focus();
+            if (!mode || mode.value == "Select") {
+                alert('Select Payment Mode');
+                if (mode) mode.focus();
                 return false;
             }
-
-            if (document.getElementById("<%=TxtTransactionId.ClientID%>").value == "") {
-
-                  alert('Enter Transaction Id');
-                  document.getElementById("<%=TxtTransactionId.ClientID%>").focus();
-		        return false;
-            }
-              if (document.getElementById("<%=TextBox1.ClientID%>").value == "") {
-
-                  alert('Upload Payment Slip');
-                  document.getElementById("<%=TextBox1.ClientID%>").focus();
+            if (!txn || txn.value.replace(/^\s+|\s+$/g, '') == "") {
+                alert('Enter Transaction Id');
+                if (txn) txn.focus();
                 return false;
             }
+            if ((!uploadMsg || uploadMsg.value.replace(/^\s+|\s+$/g, '') == "") &&
+                (!fileName || fileName.value.replace(/^\s+|\s+$/g, '') == "")) {
+                alert('Upload Payment Slip');
+                if (uploadMsg) uploadMsg.focus();
+                return false;
+            }
+            return true;
+        }
 
-          }
-    </script>
-    <script type="text/javascript">
         function checkRadioBtn(id) {
             var gv = document.getElementById('<%=GDoffer.ClientID %>');
-
-        for (var i = 1; i < gv.rows.length; i++) {
-            var radioBtn = gv.rows[i].cells[0].getElementsByTagName("input");
-
-            // Check if the id not same
-            if (radioBtn[0].id != id.id) {
-                radioBtn[0].checked = false;
-            }
-            
-        }
-    }
-</script>
-       
-    <style type="text/css">
-        @import url(http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css);
-
-        .col-item {
-            border: 1px solid #E1E1E1;
-            border-radius: 5px;
-            background: #FFF;
-            margin-bottom: 20px;
-        }
-
-            .col-item .photo img {
-                margin: 0 auto;
-                width: 100%;
-            }
-
-            .col-item .info {
-                padding: 10px;
-                border-radius: 0 0 5px 5px;
-                margin-top: 1px;
-            }
-
-            .col-item:hover .info {
-                background-color: #F5F5DC;
-            }
-
-            .col-item .price {
-                /*width: 50%;*/
-                float: left;
-                margin-top: 5px;
-            }
-
-            .col-item .price-text-color {
-                font-size: 18px;
-                margin-top: 3px;
-            }
-
-            .col-item .price h5 {
-                line-height: 22px;
-                margin: 0;
-                font-size: 15px;
-                font-weight: bold;
-                color: #777;
-            }
-
-        .price-text-color {
-            color: #219FD1;
-        }
-
-        .col-item .info .rating {
-            color: #777;
-            font-size: 20px;
-            vertical-align: middle;
-        }
-
-        .col-item .rating {
-            /*width: 50%;*/
-            float: left;
-            font-size: 17px;
-            text-align: right;
-            line-height: 52px;
-            margin-bottom: 10px;
-            height: 52px;
-        }
-
-        .col-item .separator {
-            border-top: 1px solid #E1E1E1;
-        }
-
-        .clear-left {
-            clear: left;
-        }
-
-        .col-item .separator p {
-            line-height: 20px;
-            margin-bottom: 0;
-            margin-top: 10px;
-            /*text-align: center;
-        width: 100%;*/
-        }
-
-            .col-item .separator p i {
-                margin-right: 5px;
-            }
-
-        .col-item .btn-add {
-            width: 50%;
-            float: left;
-        }
-
-        .col-item .btn-add {
-            border-right: 1px solid #E1E1E1;
-        }
-
-        .col-item .btn-details {
-            width: 50%;
-            float: left;
-            padding-left: 10px;
-        }
-
-        .controls {
-            margin-top: 20px;
-        }
-
-        [data-slide="prev"] {
-            margin-right: 10px;
-        }
-
-        .product_grid a {
-            text-decoration: none;
-        }
-
-        .product_item {
-            display: inline-block;
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product_sale {
-            position: absolute;
-            z-index: 99;
-            right: -37px;
-            -webkit-transform: rotate(45deg);
-            -moz-transform: rotate(45deg);
-            transform: rotate(45deg);
-            font-size: 13px;
-            margin-top: 23px;
-        }
-
-        .product_image {
-            position: relative;
-            overflow: hidden;
-        }
-
-            .product_image img {
-            }
-
-        .product_title {
-            float: left;
-            width: 100%;
-            text-transform: uppercase;
-        }
-
-            .product_title h5 {
-                margin: auto;
-                font-size: 2.1em;
-                font-weight: 500;
-                line-height: 1;
-                padding-bottom: 7px;
-            }
-
-        .product_price a {
-            color: #ea2e49;
-            padding-left: 6px;
-        }
-
-        .price_old {
-            color: #ea2e49;
-            text-decoration: line-through;
-        }
-
-        .product_price span {
-            font-size: 1.1em;
-            line-height: 1;
-            padding-left: 2px;
-        }
-
-        .product_desc p {
-            margin: 0;
-            line-height: 1.3;
-            padding: 7px 5px;
-        }
-
-        .product_rating {
-            float: right;
-            width: 100px;
-            height: 20px;
-            overflow: hidden;
-            background: url(https://bit.ly/1B4PjyM) top left no-repeat;
-            background-position: 0 76%;
-        }
-
-        .product_buttons {
-            -webkit-font-smoothing: antialiased;
-            -moz-font-smoothing: antialiased;
-            font-smoothing: antialiased;
-        }
-
-            .product_buttons .product_heart:hover {
-                color: #DF0404;
-                background: rgba(255, 255, 255, 0.5);
-            }
-
-            .product_buttons .product_compare:hover {
-                color: rgb(18, 150, 18);
-                background: rgba(255, 255, 255, 0.5);
-            }
-
-            .product_buttons .add_to_cart:hover {
-                color: #4DC8D3;
-                ;
-                background: rgba(255, 255, 255, 0.5);
-            }
-
-        /* Custom, iPhone Retina */
-        @media only screen and (min-width : 320px) {
-            .product_sale p {
-                margin: 0px;
-                color: #fff;
-                background: #ff0000;
-                padding: 3px 34px;
-                box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
-            }
-
-            .product_values {
-                float: left;
-                width: calc(100% - 100px);
-                padding: 0 10px;
-            }
-
-            .product_rating {
-                margin-right: 10px;
-            }
-
-            .product_image {
-                height: 150px;
-                float: left;
-                width: 100px;
-            }
-
-                .product_image .product_buttons {
-                    display: none;
+            if (!gv) return;
+            for (var i = 1; i < gv.rows.length; i++) {
+                var radioBtn = gv.rows[i].cells[0].getElementsByTagName("input");
+                if (radioBtn.length && radioBtn[0].id != id.id) {
+                    radioBtn[0].checked = false;
                 }
-
-            .product_desc {
-                overflow: hidden;
-                float: left;
-                line-height: 1;
-            }
-
-            .product_values .product_buttons {
-                position: relative;
-                text-align: left;
-                float: left;
-                margin-top: 7px;
-            }
-
-                .product_values .product_buttons button {
-                    color: #252525;
-                    background: rgba(255, 255, 255, 1);
-                    font-size: 1em;
-                    border-radius: 50%;
-                    width: 40px;
-                    height: 40px;
-                    border: 1px solid #000;
-                }
-        }
-
-        /* Extra Small Devices, Phones */
-        @media only screen and (min-width : 480px) {
-            .product_image {
-                height: 250px;
-                width: 175px;
-            }
-
-            .product_values {
-                width: calc(100% - 175px);
             }
         }
-
-        @media only screen and (min-width: 678px) {
-            .product_item {
-                width: 49.5%;
-            }
-
-            .product_image {
-                height: 150px;
-                width: 100px;
-            }
-
-            .product_values {
-                width: calc(100% - 100px);
-            }
-        }
-
-        /* Small Devices, Tablets */
-        @media only screen and (min-width : 768px) {
-        }
-
-        /* Medium Devices, Desktops */
-        @media only screen and (min-width : 992px) {
-            .product_image {
-                height: 199px;
-                width: 175px;
-            }
-
-            .product_values {
-                width: calc(100% - 175px);
-            }
-
-            .product_desc {
-                max-height: 200px;
-            }
-        }
-
-        /* Large Devices, Wide Screens */
-        @media only screen and (min-width : 1200px) {
-            .product_item {
-                width: 33%;
-            }
-
-            .product_desc {
-                max-height: 131px;
-            }
-        }
-
-
-
-        /*==========  Non-Mobile First Method  ==========*/
-
-        /* Large Devices, Wide Screens */
-        @media only screen and (max-width : 1200px) {
-        }
-
-        /* Medium Devices, Desktops */
-        @media only screen and (max-width : 992px) {
-            .product_desc {
-                max-height: 67px;
-            }
-        }
-
-        /* Small Devices, Tablets */
-        @media only screen and (max-width : 768px) {
-        }
-
-        /* Extra Small Devices, Phones */
-        @media only screen and (max-width : 480px) {
-            .product_title h5 {
-                font-weight: bold;
-            }
-        }
-
-        /* Custom, iPhone Retina */
-        @media only screen and (max-width : 320px) {
-            .product_sale {
-                display: none;
-            }
-
-            .product_image img {
-                position: relative;
-            }
-
-            .product_price span {
-                float: left;
-                width: 100%;
-            }
-
-            .product_desc {
-                display: none;
-            }
-
-            .product_buttons {
-                display: none;
-            }
-        }
-    </style>
+    </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
         <asp:HiddenField ID="HDPlantype" runat="server" />
-           <asp:HiddenField ID="HDPlanId" runat="server" />
-         <asp:HiddenField ID="HDIsdistributer" runat="server" />
-          <asp:HiddenField ID="HdFranchiseeid" runat="server" />
-        <br />
-        <h3>Purchase Item   
-        </h3>
-        <div class="row">
-            <div class="col-md-5"> <ol class="breadcrumb" >
-            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home </a></li>
-            <li><a href="#"> / My Repurchase</a></li>
-            <li class="active">/ Purchase Item</li>
-        
-        </ol></div>
-              <div class="col-md-7">
-
-                 <a id="lnksearch" runat="server" class="btn btn-xs btn-primary" href="#">Back</a>
-              </div>
-             <div class="col-md-7" style="display:none;">    <div class="box box-primary">
-                             <div class="box-header with-border">
-                           
-                            <div style="float: right; color:white;">
-                                Your Main Balance  :   <i class="fa fa-rupee-sign"></i>
-                                <asp:Label ID="Lblbalance" runat="server" Text="Balance"></asp:Label>
-                            </div>
-                                   <div style="float: right; color:white;">
-                                Your Shopping Balance  :   <i class="fa fa-rupee-sign"></i>
-                                <asp:Label ID="LblUtility" runat="server" Text="Balance"></asp:Label>
-                            </div>
-                                 </div></div></div>
-
+        <asp:HiddenField ID="HDPlanId" runat="server" />
+        <asp:HiddenField ID="HDIsdistributer" runat="server" />
+        <asp:HiddenField ID="HdFranchiseeid" runat="server" />
+        <h1>Purchase Item</h1>
+        <ol class="breadcrumb">
+            <li><a href="Dashboard.aspx"><i class="fa fa-tachometer-alt"></i> Home</a></li>
+            <li><a href="FranchiseeSearchNew.aspx">My Repurchase</a></li>
+            <li class="active">Purchase Item</li>
+        </ol>
+        <div style="display:none;">
+            <asp:Label ID="Lblbalance" runat="server" Text="Balance"></asp:Label>
+            <asp:Label ID="LblUtility" runat="server" Text="Balance"></asp:Label>
         </div>
-       
     </section>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="contentpageData" runat="Server">
@@ -546,34 +114,38 @@ div.ex5 {
   
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+            <div class="profile-page repurchase-page">
+                <div class="profile-hero">
+                    <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-shopping-bag"></i></div>
+                    <div class="profile-hero-info">
+                        <h2>Purchase Item</h2>
+                        <p class="profile-hero-meta">Add products to cart, fill shipping &amp; payment details, then submit</p>
+                    </div>
+                    <div class="profile-hero-actions">
+                        <a id="lnksearch" runat="server" class="profile-btn profile-btn-outline" href="FranchiseeSearchNew.aspx">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
 
-          
+                <asp:HiddenField ID="HdFiled" runat="server" />
+                <asp:HiddenField ID="HDFilename" runat="server" />
 
-            <div>
-            <div class="row">
-
-
- <asp:HiddenField ID="HdFiled" runat="server" />
-                    <asp:HiddenField ID="HDFilename" runat="server" />
-                <div class="col-md-12">
-                    <asp:Panel ID="PurchasePanel" runat="server" Visible="false">
-                     
-                            <div class="box-body">
-
-                                   <div class="col-md-6">
-                        <div class="box box-primary">
-                            <div class="box-header with-border">
-                                <h3 class="box-title"> Item </h3>
+                <asp:Panel ID="PurchasePanel" runat="server" Visible="false" CssClass="rp-cart-panel">
+                    <div class="box box-primary">
+                        <div class="box-header with-border box-header-enhanced box-header-tone-0">
+                            <div class="box-header-main">
+                                <span class="box-header-icon" aria-hidden="true"><i class="fa fa-shopping-cart"></i></span>
+                                <div class="box-header-text">
+                                    <h3 class="box-title">Cart Items</h3>
+                                    <p class="box-subtitle">Review quantities, tax and totals before payment</p>
+                                </div>
                             </div>
-                            </div>
-                            </div>
-                          <div class="col-md-6" style="color:#ea2e49">
-                        
                         </div>
-
+                        <div class="box-body">
                                 <div class="row">
-                                    <div class="col-md-12" style="color:#ea2e49">
-                                        <div class="form-group table-responsive">
+                                    <div class="col-md-12">
+                                        <div class="form-group repurchase-table-wrap table-responsive">
 
                                             <asp:TextBox ID="txtuserid" CssClass="form-control" runat="server" Visible="false"></asp:TextBox>
                                             <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" ShowFooter="true" OnRowDataBound="GridView1_RowDataBound">
@@ -709,77 +281,68 @@ div.ex5 {
                                     </div>
 
                                 </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
+                                <div class="row rp-summary-grid">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Total SV</label>
-                                               <asp:TextBox ID="TxtTotalSV" CssClass="form-control" runat="server" Enabled="false" ></asp:TextBox>
-                                               </div>
-                                      </div>
-
-                                      </div>
-                                      <div class="row">
+                                            <asp:TextBox ID="TxtTotalSV" CssClass="form-control" runat="server" Enabled="false"></asp:TextBox>
+                                        </div>
+                                    </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Total Purchase</label>
-                                               <asp:TextBox ID="TxtTotalpurchase" CssClass="form-control" runat="server" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TxtTotalpurchase" CssClass="form-control" runat="server"></asp:TextBox>
                                         </div>
-                                            <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label>CGST</label>
-                                               <asp:TextBox ID="TxtTotalCGST" CssClass="form-control" runat="server" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TxtTotalCGST" CssClass="form-control" runat="server"></asp:TextBox>
                                         </div>
-                                            <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label>SGST</label>
-                                               <asp:TextBox ID="TxtTotalSGST" CssClass="form-control" runat="server" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TxtTotalSGST" CssClass="form-control" runat="server"></asp:TextBox>
                                         </div>
-                                              <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label>IGST</label>
-                                               <asp:TextBox ID="TxtTotalIGST" CssClass="form-control" runat="server" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TxtTotalIGST" CssClass="form-control" runat="server"></asp:TextBox>
                                         </div>
-                                           <div class="col-md-3" style="display:none;">
+                                    </div>
+                                    <div class="col-md-3" style="display:none;">
                                         <div class="form-group">
                                             <label>Courier Charge</label>
-                                               <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="150.00" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="150.00"></asp:TextBox>
                                         </div>
-                                              <div class="col-md-3">
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Total Amount</label>
-                                               <asp:TextBox ID="TXTTTAmount" CssClass="form-control" runat="server" Enabled="false"  ></asp:TextBox>
-                                              <asp:TextBox ID="TXTTTDP" CssClass="form-control" runat="server" Enabled="false" Visible="false" ></asp:TextBox>
-                                               </div>
+                                            <asp:TextBox ID="TXTTTAmount" CssClass="form-control" runat="server" Enabled="false"></asp:TextBox>
+                                            <asp:TextBox ID="TXTTTDP" CssClass="form-control" runat="server" Enabled="false" Visible="false"></asp:TextBox>
                                         </div>
-                                          <div class="col-md-3" style="display:none;">
+                                    </div>
+                                    <div class="col-md-3" style="display:none;">
                                         <div class="form-group">
                                             <label>Wallet Type</label>
                                             <asp:DropDownList ID="DDLSTWallet" runat="server" CssClass="form-control">
                                                 <asp:ListItem Value="1">Main Wallet</asp:ListItem>
                                                 <asp:ListItem Value="2">Shopping Wallet</asp:ListItem>
                                             </asp:DropDownList>
-                                               </div>
                                         </div>
-                                          </div>
+                                    </div>
+                                </div>
 
-                            </div>
-						  <div class="row" >
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <asp:RadioButton ID="RDBtnTRecharge" runat="server" Text="Profile Address" GroupName="A" AutoPostBack="true" OnCheckedChanged="RDBtnTRecharge_CheckedChanged"  />
-                                    </div>
+                            <h4 class="box-title" style="margin:8px 0 14px;font-size:1rem;font-weight:700;">Shipping Address</h4>
+                            <div class="rp-address-toggle">
+                                <div class="form-group">
+                                    <asp:RadioButton ID="RDBtnTRecharge" runat="server" Text="Profile Address" GroupName="A" AutoPostBack="true" OnCheckedChanged="RDBtnTRecharge_CheckedChanged" />
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <asp:RadioButton ID="RdBtnUtility" runat="server" Text="Shipping Address" GroupName="A" AutoPostBack="true" OnCheckedChanged="RdBtnUtility_CheckedChanged"   />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="form-group">
+                                    <asp:RadioButton ID="RdBtnUtility" runat="server" Text="Shipping Address" GroupName="A" AutoPostBack="true" OnCheckedChanged="RdBtnUtility_CheckedChanged" />
                                 </div>
                             </div>
 						 <div class="row">
@@ -895,102 +458,76 @@ div.ex5 {
                         	 <div class="row">
                                    <div class="col-md-6">
                              <div class="form-group">
-                                 <label>Upload Receipt Image :</label>
-                               
+                                 <label>Upload Receipt Image</label>
      <asp:FileUpload ID="ImageUpload" runat="server" />  
-                               <input id="BTNUpload" type="submit" value="Upload" onclick="Uploadimageofsign();" style="display:none;"  />  
-                                 <asp:Button ID="btnuploademo" CssClass="btn btn-danger" runat="server" Text="Upload" OnClientClick="Uploadimageofsign();" OnClick="btnuploademo_Click" />
+                               <input id="BTNUpload" type="button" value="Upload" onclick="Uploadimageofsign(); return false;" style="display:none;"  />  
+                                 <asp:Button ID="btnuploademo" CssClass="btn btn-danger" runat="server" Text="Upload" OnClientClick="return Uploadimageofsign();" OnClick="btnuploademo_Click" style="margin-top:8px;" />
                              </div>
 							 </div>
 							  <div class="col-md-3">
                                       <div class="form-group">
-                                          <asp:Label ID="LblMsg" runat="server" ForeColor="White" Text=""></asp:Label>
-                                       <asp:TextBox ID="TextBox1" runat="server" BorderStyle="None" ForeColor="Green"></asp:TextBox>
+                                          <asp:Label ID="LblMsg" runat="server" ForeColor="#16a34a" Text=""></asp:Label>
+                                       <asp:TextBox ID="TextBox1" runat="server" BorderStyle="None" ForeColor="#16a34a" ReadOnly="true" CssClass="form-control"></asp:TextBox>
                                          </div>
                          </div>
 							  <div class="col-md-3">
                                       <div class="form-group">
+                                         <div class="rp-upload-preview">
                                          <asp:Image ID="ImageButton1" runat="server" Width="100px" Height="100px" />
+                                         </div>
                                          </div>
                          </div>
                      </div>
+                        </div>
                             <div class="box-footer">
-
                                 <asp:HiddenField ID="HDTotal" runat="server" />
-
+                                <div class="rp-footer-actions">
                                 <asp:Button ID="btnSubmit" CssClass="btn btn-primary" runat="server" OnClientClick="return validate2();" Text="Submit" OnClick="btnSubmit_Click" />
                                 <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" Text="Remove All" OnClick="btnCancel_Click" />
+                                </div>
                             </div>
-                      
+                    </div>
                     </asp:Panel>
                     <div class="box box-primary">
-                       
+                        <div class="box-header with-border box-header-enhanced box-header-tone-0">
+                            <div class="box-header-main">
+                                <span class="box-header-icon" aria-hidden="true"><i class="fa fa-boxes"></i></span>
+                                <div class="box-header-text">
+                                    <h3 class="box-title">Products</h3>
+                                    <p class="box-subtitle">Browse franchisee products and add to cart</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="box-body">
-
-
-                            <div class="row">
+                            <div class="row rp-product-grid">
                                 <asp:Repeater ID="dlCustomers" runat="server" OnItemCommand="Repeater1_ItemCommand">
                                     <ItemTemplate>
-                                        <div class="col-md-4">
-                                            <div class="col-item">
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="col-item rp-product-card">
                                                 <div class="photo">
-                                                    <img src='<%# Eval("Image") %>' class="img-responsive" alt="a"  />
+                                                    <img src='<%# Eval("Image") %>' class="img-responsive" alt="product" />
                                                     <asp:Label ID="lblim" runat="server" Text='<%#Eval("Image") %>' Visible="false"></asp:Label>
                                                 </div>
                                                 <div class="info">
-                                                    <div class="row">
-                                                        <div class="price col-md-6">
-                                                            <h5>
-                                                                <asp:Label ID="lblstatename" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label></h5>
-                                                            <h5 class="price-text-color">
-																 
-																 Produt ID :  <asp:Label ID="lblid" runat="server"  Text='<%#Eval("ProductId") %>' ForeColor="#009933"></asp:Label><asp:HiddenField ID="HDCategory" runat="server" Value='<%#Eval("CategoryID") %>' /><br>
-																
-                                                                MRP : <asp:Label ID="Lblmrp" runat="server" Text='<%#Eval("MRP") %>' ForeColor="#ff0000"></asp:Label><br />
-                                                              
-                                                               
-                                                                  Amount : <asp:Label ID="lblstatename1" runat="server" Text='<%#Eval("Amount") %>' ForeColor="#ff0000"></asp:Label><br>
-																  BV : <asp:Label ID="LblBV" runat="server" Text='<%#Eval("BV") %>' ForeColor="#ff0000"></asp:Label><br />
-                                                            </h5>
-                                                        </div>
-                                                        <div class="rating hidden-sm col-md-6" >
-                                                            <asp:Label ID="LblDPDP" visible="False"  runat="server" Text='<%#Eval("DP") %>' ForeColor="#ff0000"></asp:Label>
-                                                            <asp:HiddenField ID="HDBV" runat="server" Value='<%#Eval("BV") %>' />
-                                                         
-
-                                                        </div>
-                                                    </div>
-                                                    <div class="separator clear-center">
-                                                        <p class="btn-details">
-                                                             
-                                                            <asp:LinkButton ID="lnkph" runat="server" class="btn cart-btn btn-normal btnBuyNow" CommandName="photolarge" CommandArgument='<%# Eval("ProductId") %>'>
-                                         </i> View
-                                                            </asp:LinkButton>
+                                                    <div class="price">
+                                                        <h5><asp:Label ID="lblstatename" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label></h5>
+                                                        <p class="rp-product-meta">
+                                                            Product ID: <strong><asp:Label ID="lblid" runat="server" Text='<%#Eval("ProductId") %>'></asp:Label></strong>
+                                                            <asp:HiddenField ID="HDCategory" runat="server" Value='<%#Eval("CategoryID") %>' /><br />
+                                                            MRP: <span class="is-price"><asp:Label ID="Lblmrp" runat="server" Text='<%#Eval("MRP") %>'></asp:Label></span><br />
+                                                            Amount: <span class="is-price"><asp:Label ID="lblstatename1" runat="server" Text='<%#Eval("Amount") %>'></asp:Label></span><br />
+                                                            BV: <strong><asp:Label ID="LblBV" runat="server" Text='<%#Eval("BV") %>'></asp:Label></strong>
                                                         </p>
-                                                    <div style="padding-top:10px">
-                                                          <asp:LinkButton ID="LinkButton1" runat="server" class="btn cart-btn btn-normal btnBuyNow" CommandName="BuyProduct" CommandArgument='<%# Eval("ProductId") %>'>
-                    <i class="fa fa-shopping-cart"></i> Add to cart
-                                                            </asp:LinkButton>
-                                                            
-                                                       <%-- <p class="btn-details pull-right text-right text-danger">
-                                                            <i class="fa fa-list"></i>
-                                                            <label style="font-size: 16px; font-weight: bold;">
-                                                                Stock</label>
-                                                            <asp:Label ID="LblStckAvail" runat="server" Text='<%#Eval("Stock") %>' style="font-size: 16px; font-weight: bold;"></asp:Label>
-                                                        </p>--%>
-</div>
-                                                        
+                                                        <asp:Label ID="LblDPDP" Visible="False" runat="server" Text='<%#Eval("DP") %>'></asp:Label>
+                                                        <asp:HiddenField ID="HDBV" runat="server" Value='<%#Eval("BV") %>' />
                                                     </div>
-
-                                                    <div class="row">
-                                                        <div class="col-md-12  text-center">
-
-
-                                                         
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="clearfix">
+                                                    <div class="rp-product-actions">
+                                                        <asp:LinkButton ID="lnkph" runat="server" CssClass="btn btnBuyNow" CommandName="photolarge" CommandArgument='<%# Eval("ProductId") %>'>
+                                                            <i class="fa fa-eye"></i> View
+                                                        </asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary btnBuyNow" CommandName="BuyProduct" CommandArgument='<%# Eval("ProductId") %>'>
+                                                            <i class="fa fa-shopping-cart"></i> Add to cart
+                                                        </asp:LinkButton>
                                                     </div>
                                                 </div>
                                                 
@@ -1284,71 +821,45 @@ div.ex5 {
                         </div>
                     </div>
 
-                  </div>
-                </div>
-
-                </div>
+            </div>
 
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
-   
-     <script type="text/javascript">
-
-
-         function showModal1() {
-             $('#Div1').modal({ backdrop: 'static', keyboard: false })
-         }
-         function Closepopup1() {
-             $('#Div1').modal('hide');
-             $('body').removeClass('modal-open');
-             $('body').css('padding-right', '0');
-             $('.modal-backdrop').remove();
-
-         }
-    </script>
-
     <script type="text/javascript">
-
-
+        function showModal1() {
+            $('#Div1').modal({ backdrop: 'static', keyboard: false });
+        }
+        function Closepopup1() {
+            $('#Div1').modal('hide');
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '0');
+            $('.modal-backdrop').remove();
+        }
         function showModal() {
-            $('#myModal').modal({ backdrop: 'static', keyboard: false })
+            $('#myModal').modal({ backdrop: 'static', keyboard: false });
         }
         function Closepopup() {
             $('#myModal').modal('hide');
             $('body').removeClass('modal-open');
             $('body').css('padding-right', '0');
             $('.modal-backdrop').remove();
-
         }
-    </script>
-
-    <script>
-        $(function () {
-            $('#example1').DataTable()
-            $('#example2').DataTable({
-                'paging': true,
-                'lengthChange': false,
-                'searching': false,
-                'ordering': true,
-                'info': true,
-                'autoWidth': false
-            })
-        })
-
 
         function Uploadimageofsign() {
-            var fileUpload = $('#<%=ImageUpload.ClientID %>').get(0);
-             var files = fileUpload.files;
+            var fileUpload = document.getElementById('<%=ImageUpload.ClientID %>');
+            if (!fileUpload || !fileUpload.files || fileUpload.files.length === 0) {
+                alert('Please select a receipt image to upload');
+                return false;
+            }
 
-             var data = new FormData();
-             for (var i = 0; i < files.length; i++) {
-                 data.append($('#<%=HdFiled.ClientID%>').val() + files[0].name.replace(/\s/g, ''), files[0]);
-		         ($('#<%=HDFilename.ClientID%>').val($('#<%=HdFiled.ClientID%>').val() + files[0].name.replace(/\s/g, '')));
+            var file = fileUpload.files[0];
+            var safeName = ($('#<%=HdFiled.ClientID%>').val() || '') + String(file.name || '').replace(/\s/g, '');
+            $('#<%=HDFilename.ClientID%>').val(safeName);
 
-		     }
-
+            var data = new FormData();
+            data.append(safeName, file);
 
             $.ajax({
                 url: "UploadImage.ashx",
@@ -1356,17 +867,21 @@ div.ex5 {
                 data: data,
                 contentType: false,
                 processData: false,
-                success: function (result) { },
-                error: function (err) {
-                    //alert(err.statusText)  
+                async: false,
+                success: function () {
+                    var msg = document.getElementById("<%=TextBox1.ClientID%>");
+                    if (msg) msg.value = "File Upload successfullly";
+                },
+                error: function () {
+                    alert('Receipt upload failed. Please try again.');
                 }
             });
-            // alert('../ProductImage/' + ($('#<%=HDFilename.ClientID%>').val()));
 
-            document.getElementById("<%=TextBox1.ClientID%>").value = "File Upload successfullly";
-            // document.getElementById("<%=LblMsg.ClientID%>").innerHTML = 'File Upload Successfullly';
-            // $("#ImgPhoto").attr('src', '../ProductImage/'+($('#<%=HDFilename.ClientID%>').val()));
+            var msgBox = document.getElementById("<%=TextBox1.ClientID%>");
+            if (msgBox && !msgBox.value) {
+                msgBox.value = "File Upload successfullly";
+            }
+            return true;
         }
     </script>
-
 </asp:Content>

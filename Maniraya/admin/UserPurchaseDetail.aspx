@@ -260,9 +260,9 @@
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Invoice">
                                                 <ItemTemplate>
-                                                    <asp:HyperLink runat="server" Target="_blank" CssClass="btn btn-default btn-xs btn-invoice-link"
-                                                        NavigateUrl='<%# string.Format("JoiningInvoice.aspx?OrderNo={0}", HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>'
-                                                        Text="Print" />
+                                                    <asp:HyperLink runat="server"  CssClass="btn btn-default btn-xs btn-invoice-link"
+                                                        NavigateUrl='<%# string.Format("../user/JoiningInvoice.aspx?OrderNo={0}", HttpUtility.UrlEncode(Eval("PurchaseID").ToString())) %>'
+                                                        Text="Print" Target="_blank" />
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>

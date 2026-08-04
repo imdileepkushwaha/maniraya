@@ -14,6 +14,8 @@ public class SavingProductInvoicePdf : IHttpHandler
             string orderId = Convert.ToString(context.Request.QueryString["orderId"]).Trim();
             string userId = Convert.ToString(context.Request.QueryString["userId"]).Trim();
             string accessKey = Convert.ToString(context.Request.QueryString["accessKey"]).Trim();
+            int installmentId = 0;
+            int.TryParse(Convert.ToString(context.Request.QueryString["installmentId"]).Trim(), out installmentId);
 
             string configuredKey = Convert.ToString(ConfigurationManager.AppSettings["ChatwayInvoiceAccessKey"]).Trim();
             bool keyOk = !string.IsNullOrWhiteSpace(configuredKey)
@@ -38,15 +40,15 @@ public class SavingProductInvoicePdf : IHttpHandler
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(orderId))
+            if (string.IsNullOrWhiteSpace(orderId) && installmentId <= 0)
             {
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = "text/plain";
-                context.Response.Write("orderId required");
+                context.Response.Write("orderId or installmentId required");
                 return;
             }
 
-            byte[] pdf = SavingInvoicePdfHelper.BuildInvoicePdf(orderId, userId);
+            byte[] pdf = SavingInvoicePdfHelper.BuildInvoicePdf(orderId, userId, installmentId);
             if (pdf == null || pdf.Length == 0)
             {
                 context.Response.StatusCode = 404;
@@ -68,7 +70,16 @@ public class SavingProductInvoicePdf : IHttpHandler
                 return;
             }
 
-            string safeOrder = orderId.Replace(" ", "_").Replace("\"", "").Replace("'", "");
+            string safeOrder = (orderId ?? string.Empty).Replace(" ", "_").Replace("\"", "").Replace("'", "");
+            if (string.IsNullOrWhiteSpace(safeOrder) && installmentId > 0)
+            {
+                safeOrder = "I" + installmentId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (installmentId > 0)
+            {
+                safeOrder = safeOrder + "_I" + installmentId.ToString(CultureInfo.InvariantCulture);
+            }
+
             string fileName = "Invoice_" + safeOrder + ".pdf";
             context.Response.Clear();
             context.Response.Buffer = true;

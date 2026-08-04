@@ -35,12 +35,17 @@ public static class ChatwayWhatsAppHelper
 
     public static bool TrySendInvoiceAfterApprove(string userId, string orderId, InvoiceMessageType messageType, out string statusMessage)
     {
+        return TrySendInvoiceAfterApprove(userId, orderId, 0, messageType, out statusMessage);
+    }
+
+    public static bool TrySendInvoiceAfterApprove(string userId, string orderId, int installmentId, InvoiceMessageType messageType, out string statusMessage)
+    {
         statusMessage = string.Empty;
 
         if (!IsEnabled)
         {
             statusMessage = "WhatsApp disabled.";
-            WriteLog("SKIP enabled=false userId=" + userId + " orderId=" + orderId);
+            WriteLog("SKIP enabled=false userId=" + userId + " orderId=" + orderId + " installmentId=" + installmentId);
             return false;
         }
 
@@ -66,14 +71,14 @@ public static class ChatwayWhatsAppHelper
         // Invoice.pdf caused "Format error. Failed to open file." on phones.
         // Use SavingProductInvoicePdf.ashx (application/pdf) + accessKey for Chatway fetch.
         string fileName = "Invoice.pdf";
-        string fileUrl = BuildInvoiceFileUrl(orderId, userId, true);
+        string fileUrl = BuildInvoiceFileUrl(orderId, userId, true, installmentId);
         WriteLog("USING invoice PDF url=" + fileUrl);
 
         if (PreferStaticPdfUrl())
         {
             string pdfError;
             string pdfFileName;
-            string pdfUrl = SavingInvoicePdfHelper.SaveInvoicePdfAndGetPublicUrl(orderId, userId, out pdfFileName, out pdfError);
+            string pdfUrl = SavingInvoicePdfHelper.SaveInvoicePdfAndGetPublicUrl(orderId, userId, installmentId, out pdfFileName, out pdfError);
             if (!string.IsNullOrWhiteSpace(pdfUrl))
             {
                 fileName = string.IsNullOrWhiteSpace(pdfFileName) ? "Invoice.pdf" : pdfFileName;
@@ -86,7 +91,7 @@ public static class ChatwayWhatsAppHelper
             }
         }
 
-        WriteLog("START userId=" + userId + " orderId=" + orderId + " number=" + number + " type=" + messageType);
+        WriteLog("START userId=" + userId + " orderId=" + orderId + " installmentId=" + installmentId + " number=" + number + " type=" + messageType);
 
         // Background only when explicitly enabled. Default is sync so Approve shows real Chatway result.
         if (IsBackgroundSendEnabled())
@@ -97,6 +102,7 @@ public static class ChatwayWhatsAppHelper
             string fileNameCopy = fileName;
             string userIdCopy = userId;
             string orderIdCopy = orderId;
+            int installmentIdCopy = installmentId;
 
             Action sendAction = delegate
             {
@@ -104,11 +110,11 @@ public static class ChatwayWhatsAppHelper
                 {
                     string ignored;
                     bool ok = TrySendFile(numberCopy, messageCopy, fileUrlCopy, fileNameCopy, out ignored);
-                    WriteLog((ok ? "BG OK " : "BG FAIL ") + ignored + " userId=" + userIdCopy + " orderId=" + orderIdCopy);
+                    WriteLog((ok ? "BG OK " : "BG FAIL ") + ignored + " userId=" + userIdCopy + " orderId=" + orderIdCopy + " installmentId=" + installmentIdCopy);
                 }
                 catch (Exception ex)
                 {
-                    WriteLog("BG EXCEPTION " + ex.Message + " userId=" + userIdCopy + " orderId=" + orderIdCopy);
+                    WriteLog("BG EXCEPTION " + ex.Message + " userId=" + userIdCopy + " orderId=" + orderIdCopy + " installmentId=" + installmentIdCopy);
                 }
             };
 
@@ -126,13 +132,13 @@ public static class ChatwayWhatsAppHelper
         }
 
         bool sent = TrySendFile(number, message, fileUrl, fileName, out statusMessage);
-        WriteLog((sent ? "OK " : "FAIL ") + statusMessage + " userId=" + userId + " orderId=" + orderId + " number=" + number);
+        WriteLog((sent ? "OK " : "FAIL ") + statusMessage + " userId=" + userId + " orderId=" + orderId + " installmentId=" + installmentId + " number=" + number);
         return sent;
     }
 
     public static bool QueueSendInvoiceAfterApprove(string userId, string orderId, InvoiceMessageType messageType, out string statusMessage)
     {
-        return TrySendInvoiceAfterApprove(userId, orderId, messageType, out statusMessage);
+        return TrySendInvoiceAfterApprove(userId, orderId, 0, messageType, out statusMessage);
     }
 
     public static bool TrySendFile(string number, string message, string fileUrl, string fileName, out string statusMessage)
@@ -371,10 +377,15 @@ public static class ChatwayWhatsAppHelper
 
     public static string BuildInvoiceFileUrl(string orderId, string userId)
     {
-        return BuildInvoiceFileUrl(orderId, userId, true);
+        return BuildInvoiceFileUrl(orderId, userId, true, 0);
     }
 
     public static string BuildInvoiceFileUrl(string orderId, string userId, bool includeAccessKey)
+    {
+        return BuildInvoiceFileUrl(orderId, userId, includeAccessKey, 0);
+    }
+
+    public static string BuildInvoiceFileUrl(string orderId, string userId, bool includeAccessKey, int installmentId)
     {
         string baseUrl = GetSetting("ChatwayInvoiceBaseUrl", "https://mpremium.in/user/SavingProductInvoicePdf.ashx");
         var builder = new StringBuilder();
@@ -395,6 +406,11 @@ public static class ChatwayWhatsAppHelper
         if (includeUserId && !string.IsNullOrWhiteSpace(userId))
         {
             builder.Append("&userId=").Append(HttpUtility.UrlEncode(userId.Trim()));
+        }
+
+        if (installmentId > 0)
+        {
+            builder.Append("&installmentId=").Append(installmentId.ToString());
         }
 
         if (includeAccessKey)

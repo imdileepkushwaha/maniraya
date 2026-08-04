@@ -69,6 +69,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 loadawardlist();
                 GetAllIncome();
                 LoadIncentiveCard();
+                LoadCouponCards();
                 LoadPrizes();
                 LoadTopDirectRanking();
                 LoadDirectRank();
@@ -394,6 +395,101 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
         return (value ?? string.Empty).Replace("'", "''");
     }
 
+    public string GetCouponReportUrl(object couponCode)
+    {
+        string coupon = Convert.ToString(couponCode).Trim();
+        if (string.IsNullOrEmpty(coupon))
+        {
+            return "SavingProductInstallmentList.aspx";
+        }
+
+        return "SavingProductInstallmentList.aspx?coupon=" + HttpUtility.UrlEncode(coupon);
+    }
+
+    void LoadCouponCards()
+    {
+        if (pnlCouponCards == null || rptCouponCards == null || Session["userid"] == null)
+        {
+            return;
+        }
+
+        string userId = Convert.ToString(Session["userid"]).Trim();
+        if (string.IsNullOrEmpty(userId))
+        {
+            pnlCouponCards.Visible = false;
+            return;
+        }
+
+        DataTable dt = GetCouponInstallmentSummary(userId);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            pnlCouponCards.Visible = false;
+            rptCouponCards.DataSource = null;
+            rptCouponCards.DataBind();
+            return;
+        }
+
+        pnlCouponCards.Visible = true;
+        rptCouponCards.DataSource = dt;
+        rptCouponCards.DataBind();
+    }
+
+    DataTable GetCouponInstallmentSummary(string userId)
+    {
+        // One card per coupon.
+        // Paid = Approved, Unpaid = Pending.
+        // CurrentMonthPending = current month installmentdate + Pending (Approved => 0).
+        string sql = @"
+SELECT
+    x.CouponCode,
+    SUM(CASE WHEN x.StatusNorm = 'approved' THEN 1 ELSE 0 END) AS PaidCount,
+    SUM(CASE WHEN x.StatusNorm = 'pending' THEN 1 ELSE 0 END) AS UnpaidCount,
+    SUM(CASE
+            WHEN x.IsCurrentMonth = 1 AND x.StatusNorm = 'pending' THEN 1
+            ELSE 0
+        END) AS CurrentMonthPending
+FROM (
+    SELECT DISTINCT
+        sa.Id AS InstallmentId,
+        LTRIM(RTRIM(sd.couponcode)) AS CouponCode,
+        LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) AS StatusNorm,
+        CASE
+            WHEN sa.installmentdate IS NOT NULL
+             AND YEAR(sa.installmentdate) = YEAR(GETDATE())
+             AND MONTH(sa.installmentdate) = MONTH(GETDATE())
+            THEN 1 ELSE 0
+        END AS IsCurrentMonth
+    FROM SavingAccountDetail sd WITH (NOLOCK)
+    INNER JOIN SavingAccountInstallmentDetail sa WITH (NOLOCK)
+        ON sa.OrderId = sd.orderid
+       AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+    WHERE LTRIM(RTRIM(sd.UserId)) = '" + SqlEscape(userId) + @"'
+      AND NULLIF(LTRIM(RTRIM(sd.couponcode)), '') IS NOT NULL
+) x
+GROUP BY x.CouponCode
+ORDER BY x.CouponCode ASC";
+
+        DataTable dt = new DataTable();
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(sql) ?? new DataTable();
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            dt = new DataTable();
+        }
+
+        return dt;
+    }
+
     public string GetPrizeMonth(object value)
     {
         return PrizeHelper.FormatPrizeMonth(value);
@@ -596,22 +692,22 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
     void filldashboard()
     {
         objuser.UserId = Session["userid"].ToString();
-        DataTable LeftDt = objuser.getUserDownlineLeft(objuser);
-        DataTable RightDt = objuser.getUserDownlineRight(objuser);
-        LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
-        LblTotalright.Text = RightDt.Rows.Count.ToString();
-        DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
-        DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
-        DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
-        DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
-        Lblactiveleft.Text = Sactiveusers.Length.ToString();
-        LblActiveRight.Text = Sdeactiveusers.Length.ToString();
-        LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
-        LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
-        DataTable LeftDirectt = objuser.getUserleftDirect(objuser);
-        DataTable RightDirectt = objuser.getUserrightDirect(objuser);
-        LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
-        LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
+       // DataTable LeftDt = objuser.getUserDownlineLeft(objuser);
+    //    DataTable RightDt = objuser.getUserDownlineRight(objuser);
+      //  LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
+      //  LblTotalright.Text = RightDt.Rows.Count.ToString();
+      //  DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
+      //  DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
+      //  DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
+      //  DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
+      //  Lblactiveleft.Text = Sactiveusers.Length.ToString();
+      //  LblActiveRight.Text = Sdeactiveusers.Length.ToString();
+      //  LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
+      //  LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
+       // DataTable LeftDirectt = objuser.getUserleftDirect(objuser);
+       // DataTable RightDirectt = objuser.getUserrightDirect(objuser);
+       // LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
+       // LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
         string Fromdate = string.Empty;
         string Todatedate = string.Empty;
 

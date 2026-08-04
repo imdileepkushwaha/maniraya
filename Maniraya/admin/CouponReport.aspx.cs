@@ -107,17 +107,35 @@ public partial class admin_CouponReport : System.Web.UI.Page
 
     DataTable GetAvailableApproveMonths()
     {
-        string approvedFilter = GetApprovedStatusFilter("sd");
-        // Only coupon approve months — do not use UserDetail join dates
-        // (old RegDate/MentionDate e.g. 2018 were polluting the dropdown).
+        // Months from both account and installment approvals (coupon-linked only).
         string sql = @"
-SELECT DISTINCT
-    YEAR(CONVERT(date, sd.approvedate)) AS Y,
-    MONTH(CONVERT(date, sd.approvedate)) AS M
-FROM SavingAccountDetail sd WITH (NOLOCK)
-WHERE sd.approvedate IS NOT NULL
-  AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''
-  AND " + approvedFilter + @"
+SELECT Y, M
+FROM (
+    SELECT DISTINCT
+        YEAR(CONVERT(date, sd.approvedate)) AS Y,
+        MONTH(CONVERT(date, sd.approvedate)) AS M
+    FROM SavingAccountDetail sd WITH (NOLOCK)
+    WHERE sd.approvedate IS NOT NULL
+      AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''
+      AND " + GetApprovedStatusFilter("sd") + @"
+    UNION
+    SELECT DISTINCT
+        YEAR(CONVERT(date, sa.approvedate)) AS Y,
+        MONTH(CONVERT(date, sa.approvedate)) AS M
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    OUTER APPLY (
+        SELECT TOP 1 sd0.couponcode
+        FROM SavingAccountDetail sd0 WITH (NOLOCK)
+        WHERE sd0.orderid = sa.orderid
+          AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+        ORDER BY
+            CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+            sd0.id ASC
+    ) sd
+    WHERE sa.approvedate IS NOT NULL
+      AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''
+      AND " + GetApprovedStatusFilter("sa") + @"
+) x
 ORDER BY Y DESC, M DESC";
 
         DataTable dt = new DataTable();
@@ -348,64 +366,33 @@ ORDER BY Y DESC, M DESC";
     {
         loadError = string.Empty;
 
+        string drawType = (ddlDrawType.SelectedValue ?? string.Empty).Trim();
         StringBuilder sql = new StringBuilder();
-        sql.Append(@"SELECT sd.couponcode,
-                sd.approvedate,
-                sd.amount,
-                1 AS quantity,
-                sd.status,
-                pm.productname,
-                ud.username,
-                ud.userid,
-                ud.mobile
-            FROM SavingAccountDetail sd WITH (NOLOCK)
-            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id
-            LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
-            WHERE ").Append(GetApprovedStatusFilter("sd")).Append(@"
-                AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''");
 
-        if (!string.IsNullOrWhiteSpace(txtCouponCode.Text))
+        if (string.Equals(drawType, "Super", StringComparison.OrdinalIgnoreCase))
         {
-            sql.Append(" AND sd.couponcode LIKE '%").Append(SqlEscape(txtCouponCode.Text.Trim())).Append("%'");
+            // Super Draw: installment approvals day 1–10; InstNo 1 excluded
+            BuildInstallmentCouponSelect(sql, "sa", "sd", excludeInstNoOne: true);
+            AppendCommonSearchFilters(sql, "sa", "sd", "ud");
+            AppendApproveDateRangeFilter(sql, "sa.approvedate", useSuperDrawWindow: true);
+            sql.Append(" ORDER BY sa.id DESC");
         }
-
-        if (!string.IsNullOrWhiteSpace(txtUserId.Text))
+        else if (string.Equals(drawType, "Mega", StringComparison.OrdinalIgnoreCase))
         {
-            string userSearch = SqlEscape(txtUserId.Text.Trim());
-            sql.Append(" AND (sd.userid LIKE '%").Append(userSearch)
-                .Append("%' OR ud.username LIKE '%").Append(userSearch).Append("%')");
+            // Mega Draw: installment approvals for full month (day 1–last day)
+            BuildInstallmentCouponSelect(sql, "sa", "sd", excludeInstNoOne: false);
+            AppendCommonSearchFilters(sql, "sa", "sd", "ud");
+            AppendApproveDateRangeFilter(sql, "sa.approvedate", useSuperDrawWindow: false);
+            sql.Append(" ORDER BY sa.id DESC");
         }
-
-        if (!string.IsNullOrWhiteSpace(txtMobile.Text))
+        else
         {
-            sql.Append(" AND ud.mobile LIKE '%").Append(SqlEscape(txtMobile.Text.Trim())).Append("%'");
+            // No draw type: approved SavingAccountDetail coupons only
+            BuildAccountCouponSelect(sql, includeTrailingWhere: true);
+            AppendCommonSearchFilters(sql, "sd", "sd", "ud");
+            AppendApproveDateRangeFilter(sql, "sd.approvedate", useSuperDrawWindow: false);
+            sql.Append(" ORDER BY sd.id DESC");
         }
-
-        AppendApproveMonthFilter(sql);
-        AppendDrawTypeFilter(sql);
-
-        if (!string.IsNullOrWhiteSpace(txtFromDate.Text) && !string.IsNullOrWhiteSpace(txtToDate.Text))
-        {
-            sql.Append(" AND CONVERT(date, sd.approvedate) >= CONVERT(date,'")
-                .Append(Message.GetIndianDate(txtFromDate.Text))
-                .Append("') AND CONVERT(date, sd.approvedate) <= CONVERT(date,'")
-                .Append(Message.GetIndianDate(txtToDate.Text))
-                .Append("')");
-        }
-        else if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
-        {
-            sql.Append(" AND CONVERT(date, sd.approvedate) >= CONVERT(date,'")
-                .Append(Message.GetIndianDate(txtFromDate.Text))
-                .Append("')");
-        }
-        else if (!string.IsNullOrWhiteSpace(txtToDate.Text))
-        {
-            sql.Append(" AND CONVERT(date, sd.approvedate) <= CONVERT(date,'")
-                .Append(Message.GetIndianDate(txtToDate.Text))
-                .Append("')");
-        }
-
-        sql.Append(" ORDER BY sd.id DESC");
 
         DataTable dt = null;
         bool connectionOpened = false;
@@ -441,41 +428,170 @@ ORDER BY Y DESC, M DESC";
         return dt ?? new DataTable();
     }
 
-    void AppendApproveMonthFilter(StringBuilder sql)
+    void BuildAccountCouponSelect(StringBuilder sql, bool includeTrailingWhere)
     {
+        sql.Append(@"
+SELECT sd.couponcode,
+    sd.approvedate,
+    sd.amount,
+    1 AS quantity,
+    sd.status,
+    pm.productname,
+    ud.username,
+    ud.userid,
+    ud.mobile
+FROM SavingAccountDetail sd WITH (NOLOCK)
+LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id
+LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid");
+        if (includeTrailingWhere)
+        {
+            sql.Append(@"
+WHERE ").Append(GetApprovedStatusFilter("sd")).Append(@"
+  AND ISNULL(LTRIM(RTRIM(sd.couponcode)), '') <> ''");
+        }
+    }
+
+    void BuildInstallmentCouponSelect(StringBuilder sql, string installmentAlias, string detailAlias, bool excludeInstNoOne)
+    {
+        // Coupon lives on SavingAccountDetail; match installment by order + user.
+        sql.Append(@"
+SELECT ").Append(detailAlias).Append(@".couponcode,
+    ").Append(installmentAlias).Append(@".approvedate,
+    ").Append(installmentAlias).Append(@".amount,
+    1 AS quantity,
+    ").Append(installmentAlias).Append(@".status,
+    pm.productname,
+    ud.username,
+    ud.userid,
+    ud.mobile
+FROM SavingAccountInstallmentDetail ").Append(installmentAlias).Append(@" WITH (NOLOCK)
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.couponcode,
+        sd0.productid,
+        sd0.userid
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = ").Append(installmentAlias).Append(@".orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(").Append(installmentAlias).Append(@".UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = ").Append(installmentAlias).Append(@".productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) ").Append(detailAlias).Append(@"
+LEFT JOIN savingproductmaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(").Append(installmentAlias).Append(@".productid, 0), ").Append(detailAlias).Append(@".productid) = pm.id
+LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = ").Append(installmentAlias).Append(@".userid
+WHERE ").Append(GetApprovedStatusFilter(installmentAlias)).Append(@"
+  AND ISNULL(LTRIM(RTRIM(").Append(detailAlias).Append(@".couponcode)), '') <> ''");
+
+        if (excludeInstNoOne)
+        {
+            sql.Append(" AND ISNULL(").Append(installmentAlias).Append(".InstNo, 0) <> 1");
+        }
+    }
+
+    void AppendCommonSearchFilters(StringBuilder sql, string userSourceAlias, string couponAlias, string userDetailAlias)
+    {
+        if (!string.IsNullOrWhiteSpace(txtCouponCode.Text))
+        {
+            sql.Append(" AND ").Append(couponAlias).Append(".couponcode LIKE '%")
+                .Append(SqlEscape(txtCouponCode.Text.Trim())).Append("%'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtUserId.Text))
+        {
+            string userSearch = SqlEscape(txtUserId.Text.Trim());
+            sql.Append(" AND (").Append(userSourceAlias).Append(".userid LIKE '%").Append(userSearch)
+                .Append("%' OR ").Append(userDetailAlias).Append(".username LIKE '%").Append(userSearch).Append("%')");
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtMobile.Text))
+        {
+            sql.Append(" AND ").Append(userDetailAlias).Append(".mobile LIKE '%")
+                .Append(SqlEscape(txtMobile.Text.Trim())).Append("%'");
+        }
+    }
+
+    /// <summary>
+    /// Applies Approve Month + optional from/to date filters.
+    /// Super Draw window = day 1–10 of the selected month (or day 1–10 of any month if month not selected).
+    /// Mega / default = full month (day 1–last day) when month is selected.
+    /// </summary>
+    void AppendApproveDateRangeFilter(StringBuilder sql, string approveDateExpression, bool useSuperDrawWindow)
+    {
+        DateTime? monthStart;
+        DateTime? monthEnd;
+        TryGetSelectedApproveMonthRange(out monthStart, out monthEnd);
+
+        if (useSuperDrawWindow)
+        {
+            if (monthStart.HasValue)
+            {
+                // Selected month: 1st to 10th
+                DateTime superEnd = monthStart.Value.AddDays(9);
+                sql.Append(" AND CONVERT(date, ").Append(approveDateExpression).Append(") >= CONVERT(date,'")
+                    .Append(monthStart.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+                    .Append("') AND CONVERT(date, ").Append(approveDateExpression).Append(") <= CONVERT(date,'")
+                    .Append(superEnd.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+                    .Append("')");
+            }
+            else
+            {
+                // All months: only day 1–10
+                sql.Append(" AND DAY(CONVERT(date, ").Append(approveDateExpression).Append(")) BETWEEN 1 AND 10");
+            }
+        }
+        else if (monthStart.HasValue && monthEnd.HasValue)
+        {
+            // Full month: 1st to last day
+            sql.Append(" AND CONVERT(date, ").Append(approveDateExpression).Append(") >= CONVERT(date,'")
+                .Append(monthStart.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+                .Append("') AND CONVERT(date, ").Append(approveDateExpression).Append(") <= CONVERT(date,'")
+                .Append(monthEnd.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+                .Append("')");
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtFromDate.Text) && !string.IsNullOrWhiteSpace(txtToDate.Text))
+        {
+            sql.Append(" AND CONVERT(date, ").Append(approveDateExpression).Append(") >= CONVERT(date,'")
+                .Append(Message.GetIndianDate(txtFromDate.Text))
+                .Append("') AND CONVERT(date, ").Append(approveDateExpression).Append(") <= CONVERT(date,'")
+                .Append(Message.GetIndianDate(txtToDate.Text))
+                .Append("')");
+        }
+        else if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
+        {
+            sql.Append(" AND CONVERT(date, ").Append(approveDateExpression).Append(") >= CONVERT(date,'")
+                .Append(Message.GetIndianDate(txtFromDate.Text))
+                .Append("')");
+        }
+        else if (!string.IsNullOrWhiteSpace(txtToDate.Text))
+        {
+            sql.Append(" AND CONVERT(date, ").Append(approveDateExpression).Append(") <= CONVERT(date,'")
+                .Append(Message.GetIndianDate(txtToDate.Text))
+                .Append("')");
+        }
+    }
+
+    bool TryGetSelectedApproveMonthRange(out DateTime? monthStart, out DateTime? monthEnd)
+    {
+        monthStart = null;
+        monthEnd = null;
+
         string monthValue = (ddlApproveMonth.SelectedValue ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(monthValue))
         {
-            return;
+            return false;
         }
 
-        DateTime monthStart;
-        if (!DateTime.TryParseExact(monthValue + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out monthStart))
+        DateTime start;
+        if (!DateTime.TryParseExact(monthValue + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out start))
         {
-            return;
+            return false;
         }
 
-        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
-        sql.Append(" AND CONVERT(date, sd.approvedate) >= CONVERT(date,'")
-            .Append(monthStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
-            .Append("') AND CONVERT(date, sd.approvedate) <= CONVERT(date,'")
-            .Append(monthEnd.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
-            .Append("')");
-    }
-
-    void AppendDrawTypeFilter(StringBuilder sql)
-    {
-        string drawType = (ddlDrawType.SelectedValue ?? string.Empty).Trim();
-        if (string.Equals(drawType, "Mega", StringComparison.OrdinalIgnoreCase))
-        {
-            // Mega Draw: approved between day 1–10 of the month
-            sql.Append(" AND DAY(CONVERT(date, sd.approvedate)) BETWEEN 1 AND 10");
-        }
-        else if (string.Equals(drawType, "Super", StringComparison.OrdinalIgnoreCase))
-        {
-            // Super Draw: approved on day 11 or later
-            sql.Append(" AND DAY(CONVERT(date, sd.approvedate)) >= 11");
-        }
+        monthStart = start;
+        monthEnd = start.AddMonths(1).AddDays(-1);
+        return true;
     }
 
     static string GetApprovedStatusFilter(string tableAlias)

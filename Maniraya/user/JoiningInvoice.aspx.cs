@@ -14,85 +14,154 @@ public partial class MehndilinkInvoice : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         SiteContactHelper.BindInvoiceCompanyInfo(litCompanyContact);
+        SiteContactHelper.BindInvoiceCompanyInfo(litCompanyFooter);
+        SiteContactHelper.BindInvoiceSign(imgInvoiceSign, "../");
         SiteContactHelper.BindSupportContactLine(litSupportContact);
-        //if (Session["userid"] != null)
-        //{
-        //    if (!IsPostBack)
-        //    {
-               string OrderNo= Request.QueryString["OrderNo"].ToString();
-               DataTable DT = getPurchaseProductQuantityFranchisee(OrderNo);
-               if (DT != null && DT.Rows.Count > 0)
-               {
-                   string[] ValList = DT.Rows[0]["entrydate"].ToString().Split(' ');
 
-                   LblInvoicedate.Text = ValList[0].ToString();
-                   LblInvoiceTime.Text = ValList[1].ToString() + " " + ValList[2].ToString();
-                   LblInvoiceNumber.Text = DT.Rows[0]["orderno"].ToString();
-				   LblShipping.Text= DT.Rows[0]["shippingcharges"].ToString();
-                   DataTable UDT = getUserDetail(DT.Rows[0]["userid"].ToString());
-                   if (UDT != null && UDT.Rows.Count > 0)
-                   {
-                        lbluserid.Text = UDT.Rows[0]["userid"].ToString();
-                       LblBillingname.Text = UDT.Rows[0]["username"].ToString();
-                       LblBillingAddress.Text = UDT.Rows[0]["address"].ToString();
-                       LblBillingPost.Text = UDT.Rows[0]["areaname"].ToString();
-                       LblBillingCity.Text = UDT.Rows[0]["cityname"].ToString();
-                       LblBillingState.Text = UDT.Rows[0]["statename"].ToString();
-                       LblBillingPincode.Text = UDT.Rows[0]["pincode"].ToString();
-                       LblBillingMobile.Text = UDT.Rows[0]["mobile"].ToString();
+        string companyGst = SiteContactHelper.GetPrimaryGst();
+        litCompanyGst.Text = string.IsNullOrWhiteSpace(companyGst) ? "-" : companyGst.Trim();
+        litCompanyGstFooter.Text = litCompanyGst.Text;
+        if (!string.IsNullOrWhiteSpace(companyGst) && companyGst.Trim().Length >= 2)
+        {
+            lblCompanyStateCode.Text = companyGst.Trim().Substring(0, 2);
+        }
 
+        if (Request.QueryString["OrderNo"] == null)
+        {
+            return;
+        }
 
-                      // LblShipppingName.Text = UDT.Rows[0]["username"].ToString();
-                      //// LblShippingAddress.Text = UDT.Rows[0]["shippingaddress"].ToString();
-                      // LblShippingPost.Text = UDT.Rows[0]["shippingarea"].ToString();
-                      // LblShippingCity.Text = UDT.Rows[0]["shippingcity"].ToString();
-                      // LblShippingState.Text = UDT.Rows[0]["shippingstate"].ToString();
-                      // LblShippingPincode.Text = UDT.Rows[0]["shippingpincode"].ToString();
-                     //  LblShippingMobile.Text = UDT.Rows[0]["mobile"].ToString();
+        string OrderNo = Request.QueryString["OrderNo"].ToString();
+        DataTable DT = getPurchaseProductQuantityFranchisee(OrderNo);
+        if (DT == null || DT.Rows.Count == 0)
+        {
+            return;
+        }
 
-                       LblDistributername.Text = UDT.Rows[0]["username"].ToString();
-                       LbDistributerlUserid.Text = UDT.Rows[0]["userid"].ToString();
-                       LblDistributerSponserid.Text = UDT.Rows[0]["sponserid"].ToString();
-                       LblDistributerSponsername.Text = UDT.Rows[0]["sponsername"].ToString();
-                       LblDistributerRegdate.Text = UDT.Rows[0]["regdate"].ToString();
-                       LblDistributerEmail.Text = UDT.Rows[0]["email"].ToString();
-                       LblDistributerMobile.Text = UDT.Rows[0]["mobile"].ToString();
-                   }
-                   DataTable FDT = getFranchiseeDetail(DT.Rows[0]["franchiseeid"].ToString());
-                    if (FDT != null && FDT.Rows.Count > 0)
-                    {
-                        
-                     //   LblStorename.Text = FDT.Rows[0]["outletname"].ToString();
-                       // LblStoreAdd.Text = FDT.Rows[0]["Address"].ToString() + " " + FDT.Rows[0]["areaname"].ToString() + " " + FDT.Rows[0]["cityname"].ToString() + " " + FDT.Rows[0]["statename"].ToString() + " " + FDT.Rows[0]["pincode"].ToString();
-                       // LblStoreContact.Text = FDT.Rows[0]["mobile"].ToString();
-                        //LblStoreemail.Text = FDT.Rows[0]["email"].ToString();
-                    }
-                    DataTable PDT = getPurchaseProductQuantityChild(OrderNo);
-                    if (PDT != null && PDT.Rows.Count > 0)
-                    {
-                        GridView1.DataSource = PDT;
-                        GridView1.DataBind();
-                    }
-                    if (Convert.ToDecimal(PDT.Rows[0]["IGST"].ToString()) == 0)
-                    {
-                        GridView1.Columns[8].Visible = true;
-                        GridView1.Columns[9].Visible = true;
-                        GridView1.Columns[10].Visible = false;
-                    }
-                    else
-                    {
-                        GridView1.Columns[8].Visible = false;
-                        GridView1.Columns[9].Visible = false;
-                        GridView1.Columns[10].Visible = true;
-                    }
-                    DataTable GSTDT = getgstsummary(OrderNo);
-                    GridViewgst.DataSource = GSTDT;
-                    GridViewgst.DataBind();
-               }
+        string entryDate = Convert.ToString(DT.Rows[0]["entrydate"]);
+        string[] ValList = entryDate.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        LblInvoicedate.Text = ValList.Length > 0 ? ValList[0] : entryDate;
+        if (ValList.Length >= 3)
+        {
+            LblInvoiceTime.Text = ValList[1] + " " + ValList[2];
+        }
+        else if (ValList.Length == 2)
+        {
+            LblInvoiceTime.Text = ValList[1];
+        }
 
-        //    }
+        LblInvoiceNumber.Text = Convert.ToString(DT.Rows[0]["orderno"]);
+        LblOrderId.Text = Convert.ToString(DT.Rows[0]["PurchaseId"]);
+        LblShipping.Text = Convert.ToString(DT.Rows[0]["shippingcharges"]);
 
-        //}
+        DataTable UDT = getUserDetail(DT.Rows[0]["userid"].ToString());
+        if (UDT != null && UDT.Rows.Count > 0)
+        {
+            lbluserid.Text = Convert.ToString(UDT.Rows[0]["userid"]);
+            LblBillingname.Text = Convert.ToString(UDT.Rows[0]["username"]);
+            LblBillingAddress.Text = Convert.ToString(UDT.Rows[0]["address"]);
+            LblBillingPost.Text = Convert.ToString(UDT.Rows[0]["areaname"]);
+            LblBillingCity.Text = Convert.ToString(UDT.Rows[0]["cityname"]);
+            LblBillingState.Text = Convert.ToString(UDT.Rows[0]["statename"]);
+            LblBillingPincode.Text = Convert.ToString(UDT.Rows[0]["pincode"]);
+            LblBillingMobile.Text = Convert.ToString(UDT.Rows[0]["mobile"]);
+            LblBillingEmail.Text = Convert.ToString(UDT.Rows[0]["email"]);
+
+            string shipAddress = Convert.ToString(UDT.Rows[0]["Shippingaddress"]);
+            if (string.IsNullOrWhiteSpace(shipAddress))
+            {
+                shipAddress = Convert.ToString(UDT.Rows[0]["address"]);
+            }
+            LblShippingAddress.Text = shipAddress;
+            LblShippingPost.Text = !string.IsNullOrWhiteSpace(Convert.ToString(UDT.Rows[0]["ShippingAreaName"]))
+                ? Convert.ToString(UDT.Rows[0]["ShippingAreaName"])
+                : Convert.ToString(UDT.Rows[0]["areaname"]);
+            LblShippingCity.Text = !string.IsNullOrWhiteSpace(Convert.ToString(UDT.Rows[0]["shippingcityname"]))
+                ? Convert.ToString(UDT.Rows[0]["shippingcityname"])
+                : Convert.ToString(UDT.Rows[0]["cityname"]);
+            LblShippingState.Text = !string.IsNullOrWhiteSpace(Convert.ToString(UDT.Rows[0]["shippingstatename"]))
+                ? Convert.ToString(UDT.Rows[0]["shippingstatename"])
+                : Convert.ToString(UDT.Rows[0]["statename"]);
+            LblShippingPincode.Text = !string.IsNullOrWhiteSpace(Convert.ToString(UDT.Rows[0]["ShippingPincode"]))
+                ? Convert.ToString(UDT.Rows[0]["ShippingPincode"])
+                : Convert.ToString(UDT.Rows[0]["pincode"]);
+
+            LblDistributername.Text = LblBillingname.Text;
+            LbDistributerlUserid.Text = lbluserid.Text;
+            LblDistributerSponserid.Text = Convert.ToString(UDT.Rows[0]["sponserid"]);
+            LblDistributerSponsername.Text = Convert.ToString(UDT.Rows[0]["sponsername"]);
+            LblDistributerRegdate.Text = Convert.ToString(UDT.Rows[0]["regdate"]);
+            LblDistributerEmail.Text = LblBillingEmail.Text;
+            LblDistributerMobile.Text = LblBillingMobile.Text;
+        }
+
+        DataTable PDT = getPurchaseProductQuantityChild(OrderNo);
+        if (PDT != null && PDT.Rows.Count > 0)
+        {
+            GridView1.DataSource = PDT;
+            GridView1.DataBind();
+
+            bool isIgst = Convert.ToDecimal(PDT.Rows[0]["IGST"]) != 0;
+            GridView1.Columns[8].Visible = !isIgst;
+            GridView1.Columns[9].Visible = !isIgst;
+            GridView1.Columns[10].Visible = isIgst;
+            rowCgst.Visible = !isIgst;
+            rowSgst.Visible = !isIgst;
+            rowIgst.Visible = isIgst;
+
+            BindInvoiceTotals(PDT);
+        }
+
+        DataTable GSTDT = getgstsummary(OrderNo);
+        GridViewgst.DataSource = GSTDT;
+        GridViewgst.DataBind();
+    }
+
+    private void BindInvoiceTotals(DataTable pdt)
+    {
+        decimal totalAmount = 0;
+        decimal totalGst = 0;
+        decimal totalQty = 0;
+        decimal totalDp = 0;
+        decimal totalBv = 0;
+        decimal totalTaxable = 0;
+        decimal totalCgst = 0;
+        decimal totalSgst = 0;
+        decimal totalIgst = 0;
+
+        foreach (DataRow row in pdt.Rows)
+        {
+            totalAmount += ToDecimal(row["TotalAmount"]);
+            totalGst += ToDecimal(row["GST"]);
+            totalQty += ToDecimal(row["Quantity"]);
+            totalDp += ToDecimal(row["TotalDP"]);
+            totalBv += ToDecimal(row["TotalBV"]);
+            totalTaxable += ToDecimal(row["PurchaseAmount"]);
+            totalCgst += ToDecimal(row["CGST"]);
+            totalSgst += ToDecimal(row["SGST"]);
+            totalIgst += ToDecimal(row["IGST"]);
+        }
+
+        decimal shipping = ToDecimal(LblShipping.Text);
+        decimal payable = totalAmount + shipping;
+
+        LblSubTotal.Text = totalTaxable.ToString("0.00");
+        LblCgstAmount.Text = totalCgst.ToString("0.00");
+        LblSgstAmount.Text = totalSgst.ToString("0.00");
+        LblIgstAmount.Text = totalIgst.ToString("0.00");
+        lblTotalAmount.Text = totalAmount.ToString("0.00");
+        LblPaybleamount.Text = payable.ToString("0.00");
+        LblTotalgst.Text = totalGst.ToString("0.00");
+        LblTotalqnty.Text = totalQty.ToString("0");
+        lblTotaldp.Text = totalDp.ToString("0.00");
+        lblTotalBV.Text = totalBv.ToString("0.00");
+        LblPaybleamountwords.Text = ConvertWholeNumber(Math.Round(payable, 0).ToString()).ToUpper();
+    }
+
+    private static decimal ToDecimal(object value)
+    {
+        decimal result;
+        return decimal.TryParse(Convert.ToString(value), out result) ? result : 0m;
     }
     public DataTable getFranchiseeDetail(string userid)
     {
@@ -113,7 +182,7 @@ public partial class MehndilinkInvoice : System.Web.UI.Page
     }
     public DataTable getUserDetail(string userid)
     {
-        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.Statename,cm.cityname,CASE WHEN isnull(ud.cancelcheque,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.cancelcheque END AS PasbookImage,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount, CASE WHEN isnull(ud.AadharImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImage END AS AadharImg, CASE WHEN isnull(ud.AadharImageBack,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImageBack END AS AadharImgBack,  CASE WHEN isnull(ud.PanImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PanImage END AS PanImg FROM userdetail ud left join citymaster cm on ud.CityId=cm.cityid left join statemaster sm on cm.stateid=sm.stateid where ud.UserId = '" + userid + "' ";
+        string str_query = "SELECT ud.*,cm.stateid,sm.countryid,sm.Statename,cm.cityname,scm.cityname as shippingcityname,ssm.statename as shippingstatename,CASE WHEN isnull(ud.cancelcheque,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.cancelcheque END AS PasbookImage,CASE WHEN isnull(ud.PhotoImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PhotoImage END AS PhotoImage,(select UserName from userdetail where UserId=ud.sponserid) as Sponsername,(select UserName from userdetail where UserId=ud.parentuserid) as parentname,convert(char,ud.activatedate,103) as activationdate,(select planamount from UserTopupTb where userid=ud.userid and type='A') planamount, CASE WHEN isnull(ud.AadharImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImage END AS AadharImg, CASE WHEN isnull(ud.AadharImageBack,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.AadharImageBack END AS AadharImgBack,  CASE WHEN isnull(ud.PanImage,'')='' THEN 'img/default.png' ELSE '../ProductImage/'+ud.PanImage END AS PanImg FROM userdetail ud left join citymaster cm on ud.CityId=cm.cityid left join statemaster sm on cm.stateid=sm.stateid left join citymaster scm on ud.ShippingCityId=scm.cityid left join statemaster ssm on scm.stateid=ssm.stateid where ud.UserId = '" + userid + "' ";
         DataTable dt = null;
         ObjData.StartConnection();
         try

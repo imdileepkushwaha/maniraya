@@ -1033,34 +1033,104 @@ namespace BusinessLogicTier
         }
         public DataTable getUserDownline(clsUser objUser)
         {
-            string str_query = "";
+            int totalCount;
+            return getUserDownlinePaged(objUser, 0, 0, out totalCount);
+        }
 
-            str_query = @"; WITH MyCTE
-AS ( SELECT id,userid,username,   ParentUserId,1 AS userlevel
-FROM userdetail
-WHERE UserId ='" + objUser.UserId + @"'
-UNION ALL
-SELECT UserDetail.id,userdetail.userid,userdetail.username,  userdetail.ParentUserId ,MyCTE.userlevel+1 
-FROM userdetail
-INNER JOIN MyCTE ON userdetail.parentuserid = MyCTE.userid
-WHERE userdetail.userid !='" + objUser.UserId + @"' )
-SELECT MyCTE.*,ud.username as parentname
-FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid ";
+        /// <summary>
+        /// Sponsor-based downline. pageSize &lt;= 0 returns all rows (no OFFSET).
+        /// </summary>
+        public DataTable getUserDownlinePaged(clsUser objUser, int pageIndex, int pageSize, out int totalCount)
+        {
+            totalCount = 0;
+            string userId = (objUser.UserId ?? string.Empty).Trim().Replace("'", "''");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new DataTable();
+            }
 
+            if (pageIndex < 0)
+            {
+                pageIndex = 0;
+            }
 
+            string pageClause = string.Empty;
+            if (pageSize > 0)
+            {
+                int offset = pageIndex * pageSize;
+                pageClause = " OFFSET " + offset + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
+            }
+
+            string str_query = @";WITH MyCTE AS
+(
+    SELECT 
+        ud.id,
+        ud.userid,
+        ud.username,
+        ud.ParentUserId,
+        0 AS userlevel,
+        ud.StandingPosition,
+        CASE WHEN ISNULL(ud.SavingStatus, 0) = 1 THEN 'Paid' ELSE 'Unpaid' END AS Status,
+        ud.SponserId AS sponserid,
+        ud.Mobile
+    FROM UserDetail ud WITH (NOLOCK)
+    WHERE ud.UserId = '" + userId + @"'
+
+    UNION ALL
+
+    SELECT 
+        ud.id,
+        ud.userid,
+        ud.username,
+        ud.ParentUserId,
+        cte.userlevel + 1 AS userlevel,
+        ud.StandingPosition,
+        CASE WHEN ISNULL(ud.SavingStatus, 0) = 1 THEN 'Paid' ELSE 'Unpaid' END AS Status,
+        ud.SponserId AS sponserid,
+        ud.Mobile
+    FROM UserDetail ud WITH (NOLOCK)
+    INNER JOIN MyCTE cte ON ud.SponserId = cte.userid
+    WHERE ud.UserId <> '" + userId + @"'
+)
+SELECT 
+    cte.id,
+    cte.userid,
+    cte.username,
+    cte.ParentUserId,
+    cte.userlevel,
+    cte.StandingPosition,
+    cte.Status,
+    cte.sponserid,
+    cte.Mobile,
+    parent.username AS parentname,
+    COUNT(1) OVER() AS TotalRecords
+FROM MyCTE cte
+LEFT JOIN UserDetail parent WITH (NOLOCK) ON cte.sponserid = parent.UserId
+WHERE cte.userlevel > 0
+ORDER BY cte.userlevel ASC, cte.userid ASC
+" + pageClause + @"
+OPTION (MAXRECURSION 0);";
 
             DataTable dt = null;
             ObjData.StartConnection();
             try
             {
                 dt = ObjData.RunDataTable(str_query);
+                if (dt != null && dt.Rows.Count > 0 && dt.Columns.Contains("TotalRecords"))
+                {
+                    totalCount = Convert.ToInt32(dt.Rows[0]["TotalRecords"]);
+                }
+                else if (dt != null)
+                {
+                    totalCount = dt.Rows.Count;
+                }
             }
             catch (Exception ex)
             {
                 dt = null;
             }
             ObjData.EndConnection();
-            return dt;
+            return dt ?? new DataTable();
         }
 
         public DataTable getUserDownlineChkNew(clsUser objUser, string UserId)

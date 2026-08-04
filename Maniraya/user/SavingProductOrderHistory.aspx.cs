@@ -46,6 +46,7 @@ public partial class user_SavingProductOrderHistory : Page
         }
 
         SavingProductHelper.EnsureDeliveryColumns();
+        SavingProductHelper.EnsureInstallmentDeliveryColumns();
 
         if (!IsPostBack)
         {
@@ -59,7 +60,8 @@ public partial class user_SavingProductOrderHistory : Page
 
     void LoadOrders()
     {
-        OrderData = GroupOrdersByOrderId(GetOrderHistory(Session["userid"].ToString()));
+        // One card per approved installment (not grouped by OrderId).
+        OrderData = BuildApprovedInstallmentOrders(GetApprovedInstallmentHistory(Session["userid"].ToString()));
         BindGrid();
     }
 
@@ -131,8 +133,8 @@ public partial class user_SavingProductOrderHistory : Page
         }
 
         lblOrderCount.Text = count == 0
-            ? "No orders found"
-            : count + (count == 1 ? " order" : " orders");
+            ? "No approved installments found"
+            : count + (count == 1 ? " approved installment" : " approved installments");
     }
 
     int GetPageSize()
@@ -229,34 +231,36 @@ public partial class user_SavingProductOrderHistory : Page
     }
 
 
-    DataTable GetOrderHistory(string userId)
+    DataTable GetApprovedInstallmentHistory(string userId)
     {
         DataTable dt = new DataTable();
         try
         {
-            bool hasDeliveryStatus = SavingProductHelper.HasDeliveryStatusColumn();
+            bool hasDeliveryStatus = SavingProductHelper.HasInstallmentDeliveryStatusColumn();
             string deliveryStatusSelect = hasDeliveryStatus
-                ? "ISNULL(NULLIF(LTRIM(RTRIM(sd.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
-                : "'-' AS DeliveryStatus";
+                ? "ISNULL(NULLIF(LTRIM(RTRIM(sa.DeliveryStatus)), ''), 'Confirmed') AS DeliveryStatus"
+                : "'Confirmed' AS DeliveryStatus";
             string deliveryDateSelect = hasDeliveryStatus
                 ? @"CASE
-                    WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.DeliveryStatus, '')))) = 'delivered'
-                    THEN sd.DeliveryStatusUpdatedOn
+                    WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.DeliveryStatus, '')))) = 'delivered'
+                    THEN sa.DeliveryStatusUpdatedOn
                     ELSE NULL
                 END AS DeliveryDate"
                 : "CAST(NULL AS DATETIME) AS DeliveryDate";
 
             string sql = @"
 SELECT
-    sd.id,
-    sd.orderid,
+    sa.id,
+    sa.orderid,
+    sa.instno,
+    sa.amount,
+    sa.status AS OrderStatus,
+    ISNULL(sa.approvedate, sa.installmentdate) AS OrderDate,
+    ISNULL(NULLIF(LTRIM(RTRIM(sd.couponcode)), ''), '-') AS couponcode,
+    ISNULL(NULLIF(LTRIM(RTRIM(pm.productname)), ''), 'Saving Product') AS productname,
+    COALESCE(NULLIF(sa.productid, 0), sd.productid) AS productid,
     ud.username,
-    sd.status AS OrderStatus,
-    pm.productname,
-    sd.couponcode,
-    sd.amount,
     " + deliveryStatusSelect + @",
-    sd.entrydate AS OrderDate,
     " + deliveryDateSelect + @",
     CASE
         WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.Shippingaddress
@@ -278,15 +282,28 @@ SELECT
         WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingPincode
         ELSE ud.Pincode
     END AS ShipPincode
-FROM SavingAccountDetail sd WITH (NOLOCK)
-LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sd.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.couponcode,
+        sd0.productid
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = sa.orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) sd
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
 LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
-WHERE sd.UserId = '" + SqlEscape(userId) + @"'
-ORDER BY sd.entrydate DESC, sd.id DESC";
+WHERE LTRIM(RTRIM(sa.UserId)) = '" + SqlEscape(userId) + @"'
+  AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+ORDER BY ISNULL(sa.approvedate, sa.installmentdate) DESC, sa.InstNo DESC, sa.id DESC";
 
             ObjData.StartConnection();
             try
@@ -321,46 +338,59 @@ ORDER BY sd.entrydate DESC, sd.id DESC";
         return dt;
     }
 
-    static DataTable GroupOrdersByOrderId(DataTable detailRows)
+    static DataTable BuildApprovedInstallmentOrders(DataTable installmentRows)
     {
-        DataTable grouped = CreateGroupedOrderTable();
-        if (detailRows == null || detailRows.Rows.Count == 0)
+        DataTable cards = CreateGroupedOrderTable();
+        if (installmentRows == null || installmentRows.Rows.Count == 0)
         {
-            return grouped;
+            return cards;
         }
 
-        IEnumerable<IGrouping<string, DataRow>> groups = detailRows.AsEnumerable()
-            .GroupBy(row => Convert.ToString(row["orderid"]).Trim(), StringComparer.OrdinalIgnoreCase)
-            .OrderByDescending(group => group.Max(row => GetDateValue(row["OrderDate"])));
-
-        foreach (IGrouping<string, DataRow> group in groups)
+        foreach (DataRow row in installmentRows.Rows)
         {
-            List<DataRow> items = group.OrderBy(row => Convert.ToString(row["couponcode"])).ToList();
-            DataRow first = items[0];
-            DataRow summary = grouped.NewRow();
+            DataRow summary = cards.NewRow();
+            string product = Convert.ToString(row["productname"]).Trim();
+            string coupon = Convert.ToString(row["couponcode"]).Trim();
+            string instNo = Convert.ToString(row["instno"]).Trim();
+            if (string.IsNullOrWhiteSpace(product))
+            {
+                product = "Saving Product";
+            }
 
-            summary["orderid"] = first["orderid"];
-            summary["username"] = first["username"];
-            summary["AddressSummary"] = first["AddressSummary"];
-            summary["ProductsSummary"] = BuildProductsSummary(items);
-            summary["ItemCount"] = items.Count;
-            summary["ProductsHtml"] = BuildProductsHtml(summary["ProductsSummary"].ToString());
-            summary["OrderStatusDisplay"] = AggregateOrderStatus(items);
-            summary["DeliveryStatusDisplay"] = AggregateDeliveryStatus(items);
-            summary["OrderDateDisplay"] = FormatDateTime(items.Min(row => GetDateValue(row["OrderDate"])));
-            summary["DeliveryDateDisplay"] = AggregateDeliveryDateDisplay(items);
-            summary["CanInvoice"] = items.Any(row => IsApprovedOrderStatus(Convert.ToString(row["OrderStatus"])));
+            string productLine = product;
+            if (!string.IsNullOrWhiteSpace(coupon) && coupon != "-")
+            {
+                productLine += " (" + coupon + ")";
+            }
+            if (!string.IsNullOrWhiteSpace(instNo))
+            {
+                productLine += " · Inst #" + instNo;
+            }
 
-            grouped.Rows.Add(summary);
+            summary["orderid"] = row["orderid"];
+            summary["InstallmentId"] = row["id"];
+            summary["username"] = row["username"];
+            summary["AddressSummary"] = row["AddressSummary"];
+            summary["ProductsSummary"] = productLine;
+            summary["ItemCount"] = 1;
+            summary["ProductsHtml"] = BuildProductsHtml(productLine);
+            summary["OrderStatusDisplay"] = Convert.ToString(row["OrderStatusDisplay"]);
+            summary["DeliveryStatusDisplay"] = Convert.ToString(row["DeliveryStatusDisplay"]);
+            summary["OrderDateDisplay"] = Convert.ToString(row["OrderDateDisplay"]);
+            summary["DeliveryDateDisplay"] = Convert.ToString(row["DeliveryDateDisplay"]);
+            summary["CanInvoice"] = IsApprovedOrderStatus(Convert.ToString(row["OrderStatus"]));
+
+            cards.Rows.Add(summary);
         }
 
-        return grouped;
+        return cards;
     }
 
     static DataTable CreateGroupedOrderTable()
     {
         DataTable grouped = new DataTable();
         grouped.Columns.Add("orderid", typeof(string));
+        grouped.Columns.Add("InstallmentId", typeof(object));
         grouped.Columns.Add("username", typeof(string));
         grouped.Columns.Add("AddressSummary", typeof(string));
         grouped.Columns.Add("ProductsSummary", typeof(string));

@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
@@ -908,9 +908,15 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         objState.ProductImage = HDFilename.Value;//UploadImage();
 		 Update_Usershipping(txtuserid.Text,txtaddress.Text,ddcity.SelectedValue,txtareaname.Text,txtpincode.Text);
          DataTable ptable = ViewState["PDT"] as DataTable;
-         ptable.Columns.Remove("OFFERPRODUCTID");
-         ViewState["PDT"] = ptable;
-        string i = AddPurchase(objState, ViewState["PDT"] as DataTable, Convert.ToDecimal(TxtShipping.Text));
+         if (ptable == null || ptable.Rows.Count == 0)
+         {
+             string popupScript = "alert('Buy any Product');";
+             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+             return;
+         }
+         // TVP FranchiseePurchaseProductTrustedCart: FranchiseeId, ProductId, SubProductId, ...
+         DataTable purchaseForSp = BuildPurchaseProductForSp(ptable, HdFranchiseeid.Value);
+        string i = AddPurchase(objState, purchaseForSp, Convert.ToDecimal(TxtShipping.Text));
         if (i == "1")
         {
             string popupScript = "alert('Purchase Successfull');";
@@ -965,6 +971,11 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
             string popupScript = "alert('First purchase minimum should be 26 Point!');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
+        else if (!string.IsNullOrWhiteSpace(i) && i.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
+        {
+            string popupScript = "alert('" + i.Replace("'", "\\'").Replace("\r", " ").Replace("\n", " ") + "');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
+        }
         else
         {
             string popupScript = "alert('unknown error');";
@@ -972,6 +983,77 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         }
     }
     Data ObjData = new Data();
+
+    /// <summary>
+    /// Builds TVP rows matching dbo.FranchiseePurchaseProductTrustedCart (ordinal + types).
+    /// </summary>
+    private DataTable BuildPurchaseProductForSp(DataTable source, string franchiseeId)
+    {
+        DataTable dt = new DataTable();
+        dt.Columns.Add("FranchiseeId", typeof(string));
+        dt.Columns.Add("ProductId", typeof(int));
+        dt.Columns.Add("SubProductId", typeof(int));
+        dt.Columns.Add("ProductName", typeof(string));
+        dt.Columns.Add("Image", typeof(string));
+        dt.Columns.Add("Amount", typeof(decimal));
+        dt.Columns.Add("MRP", typeof(decimal));
+        dt.Columns.Add("BV", typeof(decimal));
+        dt.Columns.Add("DP", typeof(decimal));
+        dt.Columns.Add("STOCK", typeof(int));
+        dt.Columns.Add("TOTALBV", typeof(decimal));
+        dt.Columns.Add("TOTALDP", typeof(decimal));
+        dt.Columns.Add("Quantity", typeof(int));
+        dt.Columns.Add("TotalAmount", typeof(decimal));
+        dt.Columns.Add("CGST", typeof(decimal));
+        dt.Columns.Add("SGST", typeof(decimal));
+        dt.Columns.Add("IGST", typeof(decimal));
+        dt.Columns.Add("PurchaseAmount", typeof(decimal));
+        dt.Columns.Add("GSTPER", typeof(decimal));
+
+        if (source == null)
+        {
+            return dt;
+        }
+
+        foreach (DataRow src in source.Rows)
+        {
+            DataRow dr = dt.NewRow();
+            dr["FranchiseeId"] = franchiseeId ?? string.Empty;
+            dr["ProductId"] = ToInt(src["ProductId"]);
+            dr["SubProductId"] = source.Columns.Contains("SubProductId") ? ToInt(src["SubProductId"]) : 0;
+            dr["ProductName"] = Convert.ToString(src["ProductName"]);
+            dr["Image"] = Convert.ToString(src["Image"]);
+            dr["Amount"] = ToDecimal(src["Amount"]);
+            dr["MRP"] = ToDecimal(src["MRP"]);
+            dr["BV"] = ToDecimal(src["BV"]);
+            dr["DP"] = ToDecimal(src["DP"]);
+            dr["STOCK"] = ToInt(src["STOCK"]);
+            dr["TOTALBV"] = ToDecimal(src["TOTALBV"]);
+            dr["TOTALDP"] = ToDecimal(src["TOTALDP"]);
+            dr["Quantity"] = ToInt(src["Quantity"]);
+            dr["TotalAmount"] = ToDecimal(src["TotalAmount"]);
+            dr["CGST"] = ToDecimal(src["CGST"]);
+            dr["SGST"] = ToDecimal(src["SGST"]);
+            dr["IGST"] = ToDecimal(src["IGST"]);
+            dr["PurchaseAmount"] = ToDecimal(src["PurchaseAmount"]);
+            dr["GSTPER"] = ToDecimal(src["GSTPER"]);
+            dt.Rows.Add(dr);
+        }
+        return dt;
+    }
+
+    private static int ToInt(object value)
+    {
+        int result;
+        return int.TryParse(Convert.ToString(value), out result) ? result : 0;
+    }
+
+    private static decimal ToDecimal(object value)
+    {
+        decimal result;
+        return decimal.TryParse(Convert.ToString(value), out result) ? result : 0m;
+    }
+
     public string AddPurchase(clsProduct objP, DataTable Dt, Decimal shipping)
     {
         int i = 0;
@@ -1010,11 +1092,17 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
                                  new SqlParameter("@IGSTPer","0"),
                                     new SqlParameter("@Paybleamount",objP.TotalAmount),
                     new SqlParameter("@FranchiseeId",objP.FranchiseeID),
-                       new SqlParameter("@Cashamount","0"),
-                       new SqlParameter("@RestAmount","0"),
-					   new SqlParameter("@Plantype",objState.ProductId),
-                    new SqlParameter("@PurchaseProduct",Dt),
-					     new SqlParameter("@BankID",objState.tehsilid),
+                      
+					   new SqlParameter("@Plantype", ToInt(objState.ProductId)),
+
+                    new SqlParameter("@PurchaseProduct", SqlDbType.Structured)
+                    {
+                        TypeName = "dbo.FranchiseePurchaseProductTrustedCart",
+                        Value = Dt
+                    },
+                     new SqlParameter("@Cashamount","0"),
+                      new SqlParameter("@RestAmount","0"),
+					     new SqlParameter("@BankID", ToInt(objState.tehsilid)),
                         new SqlParameter("@Onlinetransactionid",objState.TransactionCode),
                           new SqlParameter("@PaymentMode",objState.PaymentMode),
 					 new SqlParameter("@Img",objState.ProductImage),
@@ -1037,12 +1125,20 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         catch (Exception ex)
         {
             res = "0";
-            tr.Rollback();
+            try
+            {
+                if (tr != null) tr.Rollback();
+            }
+            catch { }
+            if (ex != null && !string.IsNullOrWhiteSpace(ex.Message))
+            {
+                res = "Error: " + ex.Message;
+            }
         }
         finally
         {
             ObjData.EndConnection();
-            tr.Dispose();
+            if (tr != null) tr.Dispose();
         }
         return res;
 

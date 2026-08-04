@@ -31,19 +31,47 @@ public static class SavingInvoicePdfHelper
 
     public static byte[] BuildInvoicePdf(string orderId, string userId)
     {
-        if (string.IsNullOrWhiteSpace(userId))
+        return BuildInvoicePdf(orderId, userId, 0);
+    }
+
+    public static byte[] BuildInvoicePdf(string orderId, string userId, int installmentId)
+    {
+        DataTable items;
+        if (installmentId > 0)
         {
-            userId = ResolveUserId(orderId);
+            items = GetInvoiceItemsByInstallmentId(installmentId, userId);
+            if (items != null && items.Rows.Count > 0)
+            {
+                if (string.IsNullOrWhiteSpace(orderId))
+                {
+                    orderId = Convert.ToString(items.Rows[0]["orderid"]).Trim();
+                }
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    userId = Convert.ToString(items.Rows[0]["userid"]).Trim();
+                }
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                userId = ResolveUserId(orderId);
+            }
+
+            items = GetInvoiceItems(orderId, userId);
         }
 
-        DataTable items = GetInvoiceItems(orderId, userId);
         if (items == null || items.Rows.Count == 0)
         {
             return null;
         }
 
         EnrichInvoiceItems(items);
-        return BuildPdfBytes(orderId, items);
+        string invoiceKey = installmentId > 0
+            ? (orderId ?? string.Empty).Trim() + "-I" + installmentId.ToString(CultureInfo.InvariantCulture)
+            : orderId;
+        return BuildPdfBytes(invoiceKey, items);
     }
 
     /// <summary>
@@ -51,10 +79,15 @@ public static class SavingInvoicePdfHelper
     /// </summary>
     public static string SaveInvoicePdfAndGetPublicUrl(string orderId, string userId, out string fileName, out string error)
     {
+        return SaveInvoicePdfAndGetPublicUrl(orderId, userId, 0, out fileName, out error);
+    }
+
+    public static string SaveInvoicePdfAndGetPublicUrl(string orderId, string userId, int installmentId, out string fileName, out string error)
+    {
         fileName = string.Empty;
         error = string.Empty;
 
-        byte[] pdf = BuildInvoicePdf(orderId, userId);
+        byte[] pdf = BuildInvoicePdf(orderId, userId, installmentId);
         if (pdf == null || pdf.Length < 10)
         {
             error = "Invoice PDF could not be generated (no approved items).";
@@ -68,7 +101,10 @@ public static class SavingInvoicePdfHelper
             return string.Empty;
         }
 
-        fileName = "Invoice_" + Sanitize(orderId) + "_" + DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".pdf";
+        string nameKey = installmentId > 0
+            ? Sanitize(orderId) + "_I" + installmentId.ToString(CultureInfo.InvariantCulture)
+            : Sanitize(orderId);
+        fileName = "Invoice_" + nameKey + "_" + DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".pdf";
 
         string folder = HostingEnvironment.MapPath(InvoiceFolderVirtual);
         if (string.IsNullOrWhiteSpace(folder))
@@ -583,20 +619,28 @@ public static class SavingInvoicePdfHelper
 
     static DateTime GetInvoiceDate(DataTable items)
     {
-        DateTime invoiceDate = DateTime.Today;
+        // Prefer ApproveDate from SavingAccountInstallmentDetail (selected in query).
         foreach (DataRow row in items.Rows)
         {
             DateTime d;
             if (row.Table.Columns.Contains("approvedate") && row["approvedate"] != DBNull.Value
-                && DateTime.TryParse(Convert.ToString(row["approvedate"]), out d))
+                && DateTime.TryParse(Convert.ToString(row["approvedate"]), out d)
+                && d.Year > 1900)
             {
                 return d;
             }
+        }
 
+        // Fallback only when installment ApproveDate is missing.
+        DateTime invoiceDate = DateTime.Today;
+        foreach (DataRow row in items.Rows)
+        {
+            DateTime d;
             if (row.Table.Columns.Contains("entrydate") && row["entrydate"] != DBNull.Value
-                && DateTime.TryParse(Convert.ToString(row["entrydate"]), out d))
+                && DateTime.TryParse(Convert.ToString(row["entrydate"]), out d)
+                && d.Year > 1900)
             {
-                invoiceDate = d;
+                return d;
             }
         }
 
@@ -770,7 +814,18 @@ SELECT
     sd.amount,
     sd.status,
     sd.entrydate,
-    sd.approvedate,
+    (
+        SELECT TOP 1 sa.approvedate
+        FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+        WHERE sa.OrderId = sd.orderid
+          AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+          AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+          AND sa.approvedate IS NOT NULL
+        ORDER BY
+            CASE WHEN ISNULL(sa.InstNo, 0) = 1 THEN 0 ELSE 1 END,
+            sa.InstNo ASC,
+            sa.Id ASC
+    ) AS approvedate,
     sd.productid,
     1 AS quantity,
     ISNULL(sd.CGST, 0) AS CGSTPER,
@@ -826,6 +881,100 @@ WHERE sd.orderid = '" + SqlEscape(orderId) + @"'
        OR LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', 'approve', '1', 'active'))
 ORDER BY sd.couponcode, sd.id";
 
+        return RunInvoiceSql(sql);
+    }
+
+    /// <summary>
+    /// Invoice for one approved installment — product comes from SavingAccountInstallmentDetail.productid.
+    /// </summary>
+    static DataTable GetInvoiceItemsByInstallmentId(int installmentId, string userId)
+    {
+        string userFilter = string.IsNullOrWhiteSpace(userId)
+            ? string.Empty
+            : " AND LTRIM(RTRIM(sa.UserId)) = '" + SqlEscape(userId.Trim()) + "'";
+
+        string sql = @"
+SELECT
+    sa.id,
+    sa.orderid,
+    sa.userid,
+    sa.amount,
+    sa.status,
+    sa.entrydate,
+    sa.approvedate,
+    COALESCE(NULLIF(sa.productid, 0), sd.productid) AS productid,
+    1 AS quantity,
+    ISNULL(sd.CGST, 0) AS CGSTPER,
+    ISNULL(sd.SGST, 0) AS SGSTPER,
+    ISNULL(sd.IGST, 0) AS IGSTPER,
+    ISNULL(NULLIF(LTRIM(RTRIM(pm.HSNCode)), ''), '-') AS hsncode,
+    ISNULL(NULLIF(LTRIM(RTRIM(sd.couponcode)), ''), '-') AS couponcode,
+    ISNULL(NULLIF(LTRIM(RTRIM(pm.productname)), ''), 'Saving Product') AS productname,
+    ud.username,
+    ud.mobile,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Email)), ''), '') AS email,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.PanNumber)), ''), '') AS pannumber,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Address)), ''), '') AS BillAddress,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.AreaName)), ''), '') AS BillArea,
+    ISNULL(C.CityName, '') AS BillCity,
+    ISNULL(S.StateName, '') AS BillState,
+    ISNULL(S.StateId, 0) AS BillStateId,
+    ISNULL(NULLIF(LTRIM(RTRIM(ud.Pincode)), ''), '') AS BillPincode,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.Shippingaddress
+        ELSE ud.Address
+    END AS ShipAddress,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingAreaName
+        ELSE ud.AreaName
+    END AS ShipArea,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN CS.CityName
+        ELSE C.CityName
+    END AS ShipCity,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN SS.StateName
+        ELSE S.StateName
+    END AS ShipState,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN SS.StateId
+        ELSE S.StateId
+    END AS ShipStateId,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.ShippingPincode
+        ELSE ud.Pincode
+    END AS ShipPincode
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+OUTER APPLY (
+    SELECT TOP 1
+        sd0.productid,
+        sd0.couponcode,
+        sd0.CGST,
+        sd0.SGST,
+        sd0.IGST
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE sd0.orderid = sa.orderid
+      AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    ORDER BY
+        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
+        sd0.id ASC
+) sd
+LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
+    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
+LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
+LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
+LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
+WHERE sa.id = " + installmentId + @"
+  AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+" + userFilter;
+
+        return RunInvoiceSql(sql);
+    }
+
+    static DataTable RunInvoiceSql(string sql)
+    {
         Data objData = new Data();
         try
         {

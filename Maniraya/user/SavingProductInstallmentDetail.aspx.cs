@@ -58,7 +58,7 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
             LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
-            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id
+            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sa.productid = pm.id
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
             WHERE sd.couponcode = '" + SqlEscape(CouponCode) + @"'
             ORDER BY sa.instno";

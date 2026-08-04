@@ -1,110 +1,160 @@
 ﻿using BusinessLogicTier;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class admin_DownlineReport : System.Web.UI.Page
 {
-    clsState objState = new clsState();
     clsUser objUser = new clsUser();
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["userid"] == null)
+        {
+            Response.Redirect("logout.aspx");
+            return;
+        }
+
         if (!IsPostBack)
         {
-            if (Session["userid"] != null)
-            {
-                txtuserid.Text = Session["userid"].ToString();
-                txtuserid.Enabled = false;
-                filldashboard();
-                loadLeftuser();
-                loadRightuser();
-            }
-            else
-            {
-                Response.Redirect("logout.aspx");
-            }
+            txtuserid.Text = Session["userid"].ToString();
+            txtuserid.Enabled = false;
+            Getsalary();
+            BindDownline(true);
         }
     }
-    void loadLeftuser()
+
+    void BindDownline(bool resetPage)
     {
-        objUser.UserId = txtuserid.Text;
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDownlineLeft(objUser);
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
+        string userId = (txtuserid.Text ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(userId))
+        {
+            userId = Convert.ToString(Session["userid"]);
+        }
+
+        objUser.UserId = userId;
+
+        int pageSize = GetPageSize();
+        int pageIndex = GridView1.PageIndex;
+        int totalCount;
+        DataTable dt;
+
+        if (pageSize <= 0)
+        {
+            dt = objUser.getUserDownlinePaged(objUser, 0, 0, out totalCount);
+            GridView1.AllowPaging = false;
+            GridView1.AllowCustomPaging = false;
+            GridView1.PageSize = totalCount > 0 ? totalCount : 25;
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.AllowCustomPaging = true;
+            GridView1.PageSize = pageSize;
+            dt = objUser.getUserDownlinePaged(objUser, pageIndex, pageSize, out totalCount);
+
+            if (totalCount > 0)
+            {
+                int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+                if (GridView1.PageIndex >= totalPages)
+                {
+                    GridView1.PageIndex = Math.Max(0, totalPages - 1);
+                    dt = objUser.getUserDownlinePaged(objUser, GridView1.PageIndex, pageSize, out totalCount);
+                }
+            }
+
+            GridView1.VirtualItemCount = totalCount;
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+
+        lblResultSummary.Text = totalCount > 0
+            ? totalCount + " downline member(s) found."
+            : "No downline members found.";
     }
-    void loadRightuser()
+
+    int GetPageSize()
     {
-        objUser.UserId = txtuserid.Text;
-        DataTable dt = new DataTable();
-        dt = objUser.getUserDownlineRight(objUser);
-        GridView2.DataSource = dt;
-        GridView2.DataBind();
+        if (ddlRecordFilter == null || ddlRecordFilter.SelectedItem == null)
+        {
+            return 25;
+        }
+
+        string selected = ddlRecordFilter.SelectedItem.Text;
+        if (string.Equals(selected, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        int pageSize;
+        if (int.TryParse(selected, out pageSize) && pageSize > 0)
+        {
+            return pageSize;
+        }
+
+        return 25;
     }
 
-
-    void filldashboard()
+    protected int GetSerialNumber(int dataItemIndex)
     {
-        objUser.UserId = Session["userid"].ToString();
-        DataTable LeftDt = objUser.getUserDownlineLeft(objUser);
-        DataTable RightDt = objUser.getUserDownlineRight(objUser);
-        LblTotalLeft.Text = LeftDt.Rows.Count.ToString();
-        LblTotalright.Text = RightDt.Rows.Count.ToString();
-        //DataRow[] Sactiveusers = LeftDt.Select("Status='active'");
-        //DataRow[] Sdeactiveusers = RightDt.Select("Status='active'");
-        //DataRow[] SLdeactiveusers = LeftDt.Select("Status='deactive'");
-        //DataRow[] SRdeactiveusers = RightDt.Select("Status='deactive'");
-        //Lblactiveleft.Text = Sactiveusers.Length.ToString();
-        //LblActiveRight.Text = Sdeactiveusers.Length.ToString();
-        //LblInactiveleft.Text = SLdeactiveusers.Length.ToString();
-        //LblInActiveRight.Text = SRdeactiveusers.Length.ToString();
-        //DataTable LeftDirectt = objUser.getUserleftDirect(objUser);
-        //DataTable RightDirectt = objUser.getUserrightDirect(objUser);
-        //LblLeftDirect.Text = LeftDirectt.Rows[0][0].ToString();
-        //LblRightDirect.Text = RightDirectt.Rows[0][0].ToString();
-        //string Fromdate = string.Empty;
-        //string Todatedate = string.Empty;
+        if (!GridView1.AllowPaging)
+        {
+            return dataItemIndex + 1;
+        }
 
-      //  DataTable Dt = objCL.getdailyClosingReport(Fromdate, Todatedate, Session["UserId"].ToString());
-        //lblleftbv.Text = Dt.Rows[0]["leftbv"].ToString();
-        //lblrightbv.Text = Dt.Rows[0]["rightbv"].ToString();
-
-
-        //  DataSet Ds = objuser.getTotalamount(objuser);
-        //  LblBinaryIncome.Text = Ds.Tables[0].Rows[0][0].ToString();
-        // LblDirectIncome.Text = Ds.Tables[1].Rows[0][0].ToString();
-        //  LblSponserIncome.Text = Ds.Tables[2].Rows[0][0].ToString();
-        // LblRoinIncome.Text = Ds.Tables[3].Rows[0][0].ToString();
-        //lblTotalincome.Text = Convert.ToString(Convert.ToDecimal(LblBinaryIncome.Text)
-
+        return (GridView1.PageIndex * GridView1.PageSize) + dataItemIndex + 1;
     }
+
+    public void Getsalary()
+    {
+        DataTable Dt = objUser.getUserDasboardproc(Session["userid"].ToString());
+        if (Dt != null && Dt.Rows.Count > 0)
+        {
+            LblDownline.Text = Dt.Rows[0]["TotalTeam"].ToString();
+        }
+    }
+
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loadLeftuser();
-        loadRightuser();
-        LblTotalLeft.Text = GridView1.Rows.Count.ToString();
-        LblTotalright.Text = GridView2.Rows.Count.ToString();
+        BindDownline(true);
     }
+
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");
     }
 
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        BindDownline(true);
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        BindDownline(false);
+    }
+
     protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-        if (e.Row.RowType == DataControlRowType.DataRow)
+        if (e.Row.RowType != DataControlRowType.DataRow)
         {
-            Label lblstatus = (Label)e.Row.FindControl("lblstatus");
-            if (lblstatus != null)
-            {
-                lblstatus.CssClass = lblstatus.Text == "Unpaid"
-                    ? "team-status-badge team-status-unpaid"
-                    : "team-status-badge team-status-paid";
-            }
+            return;
+        }
+
+        Label lblstatus = (Label)e.Row.FindControl("lblstatus");
+        if (lblstatus != null)
+        {
+            lblstatus.CssClass = lblstatus.Text == "Unpaid"
+                ? "team-status-badge team-status-unpaid"
+                : "team-status-badge team-status-paid";
         }
     }
 }
