@@ -3,7 +3,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
     <link href="assets/css/box-modern.css?v=4" rel="stylesheet" />
-    <link href="assets/css/repurchase-modern.css?v=1" rel="stylesheet" />
+    <link href="assets/css/repurchase-modern.css?v=6" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
@@ -28,8 +28,8 @@
                         <p class="profile-hero-meta">Search nearby franchisees and continue to repurchase products</p>
                     </div>
                     <div class="profile-hero-actions">
-                        <a id="lnksearch" class="profile-btn" href="javascript:showSearchModal();">
-                            <i class="fa fa-search"></i> Search
+                        <a id="lnksearch" class="profile-btn rp-search-trigger" href="javascript:showSearchModal();">
+                            <i class="fa fa-search"></i> Search Franchisee
                         </a>
                     </div>
                 </div>
@@ -43,10 +43,18 @@
                                 <p class="box-subtitle">Select a franchisee to purchase items</p>
                             </div>
                         </div>
+                        <div class="box-tools">
+                            <a class="rp-search-chip" href="javascript:showSearchModal();">
+                                <i class="fa fa-sliders"></i> Filters
+                            </a>
+                        </div>
                     </div>
                     <div class="box-body">
                         <div class="repurchase-toolbar">
                             <p><i class="fa fa-info-circle"></i> Use Search to filter by state, city, tehsil, market or pincode. Click the cart icon to buy.</p>
+                            <a class="rp-toolbar-search" href="javascript:showSearchModal();">
+                                <i class="fa fa-search"></i> Open Search
+                            </a>
                         </div>
                         <div class="repurchase-table-wrap table-responsive">
                             <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
@@ -137,101 +145,97 @@
                     </div>
                 </div>
 
-                <div id="DivSearch" class="modal fade rp-modal">
-                    <div class="modal-dialog" style="top: 12%;">
+                <div id="DivSearch" class="modal fade rp-modal rp-search-modal">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title"><i class="fa fa-filter"></i> Search Franchisee</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title"><i class="fa fa-search" aria-hidden="true"></i> Search Franchisee</h4>
+                                <p class="rp-modal-sub">Filter by location to find the nearest franchisee</p>
                             </div>
                             <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-4">
+                                <div class="rp-search-form">
+                                    <div class="rp-search-grid">
                                         <div class="form-group">
                                             <asp:Label ID="Label2" CssClass="form-control" runat="server" Visible="false"></asp:Label>
-                                            <label>State</label>
+                                            <label for="<%= ddstate.ClientID %>"><i class="fa fa-map"></i> State</label>
                                             <asp:DropDownList ID="ddstate" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="ddstate_SelectedIndexChanged">
                                                 <asp:ListItem Value="0">Select State</asp:ListItem>
                                             </asp:DropDownList>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>City</label>
+                                            <label for="<%= ddcity.ClientID %>"><i class="fa fa-building"></i> City</label>
                                             <asp:DropDownList ID="ddcity" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddcity_SelectedIndexChanged">
                                                 <asp:ListItem Value="0">Select City</asp:ListItem>
                                             </asp:DropDownList>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Tehsil</label>
+                                            <label for="<%= ddlsttehsil.ClientID %>"><i class="fa fa-map-marker"></i> Tehsil</label>
                                             <asp:DropDownList ID="ddlsttehsil" AutoPostBack="true" CssClass="form-control" runat="server" OnSelectedIndexChanged="DDlstTehsil_SelectedIndexChanged">
                                                 <asp:ListItem Value="0">Select Tehsil</asp:ListItem>
                                             </asp:DropDownList>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Market</label>
+                                            <label for="<%= ddlstmarket.ClientID %>"><i class="fa fa-shopping-bag"></i> Market</label>
                                             <asp:DropDownList ID="ddlstmarket" CssClass="form-control" runat="server">
                                                 <asp:ListItem Value="0">Select Market</asp:ListItem>
                                             </asp:DropDownList>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Pincode</label>
-                                            <asp:TextBox ID="txtpincode" CssClass="form-control" runat="server" placeholder="Enter pincode"></asp:TextBox>
+                                        <div class="form-group rp-search-pincode">
+                                            <label for="<%= txtpincode.ClientID %>"><i class="fa fa-hashtag"></i> Pincode</label>
+                                            <div class="rp-input-wrap">
+                                                <asp:TextBox ID="txtpincode" CssClass="form-control" runat="server" placeholder="e.g. 560065" MaxLength="10"></asp:TextBox>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary" Text="Search" OnClick="BtnSearchFranchisee_Click" />
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            <div class="modal-footer rp-search-footer">
+                                <button type="button" class="btn btn-default rp-modal-close" data-dismiss="modal">Close</button>
+                                <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary rp-search-submit" Text="Search Now" OnClick="BtnSearchFranchisee_Click" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="Div_FDetails" class="modal fade rp-modal">
-                    <div class="modal-dialog" style="margin-top: 60px;">
+                <div id="Div_FDetails" class="modal fade rp-modal rp-franchisee-modal">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title"><i class="fa fa-store"></i> Franchisee Details</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title"><i class="fa fa-store" aria-hidden="true"></i> Franchisee Details</h4>
+                                <p class="rp-modal-sub">Contact and location information</p>
                             </div>
                             <div class="modal-body">
                                 <div class="rp-detail-grid">
                                     <div class="rp-detail-row">
-                                        <span class="label">Name</span>
-                                        <span class="value"><asp:Label ID="lblfname" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-user"></i> Name</span>
+                                        <span class="rp-field-value"><asp:Label ID="lblfname" runat="server"></asp:Label></span>
                                     </div>
                                     <div class="rp-detail-row">
-                                        <span class="label">Mobile No</span>
-                                        <span class="value"><asp:Label ID="lblmob" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-phone"></i> Mobile No</span>
+                                        <span class="rp-field-value"><asp:Label ID="lblmob" runat="server"></asp:Label></span>
                                     </div>
                                     <div class="rp-detail-row">
-                                        <span class="label">Address</span>
-                                        <span class="value"><asp:Label ID="lbladdress" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-home"></i> Address</span>
+                                        <span class="rp-field-value"><asp:Label ID="lbladdress" runat="server"></asp:Label></span>
                                     </div>
                                     <div class="rp-detail-row">
-                                        <span class="label">State</span>
-                                        <span class="value"><asp:Label ID="lblstate" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-map"></i> State</span>
+                                        <span class="rp-field-value"><asp:Label ID="lblstate" runat="server"></asp:Label></span>
                                     </div>
                                     <div class="rp-detail-row">
-                                        <span class="label">City</span>
-                                        <span class="value"><asp:Label ID="lblcity" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-building"></i> City</span>
+                                        <span class="rp-field-value"><asp:Label ID="lblcity" runat="server"></asp:Label></span>
                                     </div>
                                     <div class="rp-detail-row">
-                                        <span class="label">Pincode</span>
-                                        <span class="value"><asp:Label ID="lblpincode" runat="server"></asp:Label></span>
+                                        <span class="rp-field-label"><i class="fa fa-hashtag"></i> Pincode</span>
+                                        <span class="rp-field-value"><asp:Label ID="lblpincode" runat="server"></asp:Label></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-default rp-modal-close" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

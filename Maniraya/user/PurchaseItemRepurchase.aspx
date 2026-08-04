@@ -3,7 +3,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=8" rel="stylesheet" />
     <link href="assets/css/box-modern.css?v=4" rel="stylesheet" />
-    <link href="assets/css/repurchase-modern.css?v=1" rel="stylesheet" />
+    <link href="assets/css/repurchase-modern.css?v=4" rel="stylesheet" />
     <style type="text/css">
         .product_item { display: block; background: #fff; border: 1px solid #e8ecf1; padding: 12px; border-radius: 12px; position: relative; overflow: hidden; }
         .product_sale { position: absolute; z-index: 2; right: -34px; transform: rotate(45deg); font-size: 12px; margin-top: 18px; }
@@ -505,36 +505,37 @@
                                         <div class="col-md-4 col-sm-6">
                                             <div class="col-item rp-product-card">
                                                 <div class="photo">
-                                                    <img src='<%# Eval("Image") %>' class="img-responsive" alt="product" />
+                                                    <div class="rp-product-media">
+                                                        <img src='<%# Eval("Image") %>' class="img-responsive" alt="product" />
+                                                    </div>
                                                     <asp:Label ID="lblim" runat="server" Text='<%#Eval("Image") %>' Visible="false"></asp:Label>
+                                                    <%# HasDiscount(Eval("MRP"), Eval("Amount")) ? "<span class=\"rp-product-badge\">Save " + GetDiscountPercent(Eval("MRP"), Eval("Amount")) + "%</span>" : "" %>
                                                 </div>
                                                 <div class="info">
                                                     <div class="price">
-                                                        <h5><asp:Label ID="lblstatename" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label></h5>
-                                                        <p class="rp-product-meta">
-                                                            Product ID: <strong><asp:Label ID="lblid" runat="server" Text='<%#Eval("ProductId") %>'></asp:Label></strong>
-                                                            <asp:HiddenField ID="HDCategory" runat="server" Value='<%#Eval("CategoryID") %>' /><br />
-                                                            MRP: <span class="is-price"><asp:Label ID="Lblmrp" runat="server" Text='<%#Eval("MRP") %>'></asp:Label></span><br />
-                                                            Amount: <span class="is-price"><asp:Label ID="lblstatename1" runat="server" Text='<%#Eval("Amount") %>'></asp:Label></span><br />
-                                                            BV: <strong><asp:Label ID="LblBV" runat="server" Text='<%#Eval("BV") %>'></asp:Label></strong>
-                                                        </p>
+                                                        <p class="rp-product-id">ID <asp:Label ID="lblid" runat="server" Text='<%#Eval("ProductId") %>'></asp:Label></p>
+                                                        <h5 class="rp-product-title"><asp:Label ID="lblstatename" runat="server" Text='<%#Eval("ProductName") %>'></asp:Label></h5>
+                                                        <div class="rp-product-price-row">
+                                                            <span class="rp-product-amount">&#8377;<asp:Label ID="lblstatename1" runat="server" Text='<%#Eval("Amount") %>'></asp:Label></span>
+                                                            <span class="rp-product-mrp">MRP &#8377;<asp:Label ID="Lblmrp" runat="server" Text='<%#Eval("MRP") %>'></asp:Label></span>
+                                                        </div>
+                                                        <div class="rp-product-stats">
+                                                            <span class="rp-stat"><i class="fa fa-star" aria-hidden="true"></i> BV <strong><asp:Label ID="LblBV" runat="server" Text='<%#Eval("BV") %>'></asp:Label></strong></span>
+                                                        </div>
+                                                        <asp:HiddenField ID="HDCategory" runat="server" Value='<%#Eval("CategoryID") %>' />
                                                         <asp:Label ID="LblDPDP" Visible="False" runat="server" Text='<%#Eval("DP") %>'></asp:Label>
                                                         <asp:HiddenField ID="HDBV" runat="server" Value='<%#Eval("BV") %>' />
                                                     </div>
                                                     <div class="rp-product-actions">
-                                                        <asp:LinkButton ID="lnkph" runat="server" CssClass="btn btnBuyNow" CommandName="photolarge" CommandArgument='<%# Eval("ProductId") %>'>
+                                                        <asp:LinkButton ID="lnkph" runat="server" CssClass="btn btnBuyNow rp-btn-view" CommandName="photolarge" CommandArgument='<%# Eval("ProductId") %>'>
                                                             <i class="fa fa-eye"></i> View
                                                         </asp:LinkButton>
-                                                        <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary btnBuyNow" CommandName="BuyProduct" CommandArgument='<%# Eval("ProductId") %>'>
+                                                        <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary btnBuyNow rp-btn-cart" CommandName="BuyProduct" CommandArgument='<%# Eval("ProductId") %>'>
                                                             <i class="fa fa-shopping-cart"></i> Add to cart
                                                         </asp:LinkButton>
                                                     </div>
                                                 </div>
-                                                
                                             </div>
-
-
-                                            <%-- <asp:Image ID="Image1" runat="server" ImageUrl= Height="200px" Width="200px"  /><br />--%>
                                         </div>
                                     </ItemTemplate>
                                 </asp:Repeater>
@@ -552,151 +553,114 @@
 
                         </div>
                         <div class="box-footer">
-
-
-
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-                                        <asp:Label ID="LblRecordCount" runat="server" Text=""></asp:Label>
-                                    </div>
+                            <div class="rp-pager">
+                                <div class="rp-pager-info">
+                                    <asp:Label ID="LblRecordCount" runat="server" Text=""></asp:Label>
                                 </div>
-                                <div class="col-sm-7">
-                                    <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-                                        <ul class="pagination">
-
-                                            <asp:Repeater ID="rptPager" runat="server">
-                                                <ItemTemplate>
-
-
-                                                    <li class="paginate_button ">
-
-                                                        <asp:LinkButton ID="lnkPage" runat="server" Text='<%#Eval("Text") %>' CommandArgument='<%# Eval("Value") %>'
-                                                            CssClass='<%# Convert.ToBoolean(Eval("Enabled")) ? "page_enabled" : "page_disabled" %>'
-                                                            OnClick="Page_Changed" OnClientClick='<%# !Convert.ToBoolean(Eval("Enabled")) ? "return false;" : "" %>'></asp:LinkButton>
-
-                                                    </li>
-
-                                                </ItemTemplate>
-                                            </asp:Repeater>
-
-                                        </ul>
-                                    </div>
-
-                                </div>
+                                <asp:Panel ID="pnlPager" runat="server" CssClass="rp-pager-nav" Visible="false">
+                                    <ul class="pagination rp-pagination">
+                                        <asp:Repeater ID="rptPager" runat="server">
+                                            <ItemTemplate>
+                                                <li class='paginate_button <%# Convert.ToBoolean(Eval("IsActive")) ? "active" : "" %>'>
+                                                    <asp:LinkButton ID="lnkPage" runat="server"
+                                                        Text='<%# Eval("Text") %>'
+                                                        CommandArgument='<%# Eval("Value") %>'
+                                                        CssClass='<%# Convert.ToBoolean(Eval("IsActive")) ? "page_disabled is-active" : "page_enabled" %>'
+                                                        OnClick="Page_Changed"
+                                                        OnClientClick='<%# Convert.ToBoolean(Eval("IsActive")) ? "return false;" : "" %>'
+                                                        Enabled='<%# Convert.ToBoolean(Eval("Enabled")) %>'></asp:LinkButton>
+                                                </li>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </ul>
+                                </asp:Panel>
                             </div>
-
-
                         </div>
 
                     </div>
                  
-                       <div id="myModal" class="modal fade">
-                           <div class="modal-dialog">
+                       <div id="myModal" class="modal fade rp-modal rp-product-modal">
+                           <div class="modal-dialog modal-lg">
                                <div class="modal-content">
                                    <div class="modal-header">
-                                       <div class="container-fluid">
-                                           <h4 class="modal-title pull-left">Full Details</h4>
-                                           <span class="pull-right"><b>Product Id :
-                                               <asp:Label ID="LblProductCode" runat="server" Text=""></asp:Label></b></span>
-                                       </div>
+                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                       <h4 class="modal-title"><i class="fa fa-cube" aria-hidden="true"></i> Product Details</h4>
+                                       <p class="rp-modal-sub">Product ID <asp:Label ID="LblProductCode" runat="server" Text=""></asp:Label></p>
                                    </div>
-                                   <div class="modal-body table-responsive">
-                                       <div class="container-fluid">
+                                   <div class="modal-body">
+                                       <asp:HiddenField ID="HdCatId" runat="server" />
+                                       <asp:HiddenField ID="HdBuisnessVolume" runat="server" />
 
-                                           <asp:HiddenField ID="HdCatId" runat="server" />
-                                           <asp:HiddenField ID="HdBuisnessVolume" runat="server" />
-                                           <div class="product_item" style="width: 100%; color:#777">
-                                               <div class="product_sale">
-                                                   <p>
-                                                       <asp:Label ID="LblcategoryName123" runat="server" Text=""></asp:Label></p>
-                                               </div>
-                                               <div class="product_image">
-                                                   <div class="pro-img">
-                                                       <div id="myCarousel" class="carousel slide" data-ride="carousel">
-                                                           <!-- Indicators -->
-                                                           <ol class="carousel-indicators">
-                                                               <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                                                               <li data-target="#myCarousel" data-slide-to="1"></li>
-                                                               <li data-target="#myCarousel" data-slide-to="2"></li>
-                                                           </ol>
-
-                                                           <!-- Wrapper for slides -->
-                                                           <div class="carousel-inner">
-                                                               <div class="item active">
-                                                                   <asp:Image ID="Image2" runat="server" Width="570px" Height="200px" />
-                                                                   <%--<asp:Image ID="Image2" runat="server" Width="100%" />--%>
-                                                                   <%-- <img src="../ProductImage/636480744192755102Chrysanthemum.jpg" alt="image" runat="server">--%>
-                                                               </div>
-
-                                                               <div class="item">
-                                                                   <asp:Image ID="Image3" runat="server" Width="570px" Height="200px" />
-
-                                                               </div>
-
-                                                               <div class="item">
-                                                                   <asp:Image ID="Image4" runat="server" Width="570px" Height="200px" />
-
-                                                               </div>
-                                                           </div>
-
-                                                           <!-- Left and right controls -->
-                                                           <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-                                                               <span class="glyphicon glyphicon-chevron-left"></span>
-                                                               <span class="sr-only">Previous</span>
-                                                           </a>
-                                                           <a class="right carousel-control" href="#myCarousel" data-slide="next">
-                                                               <span class="glyphicon glyphicon-chevron-right"></span>
-                                                               <span class="sr-only">Next</span>
-                                                           </a>
+                                       <div class="rp-detail-layout">
+                                           <div class="rp-detail-gallery">
+                                               <span class="rp-detail-category">
+                                                   <asp:Label ID="LblcategoryName123" runat="server" Text=""></asp:Label>
+                                               </span>
+                                               <div id="myCarousel" class="carousel slide rp-detail-carousel" data-ride="carousel">
+                                                   <ol class="carousel-indicators">
+                                                       <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                                                       <li data-target="#myCarousel" data-slide-to="1"></li>
+                                                       <li data-target="#myCarousel" data-slide-to="2"></li>
+                                                   </ol>
+                                                   <div class="carousel-inner">
+                                                       <div class="item active">
+                                                           <asp:Image ID="Image2" runat="server" CssClass="rp-detail-image" />
+                                                       </div>
+                                                       <div class="item">
+                                                           <asp:Image ID="Image3" runat="server" CssClass="rp-detail-image" />
+                                                       </div>
+                                                       <div class="item">
+                                                           <asp:Image ID="Image4" runat="server" CssClass="rp-detail-image" />
                                                        </div>
                                                    </div>
+                                                   <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                                                       <span class="glyphicon glyphicon-chevron-left"></span>
+                                                       <span class="sr-only">Previous</span>
+                                                   </a>
+                                                   <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                                                       <span class="glyphicon glyphicon-chevron-right"></span>
+                                                       <span class="sr-only">Next</span>
+                                                   </a>
+                                               </div>
+                                           </div>
+
+                                           <div class="rp-detail-info">
+                                               <h3 class="rp-detail-title">
+                                                   <asp:Label ID="LblProductName" runat="server" Text=""></asp:Label>
+                                               </h3>
+
+                                               <div class="rp-detail-price-block">
+                                                   <div class="rp-detail-amount">
+                                                       <span class="rp-detail-label">Amount</span>
+                                                       <strong>&#8377;<asp:Label ID="LblAmount" runat="server" Text=""></asp:Label></strong>
+                                                   </div>
+                                                   <div class="rp-detail-mrp">
+                                                       <span class="rp-detail-label">MRP</span>
+                                                       <span>&#8377;<asp:Label ID="LblMRP" runat="server" Text=""></asp:Label></span>
+                                                   </div>
                                                </div>
 
-                                               <div class="product_values">
-                                                   <div class="product_title">
-                                                    
-                                                          <h6> <asp:Label ID="LblProductName" runat="server" Text=""></asp:Label></h6>
-                                                   </div>
-                                                   <div>
-                                                       <h6>MRP : <i class="fa fa-rupee-sign"></i>
-                                                           <asp:Label ID="LblMRP" runat="server" Text=""></asp:Label></h6>
-                                                   </div>
-                                                   <div>
-                                                       <h6>SV : <i class="fa fa-circle-o"></i>
-                                                           <asp:Label ID="LblBv" runat="server" Text=""></asp:Label></h6>
-                                                   </div>
-                                                    <div>
-                                                       <h6>Amount : <i class="fa fa-rupee-sign"></i>
-                                                              <asp:Label ID="LblAmount" runat="server" Text=""></asp:Label>
-                                                          </h6>
-                                                   </div>
-                                                 <%--  <div>
-                                                       <h5>Available Stock : <i class="fa fa-chrome"></i>
-                                                           <asp:Label ID="LblStock" runat="server" Text=""></asp:Label></h5>
-                                                   </div>--%>
+                                               <div class="rp-detail-chips">
+                                                   <span class="rp-detail-chip">
+                                                       <i class="fa fa-star" aria-hidden="true"></i>
+                                                       BV <strong><asp:Label ID="LblBv" runat="server" Text=""></asp:Label></strong>
+                                                   </span>
+                                                   <span class="rp-detail-chip is-muted" style="display:none;">
+                                                       DP <strong><asp:Label ID="LblDP" runat="server" Text=""></asp:Label></strong>
+                                                   </span>
+                                               </div>
 
-                                                   <div class="product_price" style="display:none;">
-                                                       <a href="#">DP
-          <i class="fa fa-rupee-sign"></i>
-                                                           <span class="price_new">
-                                                         <asp:Label ID="LblDP" runat="server" Text=""></asp:Label>    </span></a>
-
+                                               <div class="rp-detail-desc">
+                                                   <h5>Description</h5>
+                                                   <div class="rp-detail-desc-body">
+                                                       <asp:Label ID="LblDescription" runat="server" Text=""></asp:Label>
                                                    </div>
-                                                   <div class="product_desc">
-                                                       <div class="ex3">
-														  
-                                                           <asp:Label ID="LblDescription" runat="server" Text="Label"></asp:Label></div>
-                                                   </div>
-
                                                </div>
                                            </div>
                                        </div>
-
                                    </div>
                                    <div class="modal-footer">
-
-                                       <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                       <button type="button" class="btn btn-default rp-modal-close" data-dismiss="modal">Close</button>
                                    </div>
                                </div>
                            </div>

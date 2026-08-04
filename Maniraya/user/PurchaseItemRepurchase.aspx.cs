@@ -19,6 +19,32 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
     DataTable PurchaseDt;
     Decimal TAmt = 0;
     clsAccount objaccount = new clsAccount();
+
+    protected bool HasDiscount(object mrpObj, object amountObj)
+    {
+        decimal mrp;
+        decimal amount;
+        if (!decimal.TryParse(Convert.ToString(mrpObj), out mrp) || !decimal.TryParse(Convert.ToString(amountObj), out amount))
+        {
+            return false;
+        }
+
+        return mrp > 0 && amount > 0 && mrp > amount;
+    }
+
+    protected string GetDiscountPercent(object mrpObj, object amountObj)
+    {
+        decimal mrp;
+        decimal amount;
+        if (!decimal.TryParse(Convert.ToString(mrpObj), out mrp) || !decimal.TryParse(Convert.ToString(amountObj), out amount) || mrp <= 0)
+        {
+            return "0";
+        }
+
+        int pct = (int)Math.Round(((mrp - amount) / mrp) * 100m, 0, MidpointRounding.AwayFromZero);
+        return pct > 0 ? pct.ToString() : "0";
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (Session["userid"] != null)
@@ -204,95 +230,117 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
     }
     void loadProduct(int PageIndex)
     {
+        if (PageIndex < 1)
+        {
+            PageIndex = 1;
+        }
+
         int recordCount = 0;
         DataTable dt = new DataTable();
         objState.ProductName = string.Empty;
         objState.Status = string.Empty;
         objState.PurchaseStatus = string.Empty;
         dt = ProductPageWiseFranchisee(PageIndex, PageSize, HdFranchiseeid.Value, HDPlantype.Value, HDPlanId.Value, "0");
+        if (dt == null)
+        {
+            dt = new DataTable();
+        }
+
         dlCustomers.DataSource = dt;
         dlCustomers.DataBind();
-        if (dt.Rows.Count > 0)
-        {
-            recordCount = Convert.ToInt32(dt.Rows[0]["Count"].ToString());
-        }        
-        this.PopulatePager(recordCount, PageIndex);
-        LblRecordCount.Text = "Showing " + Convert.ToString((PageSize * (PageIndex - 1)) + 1) + " to " + Convert.ToString(PageSize * PageIndex) + " of " + recordCount.ToString() + " entries";
 
-    }
-    private void PopulatePager(int recordCount, int currentPage)
-    {
-        List<ListItem> pages = new List<ListItem>();
-        int startIndex, endIndex;
-        int pagerSpan = 5;
-
-        //Calculate the Start and End Index of pages to be displayed.
-        double dblPageCount = (double)((decimal)recordCount / Convert.ToDecimal(PageSize));
-        int pageCount = (int)Math.Ceiling(dblPageCount);
-        startIndex = currentPage > 1 && currentPage + pagerSpan - 1 < pagerSpan ? currentPage : 1;
-        endIndex = pageCount > pagerSpan ? pagerSpan : pageCount;
-        if (currentPage > pagerSpan % 2)
+        if (dt.Rows.Count > 0 && dt.Columns.Contains("Count"))
         {
-            if (currentPage == 2)
-            {
-                endIndex = 5;
-            }
-            else
-            {
-                endIndex = currentPage + 2;
-            }
+            int.TryParse(Convert.ToString(dt.Rows[0]["Count"]), out recordCount);
+        }
+
+        int pageCount = recordCount > 0
+            ? (int)Math.Ceiling(recordCount / (double)PageSize)
+            : 0;
+
+        if (pageCount > 0 && PageIndex > pageCount)
+        {
+            loadProduct(pageCount);
+            return;
+        }
+
+        ViewState["ProductPageIndex"] = PageIndex;
+        PopulatePager(recordCount, PageIndex);
+
+        if (recordCount <= 0)
+        {
+            LblRecordCount.Text = "No products found.";
         }
         else
         {
-            endIndex = (pagerSpan - currentPage) + 1;
+            int fromRecord = ((PageIndex - 1) * PageSize) + 1;
+            int toRecord = Math.Min(PageIndex * PageSize, recordCount);
+            LblRecordCount.Text = "Showing " + fromRecord + " to " + toRecord + " of " + recordCount + " (10 per page)";
         }
+    }
 
-        if (endIndex - (pagerSpan - 1) > startIndex)
+    private void PopulatePager(int recordCount, int currentPage)
+    {
+        var pages = new List<object>();
+        int pageCount = recordCount > 0
+            ? (int)Math.Ceiling(recordCount / (double)PageSize)
+            : 0;
+
+        pnlPager.Visible = pageCount > 1;
+
+        if (pageCount <= 1)
         {
-            startIndex = endIndex - (pagerSpan - 1);
+            rptPager.DataSource = pages;
+            rptPager.DataBind();
+            return;
         }
 
-        if (endIndex > pageCount)
+        if (currentPage < 1)
         {
-            endIndex = pageCount;
-            startIndex = ((endIndex - pagerSpan) + 1) > 0 ? (endIndex - pagerSpan) + 1 : 1;
+            currentPage = 1;
+        }
+        if (currentPage > pageCount)
+        {
+            currentPage = pageCount;
         }
 
-        //Add the First Page Button.
+        const int pagerSpan = 5;
+        int startIndex = Math.Max(1, currentPage - (pagerSpan / 2));
+        int endIndex = Math.Min(pageCount, startIndex + pagerSpan - 1);
+        startIndex = Math.Max(1, endIndex - pagerSpan + 1);
+
         if (currentPage > 1)
         {
-            pages.Add(new ListItem("First", "1"));
-        }
-
-        //Add the Previous Button.
-        if (currentPage > 1)
-        {
-            pages.Add(new ListItem("<<", (currentPage - 1).ToString()));
+            pages.Add(new { Text = "First", Value = "1", Enabled = true, IsActive = false });
+            pages.Add(new { Text = "Prev", Value = (currentPage - 1).ToString(), Enabled = true, IsActive = false });
         }
 
         for (int i = startIndex; i <= endIndex; i++)
         {
-            pages.Add(new ListItem(i.ToString(), i.ToString(), i != currentPage));
+            bool isActive = i == currentPage;
+            pages.Add(new { Text = i.ToString(), Value = i.ToString(), Enabled = !isActive, IsActive = isActive });
         }
 
-        //Add the Next Button.
         if (currentPage < pageCount)
         {
-            pages.Add(new ListItem(">>", (currentPage + 1).ToString()));
+            pages.Add(new { Text = "Next", Value = (currentPage + 1).ToString(), Enabled = true, IsActive = false });
+            pages.Add(new { Text = "Last", Value = pageCount.ToString(), Enabled = true, IsActive = false });
         }
 
-        //Add the Last Button.
-        if (currentPage != pageCount)
-        {
-            pages.Add(new ListItem("Last", pageCount.ToString()));
-        }
         rptPager.DataSource = pages;
         rptPager.DataBind();
     }
+
     protected void Page_Changed(object sender, EventArgs e)
     {
-        int pageIndex = int.Parse((sender as LinkButton).CommandArgument);
-        this.loadProduct(pageIndex);
+        int pageIndex;
+        LinkButton btn = sender as LinkButton;
+        if (btn == null || !int.TryParse(btn.CommandArgument, out pageIndex) || pageIndex < 1)
+        {
+            pageIndex = 1;
+        }
+
+        loadProduct(pageIndex);
     }
     protected void Repeater1_ItemCommand(object source, RepeaterCommandEventArgs e)
     {
