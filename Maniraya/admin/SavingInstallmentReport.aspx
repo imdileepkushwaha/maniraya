@@ -62,7 +62,7 @@
                                 <div class="admin-form-section admin-form-section-last">
                                     <h5 class="admin-form-section-title"><i class="fa fa-sliders"></i> Filters</h5>
                                     <div class="row">
-                                        <div class="col-md-6 col-sm-12">
+                                        <div class="col-md-4 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txtuserid.ClientID %>">User Id</label>
                                                 <div class="admin-input-group">
@@ -71,7 +71,22 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-sm-12">
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="<%= ddstatus.ClientID %>">Status</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-info-circle"></i></span>
+                                                    <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
+                                                        <asp:ListItem Value="0">Select Status</asp:ListItem>
+                                                        <asp:ListItem>Pending</asp:ListItem>
+                                                        <asp:ListItem>Processing</asp:ListItem>
+                                                        <asp:ListItem>Approved</asp:ListItem>
+                                                        <asp:ListItem>Rejected</asp:ListItem>
+                                                    </asp:DropDownList>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12">
                                             <div class="form-group">
                                                 <label for="<%= txttransactionid.ClientID %>">Transaction Id / UTR No.</label>
                                                 <div class="admin-input-group">

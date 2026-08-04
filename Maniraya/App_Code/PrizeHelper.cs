@@ -296,10 +296,18 @@ public static class PrizeHelper
 
     public static DataTable GetAllWinners(int topCount)
     {
+        return GetAllWinners(topCount, null);
+    }
+
+    /// <summary>
+    /// Returns active prize winners. When prizeMonth is set (yyyy-MM), only that month is returned.
+    /// </summary>
+    public static DataTable GetAllWinners(int topCount, string prizeMonth)
+    {
         EnsureTables();
 
         int top = topCount > 0 ? topCount : 200;
-        return RunSelect(@"
+        string sql = @"
             SELECT TOP " + top + @"
                 pa.Id,
                 pa.UserId,
@@ -309,8 +317,22 @@ public static class PrizeHelper
                 pa.CreatedOn
             FROM PrizeAssignment pa
             LEFT JOIN PrizeMaster pm ON pa.PrizeId = pm.Id
-            WHERE ISNULL(pa.Status, 1) = 1
-            ORDER BY pa.Id DESC");
+            WHERE ISNULL(pa.Status, 1) = 1";
+
+        if (!string.IsNullOrWhiteSpace(prizeMonth))
+        {
+            sql += " AND LTRIM(RTRIM(ISNULL(pa.PrizeMonth, ''))) = '" + Escape(prizeMonth.Trim()) + "'";
+        }
+
+        sql += " ORDER BY pa.Id DESC";
+        return RunSelect(sql);
+    }
+
+    /// <summary>Previous calendar month key in yyyy-MM (e.g. August → 2026-07).</summary>
+    public static string GetPreviousPrizeMonthKey()
+    {
+        DateTime lastMonth = DateTime.Today.AddMonths(-1);
+        return lastMonth.ToString("yyyy-MM", CultureInfo.InvariantCulture);
     }
 
     public static string FormatPrizeMonth(object value)

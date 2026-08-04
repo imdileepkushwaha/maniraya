@@ -40,19 +40,24 @@ FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-WHERE 1 = 1 AND sa.status = 'Processing' ";
+WHERE 1 = 1 ";
         if (txtfromdate.Text != "" && txttodate.Text != "")
         {
             str_query += "  and convert(date, sa.requestdate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sa.requestdate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
         }
         if (txtuserid.Text != "")
         {
-            str_query += "  and sa.UserId = '" + txtuserid.Text.Trim().Replace("'", "''") + "' ";
+            str_query += "  and sa.UserId = '" + SqlEscape(txtuserid.Text.Trim()) + "' ";
         }
 
         if (!string.IsNullOrWhiteSpace(txttransactionid.Text))
         {
-            str_query += "  and sa.OnlineTransactionId LIKE '%" + txttransactionid.Text.Trim().Replace("'", "''") + "%' ";
+            str_query += "  and sa.OnlineTransactionId LIKE '%" + SqlEscape(txttransactionid.Text.Trim()) + "%' ";
+        }
+
+        if (ddstatus.SelectedValue.ToString() != "0")
+        {
+            str_query += "  and " + BuildInstallmentStatusFilter(ddstatus.SelectedValue.ToString()) + " ";
         }
 
         str_query += " order by sa.entrydate  desc";
@@ -68,6 +73,38 @@ WHERE 1 = 1 AND sa.status = 'Processing' ";
         }
         ObjData.EndConnection();
         return dt;
+    }
+
+    static string BuildInstallmentStatusFilter(string selectedStatus)
+    {
+        string status = (selectedStatus ?? string.Empty).Trim();
+        if (string.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"(LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('pending', '0')
+                OR sa.status IS NULL OR LTRIM(RTRIM(ISNULL(sa.status, ''))) = '')";
+        }
+
+        if (string.Equals(status, "Processing", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing')";
+        }
+
+        if (string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('approved', '1', 'active')";
+        }
+
+        if (string.Equals(status, "Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('rejected', '2', 'cancelled', 'canceled')";
+        }
+
+        return "sa.status = '" + SqlEscape(status) + "'";
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
     void loadprevproduct()
     {

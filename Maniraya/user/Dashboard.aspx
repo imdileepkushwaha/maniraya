@@ -3123,7 +3123,7 @@ Profit Share Budget</p>
                         <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
                         <div class="dash-prize-head-text">
                             <h3>Prize Winners</h3>
-                            <p>Members who have won prizes.</p>
+                            <p><asp:Label ID="lblPrizeSubtitle" runat="server" Text="Last month prize winners." /></p>
                         </div>
                         <span class="dash-prize-count"><asp:Label ID="lblPrizeCount" runat="server" Text="0" /></span>
                     </div>
@@ -3153,7 +3153,7 @@ Profit Share Budget</p>
                     </asp:Panel>
                     <asp:Panel ID="pnlPrizeEmpty" runat="server" Visible="false" CssClass="dash-prize-empty">
                         <i class="fa fa-gift"></i>
-                        <p>No prize winners yet. Winners will appear here once prizes are assigned.</p>
+                        <p><asp:Label ID="lblPrizeEmptyText" runat="server" Text="No prize winners for last month yet." /></p>
                     </asp:Panel>
                 </asp:Panel>
 

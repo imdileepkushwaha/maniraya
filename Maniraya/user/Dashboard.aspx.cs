@@ -139,7 +139,10 @@ public partial class user_Dashboard : System.Web.UI.Page
     {
         try
         {
-            DataTable dt = PrizeHelper.GetAllWinners(200);
+            string lastMonthKey = PrizeHelper.GetPreviousPrizeMonthKey();
+            string lastMonthLabel = PrizeHelper.FormatPrizeMonth(lastMonthKey);
+
+            DataTable dt = PrizeHelper.GetAllWinners(200, lastMonthKey);
             pnlPrizes.Visible = true;
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -154,6 +157,19 @@ public partial class user_Dashboard : System.Web.UI.Page
                 lblPrizeCount.Text = "0";
                 pnlPrizeGrid.Visible = false;
                 pnlPrizeEmpty.Visible = true;
+            }
+
+            if (lblPrizeSubtitle != null)
+            {
+                lblPrizeSubtitle.Text = string.IsNullOrWhiteSpace(lastMonthLabel)
+                    ? "Last month prize winners."
+                    : ("Showing winners for " + lastMonthLabel + ".");
+            }
+            if (lblPrizeEmptyText != null)
+            {
+                lblPrizeEmptyText.Text = string.IsNullOrWhiteSpace(lastMonthLabel)
+                    ? "No prize winners for last month yet."
+                    : ("No prize winners for " + lastMonthLabel + " yet.");
             }
         }
         catch
