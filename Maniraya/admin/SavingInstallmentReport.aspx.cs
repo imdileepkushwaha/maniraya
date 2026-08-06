@@ -20,8 +20,13 @@ public partial class admin_UserReport : System.Web.UI.Page
         {
             if (!IsPostBack)
             {
-
-
+                if (ddstatus.Items.FindByText("Processing") != null)
+                {
+                    ddstatus.ClearSelection();
+                    ddstatus.Items.FindByText("Processing").Selected = true;
+                }
+                ViewState["HasSearched"] = true;
+                loadprevproduct(true);
             }
         }
         else
@@ -31,8 +36,10 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        loadprevproduct();
+        ViewState["HasSearched"] = true;
+        loadprevproduct(true);
     }
+
     public DataTable getPrevProduct()
     {
         string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
@@ -40,54 +47,82 @@ FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-WHERE 1 = 1 ";
-        if (txtfromdate.Text != "" && txttodate.Text != "")
+WHERE LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing', 'approved', 'rejected', '1', 'active', '2', 'cancelled', 'canceled') ";
+
+        // Date filter: use request / installment / entry date (whichever is available)
+        string dateExpr = "CONVERT(date, COALESCE(sa.requestdate, sa.installmentdate, sa.entrydate))";
+        string fromSql = TryGetSqlDate(txtfromdate.Text);
+        string toSql = TryGetSqlDate(txttodate.Text);
+        if (!string.IsNullOrEmpty(fromSql))
         {
-            str_query += "  and convert(date, sa.requestdate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sa.requestdate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
+            str_query += " AND " + dateExpr + " >= CONVERT(date, '" + fromSql + "') ";
         }
-        if (txtuserid.Text != "")
+        if (!string.IsNullOrEmpty(toSql))
         {
-            str_query += "  and sa.UserId = '" + SqlEscape(txtuserid.Text.Trim()) + "' ";
+            str_query += " AND " + dateExpr + " <= CONVERT(date, '" + toSql + "') ";
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtuserid.Text))
+        {
+            str_query += " AND LTRIM(RTRIM(sa.UserId)) = '" + SqlEscape(txtuserid.Text.Trim()) + "' ";
         }
 
         if (!string.IsNullOrWhiteSpace(txttransactionid.Text))
         {
-            str_query += "  and sa.OnlineTransactionId LIKE '%" + SqlEscape(txttransactionid.Text.Trim()) + "%' ";
+            str_query += " AND LTRIM(RTRIM(ISNULL(sa.OnlineTransactionId, ''))) LIKE '%" + SqlEscape(txttransactionid.Text.Trim()) + "%' ";
         }
 
-        if (ddstatus.SelectedValue.ToString() != "0")
+        string selectedStatus = ddstatus.SelectedValue;
+        if (string.IsNullOrWhiteSpace(selectedStatus))
         {
-            str_query += "  and " + BuildInstallmentStatusFilter(ddstatus.SelectedValue.ToString()) + " ";
+            selectedStatus = "Processing";
         }
+        str_query += " AND " + BuildInstallmentStatusFilter(selectedStatus) + " ";
 
-        str_query += " order by sa.entrydate  desc";
+        str_query += " ORDER BY ISNULL(sa.entrydate, sa.requestdate) DESC, sa.id DESC";
+
         DataTable dt = null;
         ObjData.StartConnection();
         try
         {
             dt = ObjData.RunDataTable(str_query);
         }
-        catch (Exception ex)
+        catch
         {
             dt = null;
         }
-        ObjData.EndConnection();
+        finally
+        {
+            ObjData.EndConnection();
+        }
         return dt;
+    }
+
+    static string TryGetSqlDate(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return null;
+        }
+
+        try
+        {
+            DateTime dt = Message.GetIndianDate(raw.Trim());
+            if (dt.Year <= 1900)
+            {
+                return null;
+            }
+            return dt.ToString("yyyy-MM-dd");
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     static string BuildInstallmentStatusFilter(string selectedStatus)
     {
         string status = (selectedStatus ?? string.Empty).Trim();
-        if (string.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
-        {
-            return @"(LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('pending', '0')
-                OR sa.status IS NULL OR LTRIM(RTRIM(ISNULL(sa.status, ''))) = '')";
-        }
-
-        if (string.Equals(status, "Processing", StringComparison.OrdinalIgnoreCase))
-        {
-            return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing')";
-        }
 
         if (string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase))
         {
@@ -99,20 +134,204 @@ WHERE 1 = 1 ";
             return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('rejected', '2', 'cancelled', 'canceled')";
         }
 
-        return "sa.status = '" + SqlEscape(status) + "'";
+        // Default / Processing
+        return @"LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing')";
     }
 
     static string SqlEscape(string value)
     {
         return (value ?? string.Empty).Replace("'", "''");
     }
+
     void loadprevproduct()
     {
+        loadprevproduct(false);
+    }
 
-        DataTable dt = new DataTable();
-        dt = getPrevProduct();
+    void loadprevproduct(bool resetPage)
+    {
+        if (resetPage)
+        {
+            GridView1.PageIndex = 0;
+        }
+
+        DataTable dt = getPrevProduct();
+        BindGrid(dt);
+    }
+
+    void BindGrid(DataTable dt)
+    {
+        if (dt == null)
+        {
+            dt = new DataTable();
+        }
+
+        int totalRecords = dt.Rows.Count;
+        int pageSize = GetPageSize();
+        bool showAll = pageSize <= 0 || string.Equals(ddlRecordFilter.SelectedItem.Text, "All", StringComparison.OrdinalIgnoreCase);
+
+        if (showAll || totalRecords == 0)
+        {
+            GridView1.AllowPaging = false;
+            GridView1.PageSize = Math.Max(totalRecords, 1);
+            if (showAll)
+            {
+                GridView1.PageIndex = 0;
+            }
+        }
+        else
+        {
+            GridView1.AllowPaging = true;
+            GridView1.PageSize = pageSize;
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+            if (GridView1.PageIndex >= totalPages)
+            {
+                GridView1.PageIndex = Math.Max(0, totalPages - 1);
+            }
+        }
+
         GridView1.DataSource = dt;
         GridView1.DataBind();
+
+        if (totalRecords == 0)
+        {
+            lblSummary.Text = "No installment requests found for selected filters.";
+        }
+        else
+        {
+            int fromRecord = 1;
+            int toRecord = totalRecords;
+            if (GridView1.AllowPaging)
+            {
+                fromRecord = (GridView1.PageIndex * GridView1.PageSize) + 1;
+                toRecord = Math.Min(totalRecords, (GridView1.PageIndex + 1) * GridView1.PageSize);
+            }
+            lblSummary.Text = "Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + " record(s)";
+        }
+
+        BuildExternalPager(totalRecords);
+    }
+
+    int GetPageSize()
+    {
+        int pageSize;
+        if (ddlRecordFilter != null && int.TryParse(ddlRecordFilter.SelectedItem.Text, out pageSize))
+        {
+            return pageSize;
+        }
+        return 25;
+    }
+
+    protected void ddlRecordFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (ViewState["HasSearched"] == null || !(bool)ViewState["HasSearched"])
+        {
+            return;
+        }
+        loadprevproduct(true);
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        if (ViewState["HasSearched"] == null || !(bool)ViewState["HasSearched"])
+        {
+            return;
+        }
+        loadprevproduct(false);
+    }
+
+    void BuildExternalPager(int totalRecords)
+    {
+        pnlPager.Controls.Clear();
+
+        if (!GridView1.AllowPaging || totalRecords <= 0)
+        {
+            pnlPager.Visible = false;
+            return;
+        }
+
+        int pageSize = GridView1.PageSize;
+        int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+        if (totalPages <= 1)
+        {
+            pnlPager.Visible = false;
+            return;
+        }
+
+        int currentPage = GridView1.PageIndex;
+        pnlPager.Visible = true;
+
+        int fromRecord = (currentPage * pageSize) + 1;
+        int toRecord = Math.Min(totalRecords, (currentPage + 1) * pageSize);
+        pnlPager.Controls.Add(new LiteralControl(
+            "<span class=\"admin-pager-info\">Page " + (currentPage + 1) + " of " + totalPages
+            + " · Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + "</span>"));
+
+        AddPagerLink("First", 0, currentPage > 0, false);
+        AddPagerLink("Prev", currentPage - 1, currentPage > 0, false);
+
+        const int windowSize = 5;
+        int startPage = Math.Max(0, currentPage - (windowSize / 2));
+        int endPage = Math.Min(totalPages - 1, startPage + windowSize - 1);
+        startPage = Math.Max(0, endPage - windowSize + 1);
+
+        if (startPage > 0)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-ellipsis\">...</span>"));
+        }
+
+        for (int i = startPage; i <= endPage; i++)
+        {
+            AddPagerLink((i + 1).ToString(), i, true, i == currentPage);
+        }
+
+        if (endPage < totalPages - 1)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-ellipsis\">...</span>"));
+        }
+
+        AddPagerLink("Next", currentPage + 1, currentPage < totalPages - 1, false);
+        AddPagerLink("Last", totalPages - 1, currentPage < totalPages - 1, false);
+    }
+
+    void AddPagerLink(string text, int pageIndex, bool enabled, bool isActive)
+    {
+        if (isActive)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-active\">" + text + "</span>"));
+            return;
+        }
+        if (!enabled)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-disabled\">" + text + "</span>"));
+            return;
+        }
+
+        LinkButton link = new LinkButton();
+        link.ID = "pagerBtn_" + pageIndex + "_" + text.Replace(" ", "");
+        link.Text = text;
+        link.CssClass = "admin-pager-btn";
+        link.CommandArgument = pageIndex.ToString();
+        link.Click += ExternalPager_Click;
+        link.CausesValidation = false;
+        pnlPager.Controls.Add(link);
+    }
+
+    protected void ExternalPager_Click(object sender, EventArgs e)
+    {
+        LinkButton link = sender as LinkButton;
+        int pageIndex;
+        if (link == null || !int.TryParse(link.CommandArgument, out pageIndex))
+        {
+            return;
+        }
+        GridView1.PageIndex = pageIndex;
+        if (ViewState["HasSearched"] == null || !(bool)ViewState["HasSearched"])
+        {
+            return;
+        }
+        loadprevproduct(false);
     }
     public DataTable getWithdrawlRequest(clsAccount objaccount)
     {

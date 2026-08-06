@@ -35,7 +35,7 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Filter saving product installment requests by date range, user ID, transaction ID / UTR, or approval status.</p>
+                                <p class="admin-report-intro">Filter by date, user ID, transaction ID / UTR, or status (Processing / Approved / Rejected). Default list shows latest Processing records.</p>
                                 <div class="admin-form-section">
                                     <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Date Range</h5>
                                     <div class="row">
@@ -77,8 +77,6 @@
                                                 <div class="admin-input-group">
                                                     <span class="admin-input-icon"><i class="fa fa-info-circle"></i></span>
                                                     <asp:DropDownList ID="ddstatus" CssClass="form-control" runat="server">
-                                                        <asp:ListItem Value="0">Select Status</asp:ListItem>
-                                                        <asp:ListItem>Pending</asp:ListItem>
                                                         <asp:ListItem>Processing</asp:ListItem>
                                                         <asp:ListItem>Approved</asp:ListItem>
                                                         <asp:ListItem>Rejected</asp:ListItem>
@@ -111,16 +109,35 @@
                         <div class="box box-primary">
                             <div class="box-header with-border">
                                 <h3 class="box-title"><i class="fa fa-list-alt"></i> Installment Details</h3>
+                                <div class="box-tools admin-record-filter-tools">
+                                    <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
+                                        AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                                        <asp:ListItem>10</asp:ListItem>
+                                        <asp:ListItem Selected="True">25</asp:ListItem>
+                                        <asp:ListItem>50</asp:ListItem>
+                                        <asp:ListItem>100</asp:ListItem>
+                                        <asp:ListItem>All</asp:ListItem>
+                                    </asp:DropDownList>
+                                    <span class="admin-record-filter-suffix">records</span>
+                                </div>
                             </div>
                             <div class="box-body">
                                 <div class="admin-table-toolbar">
-                                    <span class="admin-table-caption"><i class="fa fa-table"></i> Saving Product Installment Requests</span>
+                                    <span class="admin-table-caption">
+                                        <i class="fa fa-table"></i>
+                                        <asp:Label ID="lblSummary" runat="server" Text="Use Search to load installment requests." />
+                                    </span>
                                 </div>
-                                <div class="admin-table-wrap table-responsive">
-                                    <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
-                                        AutoGenerateColumns="False" EmptyDataText="No saving product purchase requests found."
-                                        OnRowDataBound="grdGetHelp_RowDataBound" OnRowCommand="GridView1_RowCommand">
-                                        <Columns>
+                                <div class="admin-table-paged-shell">
+                                    <div class="admin-table-wrap table-responsive">
+                                        <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
+                                            AutoGenerateColumns="False" EmptyDataText="No saving product installment requests found."
+                                            AllowPaging="true" PageSize="25"
+                                            OnRowDataBound="grdGetHelp_RowDataBound" OnRowCommand="GridView1_RowCommand"
+                                            OnPageIndexChanging="GridView1_PageIndexChanging">
+                                            <PagerSettings Visible="false" />
+                                            <Columns>
                                             <asp:TemplateField >
                                                  <HeaderTemplate>  
                                                     <%--<asp:CheckBox="CheckBox1" AutoPostBack="true" OnCheckedChanged="chckchanged" runat="server" />--%>
@@ -206,7 +223,9 @@
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
-                                    </asp:GridView>
+                                        </asp:GridView>
+                                    </div>
+                                    <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar" Visible="false"></asp:Panel>
                                 </div>
                             </div>
                         </div>
