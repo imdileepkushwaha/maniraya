@@ -2,6 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
     <style>
         .purchase-detail-page .admin-filter-grid {
             display: grid;
@@ -155,10 +156,34 @@
                         <div class="box box-primary">
                             <div class="box-header with-border">
                                 <h3 class="box-title">Purchase Details</h3>
+                                <div class="box-tools admin-record-filter-tools">
+                                    <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
+                                        AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                                        <asp:ListItem Selected="True">10</asp:ListItem>
+                                        <asp:ListItem>25</asp:ListItem>
+                                        <asp:ListItem>50</asp:ListItem>
+                                        <asp:ListItem>100</asp:ListItem>
+                                        <asp:ListItem>All</asp:ListItem>
+                                    </asp:DropDownList>
+                                    <span class="admin-record-filter-suffix">records</span>
+                                </div>
                             </div>
                             <div class="box-body">
-                                <div class="table-responsive">
-                                    <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
+                                <div class="admin-table-toolbar">
+                                    <span class="admin-table-caption">
+                                        <i class="fa fa-table"></i>
+                                        <asp:Label ID="lblSummary" runat="server" Text="Use Search to load franchisee sales." />
+                                    </span>
+                                </div>
+                                <div class="admin-table-paged-shell">
+                                <div class="table-responsive admin-table-wrap">
+                                    <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
+                                        AutoGenerateColumns="False" EmptyDataText="No franchisee sales found for selected filters."
+                                        AllowPaging="true" PageSize="10"
+                                        OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound"
+                                        OnPageIndexChanging="GridView1_PageIndexChanging" DataKeyNames="PurchaseID">
+                                        <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="" ItemStyle-Width="40px">
                                                 <ItemTemplate>
@@ -202,7 +227,7 @@
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="#">
-                                                <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                                <ItemTemplate><%# (GridView1.PageIndex * GridView1.PageSize) + Container.DataItemIndex + 1 %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Purchase ID">
                                                 <ItemTemplate>
@@ -267,6 +292,8 @@
                                             </asp:TemplateField>
                                         </Columns>
                                     </asp:GridView>
+                                </div>
+                                <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar" Visible="false"></asp:Panel>
                                 </div>
                             </div>
                         </div>

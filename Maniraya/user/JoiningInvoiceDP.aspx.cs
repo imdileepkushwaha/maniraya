@@ -129,7 +129,7 @@ public partial class JoiningInvoiceDP : System.Web.UI.Page
     }
     public DataTable getPurchaseProductQuantityFranchisee(string ID)
     {
-        string str_query = "SELECT PU.TotalDP,PU.Cstatus Pstatus,PU.orderNo,PU.PurchaseId,PU.TotalAmount,PU.Userid  AS UserId,PU.franchiseeid,Convert(CHAR,PU.PurchaseDate,103) AS PurchaseDate,U.Username ,U.Email Emailid,U.Mobile AS ContactNo,U.Address+' '+C.Cityname+' '+S.Statename+' '+U.Pincode  AS address,(Select top 1 isnull(invoicestatus,0) from PurchaseProductMaster where purchaseId=PU.purchaseId) as InvoiceStatus,PU.entrydate,isnull(PU.shippingcharges,0) shippingcharges   FROM   UserFranchiseePurchaseMaster PU JOIN Userdetail U ON PU.UserId=U.userid INNER JOIN citymaster C ON C.CityId=U.CityId INNER JOIN statemaster S ON C.StateId=S.StateId   where 1=1 ";
+        string str_query = "SELECT PU.TotalDP,PU.Cstatus Pstatus,PU.orderNo,PU.PurchaseId,PU.TotalAmount,PU.Userid  AS UserId,PU.franchiseeid,Convert(CHAR,PU.PurchaseDate,103) AS PurchaseDate,U.Username ,U.Email Emailid,U.Mobile AS ContactNo,isnull(U.Address,'')+' '+isnull(C.Cityname,'')+' '+isnull(S.Statename,'')+' '+isnull(U.Pincode,'')  AS address,(Select top 1 isnull(invoicestatus,0) from PurchaseProductMaster where purchaseId=PU.purchaseId) as InvoiceStatus,PU.entrydate,isnull(PU.shippingcharges,0) shippingcharges   FROM   UserFranchiseePurchaseMaster PU JOIN Userdetail U ON PU.UserId=U.userid LEFT JOIN citymaster C ON C.CityId=U.CityId LEFT JOIN statemaster S ON C.StateId=S.StateId   where 1=1 ";
 
 
 

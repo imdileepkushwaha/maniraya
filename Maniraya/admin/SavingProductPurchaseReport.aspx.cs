@@ -6,7 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
-
+using System.IO;
 using System.Configuration;
 using BusinessLogicTier;
 using DataTier;
@@ -665,5 +665,90 @@ public partial class admin_UserReport : System.Web.UI.Page
         }
 
         return ". " + waStatus.Replace("'", "");
+    }
+
+    protected void btnExcel_Click(object sender, EventArgs e)
+    {
+        DataTable dt = getPrevProduct();
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            Message.Show("No records available to export.");
+            return;
+        }
+
+        DataTable exportDt = BuildPurchaseExportTable(dt);
+        GridView exportGrid = new GridView();
+        exportGrid.AutoGenerateColumns = true;
+        exportGrid.DataSource = exportDt;
+        exportGrid.DataBind();
+
+        Response.Clear();
+        Response.Buffer = true;
+        Response.AddHeader("content-disposition", "attachment;filename=SavingProductPurchaseReport_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls");
+        Response.Charset = "";
+        Response.ContentType = "application/vnd.ms-excel";
+
+        using (StringWriter sw = new StringWriter())
+        {
+            HtmlTextWriter hw = new HtmlTextWriter(sw);
+            exportGrid.RenderControl(hw);
+            Response.Write("<style> td { mso-number-format:\\@; } </style>");
+            Response.Output.Write(sw.ToString());
+            Response.Flush();
+            Response.End();
+        }
+    }
+
+    static DataTable BuildPurchaseExportTable(DataTable source)
+    {
+        DataTable export = new DataTable();
+        export.Columns.Add("Order Id", typeof(string));
+        export.Columns.Add("User Id", typeof(string));
+        export.Columns.Add("Name", typeof(string));
+        export.Columns.Add("Date of Request", typeof(string));
+        export.Columns.Add("Approve Date", typeof(string));
+        export.Columns.Add("Amount", typeof(string));
+        export.Columns.Add("Product", typeof(string));
+        export.Columns.Add("Transaction Id", typeof(string));
+        export.Columns.Add("Status", typeof(string));
+        export.Columns.Add("Remark", typeof(string));
+
+        foreach (DataRow row in source.Rows)
+        {
+            DataRow outRow = export.NewRow();
+            outRow["Order Id"] = Convert.ToString(row["orderid"]);
+            outRow["User Id"] = Convert.ToString(row["userid"]);
+            outRow["Name"] = Convert.ToString(row["username"]);
+            outRow["Date of Request"] = FormatExportDate(row["entrydate"]);
+            outRow["Approve Date"] = FormatExportDate(row["approvedate"]);
+            outRow["Amount"] = Convert.ToString(row["amount"]);
+            outRow["Product"] = Convert.ToString(row["productname"]);
+            outRow["Transaction Id"] = Convert.ToString(row["OnlineTransactionId"]);
+            outRow["Status"] = Convert.ToString(row["status"]);
+            outRow["Remark"] = Convert.ToString(row["remark"]);
+            export.Rows.Add(outRow);
+        }
+
+        return export;
+    }
+
+    static string FormatExportDate(object value)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return string.Empty;
+        }
+
+        DateTime dt;
+        if (DateTime.TryParse(Convert.ToString(value), out dt))
+        {
+            return dt.ToString("dd/MM/yyyy hh:mm tt");
+        }
+
+        return Convert.ToString(value);
+    }
+
+    public override void VerifyRenderingInServerForm(Control control)
+    {
     }
 }

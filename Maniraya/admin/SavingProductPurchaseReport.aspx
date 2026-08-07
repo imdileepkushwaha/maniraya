@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
+﻿<%@ Page Title="Saving Product Purchase Report" Language="C#" MasterPageFile="adminmaster.master" EnableEventValidation="false" AutoEventWireup="true" CodeFile="SavingProductPurchaseReport.aspx.cs" Inherits="admin_UserReport" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
@@ -121,6 +121,9 @@
                                         <asp:ListItem>All</asp:ListItem>
                                     </asp:DropDownList>
                                     <span class="admin-record-filter-suffix">records</span>
+                                    <asp:ImageButton ID="btnExcel" runat="server" CssClass="admin-export-excel-btn"
+                                        ImageUrl="../user/img/excel123.png" Height="25px" Width="25px"
+                                        OnClick="btnExcel_Click" ToolTip="Export to Excel" />
                                 </div>
                             </div>
                             <div class="box-body">
@@ -264,6 +267,9 @@
                 </div>
             </div>
         </ContentTemplate>
+        <Triggers>
+            <asp:PostBackTrigger ControlID="btnExcel" />
+        </Triggers>
     </asp:UpdatePanel>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
