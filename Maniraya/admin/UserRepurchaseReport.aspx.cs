@@ -21,12 +21,8 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
         {
             if (Session["useradmin"] != null)
             {
-                // txtuserid.Text = Session["fuserid"].ToString();
-                // txtuserid.Enabled = false;
-                txtfromdate.Attributes.Add("readonly", "true");
-                txttodate.Attributes.Add("readonly", "true");
-                txtfromdate.Text = DateTime.Now.ToString("dd-MMM-yyyy");
-                txttodate.Text = DateTime.Now.ToString("dd-MMM-yyyy");
+                txtfromdate.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                txttodate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             }
             else
             {
@@ -36,23 +32,37 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
     }
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
+        if (string.Equals(e.CommandName, "photolarge", StringComparison.OrdinalIgnoreCase))
+        {
+            int photoIndex = Convert.ToInt32(e.CommandArgument.ToString());
+            Label LblImage = (Label)GridView1.Rows[photoIndex].FindControl("LblImage");
+            string imageUrl = (LblImage != null && !string.IsNullOrWhiteSpace(LblImage.Text))
+                ? LblImage.Text.Trim()
+                : "../ProductImage/images.png";
+            string script = "var img=document.getElementById('imgRepurchasePreview'); if(img){img.src='"
+                + imageUrl.Replace("\\", "\\\\").Replace("'", "\\'")
+                + "';} showAdminModal('DivPhotolarge');";
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "PopPhoto", script, true);
+            return;
+        }
+
+        if (!string.Equals(e.CommandName, "mySuccess", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(e.CommandName, "myFail", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         int index = Convert.ToInt32(e.CommandArgument.ToString());
         Label lbluserid = (Label)GridView1.Rows[index].FindControl("lbluserid123");
         Label lblPurchaseID = (Label)GridView1.Rows[index].FindControl("LblOrderNo");
-        string str_status = "";
-        if (e.CommandName == "mySuccess")
-        {
-            str_status = "Success";
-        }
-        else if (e.CommandName == "myFail")
-        {
-            str_status = "Failed";
-        }
+        string str_status = string.Equals(e.CommandName, "mySuccess", StringComparison.OrdinalIgnoreCase)
+            ? "Success"
+            : "Failed";
 
         objUser.UserId = txtuserid.Text;
         objUser.TransferUserId = txtuserid.Text;
         objUser.EpinNo = lblPurchaseID.Text;
-        objUser.MentionBy = "F000001";// Session["fuserid"].ToString();
+        objUser.MentionBy = "F000001";
         DataTable dt = UpdateStatusTopupManual(lbluserid.Text, str_status, lblPurchaseID.Text);
         if (dt != null)
         {
@@ -63,18 +73,7 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
             Message.Show("Unknown error");
         }
 
-        
         loaduser();
-
-
-        if (e.CommandName == "photolarge")
-        {
-            int index2 = Convert.ToInt32(e.CommandArgument.ToString());
-            Label lblid = (Label)GridView1.Rows[index2].FindControl("lblid");
-            Label LblImage = (Label)GridView1.Rows[index2].FindControl("LblImage");
-            ImageLarge.ImageUrl = LblImage.Text;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
-        }
     }
     public DataTable UpdateStatusTopupManual(string userid, string status, string purchaseid)
     {
@@ -105,11 +104,8 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
     }
     void loaduser()
     {
-
-
-        string fromDate = "", toDate = "";
-        fromDate = txtfromdate.Text;
-        toDate = txttodate.Text;
+        string fromDate = TryGetSqlDate(txtfromdate.Text);
+        string toDate = TryGetSqlDate(txttodate.Text);
         objP.PurchaseStatus = DDLSTStatus.SelectedValue;
         objP.UserId = txtuserid.Text;
         objP.FranchiseeID = "F000001"; //Session["fuserid"].ToString();
@@ -118,29 +114,70 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
         GridView1.DataSource = dt;
         GridView1.DataBind();
     }
+
+    static string TryGetSqlDate(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return null;
+        }
+
+        raw = raw.Trim();
+        try
+        {
+            // Preferred UI format: dd/mm/yyyy
+            if (raw.Contains("/"))
+            {
+                DateTime dt = Message.GetIndianDate(raw);
+                if (dt.Year > 1900)
+                {
+                    return dt.ToString("yyyy-MM-dd");
+                }
+            }
+
+            DateTime parsed;
+            if (DateTime.TryParse(raw, out parsed) && parsed.Year > 1900)
+            {
+                return parsed.ToString("yyyy-MM-dd");
+            }
+        }
+        catch
+        {
+        }
+
+        return null;
+    }
+
     public DataTable getPurchaseProductQuantityFranchisee(clsProduct objstate, string Fromdate, String Todate)
     {
-        string str_query = "SELECT PU.TotalDP,PU.Cstatus Pstatus,PU.orderNo,PU.PurchaseId,PU.TotalAmount,PU.Userid  AS UserId,Convert(CHAR,PU.PurchaseDate,103) AS PurchaseDate,U.Username ,U.Email Emailid,U.Mobile AS ContactNo,U.Address AS address,(Select top 1 isnull(invoicestatus,0) from PurchaseProductMaster where purchaseId=PU.purchaseId) as InvoiceStatus,case when img='' then '../ProductImage/images.png' else '../ProductImage/'+ img end as IMAGE,PU.onlinetransactionID AS transactionid   FROM   UserFranchiseePurchaseMaster PU JOIN Userdetail U ON PU.UserId=U.userid  where 1=1 ";
+        string str_query = @"SELECT PU.TotalDP,PU.Cstatus Pstatus,PU.orderNo,PU.PurchaseId,PU.TotalAmount,PU.Userid AS UserId,
+Convert(CHAR,PU.PurchaseDate,103) AS PurchaseDate,U.Username ,U.Email Emailid,U.Mobile AS ContactNo,U.Address AS address,
+(Select top 1 isnull(invoicestatus,0) from PurchaseProductMaster where purchaseId=PU.purchaseId) as InvoiceStatus,
+CASE WHEN LTRIM(RTRIM(ISNULL(PU.img, ''))) = '' THEN '../ProductImage/images.png' ELSE '../ProductImage/' + LTRIM(RTRIM(PU.img)) END AS IMAGE,
+PU.onlinetransactionID AS transactionid
+FROM UserFranchiseePurchaseMaster PU
+JOIN Userdetail U ON PU.UserId=U.userid
+WHERE 1=1 ";
 
-        if (Fromdate != string.Empty)
+        if (!string.IsNullOrEmpty(Fromdate))
         {
             str_query += " and cast(PU.PurchaseDate as date)>=cast('" + Fromdate + "' as date)";
         }
-        if (Todate != string.Empty)
+        if (!string.IsNullOrEmpty(Todate))
         {
             str_query += " and cast(PU.PurchaseDate as date)<=cast('" + Todate + "' as date)";
         }
         if (objstate.UserId != string.Empty)
         {
-            str_query += " and PU.Userid='" + objstate.UserId + "'";
+            str_query += " and PU.Userid='" + objstate.UserId.Replace("'", "''") + "'";
         }
         if (objstate.FranchiseeID != string.Empty)
         {
-            str_query += " and PU.franchiseeid='" + objstate.FranchiseeID + "'";
+            str_query += " and PU.franchiseeid='" + objstate.FranchiseeID.Replace("'", "''") + "'";
         }
         if (objstate.PurchaseStatus != string.Empty)
         {
-            str_query += " and isnull(PU.Isdistributer,0)=0 and isnull(PU.Cstatus,0)='" + objstate.PurchaseStatus + "'";
+            str_query += " and isnull(PU.Isdistributer,0)=0 and isnull(PU.Cstatus,0)='" + objstate.PurchaseStatus.Replace("'", "''") + "'";
         }
        // str_query += " and isnull(PU.RepurchaseStatus,0)='1'";
         //  str_query += "GROUP BY PU.TotalDP,PU.Pstatus,PU.PurchaseId,PU.Purchaseby,Convert(CHAR,PU.PurchaseDate,103)";
@@ -209,18 +246,21 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
             if (lblpstatus.Text == "0")
             {
                 Lblstatus.Text = "Pending";
+                Lblstatus.CssClass = "label label-warning";
                 btnSuccess.Visible = true;
                 btnFail.Visible = true;
             }
             if (lblpstatus.Text == "1")
             {
-                Lblstatus.Text = "Success";
+                Lblstatus.Text = "Approved";
+                Lblstatus.CssClass = "label label-success";
                 btnSuccess.Visible = false;
                 btnFail.Visible = false;
             }
             if (lblpstatus.Text == "2")
             {
-                Lblstatus.Text = "Failed";
+                Lblstatus.Text = "Rejected";
+                Lblstatus.CssClass = "label label-danger";
                 btnSuccess.Visible = false;
                 btnFail.Visible = false;
             }

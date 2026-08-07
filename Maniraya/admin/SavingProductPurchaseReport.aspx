@@ -110,16 +110,35 @@
                         <div class="box box-primary">
                             <div class="box-header with-border">
                                 <h3 class="box-title"><i class="fa fa-list-alt"></i> Purchase Details</h3>
+                                <div class="box-tools admin-record-filter-tools">
+                                    <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
+                                    <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
+                                        AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
+                                        <asp:ListItem>10</asp:ListItem>
+                                        <asp:ListItem Selected="True">25</asp:ListItem>
+                                        <asp:ListItem>50</asp:ListItem>
+                                        <asp:ListItem>100</asp:ListItem>
+                                        <asp:ListItem>All</asp:ListItem>
+                                    </asp:DropDownList>
+                                    <span class="admin-record-filter-suffix">records</span>
+                                </div>
                             </div>
                             <div class="box-body">
                                 <div class="admin-table-toolbar">
-                                    <span class="admin-table-caption"><i class="fa fa-table"></i> Saving Product Requests</span>
+                                    <span class="admin-table-caption">
+                                        <i class="fa fa-table"></i>
+                                        <asp:Label ID="lblSummary" runat="server" Text="Use Search to load purchase requests." />
+                                    </span>
                                 </div>
-                                <div class="admin-table-wrap table-responsive">
-                                    <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
-                                        AutoGenerateColumns="False" EmptyDataText="No saving product purchase requests found."
-                                        OnRowDataBound="grdGetHelp_RowDataBound" OnRowCommand="GridView1_RowCommand">
-                                        <Columns>
+                                <div class="admin-table-paged-shell">
+                                    <div class="admin-table-wrap table-responsive">
+                                        <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
+                                            AutoGenerateColumns="False" EmptyDataText="No saving product purchase requests found."
+                                            AllowPaging="true" PageSize="25"
+                                            OnRowDataBound="grdGetHelp_RowDataBound" OnRowCommand="GridView1_RowCommand"
+                                            OnPageIndexChanging="GridView1_PageIndexChanging">
+                                            <PagerSettings Visible="false" />
+                                            <Columns>
                                             <asp:TemplateField >
                                                  <HeaderTemplate>  
                                                     <%--<asp:CheckBox="CheckBox1" AutoPostBack="true" OnCheckedChanged="chckchanged" runat="server" />--%>
@@ -216,7 +235,9 @@
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
-                                    </asp:GridView>
+                                        </asp:GridView>
+                                    </div>
+                                    <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar" Visible="false"></asp:Panel>
                                 </div>
                             </div>
                         </div>

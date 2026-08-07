@@ -1,6 +1,33 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="UserRepurchaseReport.aspx.cs" Inherits="Franchisee_UserRepurchaseReport" %>
-<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=73" />
+    <style type="text/css">
+        .admin-product-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+        #DivPhotolarge .admin-image-preview-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 240px;
+            max-height: 75vh;
+            overflow: auto;
+            background: #f8fafc;
+            padding: 12px;
+        }
+        #DivPhotolarge .admin-image-preview-img {
+            max-width: 100% !important;
+            max-height: 70vh !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
      <section class="content-header">
@@ -25,29 +52,38 @@
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+             <div class="admin-report-page">
              <section class="content">
             <div class="container-fluid">
             <div class="row">
           <div class="col-md-12">
               <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Search Criteria</h3>
+              <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
             </div>
                    <div class="box-body">
                   
                           <div class="row">
                          <div class="col-md-3">
                              <div class="form-group">
-                                 <label>From date :</label>
-                                 <asp:TextBox ID="txtfromdate" CssClass="form-control" runat="server"></asp:TextBox>
-                                    <cc1:CalendarExtender ID="CalFromDate" runat="server" TargetControlID="txtfromdate" Format="dd-MMM-yyyy"></cc1:CalendarExtender>
+                                 <label for="<%= txtfromdate.ClientID %>">From date :</label>
+                                 <div class="input-group date">
+                                     <asp:TextBox ID="txtfromdate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" autocomplete="off"></asp:TextBox>
+                                     <span class="input-group-addon form_date_btn" style="cursor:pointer;" title="Select date">
+                                         <i class="fa fa-calendar"></i>
+                                     </span>
+                                 </div>
                              </div>
                          </div>
                          <div class="col-md-3">
                              <div class="form-group">
-                                 <label>To date :</label>
-                                  <asp:TextBox ID="txttodate"  CssClass="form-control" runat="server"></asp:TextBox>
-                                    <cc1:CalendarExtender ID="CalToDate" runat="server" TargetControlID="txttodate" Format="dd-MMM-yyyy"></cc1:CalendarExtender>
+                                 <label for="<%= txttodate.ClientID %>">To date :</label>
+                                 <div class="input-group date">
+                                     <asp:TextBox ID="txttodate" CssClass="form-control form_date" runat="server" placeholder="dd/mm/yyyy" autocomplete="off"></asp:TextBox>
+                                     <span class="input-group-addon form_date_btn" style="cursor:pointer;" title="Select date">
+                                         <i class="fa fa-calendar"></i>
+                                     </span>
+                                 </div>
                              </div>
                          </div>
                                <div class="col-md-3">
@@ -88,13 +124,14 @@
 
               <div class="box box-primary">
             <div class="box-header with-border">
+              <h3 class="box-title"><i class="fa fa-list-alt"></i> Repurchase Details</h3>
             </div>
-                   <div class="box-body table-responsive">
-                  
-                          <div class="row">
-                         <div class="col-md-12">
-                             <div class="form-group">
-                                <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID">
+                   <div class="box-body">
+                          <div class="admin-table-toolbar">
+                              <span class="admin-table-caption"><i class="fa fa-table"></i> User Repurchase Requests</span>
+                          </div>
+                          <div class="admin-table-wrap table-responsive">
+                                <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound" DataKeyNames="PurchaseID" EmptyDataText="No repurchase records found.">
                                <Columns>
                                     <asp:TemplateField>
             <ItemTemplate>
@@ -123,7 +160,7 @@
                                     <asp:TemplateField HeaderText="User Id">
                                         <ItemTemplate>
                                             <asp:Label ID="lbluserid123" runat="server" Text='<%#Eval("UserID") %>'></asp:Label>
-                                             <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%#Eval("Image") %>'></asp:Label>
+                                             <asp:Label ID="LblImageHidden" runat="server" Visible="false" Text='<%#Eval("Image") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                       <asp:TemplateField HeaderText="User name">
@@ -172,112 +209,162 @@
                                             <asp:Label ID="lblTransactionid" runat="server" Text='<%#Eval("transactionid") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>  
-                                    <asp:TemplateField HeaderText="Product Image" >
-                               <ItemTemplate>
-                                   <asp:LinkButton ID="lnkph1" runat="server" CommandName="photolarge"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
-                                  <asp:Image ID="Image1" runat="server" ImageUrl='<%# Eval("Image") %>' Height="40px" Width="40px"  /></asp:LinkButton>
-                               </ItemTemplate>
-                           </asp:TemplateField>
-								          <asp:TemplateField HeaderText="Status">
+                                    <asp:TemplateField HeaderText="Product Image">
+                                        <ItemTemplate>
+                                            <a href="javascript:void(0);" class="admin-product-thumb-link"
+                                                data-full="<%# Server.HtmlEncode(Convert.ToString(Eval("Image"))) %>"
+                                                title="View image">
+                                                <img src="<%# Server.HtmlEncode(Convert.ToString(Eval("Image"))) %>" class="admin-product-thumb" alt="Product image"
+                                                    onerror="this.onerror=null;this.src='../ProductImage/images.png';" />
+                                            </a>
+                                            <asp:Label ID="LblImage" runat="server" Visible="false" Text='<%# Eval("Image") %>'></asp:Label>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+								          <asp:TemplateField HeaderText="Status" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center">
                                         <ItemTemplate>
 											  <asp:Label ID="Lblstatus" runat="server" ></asp:Label>
 										     </ItemTemplate>
                                     </asp:TemplateField>     
-                                                 <asp:TemplateField HeaderText="Approve">
+                                                 <asp:TemplateField HeaderText="Approve" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="120px">
                                         <ItemTemplate>
-                                            
-                                               <asp:LinkButton ID="btnSuccess" CssClass="btn btn-success" CommandName="mySuccess" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Success" runat="server"><i class="icon fa fa-check-square-o" aria-hidden="true"></i></asp:LinkButton>
-                                            
-                                          
-                                         
+                                               <asp:LinkButton ID="btnSuccess" CssClass="admin-action-btn is-approve" CommandName="mySuccess" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Approve" runat="server">
+                                                   <i class="fa fa-check" aria-hidden="true"></i> Approve
+                                               </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>     
-								       <asp:TemplateField HeaderText="Reject">
+								       <asp:TemplateField HeaderText="Reject" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="110px">
                                         <ItemTemplate>
-                                           
-                                              <asp:LinkButton ID="btnFail" CssClass="btn btn-danger" CommandName="myFail" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Fail" runat="server"><i class="icon fa fa-window-close-o" aria-hidden="true"></i></asp:LinkButton>
-                                         
+                                              <asp:LinkButton ID="btnFail" CssClass="admin-action-btn is-reject" CommandName="myFail" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" ToolTip="Reject" runat="server">
+                                                  <i class="fa fa-times" aria-hidden="true"></i> Reject
+                                              </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>                        
                                 </Columns>
                             </asp:GridView>
-                             </div>
-                         </div>
-                      
-                            
-                     </div>
-                         
-                          
+                          </div>
                        </div>
-                         <div class="box-footer">
-                        
-             
-
-                           
-                    
-              </div>
-
-
-                  
               </div>
 
               </div>
                   </div>
-                  <div id="DivPhotolarge" class="modal fade">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                  
-                    <div class="modal-body">
-                       
-                        <div class="form-group">
-                                          
-                          <asp:Image ID="ImageLarge" runat="server" Width="570px" Height="400px" />
-                        </div>
-                        
+            </div>
+                 </section>
+             </div>
+             </ContentTemplate>
+    </asp:UpdatePanel>
+
+    <div id="DivPhotolarge" class="modal fade admin-image-preview-modal" tabindex="-1" role="dialog" aria-labelledby="repurchaseImagePreviewTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="repurchaseImagePreviewTitle"><i class="fa fa-picture-o"></i> Image Preview</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="admin-image-preview-wrap">
+                        <img id="imgRepurchasePreview" class="admin-image-preview-img" alt="Preview" src="../ProductImage/images.png" />
                     </div>
-                    <div class="modal-footer">
-                       
-                          <button type="button"  class="btn btn-danger"  data-dismiss="modal">Close</button>                  
-                    </div>
+                </div>
+                <div class="modal-footer admin-modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-                  
-        </div>
-                 </section>
-             </ContentTemplate>
-    </asp:UpdatePanel>
+    </div>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" Runat="Server">
-       <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript">
-    $("[src*=PLUS]").live("click", function () {
-        $(this).closest("tr").after("<tr><td></td><td colspan = '999'>" + $(this).next().html() + "</td></tr>")
-        $(this).attr("src", "img/Continue1.png");
-    });
-    $("[src*=Continue1]").live("click", function () {
-        $(this).attr("src", "img/PLUS.jpg");
-        $(this).closest("tr").next().remove();
-    });
-
-</script>
-       <script type="text/javascript">
-           $('.form_date').datepicker({
-               format: 'dd/mm/yyyy',
-           }).on('changeDate', function (ev) {
-               $(this).datepicker('hide');
-           });
-     </script>
-       <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript">
-        Sys.Application.add_load(LoadHandler);
-        function LoadHandler() {
-            $('.form_date').datepicker({
-                format: 'dd/mm/yyyy',
-            }).on('changeDate', function (ev) {
-                $(this).datepicker('hide');
+        function previewRepurchaseImage(el) {
+            if (!el) { return false; }
+            var url = el.getAttribute('data-full') || '';
+            if (!url) {
+                var thumb = el.querySelector ? el.querySelector('img') : null;
+                if (thumb) { url = thumb.getAttribute('src') || ''; }
+            }
+            if (!url) {
+                url = '../ProductImage/images.png';
+            }
+
+            var img = document.getElementById('imgRepurchasePreview');
+            if (img) {
+                img.src = url;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '70vh';
+                img.style.width = 'auto';
+                img.style.height = 'auto';
+                img.style.objectFit = 'contain';
+            }
+
+            if (typeof showAdminModal === 'function') {
+                showAdminModal('DivPhotolarge');
+            } else if (window.jQuery) {
+                $('#DivPhotolarge').modal('show');
+            }
+            return false;
+        }
+
+        function bindRepurchaseImagePreview() {
+            if (!window.jQuery) { return; }
+            $(document).off('click.repurchaseImg', '.admin-product-thumb-link').on('click.repurchaseImg', '.admin-product-thumb-link', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                previewRepurchaseImage(this);
             });
         }
-     </script>
+
+        function bindRepurchaseExpanders() {
+            if (!window.jQuery) { return; }
+            $(document).off('click.repurchasePlus', '[src*=PLUS]').on('click.repurchasePlus', '[src*=PLUS]', function () {
+                $(this).closest('tr').after("<tr><td></td><td colspan='999'>" + $(this).next().html() + "</td></tr>");
+                $(this).attr('src', 'img/Continue1.png');
+            });
+            $(document).off('click.repurchaseMinus', '[src*=Continue1]').on('click.repurchaseMinus', '[src*=Continue1]', function () {
+                $(this).attr('src', 'img/PLUS.jpg');
+                $(this).closest('tr').next().remove();
+            });
+        }
+
+        $(function () {
+            bindRepurchaseImagePreview();
+            bindRepurchaseExpanders();
+        });
+        if (typeof Sys !== 'undefined' && Sys.Application) {
+            Sys.Application.add_load(function () {
+                bindRepurchaseImagePreview();
+                bindRepurchaseExpanders();
+            });
+        }
+    </script>
+    <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" />
+    <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript">
+        function initRepurchaseDatePickers() {
+            if (!window.jQuery || !jQuery.fn.datepicker) { return; }
+            $('.form_date').each(function () {
+                var $el = $(this);
+                if ($el.data('datepicker')) {
+                    $el.datepicker('remove');
+                }
+                $el.datepicker({
+                    format: 'dd/mm/yyyy',
+                    autoclose: true,
+                    todayHighlight: true,
+                    orientation: 'bottom auto'
+                }).on('changeDate', function () {
+                    $(this).datepicker('hide');
+                });
+            });
+
+            $(document).off('click.repurchaseCal', '.form_date_btn').on('click.repurchaseCal', '.form_date_btn', function (e) {
+                e.preventDefault();
+                $(this).closest('.input-group').find('.form_date').datepicker('show');
+            });
+        }
+
+        $(function () { initRepurchaseDatePickers(); });
+        if (typeof Sys !== 'undefined' && Sys.Application) {
+            Sys.Application.add_load(initRepurchaseDatePickers);
+        }
+    </script>
 </asp:Content>
 

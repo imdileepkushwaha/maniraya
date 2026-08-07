@@ -9,6 +9,9 @@ public partial class MasterPage : System.Web.UI.MasterPage
     {
         if (Session["userid"] != null)
         {
+            // Keep session alive while user browses the panel
+            Session.Timeout = 480;
+
             string profileImage = GetProfileImageUrl();
 
             dvUserImage3.Src = profileImage;

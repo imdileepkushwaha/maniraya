@@ -92,6 +92,8 @@ public partial class Login : System.Web.UI.Page
                     ? Session["returnUrl"].ToString()
                     : ResolveUrl("~/index.aspx");
                 Session.Remove("returnUrl");
+                // Sliding session: touch timeout so active users stay logged in longer
+                Session.Timeout = 480;
                 RedirectAfterLogin(redirectUrl);
                 return;
             }
