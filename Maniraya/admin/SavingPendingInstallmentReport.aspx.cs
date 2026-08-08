@@ -455,15 +455,15 @@ WHERE 1 = 1");
         sql.Append(@"
 SELECT
     sa.id,
-    sa.userid,
-    ud.username,
-    ud.mobile,
+    LTRIM(RTRIM(ISNULL(sa.userid, ''))) AS userid,
+    LTRIM(RTRIM(ISNULL(ud.UserName, ''))) AS username,
+    LTRIM(RTRIM(ISNULL(ud.Mobile, ''))) AS mobile,
     sa.installmentdate,
     sa.instno,
     sa.amount,
     sa.status
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON LTRIM(RTRIM(ud.UserId)) = LTRIM(RTRIM(sa.UserId))
 WHERE 1 = 1");
 
         if (!string.IsNullOrWhiteSpace(ddReminderStatus.SelectedValue))
@@ -519,10 +519,19 @@ WHERE 1 = 1");
             HiddenField hdnMobile = row.FindControl("hdnReminderMobile") as HiddenField;
             HiddenField hdnName = row.FindControl("hdnReminderName") as HiddenField;
             HiddenField hdnUserId = row.FindControl("hdnReminderUserId") as HiddenField;
+            Label lblName = row.FindControl("lblReminderUserName") as Label;
 
-            string name = hdnName != null ? hdnName.Value : string.Empty;
-            string mobile = hdnMobile != null ? hdnMobile.Value : string.Empty;
-            string userId = hdnUserId != null ? hdnUserId.Value : string.Empty;
+            string userId = hdnUserId != null ? Convert.ToString(hdnUserId.Value).Trim() : string.Empty;
+            string mobile = hdnMobile != null ? Convert.ToString(hdnMobile.Value).Trim() : string.Empty;
+            string name = hdnName != null ? Convert.ToString(hdnName.Value).Trim() : string.Empty;
+            if (string.IsNullOrWhiteSpace(name) && lblName != null)
+            {
+                name = Convert.ToString(lblName.Text).Trim();
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = userId;
+            }
 
             string statusMessage;
             if (InstallmentReminderSmsHelper.TrySendReminder(mobile, name, out statusMessage))

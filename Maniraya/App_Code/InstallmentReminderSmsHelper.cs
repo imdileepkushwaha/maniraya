@@ -25,9 +25,9 @@ public static class InstallmentReminderSmsHelper
     public static string BuildReminderMessage(string userName)
     {
         string name = string.IsNullOrWhiteSpace(userName) ? "Member" : userName.Trim();
-        // Only name is dynamic — keep body aligned with DLT / panel sample text.
+        // DLT sample uses "Mpremuim" spelling — keep body exact; only name is dynamic.
         return "Dear " + name
-            + "\nYour this month installment is pending kindly pay, If already paid then ignore. Thanks Mpremium Team.";
+            + "\nYour this month installment is pending kindly pay, If already paid then ignore. Thanks Mpremuim Team.";
     }
 
     public static bool TrySendReminder(string mobile, string userName, out string statusMessage)
@@ -50,15 +50,14 @@ public static class InstallmentReminderSmsHelper
         }
 
         string message = BuildReminderMessage(userName);
-        // Same gateway quirk as OTP SMS pages: append literal "sms" before route params.
-        string messageForApi = message.TrimEnd() + "sms";
-        string apiUrl = BuildApiUrl(number, messageForApi);
+        // Do NOT append "sms" into the message body — it was appearing on the user's phone.
+        string apiUrl = BuildApiUrl(number, message);
+        WriteLog("SEND mobile=" + number + " name=[" + Truncate(userName, 60) + "] msg=[" + Truncate(message.Replace("\n", "\\n"), 160) + "]");
 
         try
         {
-            // Gateway is http:// — do not force TLS-only for this host.
             string responseText = HttpGet(apiUrl, 60000);
-            WriteLog("MOBILE=" + number + " NAME=" + Truncate(userName, 40) + " RESP=" + Truncate(responseText, 400));
+            WriteLog("RESP mobile=" + number + " " + Truncate(responseText, 400));
 
             if (IsSuccessResponse(responseText))
             {

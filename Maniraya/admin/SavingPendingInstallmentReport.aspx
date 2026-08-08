@@ -249,7 +249,9 @@
                                                 <ItemTemplate><%# Eval("userid") %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="User Name">
-                                                <ItemTemplate><%# Eval("username") %></ItemTemplate>
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lblReminderUserName" runat="server" Text='<%# Eval("username") %>' />
+                                                </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Mobile">
                                                 <ItemTemplate><%# Eval("mobile") %></ItemTemplate>
