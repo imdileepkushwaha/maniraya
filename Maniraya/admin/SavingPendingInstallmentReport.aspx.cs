@@ -50,8 +50,47 @@ public partial class admin_SavingPendingInstallmentReport : Page
         {
             pending.Selected = true;
         }
+        SetDateType("InstallmentDate");
         GridView1.PageIndex = 0;
         LoadReport();
+    }
+
+    protected void ddStatus_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        // Pending/Processing usually have no approve date — default to Installment Date.
+        string status = ddStatus.SelectedValue ?? string.Empty;
+        if (string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(status, "Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            SetDateType("ApproveDate");
+        }
+        else
+        {
+            SetDateType("InstallmentDate");
+        }
+
+        GridView1.PageIndex = 0;
+        LoadReport();
+    }
+
+    void SetDateType(string value)
+    {
+        ddDateType.ClearSelection();
+        ListItem item = ddDateType.Items.FindByValue(value);
+        if (item != null)
+        {
+            item.Selected = true;
+        }
+    }
+
+    bool UseApproveDateFilter()
+    {
+        return string.Equals(ddDateType.SelectedValue, "ApproveDate", StringComparison.OrdinalIgnoreCase);
+    }
+
+    string GetDateFilterColumn()
+    {
+        return UseApproveDateFilter() ? "sa.approvedate" : "sa.InstallmentDate";
     }
 
     void LoadReport()
@@ -79,6 +118,7 @@ public partial class admin_SavingPendingInstallmentReport : Page
         {
             GridView1.DataSource = null;
             GridView1.DataBind();
+            UpdateSummary(0);
             BuildExternalPager(0);
             return;
         }
@@ -106,7 +146,30 @@ public partial class admin_SavingPendingInstallmentReport : Page
 
         GridView1.DataSource = dt;
         GridView1.DataBind();
+        UpdateSummary(dt.Rows.Count);
         BuildExternalPager(dt.Rows.Count);
+    }
+
+    void UpdateSummary(int totalRecords)
+    {
+        string text;
+        if (totalRecords <= 0)
+        {
+            text = "No records found for selected filters.";
+        }
+        else if (!GridView1.AllowPaging)
+        {
+            text = "Showing 1–" + totalRecords + " of " + totalRecords + " record(s)";
+        }
+        else
+        {
+            int fromRecord = (GridView1.PageIndex * GridView1.PageSize) + 1;
+            int toRecord = Math.Min(totalRecords, (GridView1.PageIndex + 1) * GridView1.PageSize);
+            text = "Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + " record(s)";
+        }
+
+        lblSummary.Text = text;
+        lblToolbarSummary.Text = text;
     }
 
     int GetPageSize()
@@ -224,6 +287,7 @@ SELECT
     ud.mobile,
     ud.email,
     sa.installmentdate,
+    sa.approvedate,
     sa.instno,
     sa.amount,
     sa.status
@@ -236,15 +300,17 @@ WHERE 1 = 1");
             sql.Append(" AND sa.status = '").Append(SqlEscape(ddStatus.SelectedValue)).Append("'");
         }
 
+        string dateColumn = GetDateFilterColumn();
+
         if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
         {
-            sql.Append(" AND CONVERT(date, sa.InstallmentDate) >= CONVERT(date, '")
+            sql.Append(" AND CONVERT(date, ").Append(dateColumn).Append(") >= CONVERT(date, '")
                 .Append(Message.GetIndianDate(txtFromDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
         }
 
         if (!string.IsNullOrWhiteSpace(txtToDate.Text))
         {
-            sql.Append(" AND CONVERT(date, sa.InstallmentDate) <= CONVERT(date, '")
+            sql.Append(" AND CONVERT(date, ").Append(dateColumn).Append(") <= CONVERT(date, '")
                 .Append(Message.GetIndianDate(txtToDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
         }
 
@@ -259,11 +325,14 @@ WHERE 1 = 1");
             sql.Append(" AND sa.InstNo = ").Append(instNo);
         }
 
-        sql.Append(@" ORDER BY
-    CASE WHEN CONVERT(date, sa.InstallmentDate) >= CONVERT(date, GETDATE()) THEN 0 ELSE 1 END,
-    sa.InstallmentDate ASC,
-    sa.InstNo ASC,
-    sa.id ASC");
+        if (UseApproveDateFilter())
+        {
+            sql.Append(" ORDER BY sa.approvedate DESC, sa.id DESC");
+        }
+        else
+        {
+            sql.Append(" ORDER BY sa.InstallmentDate DESC, sa.id DESC");
+        }
 
         DataTable dt = new DataTable();
         try
@@ -338,6 +407,146 @@ WHERE 1 = 1");
             Response.Flush();
             Response.End();
         }
+    }
+
+    protected void btnReminderSearch_Click(object sender, EventArgs e)
+    {
+        BindReminderGrid();
+        ShowReminderModal();
+    }
+
+    protected void btnReminderReset_Click(object sender, EventArgs e)
+    {
+        txtReminderInstNo.Text = string.Empty;
+        ddReminderStatus.ClearSelection();
+        ListItem pending = ddReminderStatus.Items.FindByValue("Pending");
+        if (pending != null)
+        {
+            pending.Selected = true;
+        }
+        gvReminder.DataSource = null;
+        gvReminder.DataBind();
+        lblReminderSummary.Text = "Search by Installment No and Status to load records.";
+        lblReminderSendStatus.Text = string.Empty;
+        ShowReminderModal();
+    }
+
+    void BindReminderGrid()
+    {
+        DataTable dt = GetReminderData();
+        gvReminder.DataSource = dt;
+        gvReminder.DataBind();
+
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            lblReminderSummary.Text = "No records found for selected Installment No / Status.";
+        }
+        else
+        {
+            lblReminderSummary.Text = "Showing " + dt.Rows.Count + " record(s). Select users and click Send Reminder.";
+        }
+        lblReminderSendStatus.Text = string.Empty;
+    }
+
+    DataTable GetReminderData()
+    {
+        StringBuilder sql = new StringBuilder();
+        sql.Append(@"
+SELECT
+    sa.id,
+    sa.userid,
+    ud.username,
+    ud.mobile,
+    sa.installmentdate,
+    sa.instno,
+    sa.amount,
+    sa.status
+FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
+WHERE 1 = 1");
+
+        if (!string.IsNullOrWhiteSpace(ddReminderStatus.SelectedValue))
+        {
+            sql.Append(" AND sa.status = '").Append(SqlEscape(ddReminderStatus.SelectedValue)).Append("'");
+        }
+
+        int instNo;
+        if (!string.IsNullOrWhiteSpace(txtReminderInstNo.Text) && int.TryParse(txtReminderInstNo.Text.Trim(), out instNo))
+        {
+            sql.Append(" AND sa.InstNo = ").Append(instNo);
+        }
+
+        sql.Append(" ORDER BY sa.InstallmentDate DESC, sa.id DESC");
+
+        DataTable dt = new DataTable();
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(sql.ToString());
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            dt = new DataTable();
+        }
+
+        return dt ?? new DataTable();
+    }
+
+    protected void btnSendReminderWhatsApp_Click(object sender, EventArgs e)
+    {
+        int selected = 0;
+        int sent = 0;
+        int failed = 0;
+
+        foreach (GridViewRow row in gvReminder.Rows)
+        {
+            CheckBox chk = row.FindControl("chkReminder") as CheckBox;
+            if (chk == null || !chk.Checked)
+            {
+                continue;
+            }
+
+            selected++;
+            HiddenField hdnMobile = row.FindControl("hdnReminderMobile") as HiddenField;
+            HiddenField hdnName = row.FindControl("hdnReminderName") as HiddenField;
+
+            string name = hdnName != null ? hdnName.Value : string.Empty;
+            string mobile = hdnMobile != null ? hdnMobile.Value : string.Empty;
+
+            string statusMessage;
+            if (InstallmentReminderSmsHelper.TrySendReminder(mobile, name, out statusMessage))
+            {
+                sent++;
+            }
+            else
+            {
+                failed++;
+            }
+        }
+
+        if (selected == 0)
+        {
+            lblReminderSendStatus.Text = "Please select at least one record.";
+        }
+        else
+        {
+            lblReminderSendStatus.Text = "Selected: " + selected + " · SMS Sent: " + sent + " · Failed: " + failed;
+        }
+
+        ShowReminderModal();
+    }
+
+    void ShowReminderModal()
+    {
+        ScriptManager.RegisterStartupScript(this, GetType(), "showSendReminderModal",
+            "showAdminModal('sendReminderModal');", true);
     }
 
     public override void VerifyRenderingInServerForm(Control control)

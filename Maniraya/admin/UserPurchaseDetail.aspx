@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=72" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=73" />
     <style>
         .purchase-detail-page .admin-filter-grid {
             display: grid;
@@ -22,6 +22,114 @@
             border: 1px solid #e8edf3;
             border-radius: 10px;
             overflow: auto;
+        }
+
+        .purchase-detail-page .admin-table-paged-shell {
+            border: 1px solid #e8edf3;
+            border-radius: 12px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .purchase-detail-page .admin-table-paged-shell > .table-responsive,
+        .purchase-detail-page .admin-table-paged-shell > .admin-table-wrap {
+            border: none;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        .purchase-detail-page .admin-table-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e8edf3;
+        }
+
+        .purchase-detail-page .admin-table-caption {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .purchase-detail-page .admin-table-caption i {
+            color: #e52d27;
+        }
+
+        .purchase-detail-page .admin-table-pager-bar {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 12px 16px;
+            border-top: 1px solid #e8edf3;
+            background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+        }
+
+        .purchase-detail-page .admin-pager-info {
+            width: 100%;
+            margin: 0 0 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .purchase-detail-page .admin-pager-btn,
+        .purchase-detail-page a.admin-pager-btn {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 12px;
+            margin: 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1;
+            color: #64748b !important;
+            text-decoration: none !important;
+            background: #fff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .purchase-detail-page a.admin-pager-btn:hover,
+        .purchase-detail-page a.admin-pager-btn:focus {
+            color: #e52d27 !important;
+            border-color: #f5c2bf !important;
+            background: #fff5f5 !important;
+        }
+
+        .purchase-detail-page .admin-pager-btn.is-active {
+            color: #fff !important;
+            background: linear-gradient(135deg, #e52d27 0%, #c41e17 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 2px 8px rgba(229, 45, 39, 0.25);
+        }
+
+        .purchase-detail-page .admin-pager-btn.is-disabled,
+        .purchase-detail-page .admin-pager-btn.is-ellipsis {
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .purchase-detail-page .admin-pager-btn.is-ellipsis {
+            opacity: 1;
+            border-color: transparent !important;
+            background: transparent !important;
+            min-width: 24px;
         }
 
         .purchase-detail-page .purchase-expand-btn {
@@ -113,7 +221,7 @@
     </asp:UpdateProgress>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <div class="purchase-detail-page">
+            <div class="purchase-detail-page admin-report-page">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="box box-primary">

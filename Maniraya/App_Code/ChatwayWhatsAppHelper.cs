@@ -141,6 +141,155 @@ public static class ChatwayWhatsAppHelper
         return TrySendInvoiceAfterApprove(userId, orderId, 0, messageType, out statusMessage);
     }
 
+    public static bool TrySendTextMessage(string mobile, string message, out string statusMessage)
+    {
+        statusMessage = string.Empty;
+
+        if (!IsEnabled)
+        {
+            statusMessage = "WhatsApp disabled.";
+            return false;
+        }
+
+        string number = NormalizeWhatsAppNumber(mobile);
+        if (string.IsNullOrWhiteSpace(number))
+        {
+            statusMessage = "Valid mobile number not found.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            statusMessage = "Message is empty.";
+            return false;
+        }
+
+        string username = GetSetting("ChatwayUsername", string.Empty);
+        string token = GetSetting("ChatwayToken", string.Empty);
+        string fileApi = GetSetting("ChatwayApiBaseUrl", "https://int.chatway.in/api/send-file");
+        string apiBase = GetSetting("ChatwayTextApiBaseUrl", string.Empty);
+        if (string.IsNullOrWhiteSpace(apiBase))
+        {
+            apiBase = fileApi.Replace("/send-file", "/send");
+            if (string.Equals(apiBase, fileApi, StringComparison.OrdinalIgnoreCase))
+            {
+                apiBase = "https://int.chatway.in/api/send";
+            }
+        }
+
+        int timeoutMs = GetTimeoutMilliseconds();
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(token))
+        {
+            statusMessage = "Chatway credentials missing.";
+            return false;
+        }
+
+        try
+        {
+            EnsureTls12();
+
+            string apiNumber = number.Trim().TrimStart('+');
+            string numberWithPlus = "+" + apiNumber;
+            string responseText;
+            bool ok = ExecuteSendTextRequest(username, token, apiBase, numberWithPlus, message, timeoutMs, out responseText);
+
+            if (!ok && IsGenericChatwayError(responseText))
+            {
+                WriteLog("TEXT RETRY without + prefix number=" + apiNumber);
+                ok = ExecuteSendTextRequest(username, token, apiBase, apiNumber, message, timeoutMs, out responseText);
+            }
+
+            WriteLog("TEXT RESPONSE " + Truncate(responseText, 500));
+
+            if (ok
+                || (!string.IsNullOrWhiteSpace(responseText)
+                    && (responseText.IndexOf("\"status\":\"success\"", StringComparison.OrdinalIgnoreCase) >= 0
+                        || responseText.IndexOf("accepted for delivery", StringComparison.OrdinalIgnoreCase) >= 0)))
+            {
+                statusMessage = "WhatsApp reminder sent.";
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(responseText))
+            {
+                statusMessage = "Empty response from Chatway.";
+                return false;
+            }
+
+            if (IsGenericChatwayError(responseText))
+            {
+                statusMessage = "Chatway could not deliver reminder.";
+                return false;
+            }
+
+            statusMessage = "Chatway response: " + Truncate(responseText, 180);
+            return false;
+        }
+        catch (WebException webEx)
+        {
+            string body = ReadWebExceptionBody(webEx);
+            statusMessage = "WhatsApp send failed: " + Truncate(string.IsNullOrWhiteSpace(body) ? webEx.Message : body, 160);
+            WriteLog("TEXT WEBEX " + statusMessage);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "WhatsApp send failed: " + Truncate(ex.Message, 160);
+            WriteLog("TEXT EXCEPTION " + ex.Message);
+            return false;
+        }
+    }
+
+    static bool ExecuteSendTextRequest(
+        string username,
+        string token,
+        string apiBase,
+        string number,
+        string message,
+        int timeoutMs,
+        out string responseText)
+    {
+        responseText = string.Empty;
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        query["username"] = username.Trim();
+        query["number"] = number.Trim();
+        query["message"] = message ?? string.Empty;
+        query["token"] = token.Trim();
+
+        string requestUrl = apiBase.Trim();
+        if (requestUrl.Contains("?"))
+        {
+            requestUrl = requestUrl.TrimEnd('&') + "&" + query;
+        }
+        else
+        {
+            requestUrl = requestUrl + "?" + query;
+        }
+
+        WriteLog("TEXT REQUEST number=" + number);
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUrl);
+        request.Method = "GET";
+        request.Timeout = timeoutMs;
+        request.ReadWriteTimeout = timeoutMs;
+        request.KeepAlive = false;
+        request.ProtocolVersion = HttpVersion.Version11;
+        request.UserAgent = "ManirayaChatwayClient/1.0";
+
+        using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+        using (Stream stream = response.GetResponseStream())
+        using (StreamReader reader = new StreamReader(stream ?? Stream.Null, Encoding.UTF8))
+        {
+            responseText = reader.ReadToEnd();
+        }
+
+        return !string.IsNullOrWhiteSpace(responseText)
+            && (responseText.IndexOf("\"status\":\"success\"", StringComparison.OrdinalIgnoreCase) >= 0
+                || responseText.IndexOf("accepted for delivery", StringComparison.OrdinalIgnoreCase) >= 0);
+    }
+
     public static bool TrySendFile(string number, string message, string fileUrl, string fileName, out string statusMessage)
     {
         statusMessage = string.Empty;
