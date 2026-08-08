@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
 
 /// <summary>
 /// Sends installment reminder SMS via shortmsgservice.com HTTP API.
@@ -24,7 +25,7 @@ public static class InstallmentReminderSmsHelper
     public static string BuildReminderMessage(string userName)
     {
         string name = string.IsNullOrWhiteSpace(userName) ? "Member" : userName.Trim();
-        // Only name is dynamic — body must match DLT template text.
+        // Only name is dynamic — keep body aligned with DLT / panel sample text.
         return "Dear " + name
             + "\nYour this month installment is pending kindly pay, If already paid then ignore. Thanks Mpremium Team.";
     }
@@ -36,26 +37,32 @@ public static class InstallmentReminderSmsHelper
         if (!IsEnabled)
         {
             statusMessage = "SMS reminder disabled.";
+            WriteLog("SKIP disabled");
             return false;
         }
 
         string number = NormalizeMobile(mobile);
         if (string.IsNullOrWhiteSpace(number))
         {
-            statusMessage = "Valid mobile number not found.";
+            statusMessage = "Valid mobile not found (" + Truncate(mobile, 20) + ").";
+            WriteLog("SKIP invalid mobile raw=" + Truncate(mobile, 40));
             return false;
         }
 
         string message = BuildReminderMessage(userName);
-        string apiUrl = BuildApiUrl(number, message);
+        // Same gateway quirk as OTP SMS pages: append literal "sms" before route params.
+        string messageForApi = message.TrimEnd() + "sms";
+        string apiUrl = BuildApiUrl(number, messageForApi);
 
         try
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            // Gateway is http:// — do not force TLS-only for this host.
             string responseText = HttpGet(apiUrl, 60000);
+            WriteLog("MOBILE=" + number + " NAME=" + Truncate(userName, 40) + " RESP=" + Truncate(responseText, 400));
+
             if (IsSuccessResponse(responseText))
             {
-                statusMessage = "SMS sent.";
+                statusMessage = "SMS Sent Successfully";
                 return true;
             }
 
@@ -65,12 +72,20 @@ public static class InstallmentReminderSmsHelper
                 return false;
             }
 
-            statusMessage = "SMS gateway: " + Truncate(responseText, 160);
+            statusMessage = Truncate(responseText, 180);
+            return false;
+        }
+        catch (WebException webEx)
+        {
+            string body = ReadWebExceptionBody(webEx);
+            statusMessage = "SMS failed: " + Truncate(string.IsNullOrWhiteSpace(body) ? webEx.Message : body, 180);
+            WriteLog("WEBEX mobile=" + number + " " + statusMessage);
             return false;
         }
         catch (Exception ex)
         {
-            statusMessage = "SMS send failed: " + Truncate(ex.Message, 160);
+            statusMessage = "SMS failed: " + Truncate(ex.Message, 180);
+            WriteLog("EXCEPTION mobile=" + number + " " + ex.Message);
             return false;
         }
     }
@@ -85,26 +100,20 @@ public static class InstallmentReminderSmsHelper
         string route = GetSetting("InstallmentReminderSmsRoute", "TRANS");
         string templateId = GetSetting("InstallmentReminderSmsTemplateId", "1677100000000388862");
 
-        // Existing site SMS calls append literal "sms" before route (gateway quirk / template suffix).
-        string messageWithSuffix = (message ?? string.Empty).TrimEnd() + "sms";
-
-        var query = HttpUtility.ParseQueryString(string.Empty);
-        query["username"] = username;
-        query["apikey"] = apiKey;
-        query["apirequest"] = "Text";
-        query["sender"] = sender;
-        query["mobile"] = mobile;
-        query["message"] = messageWithSuffix;
-        query["route"] = route;
-        query["TemplateID"] = templateId;
-        query["format"] = "JSON";
-
-        string url = baseUrl.Trim();
-        if (url.Contains("?"))
-        {
-            return url.TrimEnd('&') + "&" + query;
-        }
-        return url + "?" + query;
+        // Match working OTP SMS URL style used elsewhere in the site.
+        StringBuilder url = new StringBuilder();
+        url.Append(baseUrl.Trim());
+        url.Append(baseUrl.Contains("?") ? "&" : "?");
+        url.Append("username=").Append(HttpUtility.UrlEncode(username));
+        url.Append("&apikey=").Append(HttpUtility.UrlEncode(apiKey));
+        url.Append("&apirequest=Text");
+        url.Append("&sender=").Append(HttpUtility.UrlEncode(sender));
+        url.Append("&mobile=").Append(HttpUtility.UrlEncode(mobile));
+        url.Append("&message=").Append(HttpUtility.UrlEncode(message ?? string.Empty));
+        url.Append("&route=").Append(HttpUtility.UrlEncode(route));
+        url.Append("&TemplateID=").Append(HttpUtility.UrlEncode(templateId));
+        url.Append("&format=JSON");
+        return url.ToString();
     }
 
     static string NormalizeMobile(string mobile)
@@ -124,7 +133,7 @@ public static class InstallmentReminderSmsHelper
         }
 
         string value = digits.ToString();
-        if (value.StartsWith("91") && value.Length > 10)
+        if (value.Length > 10 && (value.StartsWith("91") || value.StartsWith("0")))
         {
             value = value.Substring(value.Length - 10);
         }
@@ -144,10 +153,22 @@ public static class InstallmentReminderSmsHelper
             return false;
         }
 
-        return responseText.IndexOf("\"status\":\"success\"", StringComparison.OrdinalIgnoreCase) >= 0
+        // Prefer explicit JSON status.
+        if (responseText.IndexOf("\"status\":\"success\"", StringComparison.OrdinalIgnoreCase) >= 0
             || responseText.IndexOf("\"status\": \"success\"", StringComparison.OrdinalIgnoreCase) >= 0
-            || responseText.IndexOf("\"Status\":\"Success\"", StringComparison.OrdinalIgnoreCase) >= 0
-            || responseText.IndexOf("success", StringComparison.OrdinalIgnoreCase) >= 0;
+            || responseText.IndexOf("SMS Sent Successfully", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return true;
+        }
+
+        if (responseText.IndexOf("\"status\":\"error\"", StringComparison.OrdinalIgnoreCase) >= 0
+            || responseText.IndexOf("\"status\": \"error\"", StringComparison.OrdinalIgnoreCase) >= 0
+            || responseText.IndexOf("fail", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return false;
+        }
+
+        return false;
     }
 
     static string HttpGet(string url, int timeoutMs)
@@ -157,12 +178,59 @@ public static class InstallmentReminderSmsHelper
         request.Timeout = timeoutMs;
         request.ReadWriteTimeout = timeoutMs;
         request.KeepAlive = false;
+        request.ProtocolVersion = HttpVersion.Version11;
+        request.UserAgent = "ManirayaSmsClient/1.0";
 
         using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
         using (Stream stream = response.GetResponseStream())
         using (StreamReader reader = new StreamReader(stream ?? Stream.Null, Encoding.UTF8))
         {
             return reader.ReadToEnd();
+        }
+    }
+
+    static string ReadWebExceptionBody(WebException webEx)
+    {
+        try
+        {
+            if (webEx.Response == null)
+            {
+                return webEx.Message;
+            }
+
+            using (Stream stream = webEx.Response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream ?? Stream.Null, Encoding.UTF8))
+            {
+                string body = reader.ReadToEnd();
+                return string.IsNullOrWhiteSpace(body) ? webEx.Message : body;
+            }
+        }
+        catch
+        {
+            return webEx.Message;
+        }
+    }
+
+    static void WriteLog(string line)
+    {
+        try
+        {
+            string folder = HostingEnvironment.MapPath("~/App_Data");
+            if (string.IsNullOrWhiteSpace(folder))
+            {
+                return;
+            }
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            string path = Path.Combine(folder, "installment-reminder-sms.log");
+            File.AppendAllText(path, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " " + line + Environment.NewLine);
+        }
+        catch
+        {
         }
     }
 

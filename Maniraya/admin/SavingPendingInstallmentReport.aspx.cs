@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -504,6 +505,7 @@ WHERE 1 = 1");
         int selected = 0;
         int sent = 0;
         int failed = 0;
+        StringBuilder failDetails = new StringBuilder();
 
         foreach (GridViewRow row in gvReminder.Rows)
         {
@@ -516,9 +518,11 @@ WHERE 1 = 1");
             selected++;
             HiddenField hdnMobile = row.FindControl("hdnReminderMobile") as HiddenField;
             HiddenField hdnName = row.FindControl("hdnReminderName") as HiddenField;
+            HiddenField hdnUserId = row.FindControl("hdnReminderUserId") as HiddenField;
 
             string name = hdnName != null ? hdnName.Value : string.Empty;
             string mobile = hdnMobile != null ? hdnMobile.Value : string.Empty;
+            string userId = hdnUserId != null ? hdnUserId.Value : string.Empty;
 
             string statusMessage;
             if (InstallmentReminderSmsHelper.TrySendReminder(mobile, name, out statusMessage))
@@ -528,16 +532,35 @@ WHERE 1 = 1");
             else
             {
                 failed++;
+                if (failDetails.Length < 300)
+                {
+                    if (failDetails.Length > 0)
+                    {
+                        failDetails.Append(" | ");
+                    }
+                    failDetails.Append(string.IsNullOrWhiteSpace(userId) ? name : userId)
+                        .Append(": ")
+                        .Append(statusMessage);
+                }
             }
         }
 
         if (selected == 0)
         {
-            lblReminderSendStatus.Text = "Please select at least one record.";
+            lblReminderSendStatus.Text = "Please select at least one record (checkbox).";
+            ScriptManager.RegisterStartupScript(this, GetType(), "reminderNoSelect",
+                "alert('Please select at least one record.');", true);
         }
         else
         {
-            lblReminderSendStatus.Text = "Selected: " + selected + " · SMS Sent: " + sent + " · Failed: " + failed;
+            string summary = "Selected: " + selected + " · SMS Sent: " + sent + " · Failed: " + failed;
+            if (failed > 0 && failDetails.Length > 0)
+            {
+                summary += " · Error: " + failDetails;
+            }
+            lblReminderSendStatus.Text = summary;
+            ScriptManager.RegisterStartupScript(this, GetType(), "reminderSendResult",
+                "alert(" + HttpUtility.JavaScriptStringEncode(summary, true) + ");", true);
         }
 
         ShowReminderModal();

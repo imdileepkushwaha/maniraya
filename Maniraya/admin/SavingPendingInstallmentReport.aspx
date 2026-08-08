@@ -284,6 +284,9 @@
         </ContentTemplate>
         <Triggers>
             <asp:PostBackTrigger ControlID="btnExcel" />
+            <asp:PostBackTrigger ControlID="btnSendReminderWhatsApp" />
+            <asp:PostBackTrigger ControlID="btnReminderSearch" />
+            <asp:PostBackTrigger ControlID="btnReminderReset" />
         </Triggers>
     </asp:UpdatePanel>
 </asp:Content>
