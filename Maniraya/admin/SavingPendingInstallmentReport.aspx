@@ -216,6 +216,9 @@
                                             <div>
                                                 <asp:Button ID="btnReminderSearch" runat="server" CssClass="btn btn-primary" Text="Search" OnClick="btnReminderSearch_Click" CausesValidation="false" />
                                                 <asp:Button ID="btnReminderReset" runat="server" CssClass="btn btn-default" Text="Reset" OnClick="btnReminderReset_Click" CausesValidation="false" />
+                                                <asp:Button ID="btnSendReminderWhatsAppTop" runat="server" CssClass="btn admin-send-reminder-btn"
+                                                    Text="Send Reminder" OnClick="btnSendReminderWhatsApp_Click" CausesValidation="false"
+                                                    OnClientClick="return confirm('Send SMS reminder to selected users?');" />
                                             </div>
                                         </div>
                                     </div>
@@ -287,6 +290,7 @@
         <Triggers>
             <asp:PostBackTrigger ControlID="btnExcel" />
             <asp:PostBackTrigger ControlID="btnSendReminderWhatsApp" />
+            <asp:PostBackTrigger ControlID="btnSendReminderWhatsAppTop" />
             <asp:PostBackTrigger ControlID="btnReminderSearch" />
             <asp:PostBackTrigger ControlID="btnReminderReset" />
         </Triggers>

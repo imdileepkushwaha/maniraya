@@ -22,17 +22,30 @@ public static class InstallmentReminderSmsHelper
         }
     }
 
+    /// <summary>
+    /// DLT template body. Only the member name after "Dear " is dynamic.
+    /// Trailing "sms" matches gateway/OTP URL style used on this site.
+    /// </summary>
     public static string BuildReminderMessage(string userName)
     {
         string name = string.IsNullOrWhiteSpace(userName) ? "Member" : userName.Trim();
-        // DLT sample uses "Mpremuim" spelling — keep body exact; only name is dynamic.
         return "Dear " + name
-            + "\nYour this month installment is pending kindly pay, If already paid then ignore. Thanks Mpremuim Team.";
+            + " Your this month installment is pending kindly pay, If already paid then ignore. Thanks Mpremuim Team.sms";
     }
 
     public static bool TrySendReminder(string mobile, string userName, out string statusMessage)
     {
+        string apiUrl;
+        return TrySendReminder(mobile, userName, out statusMessage, out apiUrl);
+    }
+
+    /// <summary>
+    /// Builds full API URL into apiUrl (for debug), then hits the gateway.
+    /// </summary>
+    public static bool TrySendReminder(string mobile, string userName, out string statusMessage, out string apiUrl)
+    {
         statusMessage = string.Empty;
+        apiUrl = string.Empty;
 
         if (!IsEnabled)
         {
@@ -49,14 +62,17 @@ public static class InstallmentReminderSmsHelper
             return false;
         }
 
-        string message = BuildReminderMessage(userName);
-        // Do NOT append "sms" into the message body — it was appearing on the user's phone.
-        string apiUrl = BuildApiUrl(number, message);
-        WriteLog("SEND mobile=" + number + " name=[" + Truncate(userName, 60) + "] msg=[" + Truncate(message.Replace("\n", "\\n"), 160) + "]");
+        string displayName = string.IsNullOrWhiteSpace(userName) ? "Member" : userName.Trim();
+        string message = BuildReminderMessage(displayName);
+
+        // Full API string for debug — inspect this before / after hit.
+        string str = BuildApiUrl(number, message);
+        apiUrl = str;
+        WriteLog("API str=" + str);
 
         try
         {
-            string responseText = HttpGet(apiUrl, 60000);
+            string responseText = HttpGet(str, 60000);
             WriteLog("RESP mobile=" + number + " " + Truncate(responseText, 400));
 
             if (IsSuccessResponse(responseText))
@@ -67,28 +83,32 @@ public static class InstallmentReminderSmsHelper
 
             if (string.IsNullOrWhiteSpace(responseText))
             {
-                statusMessage = "Empty SMS gateway response.";
+                statusMessage = "Empty SMS gateway response. API=" + Truncate(str, 250);
                 return false;
             }
 
-            statusMessage = Truncate(responseText, 180);
+            statusMessage = Truncate(responseText, 180) + " | API=" + Truncate(str, 220);
             return false;
         }
         catch (WebException webEx)
         {
             string body = ReadWebExceptionBody(webEx);
-            statusMessage = "SMS failed: " + Truncate(string.IsNullOrWhiteSpace(body) ? webEx.Message : body, 180);
+            statusMessage = "SMS failed: " + Truncate(string.IsNullOrWhiteSpace(body) ? webEx.Message : body, 180)
+                + " | API=" + Truncate(str, 220);
             WriteLog("WEBEX mobile=" + number + " " + statusMessage);
             return false;
         }
         catch (Exception ex)
         {
-            statusMessage = "SMS failed: " + Truncate(ex.Message, 180);
-            WriteLog("EXCEPTION mobile=" + number + " " + ex.Message);
+            statusMessage = "SMS failed: " + Truncate(ex.Message, 180) + " | API=" + Truncate(str, 220);
+            WriteLog("EXCEPTION mobile=" + number + " " + ex.ToString());
             return false;
         }
     }
 
+    /// <summary>
+    /// Panel login: username=mpremium + apikey. Recipient: mobile= + Dear NAME in message.
+    /// </summary>
     static string BuildApiUrl(string mobile, string message)
     {
         string baseUrl = GetSetting("InstallmentReminderSmsApiUrl",
@@ -99,18 +119,18 @@ public static class InstallmentReminderSmsHelper
         string route = GetSetting("InstallmentReminderSmsRoute", "TRANS");
         string templateId = GetSetting("InstallmentReminderSmsTemplateId", "1677100000000388862");
 
-        // Match working OTP SMS URL style used elsewhere in the site.
+        // Same style as working OTP Sendotp URL on this site.
         StringBuilder url = new StringBuilder();
         url.Append(baseUrl.Trim());
         url.Append(baseUrl.Contains("?") ? "&" : "?");
-        url.Append("username=").Append(HttpUtility.UrlEncode(username));
-        url.Append("&apikey=").Append(HttpUtility.UrlEncode(apiKey));
+        url.Append("username=").Append(username);
+        url.Append("&apikey=").Append(apiKey);
         url.Append("&apirequest=Text");
-        url.Append("&sender=").Append(HttpUtility.UrlEncode(sender));
-        url.Append("&mobile=").Append(HttpUtility.UrlEncode(mobile));
+        url.Append("&sender=").Append(sender);
+        url.Append("&mobile=").Append(mobile);
         url.Append("&message=").Append(HttpUtility.UrlEncode(message ?? string.Empty));
-        url.Append("&route=").Append(HttpUtility.UrlEncode(route));
-        url.Append("&TemplateID=").Append(HttpUtility.UrlEncode(templateId));
+        url.Append("&route=").Append(route);
+        url.Append("&TemplateID=").Append(templateId);
         url.Append("&format=JSON");
         return url.ToString();
     }
@@ -152,7 +172,6 @@ public static class InstallmentReminderSmsHelper
             return false;
         }
 
-        // Prefer explicit JSON status.
         if (responseText.IndexOf("\"status\":\"success\"", StringComparison.OrdinalIgnoreCase) >= 0
             || responseText.IndexOf("\"status\": \"success\"", StringComparison.OrdinalIgnoreCase) >= 0
             || responseText.IndexOf("SMS Sent Successfully", StringComparison.OrdinalIgnoreCase) >= 0)

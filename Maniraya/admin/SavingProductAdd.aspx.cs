@@ -49,6 +49,8 @@ public partial class admin_ProductAdd : System.Web.UI.Page
 
         try
         {
+            // EntryDate must be 1st of month; one product/month (starts Sep-2026 on monthly page).
+            DateTime entryDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             s2 = "sp_add_SavingProductMaster";
             SqlParameter[] parameter = {                                              
                 new SqlParameter("@ProductName",objState.ProductName),
@@ -58,6 +60,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
                 new SqlParameter("@EntryBy",objState.MentionBy),
                 new SqlParameter("@HSNCODE",objState.HSNCODE),
                 new SqlParameter("@GST",objState.GST),
+                new SqlParameter("@EntryDate", entryDate)
 
                 };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
