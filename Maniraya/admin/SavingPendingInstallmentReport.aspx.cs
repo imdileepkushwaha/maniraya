@@ -506,6 +506,7 @@ WHERE 1 = 1");
         int sent = 0;
         int failed = 0;
         StringBuilder failDetails = new StringBuilder();
+        string lastApiUrl = string.Empty;
 
         foreach (GridViewRow row in gvReminder.Rows)
         {
@@ -533,15 +534,38 @@ WHERE 1 = 1");
                 name = userId;
             }
 
-            string statusMessage;
-            if (InstallmentReminderSmsHelper.TrySendReminder(mobile, name, out statusMessage))
+            // Per selected user (single or multiple checkboxes): build full API into str, then hit.
+            // message uses this user's name; mobile uses this user's number.
+            string statusMessage = string.Empty;
+            string str = string.Empty;
+            try
             {
-                sent++;
+                if (InstallmentReminderSmsHelper.TrySendReminder(mobile, name, out statusMessage, out str))
+                {
+                    sent++;
+                    lastApiUrl = str;
+                }
+                else
+                {
+                    failed++;
+                    lastApiUrl = str;
+                    if (failDetails.Length < 500)
+                    {
+                        if (failDetails.Length > 0)
+                        {
+                            failDetails.Append(" | ");
+                        }
+                        failDetails.Append(string.IsNullOrWhiteSpace(userId) ? name : userId)
+                            .Append(": ")
+                            .Append(statusMessage);
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
                 failed++;
-                if (failDetails.Length < 300)
+                lastApiUrl = str;
+                if (failDetails.Length < 500)
                 {
                     if (failDetails.Length > 0)
                     {
@@ -549,7 +573,11 @@ WHERE 1 = 1");
                     }
                     failDetails.Append(string.IsNullOrWhiteSpace(userId) ? name : userId)
                         .Append(": ")
-                        .Append(statusMessage);
+                        .Append(ex.Message);
+                    if (!string.IsNullOrWhiteSpace(str))
+                    {
+                        failDetails.Append(" | API=").Append(str);
+                    }
                 }
             }
         }
@@ -566,6 +594,11 @@ WHERE 1 = 1");
             if (failed > 0 && failDetails.Length > 0)
             {
                 summary += " · Error: " + failDetails;
+            }
+            // Keep last built API URL on label for debug (copy/paste & test in browser).
+            if (!string.IsNullOrWhiteSpace(lastApiUrl))
+            {
+                summary += " · LastAPI: ";
             }
             lblReminderSendStatus.Text = summary;
             ScriptManager.RegisterStartupScript(this, GetType(), "reminderSendResult",
