@@ -15,38 +15,42 @@ public partial class admin_MasterPage : System.Web.UI.MasterPage
     Data ObjData = new Data();
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["useradmin"] == null)
+        {
+            return;
+        }
+
+        string userId = Session["useradmin"].ToString();
+        string role = Session["role"] != null ? Session["role"].ToString() : "Administrator";
+
+        LblUsernameSideMenu.Text = userId;
+        LblMainId.Text = userId;
+        LblTopbarGreet.Text = userId;
+        LblUserMenuName.Text = userId;
+        LblUserRole.Text = role;
+        LblUserMenuRole.Text = role;
+
+        // SubAdmin: block direct URL access to unassigned pages (every request)
+        AdminAccessHelper.EnforceOrRedirect();
+
         if (!IsPostBack)
         {
-            //if (Session["useradmin"] != null)
-            //{
-            //    LblUsernameSideMenu.Text = Session["useradmin"].ToString();
-            //    LblMainId.Text = Session["useradmin"].ToString();
-            //    //LblFullname.Text = Session["useradmin"].ToString();
-            //}
-            if (Session["useradmin"] != null)
+            BindNotifications(userId);
+
+            if (string.Equals(role, "Subadmin", StringComparison.OrdinalIgnoreCase))
             {
-                string userId = Session["useradmin"].ToString();
-                string role = Session["role"] != null ? Session["role"].ToString() : "Administrator";
-
-                LblUsernameSideMenu.Text = userId;
-                LblMainId.Text = userId;
-                LblTopbarGreet.Text = userId;
-                LblUserMenuName.Text = userId;
-                LblUserRole.Text = role;
-                LblUserMenuRole.Text = role;
-
-                BindNotifications(userId);
-
-                if (role == "Subadmin")
-                {
-                    BindSubMenu(userId);
-                }
-                else
-                {
-                    paneladmin2.Visible = true;
-                    panelsubadmin2.Visible = false;
-                }
+                BindSubMenu(userId);
             }
+            else
+            {
+                paneladmin2.Visible = true;
+                panelsubadmin2.Visible = false;
+            }
+        }
+        else if (string.Equals(role, "Subadmin", StringComparison.OrdinalIgnoreCase))
+        {
+            paneladmin2.Visible = false;
+            panelsubadmin2.Visible = true;
         }
     }
     public void BindNotifications(string userId)
@@ -96,17 +100,15 @@ public partial class admin_MasterPage : System.Web.UI.MasterPage
 
     public void BindSubMenu(string userid)
     {
-       
         DataSet ds = GetMenuPermission(userid);
 
-        string html = "";
+        StringBuilder html = new StringBuilder();
+        html.Append("<ul class='admin-side-menu'>");
+        html.Append("<li class='admin-side-section'>Main</li>");
+        html.Append("<li><a href='Dashboard.aspx' class='admin-side-link'><i class='fa fa-tachometer admin-side-icon'></i> Dashboard</a></li>");
+        html.Append("<li class='admin-side-section'>Modules</li>");
 
-        html += "<ul class='admin-side-menu'>";
-        html += "<li class='admin-side-section'>Main</li>";
-        html += "<li><a href='Dashboard.aspx' class='admin-side-link'><i class='fa fa-tachometer admin-side-icon'></i> Dashboard</a></li>";
-        html += "<li class='admin-side-section'>Modules</li>";
-
-        if (ds != null)
+        if (ds != null && ds.Tables.Count > 1)
         {
             DataTable dt1 = ds.Tables[0];
             DataTable dt2 = ds.Tables[1];
@@ -114,50 +116,48 @@ public partial class admin_MasterPage : System.Web.UI.MasterPage
             for (int i = 0; i < dt1.Rows.Count; i++)
             {
                 int ch = Convert.ToInt32(dt1.Rows[i]["Checked"].ToString());
-                if (ch == 1)
+                if (ch != 1) continue;
+
+                DataRow[] dr = dt2.Select("MainMenuId=" + Convert.ToInt32(dt1.Rows[i]["id"].ToString()));
+                if (dr == null || dr.Length == 0) continue;
+
+                StringBuilder subHtml = new StringBuilder();
+                for (int j = 0; j < dr.Length; j++)
                 {
-                    string mainMenuName = dt1.Rows[i]["MainMenuName"].ToString();
-                    html += "<li class='admin-side-group'>";
-                    html += "<button type='button' class='admin-side-toggle'><i class='fa fa-folder-o admin-side-icon'></i> " + mainMenuName + " <i class='fa fa-chevron-down admin-side-chevron'></i></button>";
+                    if (Convert.ToInt32(dr[j]["Checked"].ToString()) != 1) continue;
 
-                    DataRow[] dr = dt2.Select(" MainMenuId=" + Convert.ToInt32(dt1.Rows[i]["id"].ToString()) + " ");
-
-                    if (dr != null && dr.Count() > 0)
+                    string url = Convert.ToString(dr[j]["Url"]);
+                    string urlLower = (url ?? string.Empty).Trim().ToLowerInvariant();
+                    if (string.IsNullOrWhiteSpace(urlLower)) continue;
+                    if (urlLower == "subadmin.aspx" || urlLower == "subadminreport.aspx" || urlLower == "adminmenupermission.aspx")
                     {
-                        DataTable dtsub = dr.CopyToDataTable();
-
-                        html += "<ul class='admin-side-submenu'>";
-                        for (int j = 0; j < dtsub.Rows.Count; j++)
-                        {
-                            ch = Convert.ToInt32(dtsub.Rows[j]["Checked"].ToString());
-
-                            if (ch == 1)
-                            {
-                                html += "<li><a href='" + dtsub.Rows[j]["Url"].ToString() + "'>" + dtsub.Rows[j]["MenuName"].ToString() + "</a></li>";
-                            }
-                        }
-                        html += "</ul>";
+                        continue;
                     }
 
-                    html += "</li>";
+                    subHtml.Append("<li><a href='")
+                        .Append(HttpUtility.HtmlAttributeEncode(url))
+                        .Append("'>")
+                        .Append(HttpUtility.HtmlEncode(Convert.ToString(dr[j]["MenuName"])))
+                        .Append("</a></li>");
                 }
+
+                if (subHtml.Length == 0) continue;
+
+                string mainMenuName = Convert.ToString(dt1.Rows[i]["MainMenuName"]);
+                html.Append("<li class='admin-side-group'>");
+                html.Append("<button type='button' class='admin-side-toggle'><i class='fa fa-folder-o admin-side-icon'></i> ")
+                    .Append(HttpUtility.HtmlEncode(mainMenuName))
+                    .Append(" <i class='fa fa-chevron-down admin-side-chevron'></i></button>");
+                html.Append("<ul class='admin-side-submenu'>");
+                html.Append(subHtml.ToString());
+                html.Append("</ul></li>");
             }
-            html += "</ul>";
-
-
-            Literal1.Text = html;
-            paneladmin2.Visible = false;
-            panelsubadmin2.Visible = true;
-
-
-
         }
 
-
-
-
-
-
+        html.Append("</ul>");
+        Literal1.Text = html.ToString();
+        paneladmin2.Visible = false;
+        panelsubadmin2.Visible = true;
     }
     public DataSet GetMenuPermission(string Userid)
     {

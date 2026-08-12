@@ -223,6 +223,45 @@ public static class SavingProductHelper
         return VirtualPathUtility.ToAbsolute(ImageFolder + imageName.Trim());
     }
 
+    /// <summary>
+    /// Returns true if UTR / OnlineTransactionId is already used on a non-rejected
+    /// purchase or installment (case-insensitive, trimmed). Optional excludeInstallmentId
+    /// lets a rejected installment resubmit with the same UTR.
+    /// </summary>
+    public static bool IsOnlineTransactionIdUsed(string onlineTransactionId, int excludeInstallmentId = 0)
+    {
+        string utr = (onlineTransactionId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(utr) || utr.StartsWith("CASH-", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        string safe = Escape(utr);
+        string sql = @"
+SELECT CASE WHEN EXISTS (
+    SELECT 1
+    FROM SavingAccountDetail WITH (NOLOCK)
+    WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER('" + safe + @"')
+      AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED'
+)
+OR EXISTS (
+    SELECT 1
+    FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+    WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER('" + safe + @"')
+      AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED'
+      AND (" + excludeInstallmentId + @" <= 0 OR id <> " + excludeInstallmentId + @")
+)
+THEN 1 ELSE 0 END";
+
+        DataTable dt = RunSelect(sql);
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0][0] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return Convert.ToInt32(dt.Rows[0][0]) == 1;
+    }
+
     static DataTable RunSelect(string sql)
     {
         Data objData = new Data();

@@ -438,6 +438,10 @@
         }
     </style>
     <script type="text/javascript">
+        var __bulkUtrUsed = false;
+        var __bulkUtrLastChecked = '';
+        var __bulkUtrCheckToken = 0;
+
         function validate() {
             if (document.getElementById("<%=txtquantity.ClientID%>").value.trim() === "") {
                 alert('Enter Quantity');
@@ -447,15 +451,95 @@
 
             var onlinePayment = document.getElementById("<%=rbOnlinePayment.ClientID%>");
             if (onlinePayment && onlinePayment.checked) {
-                if (document.getElementById("<%=txttransactionid.ClientID%>").value.trim() === "") {
+                var txn = document.getElementById("<%=txttransactionid.ClientID%>");
+                if (!txn || txn.value.trim() === "") {
                     alert('Enter Transaction ID / UTR number');
-                    document.getElementById("<%=txttransactionid.ClientID%>").focus();
+                    if (txn) txn.focus();
+                    return false;
+                }
+                if (__bulkUtrUsed && __bulkUtrLastChecked === txn.value.trim()) {
+                    alert('This Transaction Id already used');
+                    txn.focus();
                     return false;
                 }
             }
 
             return true;
         }
+
+        function setBulkUtrMessage(isUsed) {
+            var msg = document.getElementById('bulkUtrCheckMsg');
+            if (!msg) return;
+            if (isUsed) {
+                msg.style.display = 'block';
+                msg.innerHTML = 'This Transaction Id already used';
+            } else {
+                msg.style.display = 'none';
+                msg.innerHTML = '';
+            }
+        }
+
+        function resetBulkUtrCheckState() {
+            __bulkUtrUsed = false;
+            __bulkUtrLastChecked = '';
+            setBulkUtrMessage(false);
+        }
+
+        function checkBulkUtrUsed() {
+            var txn = document.getElementById("<%=txttransactionid.ClientID%>");
+            if (!txn) return;
+            var utr = (txn.value || '').trim();
+            var onlinePayment = document.getElementById("<%=rbOnlinePayment.ClientID%>");
+            if (onlinePayment && !onlinePayment.checked) {
+                resetBulkUtrCheckState();
+                return;
+            }
+            if (!utr) {
+                resetBulkUtrCheckState();
+                return;
+            }
+            if (__bulkUtrLastChecked === utr) {
+                setBulkUtrMessage(__bulkUtrUsed);
+                return;
+            }
+
+            var token = ++__bulkUtrCheckToken;
+            $.ajax({
+                type: 'POST',
+                url: 'SavingProductPurchasebulk.aspx/CheckOnlineTransactionId',
+                data: JSON.stringify({ onlineTransactionId: utr }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (res) {
+                    if (token !== __bulkUtrCheckToken) return;
+                    var current = (txn.value || '').trim();
+                    if (current !== utr) return;
+                    __bulkUtrLastChecked = utr;
+                    __bulkUtrUsed = !!(res && res.d === true);
+                    setBulkUtrMessage(__bulkUtrUsed);
+                }
+            });
+        }
+
+        (function () {
+            function bindBulkUtrCheck() {
+                var txn = document.getElementById("<%=txttransactionid.ClientID%>");
+                if (!txn || txn.getAttribute('data-utr-bound') === '1') return;
+                txn.setAttribute('data-utr-bound', '1');
+                txn.addEventListener('input', function () {
+                    resetBulkUtrCheckState();
+                });
+                txn.addEventListener('blur', function () { checkBulkUtrUsed(); });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', bindBulkUtrCheck);
+            } else {
+                bindBulkUtrCheck();
+            }
+            if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(bindBulkUtrCheck);
+            }
+        })();
     </script>
 </asp:Content>
 
@@ -731,6 +815,7 @@
                                     <div class="form-group">
                                         <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
                                         <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
+                                        <span id="bulkUtrCheckMsg" style="display:none;color:#c0392b;font-size:12px;margin-top:6px;font-weight:600;"></span>
                                     </div>
                                     <div class="form-group profile-upload-field topup-payment-upload">
                                         <label><i class="fa fa-camera"></i> Payment Screenshot</label>

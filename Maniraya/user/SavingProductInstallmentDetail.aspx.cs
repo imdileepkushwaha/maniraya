@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Web;
+using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using BusinessLogicTier;
@@ -10,6 +11,19 @@ using DataTier;
 
 public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 {
+    [WebMethod(EnableSession = true)]
+    public static bool CheckOnlineTransactionId(string onlineTransactionId, string installmentId)
+    {
+        if (HttpContext.Current == null || HttpContext.Current.Session == null || HttpContext.Current.Session["userid"] == null)
+        {
+            return false;
+        }
+
+        int excludeId = 0;
+        int.TryParse(installmentId, out excludeId);
+        return SavingProductHelper.IsOnlineTransactionIdUsed(onlineTransactionId, excludeId);
+    }
+
     Data ObjData = new Data();
     clsProduct objproduct = new clsProduct();
     string CouponCode
@@ -257,6 +271,15 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
             objproduct.ProductImage = UploadImage();
             objproduct.TransactionCode = txttransactionidedit.Text.Trim();
+
+            int excludeId = 0;
+            int.TryParse(lblidedit.Text, out excludeId);
+            if (SavingProductHelper.IsOnlineTransactionIdUsed(objproduct.TransactionCode, excludeId))
+            {
+                Message.Show("This UTR No / Transaction ID is already used.");
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+                return;
+            }
         }
         else
         {
@@ -277,10 +300,17 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         else if (res == "f")
         {
             Message.Show("Already in process");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+        }
+        else if (res == "u")
+        {
+            Message.Show("This UTR No / Transaction ID is already used.");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
         }
         else
         {
             Message.Show("unknown error occurred");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
         }
     }
 

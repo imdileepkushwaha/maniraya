@@ -457,7 +457,7 @@
                             </button>
                         </div>
                         <div class="modal-body dash-pay-modal-body">
-                            <asp:Label runat="server" ID="lblidedit" Visible="false"></asp:Label>
+                            <asp:Label runat="server" ID="lblidedit" style="display:none;" aria-hidden="true"></asp:Label>
 
                             <div class="dash-pay-modal-grid">
                                 <div class="dash-pay-qr-card" id="dashPayQrCard">
@@ -518,6 +518,7 @@
                                         <div class="form-group dash-pay-field">
                                             <label for="<%= txttransactionidedit.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
                                             <asp:TextBox ID="txttransactionidedit" CssClass="form-control dash-pay-input" runat="server" placeholder="Enter UTR or transaction reference"></asp:TextBox>
+                                            <span id="installmentUtrCheckMsg" style="display:none;color:#c0392b;font-size:12px;margin-top:6px;font-weight:600;"></span>
                                         </div>
 
                                         <div class="form-group profile-upload-field topup-payment-upload dash-pay-upload">
@@ -571,6 +572,7 @@
                 resetInstallmentPaymentMethod();
                 initInstallmentPaymentUpload();
                 syncInstallmentPaymentMethodUI();
+                bindInstallmentUtrCheck();
             }, 50);
         }
         function Closepopup() {
@@ -590,6 +592,7 @@
             if (cash) cash.checked = false;
             var txn = document.getElementById('<%= txttransactionidedit.ClientID %>');
             if (txn) txn.value = '';
+            resetInstallmentUtrCheckState();
         }
         function syncInstallmentPaymentMethodUI() {
             var isOnline = isInstallmentOnlinePayment();
@@ -602,7 +605,81 @@
                 if (isOnline) grid.classList.remove('is-cash');
                 else grid.classList.add('is-cash');
             }
+            if (!isOnline) {
+                resetInstallmentUtrCheckState();
+            }
         }
+
+        var __installmentUtrUsed = false;
+        var __installmentUtrLastChecked = '';
+        var __installmentUtrCheckToken = 0;
+
+        function setInstallmentUtrMessage(isUsed) {
+            var msg = document.getElementById('installmentUtrCheckMsg');
+            if (!msg) return;
+            if (isUsed) {
+                msg.style.display = 'block';
+                msg.innerHTML = 'This UTR No / Transaction ID is already used.';
+            } else {
+                msg.style.display = 'none';
+                msg.innerHTML = '';
+            }
+        }
+
+        function resetInstallmentUtrCheckState() {
+            __installmentUtrUsed = false;
+            __installmentUtrLastChecked = '';
+            setInstallmentUtrMessage(false);
+        }
+
+        function checkInstallmentUtrUsed() {
+            if (!isInstallmentOnlinePayment()) {
+                resetInstallmentUtrCheckState();
+                return;
+            }
+            var txn = document.getElementById('<%= txttransactionidedit.ClientID %>');
+            if (!txn) return;
+            var utr = (txn.value || '').trim();
+            if (!utr) {
+                resetInstallmentUtrCheckState();
+                return;
+            }
+            if (__installmentUtrLastChecked === utr) {
+                setInstallmentUtrMessage(__installmentUtrUsed);
+                return;
+            }
+            var idEl = document.getElementById('<%= lblidedit.ClientID %>');
+            var installmentId = idEl ? (idEl.innerText || idEl.textContent || '') : '';
+            var token = ++__installmentUtrCheckToken;
+
+            $.ajax({
+                type: 'POST',
+                url: 'SavingProductInstallmentDetail.aspx/CheckOnlineTransactionId',
+                data: JSON.stringify({ onlineTransactionId: utr, installmentId: installmentId }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (res) {
+                    if (token !== __installmentUtrCheckToken) return;
+                    var current = (txn.value || '').trim();
+                    if (current !== utr) return;
+                    __installmentUtrLastChecked = utr;
+                    __installmentUtrUsed = !!(res && res.d === true);
+                    setInstallmentUtrMessage(__installmentUtrUsed);
+                }
+            });
+        }
+
+        function bindInstallmentUtrCheck() {
+            var txn = document.getElementById('<%= txttransactionidedit.ClientID %>');
+            if (!txn) return;
+            if (txn.getAttribute('data-utr-bound') === '1') return;
+            txn.setAttribute('data-utr-bound', '1');
+            txn.addEventListener('input', function () {
+                resetInstallmentUtrCheckState();
+            });
+            txn.addEventListener('blur', function () { checkInstallmentUtrUsed(); });
+        }
+
         function validate2() {
             if (!isInstallmentOnlinePayment()) {
                 return true;
@@ -612,6 +689,11 @@
             if (!txn || !txn.value || !txn.value.trim()) {
                 alert('Please enter UTR No / Transaction ID.');
                 if (txn) txn.focus();
+                return false;
+            }
+            if (__installmentUtrUsed && __installmentUtrLastChecked === txn.value.trim()) {
+                alert('This UTR No / Transaction ID is already used.');
+                txn.focus();
                 return false;
             }
             if (!file || !file.files || file.files.length === 0) {
@@ -634,6 +716,7 @@
                     cash.addEventListener('change', syncInstallmentPaymentMethodUI);
                 }
                 syncInstallmentPaymentMethodUI();
+                bindInstallmentUtrCheck();
             }
 
             if (document.readyState === 'loading') {

@@ -32,6 +32,12 @@ public partial class admin_Dashboard : Page
 
         if (!IsPostBack)
         {
+            if (string.Equals(Request.QueryString["denied"], "1"))
+            {
+                ScriptManager.RegisterStartupScript(this, GetType(), "accessDenied",
+                    "alert('You do not have permission to access that page.');", true);
+            }
+
             FillAllDashboardStats();
             BindPurchaseChart();
             BindUserChart();

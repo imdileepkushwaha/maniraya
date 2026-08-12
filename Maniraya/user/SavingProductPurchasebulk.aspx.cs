@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
@@ -13,6 +14,17 @@ using System.Text;
 
 public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
 {
+    [WebMethod(EnableSession = true)]
+    public static bool CheckOnlineTransactionId(string onlineTransactionId)
+    {
+        if (HttpContext.Current == null || HttpContext.Current.Session == null || HttpContext.Current.Session["userid"] == null)
+        {
+            return false;
+        }
+
+        return SavingProductHelper.IsOnlineTransactionIdUsed(onlineTransactionId);
+    }
+
     clsEPin objEPin = new clsEPin();
     clsUser objUser = new clsUser();
     clsAccount objaccount = new clsAccount();
@@ -866,6 +878,12 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
             }
 
             objproduct.TransactionCode = txttransactionid.Text.Trim();
+
+            if (SavingProductHelper.IsOnlineTransactionIdUsed(objproduct.TransactionCode))
+            {
+                ShowAlert("This Transaction Id already used");
+                return;
+            }
         }
         else
         {

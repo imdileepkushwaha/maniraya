@@ -66,6 +66,17 @@
             padding: 4px;
             border-radius: 5px;
         }
+        /* Keep edit popup above dark overlay (modal was trapped under admin layout stacking) */
+        body.admin-app #myModal {
+            z-index: 10050 !important;
+        }
+        body.admin-app .modal-backdrop {
+            z-index: 10040 !important;
+        }
+        body.admin-app #myModal .modal-dialog {
+            z-index: 1;
+            position: relative;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
@@ -423,15 +434,18 @@
 
 
              function showModal() {
-                 $('#myModal').modal({ backdrop: 'static', keyboard: false })
+                 var $modal = $('#myModal');
+                 // Move out of nested admin layout stacking context so it paints above backdrop
+                 if ($modal.length && $modal.parent().attr('id') !== 'form1') {
+                     $modal.appendTo('#form1');
+                 }
+                 $modal.modal({ backdrop: 'static', keyboard: false });
              }
              function Closepopup() {
                  $('#myModal').modal('hide');
                  $('body').removeClass('modal-open');
                  $('body').css('padding-right', '0');
                  $('.modal-backdrop').remove();
-
-
              }
     </script>
    

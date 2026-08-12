@@ -94,6 +94,12 @@
                                 </ul>
                             </li>
                             <li class="admin-side-group">
+                                <button type="button" class="admin-side-toggle"><i class="fa fa-cog admin-side-icon"></i> Settings <i class="fa fa-chevron-down admin-side-chevron"></i></button>
+                                <ul class="admin-side-submenu">
+                                    <li><a href="AdminSettings.aspx">Admin users &amp; menu access</a></li>
+                                </ul>
+                            </li>
+                            <li class="admin-side-group">
                                 <button type="button" class="admin-side-toggle"><i class="fa fa-building admin-side-icon"></i> Franchisee Master <i class="fa fa-chevron-down admin-side-chevron"></i></button>
                                 <ul class="admin-side-submenu">
                                     <li><a href="FranchiseetypeMaster.aspx">Franchisee Type Master</a></li>
