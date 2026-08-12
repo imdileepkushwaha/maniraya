@@ -1361,6 +1361,45 @@
 
                               <div class="row dash-metrics-grid">
 
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-teal">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-user"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Myself BV</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblMyselfBV" runat="server" Text="0"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Self repurchase volume</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-indigo">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Team Repurchase BV</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblTeamRepurchaseBV" runat="server" Text="0"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Team repurchase volume</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-green">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-rupee-sign"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Repurchase Income</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblRepurchaseIncomeBV" runat="server" Text="0"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag dash-income-tag--muted">Repurchase income</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
                              <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>

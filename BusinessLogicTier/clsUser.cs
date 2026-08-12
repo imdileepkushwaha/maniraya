@@ -1204,6 +1204,80 @@ FROM MyCTE left join userdetail ud on mycte.parentuserid=ud.userid  WHERE MyCTE.
             }
             return Dt;
         }
+
+        public DataTable getUserRepurchaseBV(string UserId)
+        {
+            string str_query = "SELECT ISNULL(SUM(SelfBv),0) AS MyselfBV, ISNULL(SUM(LeftBV),0)+ISNULL(SUM(RightBv),0) AS TeamRepurchaseBV FROM UserBuisnessVolumeRepurchase WHERE UserId='" + UserId + "'";
+            DataTable dt = null;
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(str_query);
+            }
+            catch (Exception ex)
+            {
+                dt = null;
+            }
+            ObjData.EndConnection();
+            return dt;
+        }
+
+        public DataTable getBVReport(string UserId, DateTime fromDate, DateTime toDate, string bvType, string fromUserId, string noOfRows)
+        {
+            string topClause = string.IsNullOrWhiteSpace(noOfRows) ? "" : noOfRows + " ";
+            string str_query = @"SELECT " + topClause + @"
+                U.UserId,
+                ISNULL(UD.UserName,'') AS UserName,
+                CASE WHEN ISNULL(U.SelfBv,0) > 0 THEN ISNULL(U.SelfBv,0) ELSE ISNULL(U.LeftBV,0)+ISNULL(U.RightBv,0) END AS BV,
+                CASE WHEN ISNULL(U.SelfBv,0) > 0 THEN 'Self' ELSE 'Team' END AS BVType,
+                U.FromUserId AS UseId,
+                Convert(Char,U.CreateDate,103) AS PurchaseDate,
+                U.CreateDate,
+                ISNULL(U.LEVEL,0) AS Level
+                FROM UserBuisnessVolumeRepurchase U
+                LEFT JOIN UserDetail UD ON U.UserId = UD.UserId
+                LEFT JOIN UserDetail FU ON U.FromUserId = FU.UserId
+                WHERE U.UserId='" + UserId + "'";
+
+            if (fromDate != DateTime.MinValue)
+            {
+                str_query += " AND Cast(U.CreateDate as date)>='" + fromDate.ToString("yyyy-MM-dd") + "'";
+            }
+            if (toDate != DateTime.MinValue)
+            {
+                str_query += " AND Cast(U.CreateDate as date)<='" + toDate.ToString("yyyy-MM-dd") + "'";
+            }
+            if (!string.IsNullOrWhiteSpace(bvType) && bvType != "All")
+            {
+                if (string.Equals(bvType, "Self", StringComparison.OrdinalIgnoreCase))
+                {
+                    str_query += " AND ISNULL(U.SelfBv,0) > 0";
+                }
+                else if (string.Equals(bvType, "Team", StringComparison.OrdinalIgnoreCase))
+                {
+                    str_query += " AND ISNULL(U.SelfBv,0) = 0 AND (ISNULL(U.LeftBV,0) > 0 OR ISNULL(U.RightBv,0) > 0)";
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(fromUserId))
+            {
+                str_query += " AND U.FromUserId LIKE '%" + fromUserId.Replace("'", "''") + "%'";
+            }
+
+            str_query += " ORDER BY U.CreateDate DESC, U.Id DESC";
+
+            DataTable dt = null;
+            ObjData.StartConnection();
+            try
+            {
+                dt = ObjData.RunDataTable(str_query);
+            }
+            catch (Exception ex)
+            {
+                dt = null;
+            }
+            ObjData.EndConnection();
+            return dt;
+        }
         public DataTable getTotalincome(string UserId)
         {
 

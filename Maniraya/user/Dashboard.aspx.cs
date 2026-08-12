@@ -49,6 +49,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 // loadmonthlyPerformance();
                 // loadtotalPerformance();
                 loadTotalSV();
+                loadRepurchaseBV();
                 loadPerformance();
                 loadTotalpayout();
                 loadBuissness();
@@ -629,6 +630,31 @@ ORDER BY x.CouponCode ASC";
         catch
         {
             // Keep default values when SV data is unavailable or schema differs.
+        }
+    }
+
+    void loadRepurchaseBV()
+    {
+        SetLabelDefault(lblMyselfBV);
+        SetLabelDefault(lblTeamRepurchaseBV);
+        lblRepurchaseIncomeBV.Text = "0";
+
+        try
+        {
+            DataTable dt = objuser.getUserRepurchaseBV(Session["userid"].ToString());
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                return;
+            }
+
+            DataRow row = dt.Rows[0];
+            lblMyselfBV.Text = GetColumnValue(row, dt, "MyselfBV");
+            lblTeamRepurchaseBV.Text = GetColumnValue(row, dt, "TeamRepurchaseBV");
+            lblRepurchaseIncomeBV.Text = "0";
+        }
+        catch
+        {
+            lblRepurchaseIncomeBV.Text = "0";
         }
     }
 
