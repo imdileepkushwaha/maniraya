@@ -74,6 +74,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 LoadPrizes();
                 LoadTopDirectRanking();
                 LoadDirectRank();
+                LoadRenewalPendingCount();
 
 
             }
@@ -132,6 +133,70 @@ public partial class user_Dashboard : System.Web.UI.Page
             if (lblWelcomeRank != null)
             {
                 lblWelcomeRank.Text = "Member";
+            }
+        }
+    }
+
+    void LoadRenewalPendingCount()
+    {
+        if (lblRenewalPendingCount != null)
+        {
+            lblRenewalPendingCount.Text = "0";
+        }
+
+        string rootUserId = Convert.ToString(Session["userid"] ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(rootUserId))
+        {
+            return;
+        }
+
+        string rootEsc = SqlEscape(rootUserId);
+        string sql = @"
+;WITH TeamCTE AS (
+    SELECT
+        LTRIM(RTRIM(ud.UserId)) AS UserId,
+        1 AS userlevel
+    FROM UserDetail ud WITH (NOLOCK)
+    WHERE LTRIM(RTRIM(ud.SponserId)) = '" + rootEsc + @"'
+      AND LTRIM(RTRIM(ud.UserId)) <> '" + rootEsc + @"'
+    UNION ALL
+    SELECT
+        LTRIM(RTRIM(c.UserId)) AS UserId,
+        t.userlevel + 1
+    FROM UserDetail c WITH (NOLOCK)
+    INNER JOIN TeamCTE t ON LTRIM(RTRIM(c.SponserId)) = t.UserId
+    WHERE t.userlevel < 10
+      AND LTRIM(RTRIM(c.UserId)) <> '" + rootEsc + @"'
+)
+SELECT COUNT(1) AS PendingCount
+FROM TeamCTE t
+INNER JOIN SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    ON LTRIM(RTRIM(sa.UserId)) = t.UserId
+WHERE LTRIM(RTRIM(ISNULL(sa.Status, ''))) = 'Pending'
+  AND ISNULL(sa.InstNo, 0) > 1
+OPTION (MAXRECURSION 10)";
+
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                DataTable dt = ObjData.RunDataTable(sql);
+                if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["PendingCount"] != DBNull.Value)
+                {
+                    lblRenewalPendingCount.Text = Convert.ToString(dt.Rows[0]["PendingCount"]);
+                }
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            if (lblRenewalPendingCount != null)
+            {
+                lblRenewalPendingCount.Text = "0";
             }
         }
     }
@@ -214,26 +279,38 @@ public partial class user_Dashboard : System.Web.UI.Page
     DataTable GetTopDirectRanking(int topCount)
     {
         string sql = @"
-;WITH Ranked AS (
+;WITH RenewedDirects AS (
+    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    WHERE ISNULL(sa.InstNo, 0) > 1
+      AND " + ApprovedInstallmentStatusFilter("sa") + @"
+),
+Ranked AS (
     SELECT
         LTRIM(RTRIM(s.UserId)) AS userid,
         ISNULL(s.UserName, '') AS username,
-        COUNT(d.UserId) AS DirectCount
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
+        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount
     FROM UserDetail d WITH (NOLOCK)
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    LEFT JOIN RenewedDirects rd
+        ON rd.UserId = LTRIM(RTRIM(d.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.SavingStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
 )
 SELECT TOP (" + topCount + @")
-    ROW_NUMBER() OVER (ORDER BY DirectCount DESC, userid ASC) AS RankNo,
+    ROW_NUMBER() OVER (ORDER BY ActiveDirectCount DESC, ActiveRenewalDirectCount DESC, TotalDirectCount DESC, userid ASC) AS RankNo,
     userid,
     username,
-    DirectCount
+    TotalDirectCount,
+    ActiveDirectCount,
+    ActiveRenewalDirectCount,
+    ActiveDirectCount AS DirectCount
 FROM Ranked
-ORDER BY DirectCount DESC, userid ASC";
+ORDER BY ActiveDirectCount DESC, ActiveRenewalDirectCount DESC, TotalDirectCount DESC, userid ASC";
 
         DataTable dt = new DataTable();
         ObjData.StartConnection();
@@ -253,6 +330,13 @@ ORDER BY DirectCount DESC, userid ASC";
         return AppendDirectRankColumn(dt ?? new DataTable());
     }
 
+    static string ApprovedInstallmentStatusFilter(string alias)
+    {
+        return "(" + alias + ".status = 'Approved'"
+            + " OR " + alias + ".status = '1'"
+            + " OR LOWER(LTRIM(RTRIM(ISNULL(" + alias + ".status, '')))) IN ('approved', 'approve'))";
+    }
+
     DataTable AppendDirectRankColumn(DataTable dt)
     {
         if (dt == null)
@@ -268,9 +352,10 @@ ORDER BY DirectCount DESC, userid ASC";
         foreach (DataRow row in dt.Rows)
         {
             int directCount = 0;
-            if (row["DirectCount"] != null && row["DirectCount"] != DBNull.Value)
+            string countColumn = dt.Columns.Contains("ActiveDirectCount") ? "ActiveDirectCount" : "DirectCount";
+            if (row[countColumn] != null && row[countColumn] != DBNull.Value)
             {
-                int.TryParse(Convert.ToString(row["DirectCount"]), out directCount);
+                int.TryParse(Convert.ToString(row[countColumn]), out directCount);
             }
             row["DirectRank"] = DirectRankHelper.GetRank(directCount);
         }
@@ -288,20 +373,34 @@ ORDER BY DirectCount DESC, userid ASC";
         }
 
         string sql = @"
-;WITH Ranked AS (
+;WITH RenewedDirects AS (
+    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    WHERE ISNULL(sa.InstNo, 0) > 1
+      AND " + ApprovedInstallmentStatusFilter("sa") + @"
+),
+Ranked AS (
     SELECT
         LTRIM(RTRIM(s.UserId)) AS userid,
-        COUNT(d.UserId) AS DirectCount,
-        ROW_NUMBER() OVER (ORDER BY COUNT(d.UserId) DESC, LTRIM(RTRIM(s.UserId)) ASC) AS RankNo
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
+        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount,
+        ROW_NUMBER() OVER (
+            ORDER BY SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) DESC,
+                     SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) DESC,
+                     COUNT(d.UserId) DESC,
+                     LTRIM(RTRIM(s.UserId)) ASC
+        ) AS RankNo
     FROM UserDetail d WITH (NOLOCK)
     INNER JOIN UserDetail s WITH (NOLOCK)
         ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    LEFT JOIN RenewedDirects rd
+        ON rd.UserId = LTRIM(RTRIM(d.UserId))
     WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(d.SavingStatus, 0) = 1
       AND ISNULL(s.ActiveStatus, 0) = 1
     GROUP BY LTRIM(RTRIM(s.UserId))
 )
-SELECT RankNo, DirectCount
+SELECT RankNo, TotalDirectCount, ActiveDirectCount, ActiveRenewalDirectCount
 FROM Ranked
 WHERE userid = '" + SqlEscape(currentUserId) + "'";
 
@@ -315,13 +414,15 @@ WHERE userid = '" + SqlEscape(currentUserId) + "'";
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     int myDirectCount = 0;
-                    int.TryParse(Convert.ToString(dt.Rows[0]["DirectCount"]), out myDirectCount);
+                    int.TryParse(Convert.ToString(dt.Rows[0]["ActiveDirectCount"]), out myDirectCount);
                     string myDirectRank = DirectRankHelper.GetRank(myDirectCount);
                     litTopDirectMyRank.Text = string.Format(
-                        "Your overall rank: <strong>#{0}</strong> · Direct Rank: <strong>{1}</strong> · <strong>{2}</strong> active direct(s).",
+                        "Your overall rank: <strong>#{0}</strong> · Direct Rank: <strong>{1}</strong> · Active Directs: <strong>{2}</strong> · Active Renewals Direct: <strong>{3}</strong> · Total Directs: <strong>{4}</strong>.",
                         Convert.ToString(dt.Rows[0]["RankNo"]),
                         myDirectRank,
-                        Convert.ToString(dt.Rows[0]["DirectCount"]));
+                        Convert.ToString(dt.Rows[0]["ActiveDirectCount"]),
+                        Convert.ToString(dt.Rows[0]["ActiveRenewalDirectCount"]),
+                        Convert.ToString(dt.Rows[0]["TotalDirectCount"]));
                 }
                 else
                 {

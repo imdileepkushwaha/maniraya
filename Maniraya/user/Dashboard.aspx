@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=48" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=50" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -1082,6 +1082,22 @@
                                     </div>
                                 </div>
                             </asp:Panel>
+					</div>
+
+                          <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <a href="TeamPendingInstallmentReport.aspx" class="dash-metric-card-link">
+                                <div class="card dash-income-card dash-income-compact tone-orange">
+                                    <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-clock"></i></span>
+                                    <div class="card-body">
+                                        <p class="dash-income-label">Total Renewal Pending</p>
+                                        <h3 class="dash-income-value is-number"><asp:Label ID="lblRenewalPendingCount" runat="server" Text="0" /></h3>
+                                        <div class="dash-income-meta">
+                                            <span class="dash-income-tag dash-income-tag--muted">Team pending renewals</span>
+                                            <span class="dash-income-meta-link">View report</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
 					</div>
 
                         <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
@@ -3113,7 +3129,7 @@ Profit Share Budget</p>
                         <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
                         <div class="dash-prize-head-text">
                             <h3>Top Direct Ranking</h3>
-                            <p>Overall leaderboard by SavingStatus active directs.</p>
+                            <p>Overall leaderboard by Active Directs and Active Renewals Direct.</p>
                         </div>
                         <a href="TopDirectRanking.aspx" class="dash-btn dash-btn-outline dash-ranking-view-all">View All</a>
                     </div>
@@ -3145,7 +3161,17 @@ Profit Share Budget</p>
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="Total Directs">
                                     <ItemTemplate>
-                                        <span class="dash-direct-count"><%# Eval("DirectCount") %></span>
+                                        <span class="dash-direct-count dash-direct-count--total"><%# Eval("TotalDirectCount") %></span>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Active Directs">
+                                    <ItemTemplate>
+                                        <span class="dash-direct-count"><%# Eval("ActiveDirectCount") %></span>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Active Renewals Direct">
+                                    <ItemTemplate>
+                                        <span class="dash-direct-count dash-direct-count--renewal"><%# Eval("ActiveRenewalDirectCount") %></span>
                                     </ItemTemplate>
                                 </asp:TemplateField>
                             </Columns>

@@ -257,11 +257,15 @@
 					</li>--%>
                     <li><h3>Reports</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Reports</span><span class="badge badge-warning side-badge">2</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-palette "></i><span class="side-menu__label">Reports</span><span class="badge badge-warning side-badge">6</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<%--<<li><a class="slide-item" href="account_Ledger.aspx">Account Ledger</a></li>--%>
 							<li><a class="slide-item" href="TransactionReport.aspx">Transaction Report</a></li>
 							<li><a class="slide-item" href="BVReport.aspx">BV Report</a></li>
+							<li><a class="slide-item" href="SavingLevelIncomeReport.aspx">Saving Level Income Report</a></li>
+							<li><a class="slide-item" href="SavingDirectIncomeReport.aspx">Saving Direct Income Report</a></li>
+							<li><a class="slide-item" href="SavingLevelInstIncomeReport.aspx">Saving Level Installment Income</a></li>
+							<li><a class="slide-item" href="#">Repurchase Income Report</a></li>
 						</ul>
 					</li>
 					 <li><h3>Generate Ticket</h3></li>

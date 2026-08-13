@@ -61,6 +61,9 @@
         .dash-direct-count--total {
             color: #334155;
         }
+        .dash-direct-count--renewal {
+            color: #b45309;
+        }
         .dash-direct-rank-pill {
             display: inline-flex;
             align-items: center;
@@ -139,7 +142,7 @@
                             <asp:Literal ID="litMyRank" runat="server" />
                         </asp:Panel>
 
-                        <p class="dash-saving-report-intro">Ranking is based on <strong>Active Directs</strong> (<code>SavingStatus = 1</code>). Table also shows total directs for each member.</p>
+                        <p class="dash-saving-report-intro">Ranking is based on <strong>Active Directs</strong> (<code>SavingStatus = 1</code>). <strong>Active Renewals Direct</strong> counts directs with at least one approved renewal installment (<code>InstNo &gt; 1</code>).</p>
 
                         <div class="dash-saving-report-table-wrap">
                             <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%"
@@ -176,6 +179,11 @@
                                     <asp:TemplateField HeaderText="Active Directs">
                                         <ItemTemplate>
                                             <span class="dash-direct-count"><%# Eval("ActiveDirectCount") %></span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Active Renewals Direct">
+                                        <ItemTemplate>
+                                            <span class="dash-direct-count dash-direct-count--renewal"><%# Eval("ActiveRenewalDirectCount") %></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
