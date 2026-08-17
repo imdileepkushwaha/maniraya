@@ -1100,6 +1100,48 @@
                             </a>
 					</div>
 
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-green">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-rupee-sign"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Total Payout</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblTotalPayout" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--up">Credit total</span>
+                                        <a href="TransactionReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-blue">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-paper-plane"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Total Released Payout</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblTotalReleasedPayout" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--muted">Debit total</span>
+                                        <a href="TransactionReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+                            <div class="card dash-income-card dash-income-compact tone-indigo">
+                                <span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-wallet"></i></span>
+                                <div class="card-body">
+                                    <p class="dash-income-label">Balance</p>
+                                    <h3 class="dash-income-value is-number"><asp:Label ID="lblPayoutBalance" runat="server" Text="0" /></h3>
+                                    <div class="dash-income-meta">
+                                        <span class="dash-income-tag dash-income-tag--up">Credit − Debit</span>
+                                        <a href="TransactionReport.aspx" class="dash-income-meta-link">View report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-sm-12 col-lg-6 col-xl-4" style="display:none">
 						<div class="card dash-income-card dash-income-compact tone-teal">
 							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-users"></i></span>

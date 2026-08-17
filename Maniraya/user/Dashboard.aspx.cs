@@ -75,6 +75,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 LoadTopDirectRanking();
                 LoadDirectRank();
                 LoadRenewalPendingCount();
+                LoadPayoutSummary();
 
 
             }
@@ -199,6 +200,63 @@ OPTION (MAXRECURSION 10)";
                 lblRenewalPendingCount.Text = "0";
             }
         }
+    }
+
+    void LoadPayoutSummary()
+    {
+        SetLabelDefault(lblTotalPayout);
+        SetLabelDefault(lblTotalReleasedPayout);
+        SetLabelDefault(lblPayoutBalance);
+
+        string userId = Convert.ToString(Session["userid"] ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        string sql = @"
+SELECT
+    ISNULL(SUM(crAmount), 0) AS TotalPayout,
+    ISNULL(SUM(drAmount), 0) AS TotalReleasedPayout,
+    ISNULL(SUM(crAmount), 0) - ISNULL(SUM(drAmount), 0) AS Balance
+FROM TransactionDetail WITH (NOLOCK)
+WHERE UserID = '" + SqlEscape(userId) + "'";
+
+        try
+        {
+            ObjData.StartConnection();
+            try
+            {
+                DataTable dt = ObjData.RunDataTable(sql);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    DataRow row = dt.Rows[0];
+                    lblTotalPayout.Text = FormatAmount(row["TotalPayout"]);
+                    lblTotalReleasedPayout.Text = FormatAmount(row["TotalReleasedPayout"]);
+                    lblPayoutBalance.Text = FormatAmount(row["Balance"]);
+                }
+            }
+            finally
+            {
+                ObjData.EndConnection();
+            }
+        }
+        catch
+        {
+            SetLabelDefault(lblTotalPayout);
+            SetLabelDefault(lblTotalReleasedPayout);
+            SetLabelDefault(lblPayoutBalance);
+        }
+    }
+
+    static string FormatAmount(object value)
+    {
+        decimal amount;
+        if (value == null || value == DBNull.Value || !decimal.TryParse(Convert.ToString(value), out amount))
+        {
+            return "0";
+        }
+        return amount.ToString("0.##");
     }
 
     void LoadPrizes()

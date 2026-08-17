@@ -2,15 +2,18 @@ using DataTier;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class admin_Bonanza : Page
 {
     const string AdminExcludeUserId = "MP000001";
-    const int RequiredQualifyingLegs = 10;
+    const int DefaultRequiredQualifyingLegs = 10;
     const int MinActiveUnderLeg = 10;
-    const int RequiredTeamActive = 500;
+    const int DefaultRequiredTeamActive = 500;
 
     Data ObjData = new Data();
 
@@ -18,6 +21,41 @@ public partial class admin_Bonanza : Page
     {
         get { return ViewState["BonanzaData"] as DataTable; }
         set { ViewState["BonanzaData"] = value; }
+    }
+
+    int GetRequiredTeamActive()
+    {
+        int teamActive;
+        if (txtTeamActive != null && int.TryParse((txtTeamActive.Text ?? string.Empty).Trim(), out teamActive) && teamActive > 0)
+        {
+            return teamActive;
+        }
+        return DefaultRequiredTeamActive;
+    }
+
+    int GetRequiredQualifyingLegs()
+    {
+        int legs;
+        if (txtQualifyingLegs != null && int.TryParse((txtQualifyingLegs.Text ?? string.Empty).Trim(), out legs) && legs > 0)
+        {
+            return legs;
+        }
+        return DefaultRequiredQualifyingLegs;
+    }
+
+    /// <summary>
+    /// Optional upper bound. Returns 0 when blank/invalid (no max limit).
+    /// </summary>
+    int GetMaximumTeamActive()
+    {
+        int maxTeamActive;
+        if (txtMaxTeamActive != null
+            && int.TryParse((txtMaxTeamActive.Text ?? string.Empty).Trim(), out maxTeamActive)
+            && maxTeamActive > 0)
+        {
+            return maxTeamActive;
+        }
+        return 0;
     }
 
     protected void Page_Load(object sender, EventArgs e)
@@ -51,6 +89,9 @@ public partial class admin_Bonanza : Page
         txtUserId.Text = string.Empty;
         ddlStatus.SelectedIndex = 0;
         txtMinDirects.Text = "10";
+        txtQualifyingLegs.Text = DefaultRequiredQualifyingLegs.ToString();
+        txtTeamActive.Text = DefaultRequiredTeamActive.ToString();
+        txtMaxTeamActive.Text = string.Empty;
         GridView1.PageIndex = 0;
         pnlLegs.Visible = false;
         ReportData = null;
@@ -172,8 +213,10 @@ public partial class admin_Bonanza : Page
         }
 
         lblSummary.Text = total + " user(s) · " + qualified + " Qualified · Need "
-            + RequiredQualifyingLegs + " legs (≥" + MinActiveUnderLeg + " under each) · Team Active ≥ "
-            + RequiredTeamActive + " · Exclude " + AdminExcludeUserId;
+            + GetRequiredQualifyingLegs() + " legs (≥" + MinActiveUnderLeg + " under each) · Team Active ≥ "
+            + GetRequiredTeamActive()
+            + (GetMaximumTeamActive() > 0 ? " and ≤ " + GetMaximumTeamActive() : "")
+            + " · Exclude " + AdminExcludeUserId;
         BuildExternalPager();
     }
 
@@ -332,6 +375,14 @@ public partial class admin_Bonanza : Page
             minDirects = parsedMin;
         }
 
+        int requiredTeamActive = GetRequiredTeamActive();
+        int maximumTeamActive = GetMaximumTeamActive();
+        int requiredQualifyingLegs = GetRequiredQualifyingLegs();
+        if (maximumTeamActive > 0 && maximumTeamActive < requiredTeamActive)
+        {
+            maximumTeamActive = requiredTeamActive;
+        }
+
         string search = (txtUserId.Text ?? string.Empty).Trim();
         string statusFilter = (ddlStatus.SelectedValue ?? string.Empty).Trim();
 
@@ -387,7 +438,9 @@ public partial class admin_Bonanza : Page
             }
 
             int teamActive = GetTeamActiveCount(network, user.UserId, teamActiveCache);
-            bool isQualified = qualifyingLegs >= RequiredQualifyingLegs && teamActive >= RequiredTeamActive;
+            bool isQualified = qualifyingLegs >= requiredQualifyingLegs
+                && teamActive >= requiredTeamActive
+                && (maximumTeamActive <= 0 || teamActive <= maximumTeamActive);
 
             if (string.Equals(statusFilter, "Qualified", StringComparison.OrdinalIgnoreCase) && !isQualified)
             {
@@ -630,6 +683,65 @@ WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
         dt.Columns.Add("underactive", typeof(int));
         dt.Columns.Add("iscounted", typeof(bool));
         return dt;
+    }
+
+    public override void VerifyRenderingInServerForm(Control control)
+    {
+    }
+
+    protected void imgExcel_Click(object sender, ImageClickEventArgs e)
+    {
+        if (ReportData == null)
+        {
+            LoadReport();
+        }
+
+        DataTable dt = ReportData;
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            ShowLoadError("No data available to export. Please run Search first.");
+            return;
+        }
+
+        GridView1.AllowPaging = false;
+        GridView1.PageIndex = 0;
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+
+        if (GridView1.HeaderRow == null)
+        {
+            ShowLoadError("Unable to export grid.");
+            BindGrid();
+            return;
+        }
+
+        Response.Clear();
+        Response.Buffer = true;
+        Response.AddHeader("content-disposition", "attachment;filename=BonanzaReport_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls");
+        Response.Charset = "";
+        Response.ContentType = "application/vnd.ms-excel";
+        using (StringWriter sw = new StringWriter())
+        {
+            HtmlTextWriter hw = new HtmlTextWriter(sw);
+            GridView1.HeaderRow.BackColor = Color.White;
+            foreach (TableCell cell in GridView1.HeaderRow.Cells)
+            {
+                cell.BackColor = GridView1.HeaderStyle.BackColor;
+            }
+            foreach (GridViewRow row in GridView1.Rows)
+            {
+                row.BackColor = Color.White;
+                foreach (TableCell cell in row.Cells)
+                {
+                    cell.CssClass = "textmode";
+                }
+            }
+            GridView1.RenderControl(hw);
+            Response.Write(@"<style> .textmode { mso-number-format:\@; } </style>");
+            Response.Output.Write(sw.ToString());
+            Response.Flush();
+            Response.End();
+        }
     }
 
     sealed class BonanzaNetwork

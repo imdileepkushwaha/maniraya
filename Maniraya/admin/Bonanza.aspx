@@ -117,21 +117,22 @@
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-filter"></i> Bonanza Check</h3>
+                                <h3 class="box-title"><i class="fa fa-sitemap"></i> Bonanza Check</h3>
                             </div>
                             <div class="box-body admin-search-form">
                                 <div class="bonanza-rules">
                                     <strong>Rules:</strong>
-                                    Active user ke niche <strong>10 qualifying legs</strong> chahiye.
+                                    Active user ke niche selected <strong>Qualifying Legs</strong> chahiye.
                                     Har leg ke niche minimum <strong>10 active</strong> hone chahiye — kam hone par woh leg count nahi hogi.
-                                    Overall team active <strong>500+</strong> hona chahiye.
+                                    Overall team active <strong>Team Active Required</strong> se kam nahi hona chahiye.
+                                    Optional <strong>Team Active Required (Max)</strong> set ho to usse zyada team active qualify nahi hoga.
                                     <strong>MP000001</strong> (admin) poori calculation se exclude hai.
                                     Active = <strong>SavingStatus = 1</strong>.
                                 </div>
                                 <div class="admin-form-section admin-form-section-last">
                                     <h5 class="admin-form-section-title"><i class="fa fa-search"></i> Filters</h5>
                                     <div class="row">
-                                        <div class="col-md-4 col-sm-12">
+                                        <div class="col-md-4 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= txtUserId.ClientID %>">User ID / Name</label>
                                                 <div class="admin-input-group">
@@ -140,7 +141,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-sm-12">
+                                        <div class="col-md-4 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= ddlStatus.ClientID %>">Status</label>
                                                 <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-control">
@@ -150,12 +151,39 @@
                                                 </asp:DropDownList>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-sm-12">
+                                        <div class="col-md-4 col-sm-6">
                                             <div class="form-group">
                                                 <label for="<%= txtMinDirects.ClientID %>">Min Active Directs (pre-filter)</label>
                                                 <div class="admin-input-group">
                                                     <span class="admin-input-icon"><i class="fa fa-users"></i></span>
                                                     <asp:TextBox ID="txtMinDirects" runat="server" CssClass="form-control" Text="10" placeholder="e.g. 10" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtQualifyingLegs.ClientID %>">Qualifying Legs Required</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-check-circle"></i></span>
+                                                    <asp:TextBox ID="txtQualifyingLegs" runat="server" CssClass="form-control" Text="10" placeholder="e.g. 10" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtTeamActive.ClientID %>">Team Active Required (Min)</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-sitemap"></i></span>
+                                                    <asp:TextBox ID="txtTeamActive" runat="server" CssClass="form-control" Text="500" placeholder="e.g. 500 / 1000" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtMaxTeamActive.ClientID %>">Team Active Required (Max)</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-filter"></i></span>
+                                                    <asp:TextBox ID="txtMaxTeamActive" runat="server" CssClass="form-control" Text="" placeholder="Optional e.g. 2000" />
                                                 </div>
                                             </div>
                                         </div>
@@ -174,6 +202,9 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title"><i class="fa fa-trophy"></i> Bonanza Status</h3>
                                 <div class="box-tools admin-record-filter-tools">
+                                    <asp:ImageButton ID="imgExcel" runat="server" CssClass="admin-export-excel-btn"
+                                        ImageUrl="../user/img/excel123.png" Height="25px" Width="25px"
+                                        OnClick="imgExcel_Click" ToolTip="Export to Excel" />
                                     <label for="<%= ddlRecordFilter.ClientID %>" class="admin-record-filter-label">Show</label>
                                     <asp:DropDownList ID="ddlRecordFilter" runat="server" CssClass="form-control admin-record-filter"
                                         AutoPostBack="true" OnSelectedIndexChanged="ddlRecordFilter_SelectedIndexChanged">
@@ -280,5 +311,8 @@
                 </div>
             </div>
         </ContentTemplate>
+        <Triggers>
+            <asp:PostBackTrigger ControlID="imgExcel" />
+        </Triggers>
     </asp:UpdatePanel>
 </asp:Content>

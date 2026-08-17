@@ -231,8 +231,12 @@
                            <%--	  <li><a class="slide-item" href="DirectIncomeReport.aspx">Sponser Income</a></li>
                             <li><a class="slide-item" href="giftbalancereport.aspx"> Direct Income</a></li>
                             <li><a class="slide-item" href="giftbalancereport.aspx"> Direct Income</a></li>
-                            <li><a class="slide-item" href="giftbalancereport.aspx"> Director Income</a></li>--%>
-							 <li><a class="slide-item" href="#">Level Income</a></li>
+                            <li><a class="slide-item" href="giftbalancereport.aspx"> Director Income</a></li>
+							 <li><a class="slide-item" href="#">Level Income</a></li>--%>
+							 <li><a class="slide-item" href="SavingLevelIncomeReport.aspx">Saving Level Income</a></li>
+							<li><a class="slide-item" href="SavingDirectIncomeReport.aspx">Saving Direct Income</a></li>
+							<li><a class="slide-item" href="SavingLevelInstIncomeReport.aspx">Saving Level Installment Income</a></li>
+							<li><a class="slide-item" href="#">Repurchase Income</a></li>
 						</ul>
 					</li>
                      <li style="display:none"><h3>Topup Request</h3></li>
@@ -262,10 +266,7 @@
 							<%--<<li><a class="slide-item" href="account_Ledger.aspx">Account Ledger</a></li>--%>
 							<li><a class="slide-item" href="TransactionReport.aspx">Transaction Report</a></li>
 							<li><a class="slide-item" href="BVReport.aspx">BV Report</a></li>
-							<li><a class="slide-item" href="SavingLevelIncomeReport.aspx">Saving Level Income Report</a></li>
-							<li><a class="slide-item" href="SavingDirectIncomeReport.aspx">Saving Direct Income Report</a></li>
-							<li><a class="slide-item" href="SavingLevelInstIncomeReport.aspx">Saving Level Installment Income</a></li>
-							<li><a class="slide-item" href="#">Repurchase Income Report</a></li>
+							
 						</ul>
 					</li>
 					 <li><h3>Generate Ticket</h3></li>
