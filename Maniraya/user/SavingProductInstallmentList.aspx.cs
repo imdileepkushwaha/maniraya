@@ -27,7 +27,7 @@ public partial class user_SavingProductInstallmentList : Page
 
     void ApplyCouponQueryString()
     {
-        string coupon = Convert.ToString(Request.QueryString["coupon"]).Trim();
+        string coupon = (Convert.ToString(Request.QueryString["coupon"]) ?? string.Empty).Trim();
         if (string.IsNullOrEmpty(coupon) || ddCouponCode == null || ddCouponCode.Items.Count == 0)
         {
             return;

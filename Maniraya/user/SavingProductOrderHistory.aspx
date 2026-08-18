@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link href="assets/css/user-profile.css?v=10" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=27" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=28" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" Runat="Server">
     <section class="content-header">
@@ -94,6 +94,10 @@
                                                 <span class="soh-order-block-label">Delivery Date</span>
                                                 <span class="soh-order-delivery-value<%# Eval("DeliveryDateDisplay").ToString() == "-" ? " is-muted" : "" %>"><%# Eval("DeliveryDateDisplay") %></span>
                                             </div>
+                                            <asp:Panel ID="pnlConsignment" runat="server" CssClass="soh-order-consignment" Visible="false">
+                                                <span class="soh-order-block-label">Consignment Number</span>
+                                                <span class="soh-order-consignment-value"><asp:Literal ID="litConsignment" runat="server" /></span>
+                                            </asp:Panel>
                                             <div class="soh-order-actions">
                                                 <asp:HyperLink ID="lnkInvoice" runat="server" CssClass="soh-invoice-btn" Target="_blank"
                                                     NavigateUrl='<%# "SavingProductInvoice.aspx?orderId=" + HttpUtility.UrlEncode(Convert.ToString(Eval("orderid"))) + "&installmentId=" + HttpUtility.UrlEncode(Convert.ToString(Eval("InstallmentId"))) %>'>

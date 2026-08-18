@@ -184,6 +184,18 @@
             margin-bottom: 8px;
             font-size: 13px;
         }
+
+        #statusUpdateModal .modal-body .form-group > label {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        #statusUpdateModal .saving-consignment-group {
+            margin-top: 4px;
+        }
     </style>
 </asp:Content>
 
@@ -213,6 +225,7 @@
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
             <asp:HiddenField ID="hfOrderId" runat="server" />
+            <asp:HiddenField ID="hfInstallmentId" runat="server" />
 
             <div class="admin-report-page">
                 <div class="row">
@@ -295,7 +308,7 @@
                                         <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%"
                                             AutoGenerateColumns="False" EmptyDataText="No confirmed installment orders found."
                                             AllowPaging="true"
-                                            OnRowDataBound="GridView1_RowDataBound" OnRowCommand="GridView1_RowCommand" DataKeyNames="orderid">
+                                            OnRowDataBound="GridView1_RowDataBound" OnRowCommand="GridView1_RowCommand" DataKeyNames="id,orderid">
                                             <PagerSettings Visible="false" />
                                         <Columns>
                                             <asp:TemplateField HeaderText="S.No">
@@ -346,7 +359,7 @@
                                             <asp:TemplateField HeaderText="Action">
                                                 <ItemTemplate>
                                                     <asp:LinkButton ID="btnUpdateStatus" runat="server" CssClass="saving-order-icon-btn is-status"
-                                                        CommandName="updatestatus" CommandArgument='<%# Eval("orderid") %>' ToolTip="Update delivery status for all installments in this order">
+                                                        CommandName="updatestatus" CommandArgument='<%# Eval("id") %>' ToolTip="Update delivery status for this product">
                                                         <i class="fa fa-pencil"></i> Status
                                                     </asp:LinkButton>
                                                 </ItemTemplate>
@@ -388,7 +401,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status (All Installments)</h4>
+                                <h4 class="modal-title" id="statusUpdateModalTitle"><i class="fa fa-truck"></i> Update Delivery Status</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
@@ -400,7 +413,7 @@
                                     <asp:TextBox ID="txtModalUserName" runat="server" CssClass="form-control" ReadOnly="true" />
                                 </div>
                                 <div class="form-group">
-                                    <label>Installments In Order</label>
+                                    <label>Product</label>
                                     <asp:Literal ID="litModalProducts" runat="server" Mode="PassThrough" />
                                 </div>
                                 <div class="form-group">
@@ -412,6 +425,10 @@
                                         <asp:ListItem>Delivered</asp:ListItem>
                                     </asp:DropDownList>
                                 </div>
+                                <asp:Panel ID="pnlConsignment" runat="server" CssClass="form-group saving-consignment-group" style="display:none;">
+                                    <label for="<%= txtConsignmentNumber.ClientID %>">Consignment Number</label>
+                                    <asp:TextBox ID="txtConsignmentNumber" runat="server" CssClass="form-control" MaxLength="100" placeholder="Enter consignment / AWB number" />
+                                </asp:Panel>
                             </div>
                             <div class="modal-footer admin-modal-footer">
                                 <asp:Button ID="btnSaveDeliveryStatus" runat="server" CssClass="btn btn-primary" Text="Update Status" OnClick="btnSaveDeliveryStatus_Click" />
@@ -443,7 +460,31 @@
 
         Sys.Application.add_load(function () {
             initSavingOrderDatepickers();
+            initConsignmentToggle();
         });
+
+        function initConsignmentToggle() {
+            var status = document.getElementById('<%= ddModalDeliveryStatus.ClientID %>');
+            if (!status || status.getAttribute('data-consign-bound') === '1') {
+                toggleConsignmentField();
+                return;
+            }
+
+            status.setAttribute('data-consign-bound', '1');
+            status.addEventListener('change', toggleConsignmentField);
+            toggleConsignmentField();
+        }
+
+        function toggleConsignmentField() {
+            var status = document.getElementById('<%= ddModalDeliveryStatus.ClientID %>');
+            var panel = document.getElementById('<%= pnlConsignment.ClientID %>');
+            if (!status || !panel) {
+                return;
+            }
+
+            var value = (status.value || '').toLowerCase();
+            panel.style.display = value === 'shipped' ? 'block' : 'none';
+        }
 
         function printSavingAddress() {
             var content = document.getElementById('addressPrintContent');

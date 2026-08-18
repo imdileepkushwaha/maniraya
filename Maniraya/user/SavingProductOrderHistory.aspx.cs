@@ -247,6 +247,9 @@ public partial class user_SavingProductOrderHistory : Page
                     ELSE NULL
                 END AS DeliveryDate"
                 : "CAST(NULL AS DATETIME) AS DeliveryDate";
+            string consignmentSelect = SavingProductHelper.HasInstallmentConsignmentColumn()
+                ? "ISNULL(NULLIF(LTRIM(RTRIM(sa.ConsignmentNumber)), ''), '') AS ConsignmentNumber"
+                : "'' AS ConsignmentNumber";
 
             string sql = @"
 SELECT
@@ -262,6 +265,7 @@ SELECT
     ud.username,
     " + deliveryStatusSelect + @",
     " + deliveryDateSelect + @",
+    " + consignmentSelect + @",
     CASE
         WHEN NULLIF(LTRIM(RTRIM(ud.Shippingaddress)), '') IS NOT NULL THEN ud.Shippingaddress
         ELSE ud.Address
@@ -378,6 +382,9 @@ ORDER BY ISNULL(sa.approvedate, sa.installmentdate) DESC, sa.InstNo DESC, sa.id 
             summary["DeliveryStatusDisplay"] = Convert.ToString(row["DeliveryStatusDisplay"]);
             summary["OrderDateDisplay"] = Convert.ToString(row["OrderDateDisplay"]);
             summary["DeliveryDateDisplay"] = Convert.ToString(row["DeliveryDateDisplay"]);
+            summary["ConsignmentNumber"] = row.Table.Columns.Contains("ConsignmentNumber")
+                ? Convert.ToString(row["ConsignmentNumber"])
+                : string.Empty;
             summary["CanInvoice"] = IsApprovedOrderStatus(Convert.ToString(row["OrderStatus"]));
 
             cards.Rows.Add(summary);
@@ -400,6 +407,7 @@ ORDER BY ISNULL(sa.approvedate, sa.installmentdate) DESC, sa.InstNo DESC, sa.id 
         grouped.Columns.Add("DeliveryStatusDisplay", typeof(string));
         grouped.Columns.Add("OrderDateDisplay", typeof(string));
         grouped.Columns.Add("DeliveryDateDisplay", typeof(string));
+        grouped.Columns.Add("ConsignmentNumber", typeof(string));
         grouped.Columns.Add("CanInvoice", typeof(bool));
         return grouped;
     }
@@ -574,6 +582,18 @@ ORDER BY ISNULL(sa.approvedate, sa.installmentdate) DESC, sa.InstNo DESC, sa.id 
         if (lblDeliveryStatus != null)
         {
             lblDeliveryStatus.CssClass = "dash-order-status-badge " + GetDeliveryStatusClass(lblDeliveryStatus.Text);
+        }
+
+        Panel pnlConsignment = (Panel)e.Item.FindControl("pnlConsignment");
+        Literal litConsignment = (Literal)e.Item.FindControl("litConsignment");
+        if (pnlConsignment != null && litConsignment != null)
+        {
+            string consignment = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "ConsignmentNumber")).Trim();
+            string deliveryStatus = Normalize(Convert.ToString(DataBinder.Eval(e.Item.DataItem, "DeliveryStatusDisplay")));
+            bool showConsignment = !string.IsNullOrWhiteSpace(consignment)
+                && (deliveryStatus == "shipped" || deliveryStatus == "out for delivery" || deliveryStatus == "delivered");
+            pnlConsignment.Visible = showConsignment;
+            litConsignment.Text = HttpUtility.HtmlEncode(consignment);
         }
 
         HyperLink lnkInvoice = (HyperLink)e.Item.FindControl("lnkInvoice");

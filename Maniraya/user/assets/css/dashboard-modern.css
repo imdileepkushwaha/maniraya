@@ -3708,6 +3708,22 @@ select.dash-care-showcase-select option {
     font-weight: 600;
 }
 
+.soh-order-consignment {
+    min-width: 180px;
+}
+
+.soh-order-consignment-value {
+    display: inline-block;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
 .soh-invoice-btn {
     display: inline-flex;
     align-items: center;

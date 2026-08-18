@@ -132,6 +132,12 @@ public static class SavingProductHelper
             END");
 
         RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'ConsignmentNumber') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD ConsignmentNumber NVARCHAR(100) NULL;
+            END");
+
+        RunNonQuery(@"
             UPDATE SavingAccountInstallmentDetail
             SET DeliveryStatus = 'Confirmed'
             WHERE (status = 'Approved' OR LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('approved', 'approve'))
@@ -141,6 +147,17 @@ public static class SavingProductHelper
     public static bool HasInstallmentDeliveryStatusColumn()
     {
         DataTable dt = RunSelect("SELECT COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatus') AS ColLen");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ColLen"] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
+    }
+
+    public static bool HasInstallmentConsignmentColumn()
+    {
+        DataTable dt = RunSelect("SELECT COL_LENGTH('SavingAccountInstallmentDetail', 'ConsignmentNumber') AS ColLen");
         if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ColLen"] == DBNull.Value)
         {
             return false;
