@@ -272,44 +272,39 @@ LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
 LEFT JOIN StateMaster S WITH (NOLOCK) ON C.StateId = S.StateId
-WHERE ").Append(GetApprovedStatusFilter("sa")).Append(@"
-AND sa.orderid IN (
-    SELECT sa2.orderid
-    FROM SavingAccountInstallmentDetail sa2 WITH (NOLOCK)
-    LEFT JOIN UserDetail ud2 WITH (NOLOCK) ON ud2.UserId = sa2.UserId
-    WHERE ").Append(GetApprovedStatusFilter("sa2"));
+WHERE ").Append(GetApprovedStatusFilter("sa"));
 
             if (!string.IsNullOrWhiteSpace(txtOrderId.Text))
             {
-                sql.Append(" AND sa2.orderid LIKE '%").Append(SqlEscape(txtOrderId.Text.Trim())).Append("%'");
+                sql.Append(" AND sa.orderid LIKE '%").Append(SqlEscape(txtOrderId.Text.Trim())).Append("%'");
             }
 
             if (!string.IsNullOrWhiteSpace(txtUserId.Text))
             {
                 string userSearch = SqlEscape(txtUserId.Text.Trim());
-                sql.Append(" AND (sa2.userid LIKE '%").Append(userSearch)
-                    .Append("%' OR ud2.username LIKE '%").Append(userSearch).Append("%')");
+                sql.Append(" AND (sa.userid LIKE '%").Append(userSearch)
+                    .Append("%' OR ud.username LIKE '%").Append(userSearch).Append("%')");
             }
 
             if (hasDeliveryStatus && !string.IsNullOrWhiteSpace(ddDeliveryStatus.SelectedValue))
             {
-                sql.Append(" AND ISNULL(NULLIF(LTRIM(RTRIM(sa2.DeliveryStatus)), ''), 'Confirmed') = '")
+                sql.Append(" AND ISNULL(NULLIF(LTRIM(RTRIM(sa.DeliveryStatus)), ''), 'Confirmed') = '")
                     .Append(SqlEscape(ddDeliveryStatus.SelectedValue)).Append("'");
             }
 
             if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
             {
-                sql.Append(" AND CONVERT(date, sa2.requestdate) >= CONVERT(date, '")
+                sql.Append(" AND CONVERT(date, sa.requestdate) >= CONVERT(date, '")
                     .Append(Message.GetIndianDate(txtFromDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
             }
 
             if (!string.IsNullOrWhiteSpace(txtToDate.Text))
             {
-                sql.Append(" AND CONVERT(date, sa2.requestdate) <= CONVERT(date, '")
+                sql.Append(" AND CONVERT(date, sa.requestdate) <= CONVERT(date, '")
                     .Append(Message.GetIndianDate(txtToDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
             }
 
-            sql.Append(") ORDER BY sa.id DESC");
+            sql.Append(" ORDER BY sa.id DESC");
 
             ObjData.StartConnection();
             try
@@ -894,6 +889,20 @@ ORDER BY sa.id";
 
         string status = lblDeliveryStatus.Text.Trim();
         lblDeliveryStatus.CssClass = "admin-delivery-badge " + GetDeliveryBadgeClass(status);
+
+        bool isDelivered = string.Equals(status, "Delivered", StringComparison.OrdinalIgnoreCase);
+
+        LinkButton btnUpdateStatus = (LinkButton)e.Row.FindControl("btnUpdateStatus");
+        if (btnUpdateStatus != null)
+        {
+            btnUpdateStatus.Visible = !isDelivered;
+        }
+
+        LinkButton btnPrintAddress = (LinkButton)e.Row.FindControl("btnPrintAddress");
+        if (btnPrintAddress != null)
+        {
+            btnPrintAddress.Visible = !isDelivered;
+        }
     }
 
     static string GetDeliveryBadgeClass(string status)
