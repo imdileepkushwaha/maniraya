@@ -308,8 +308,15 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
     {
         try
         {
+            string monthLabel = DirectRankHelper.GetCurrentMonthLabel();
+            if (lblTopDirectMonth != null)
+            {
+                lblTopDirectMonth.Text = monthLabel;
+            }
+            SetTopDirectRenewalHeader(grdTopDirectRanking, monthLabel);
+
             pnlTopDirectRanking.Visible = true;
-            DataTable dt = GetTopDirectRanking(10);
+            DataTable dt = DirectRankHelper.GetTopDirectRanking(10);
             if (dt != null && dt.Rows.Count > 0)
             {
                 grdTopDirectRanking.DataSource = dt;
@@ -323,7 +330,7 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
                 pnlTopDirectEmpty.Visible = true;
             }
 
-            BindTopDirectMyRank();
+            BindTopDirectMyRank(monthLabel);
         }
         catch
         {
@@ -334,94 +341,24 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
         }
     }
 
-    DataTable GetTopDirectRanking(int topCount)
+    static void SetTopDirectRenewalHeader(GridView grid, string monthLabel)
     {
-        string sql = @"
-;WITH RenewedDirects AS (
-    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
-    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-    WHERE ISNULL(sa.InstNo, 0) > 1
-      AND " + ApprovedInstallmentStatusFilter("sa") + @"
-),
-Ranked AS (
-    SELECT
-        LTRIM(RTRIM(s.UserId)) AS userid,
-        ISNULL(s.UserName, '') AS username,
-        COUNT(d.UserId) AS TotalDirectCount,
-        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
-        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount
-    FROM UserDetail d WITH (NOLOCK)
-    INNER JOIN UserDetail s WITH (NOLOCK)
-        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
-    LEFT JOIN RenewedDirects rd
-        ON rd.UserId = LTRIM(RTRIM(d.UserId))
-    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(s.ActiveStatus, 0) = 1
-    GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
-)
-SELECT TOP (" + topCount + @")
-    ROW_NUMBER() OVER (ORDER BY ActiveDirectCount DESC, ActiveRenewalDirectCount DESC, TotalDirectCount DESC, userid ASC) AS RankNo,
-    userid,
-    username,
-    TotalDirectCount,
-    ActiveDirectCount,
-    ActiveRenewalDirectCount,
-    ActiveDirectCount AS DirectCount
-FROM Ranked
-ORDER BY ActiveDirectCount DESC, ActiveRenewalDirectCount DESC, TotalDirectCount DESC, userid ASC";
-
-        DataTable dt = new DataTable();
-        ObjData.StartConnection();
-        try
+        if (grid == null)
         {
-            dt = ObjData.RunDataTable(sql);
-        }
-        catch
-        {
-            dt = new DataTable();
-        }
-        finally
-        {
-            ObjData.EndConnection();
+            return;
         }
 
-        return AppendDirectRankColumn(dt ?? new DataTable());
-    }
-
-    static string ApprovedInstallmentStatusFilter(string alias)
-    {
-        return "(" + alias + ".status = 'Approved'"
-            + " OR " + alias + ".status = '1'"
-            + " OR LOWER(LTRIM(RTRIM(ISNULL(" + alias + ".status, '')))) IN ('approved', 'approve'))";
-    }
-
-    DataTable AppendDirectRankColumn(DataTable dt)
-    {
-        if (dt == null)
+        foreach (DataControlField col in grid.Columns)
         {
-            return new DataTable();
-        }
-
-        if (!dt.Columns.Contains("DirectRank"))
-        {
-            dt.Columns.Add("DirectRank", typeof(string));
-        }
-
-        foreach (DataRow row in dt.Rows)
-        {
-            int directCount = 0;
-            string countColumn = dt.Columns.Contains("ActiveDirectCount") ? "ActiveDirectCount" : "DirectCount";
-            if (row[countColumn] != null && row[countColumn] != DBNull.Value)
+            if (col.HeaderText != null && col.HeaderText.StartsWith("Active Renewals Direct", StringComparison.OrdinalIgnoreCase))
             {
-                int.TryParse(Convert.ToString(row[countColumn]), out directCount);
+                col.HeaderText = "Active Renewals Direct (" + monthLabel + ")";
+                break;
             }
-            row["DirectRank"] = DirectRankHelper.GetRank(directCount);
         }
-
-        return dt;
     }
 
-    void BindTopDirectMyRank()
+    void BindTopDirectMyRank(string monthLabel)
     {
         pnlTopDirectMyRank.Visible = false;
         string currentUserId = Convert.ToString(Session["userid"]).Trim();
@@ -430,66 +367,27 @@ ORDER BY ActiveDirectCount DESC, ActiveRenewalDirectCount DESC, TotalDirectCount
             return;
         }
 
-        string sql = @"
-;WITH RenewedDirects AS (
-    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
-    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-    WHERE ISNULL(sa.InstNo, 0) > 1
-      AND " + ApprovedInstallmentStatusFilter("sa") + @"
-),
-Ranked AS (
-    SELECT
-        LTRIM(RTRIM(s.UserId)) AS userid,
-        COUNT(d.UserId) AS TotalDirectCount,
-        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
-        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount,
-        ROW_NUMBER() OVER (
-            ORDER BY SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) DESC,
-                     SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) DESC,
-                     COUNT(d.UserId) DESC,
-                     LTRIM(RTRIM(s.UserId)) ASC
-        ) AS RankNo
-    FROM UserDetail d WITH (NOLOCK)
-    INNER JOIN UserDetail s WITH (NOLOCK)
-        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
-    LEFT JOIN RenewedDirects rd
-        ON rd.UserId = LTRIM(RTRIM(d.UserId))
-    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
-      AND ISNULL(s.ActiveStatus, 0) = 1
-    GROUP BY LTRIM(RTRIM(s.UserId))
-)
-SELECT RankNo, TotalDirectCount, ActiveDirectCount, ActiveRenewalDirectCount
-FROM Ranked
-WHERE userid = '" + SqlEscape(currentUserId) + "'";
-
         try
         {
-            ObjData.StartConnection();
-            try
+            DataTable dt = DirectRankHelper.GetUserMonthlyRank(currentUserId);
+            pnlTopDirectMyRank.Visible = true;
+            if (dt != null && dt.Rows.Count > 0)
             {
-                DataTable dt = ObjData.RunDataTable(sql);
-                pnlTopDirectMyRank.Visible = true;
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    int myDirectCount = 0;
-                    int.TryParse(Convert.ToString(dt.Rows[0]["ActiveDirectCount"]), out myDirectCount);
-                    string myDirectRank = DirectRankHelper.GetRank(myDirectCount);
-                    litTopDirectMyRank.Text = string.Format(
-                        "Your overall rank: <strong>#{0}</strong> · Direct Rank: <strong>{1}</strong> · Active Directs: <strong>{2}</strong> · Active Renewals Direct: <strong>{3}</strong> · Total Directs: <strong>{4}</strong>.",
-                        Convert.ToString(dt.Rows[0]["RankNo"]),
-                        myDirectRank,
-                        Convert.ToString(dt.Rows[0]["ActiveDirectCount"]),
-                        Convert.ToString(dt.Rows[0]["ActiveRenewalDirectCount"]),
-                        Convert.ToString(dt.Rows[0]["TotalDirectCount"]));
-                }
-                else
-                {
-                    litTopDirectMyRank.Text = "You are not in the ranking yet (0 active directs). Direct Rank: <strong>Member</strong>.";
-                }
+                int myDirectCount = 0;
+                int.TryParse(Convert.ToString(dt.Rows[0]["ActiveDirectCount"]), out myDirectCount);
+                string myDirectRank = DirectRankHelper.GetRank(myDirectCount);
+                litTopDirectMyRank.Text = string.Format(
+                    "Your {0} rank: <strong>#{1}</strong> · Direct Rank: <strong>{2}</strong> · Active Directs: <strong>{3}</strong> · Active Renewals Direct this month: <strong>{4}</strong> · Total Directs: <strong>{5}</strong>.",
+                    monthLabel,
+                    Convert.ToString(dt.Rows[0]["RankNo"]),
+                    myDirectRank,
+                    Convert.ToString(dt.Rows[0]["ActiveDirectCount"]),
+                    Convert.ToString(dt.Rows[0]["ActiveRenewalDirectCount"]),
+                    Convert.ToString(dt.Rows[0]["TotalDirectCount"]));
             }
-            finally
+            else
             {
-                ObjData.EndConnection();
+                litTopDirectMyRank.Text = "You have no Active Renewals Direct in <strong>" + monthLabel + "</strong> yet.";
             }
         }
         catch
@@ -1560,19 +1458,20 @@ ORDER BY x.CouponCode ASC";
     {
         decimal savingDirect = GetSavingLevelIncome(userId, true, days);
         decimal levelIncome = GetSavingLevelIncome(userId, false, days);
-        decimal premiumDirect = GetTransactionIncome(userId, "Direct Income", days);
+        decimal installmentIncome = GetSavingInstallmentIncome(userId, days);
         decimal matchingIncome = GetTransactionIncome(userId, "Binary Income", days);
         decimal cashBack = GetCashBackIncome(userId, days);
         decimal productWallet = GetProductWalletBalance(userId);
-        decimal total = savingDirect + levelIncome + premiumDirect + matchingIncome + cashBack;
+        decimal total = savingDirect + levelIncome + installmentIncome + matchingIncome + cashBack;
 
         lblSavingDirectIncome.Text = savingDirect.ToString("N2");
         lblLevelIncomeCard.Text = levelIncome.ToString("N2");
-        lblPremiumDirectIncome.Text = premiumDirect.ToString("N2");
+        lblSavingInstallmentIncome.Text = installmentIncome.ToString("N2");
         lblMatchingIncomeCard.Text = matchingIncome.ToString("N2");
         lblCashBackIncome.Text = cashBack.ToString("N2");
         lblProductWalletBalance.Text = productWallet.ToString("N2");
         lblIncentiveTotal.Text = total.ToString("N2");
+        lblSavingInstallmentIncomeTotal.Text = GetSavingInstallmentIncome(userId, 0).ToString("N2");
     }
 
     void UpdateIncentiveTabState()
@@ -1606,6 +1505,21 @@ ORDER BY x.CouponCode ASC";
         string sql = @"SELECT ISNULL(SUM(sd.Amount), 0)
             FROM SavingLevelIncomeDetail sd WITH (NOLOCK)
             WHERE sd.UserId = '" + SqlEscape(userId) + @"' AND " + levelClause;
+
+        if (days > 0)
+        {
+            sql += " AND CONVERT(date, sd.MentionDate) >= CONVERT(date, DATEADD(day, -" + days + ", GETDATE()))";
+        }
+
+        return ExecuteScalarDecimal(sql);
+    }
+
+    decimal GetSavingInstallmentIncome(string userId, int days)
+    {
+        string sql = @"SELECT ISNULL(SUM(sd.Amount), 0)
+            FROM SavingLevelIncomeDetail sd WITH (NOLOCK)
+            WHERE sd.UserId = '" + SqlEscape(userId) + @"'
+              AND ISNULL(sd.InstNo, 0) > 1";
 
         if (days > 0)
         {

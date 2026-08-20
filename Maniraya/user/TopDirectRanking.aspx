@@ -111,7 +111,7 @@
                     <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-trophy"></i></div>
                     <div class="profile-hero-info">
                         <h2>Top Direct Ranking</h2>
-                        <p class="profile-hero-meta">Overall leaderboard of members with the highest total direct referrals.</p>
+                        <p class="profile-hero-meta">Monthly leaderboard of members with the highest Active Renewals Direct this month.</p>
                     </div>
                     <div class="profile-hero-actions">
                         <a href="UserDirectAssociates.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-users"></i> My Direct</a>
@@ -123,7 +123,7 @@
                     <div class="dash-subpage-panel-head dash-income-report-results-head">
                         <span class="dash-subpage-panel-icon tone-amber" aria-hidden="true"><i class="fa fa-list-ol"></i></span>
                         <div class="dash-income-report-results-copy">
-                            <h3>Overall Ranking</h3>
+                            <h3>Monthly Ranking</h3>
                             <asp:Label ID="lblResultSummary" runat="server" CssClass="dash-income-report-summary" Text="Loading ranking..." />
                         </div>
                         <div class="dash-income-report-filter">
@@ -142,7 +142,7 @@
                             <asp:Literal ID="litMyRank" runat="server" />
                         </asp:Panel>
 
-                        <p class="dash-saving-report-intro">Ranking is based on <strong>Active Directs</strong> (<code>SavingStatus = 1</code>). <strong>Active Renewals Direct</strong> counts directs with at least one approved renewal installment (<code>InstNo &gt; 1</code>).</p>
+                        <p class="dash-saving-report-intro">Ranking is based on <strong>Active Renewals Direct this month</strong> — directs with at least one approved renewal installment (<code>InstNo &gt; 1</code>) in the current month. Highest this month appears first. <strong>Active Directs</strong> still shows overall active directs (<code>SavingStatus = 1</code>).</p>
 
                         <div class="dash-saving-report-table-wrap">
                             <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%"
@@ -191,7 +191,7 @@
                                     <div class="dash-saving-report-empty">
                                         <i class="fa fa-trophy"></i>
                                         <h4>No ranking data found</h4>
-                                        <p>Direct referral ranking will appear here once members start sponsoring others.</p>
+                                        <p>Direct referral ranking will appear here once members have approved renewals this month.</p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>

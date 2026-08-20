@@ -436,8 +436,8 @@
                                             <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblLevelIncomeCard" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
-                                            <span>MPremium Direct Income</span>
-                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblPremiumDirectIncome" runat="server" Text="0.00" /></strong>
+                                            <span>Saving Installment Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblSavingInstallmentIncome" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row">
                                             <span>Team Bonus</span>
@@ -1453,6 +1453,20 @@
 								<h3 class="dash-income-value is-number"><asp:Label ID="lblRepurchaseIncomeBV" runat="server" Text="0"></asp:Label></h3>
 								<div class="dash-income-meta">
 									<span class="dash-income-tag dash-income-tag--muted">Repurchase income</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                        <div class="col-sm-12 col-lg-6 col-xl-4">
+						<div class="card dash-income-card dash-income-compact tone-blue">
+							<span class="dash-income-badge-icon" aria-hidden="true"><i class="fa fa-sync-alt"></i></span>
+							<div class="card-body">
+								<p class="dash-income-label">Saving Installment Income</p>
+								<h3 class="dash-income-value is-number"><asp:Label ID="lblSavingInstallmentIncomeTotal" runat="server" Text="0.00"></asp:Label></h3>
+								<div class="dash-income-meta">
+									<span class="dash-income-tag">Total</span>
+									<a href="SavingLevelInstIncomeReport.aspx" class="dash-income-meta-link">View report</a>
 								</div>
 							</div>
 						</div>
@@ -3171,7 +3185,7 @@ Profit Share Budget</p>
                         <div class="dash-prize-head-icon"><i class="fa fa-trophy"></i></div>
                         <div class="dash-prize-head-text">
                             <h3>Top Direct Ranking</h3>
-                            <p>Overall leaderboard by Active Directs and Active Renewals Direct.</p>
+                            <p>Leaderboard for <asp:Label ID="lblTopDirectMonth" runat="server" /> — ranked by Active Renewals Direct this month.</p>
                         </div>
                         <a href="TopDirectRanking.aspx" class="dash-btn dash-btn-outline dash-ranking-view-all">View All</a>
                     </div>
@@ -3221,7 +3235,7 @@ Profit Share Budget</p>
                     </asp:Panel>
                     <asp:Panel ID="pnlTopDirectEmpty" runat="server" Visible="false" CssClass="dash-prize-empty">
                         <i class="fa fa-users"></i>
-                        <p>No ranking data available yet. Active direct referrals will appear here.</p>
+                        <p>No Active Renewals Direct this month yet.</p>
                     </asp:Panel>
                 </asp:Panel>
 
@@ -3382,7 +3396,7 @@ Profit Share Budget</p>
             setExportText('exportIncentiveUserId', getIncentiveLabelText('<%= lblReferralUserId.ClientID %>'));
             setExportAmount('exportSavingDirect', getIncentiveLabelText('<%= lblSavingDirectIncome.ClientID %>'));
             setExportAmount('exportLevelIncome', getIncentiveLabelText('<%= lblLevelIncomeCard.ClientID %>'));
-            setExportAmount('exportPremiumDirect', getIncentiveLabelText('<%= lblPremiumDirectIncome.ClientID %>'));
+            setExportAmount('exportPremiumDirect', getIncentiveLabelText('<%= lblSavingInstallmentIncome.ClientID %>'));
             setExportAmount('exportTeamBonus', getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'));
             setExportAmount('exportSelfBonus', getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'));
             setExportAmount('exportWallet', getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'));
@@ -3410,7 +3424,7 @@ Profit Share Budget</p>
                 '',
                 'Saving Direct Income: ₹ ' + getIncentiveLabelText('<%= lblSavingDirectIncome.ClientID %>'),
                 'Level Income: ₹ ' + getIncentiveLabelText('<%= lblLevelIncomeCard.ClientID %>'),
-                'MPremium Direct Income: ₹ ' + getIncentiveLabelText('<%= lblPremiumDirectIncome.ClientID %>'),
+                'Saving Installment Income: ₹ ' + getIncentiveLabelText('<%= lblSavingInstallmentIncome.ClientID %>'),
                 'Team Bonus: ₹ ' + getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'),
                 'Self Business Bonus: ₹ ' + getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'),
                 'Product Wallet Balance: ₹ ' + getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'),
@@ -3878,7 +3892,7 @@ Profit Share Budget</p>
                 </div>
                 <div class="dash-incentive-export-income-row"><span>Saving Direct Income</span><strong id="exportSavingDirect"></strong></div>
                 <div class="dash-incentive-export-income-row"><span>Level Income</span><strong id="exportLevelIncome"></strong></div>
-                <div class="dash-incentive-export-income-row"><span>MPremium Direct Income</span><strong id="exportPremiumDirect"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Saving Installment Income</span><strong id="exportPremiumDirect"></strong></div>
                 <div class="dash-incentive-export-income-row"><span>Team Bonus</span><strong id="exportTeamBonus"></strong></div>
                 <div class="dash-incentive-export-income-row"><span>Self Business Bonus</span><strong id="exportSelfBonus"></strong></div>
                 <div class="dash-incentive-export-income-row is-wallet"><span>Product Wallet Balance</span><strong id="exportWallet"></strong></div>

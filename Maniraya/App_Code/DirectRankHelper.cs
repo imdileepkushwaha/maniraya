@@ -247,6 +247,167 @@ WHERE LTRIM(RTRIM(d.SponserId)) = '" + SqlEscape(uid) + @"'
         return 0;
     }
 
+    public static string GetCurrentMonthLabel()
+    {
+        return DateTime.Now.ToString("MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Top ranking for the current month by Active Renewals Direct
+    /// (approved renewal installment InstNo &gt; 1 in this calendar month).
+    /// Highest monthly renewals appear first.
+    /// </summary>
+    public static DataTable GetTopDirectRanking(int topCount)
+    {
+        if (topCount <= 0)
+        {
+            topCount = 10;
+        }
+
+        string sql = @"
+;WITH RenewedDirects AS (
+    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    WHERE ISNULL(sa.InstNo, 0) > 1
+      AND " + ApprovedInstallmentStatusFilter("sa") + @"
+      AND " + CurrentMonthRenewalDateFilter("sa") + @"
+),
+Ranked AS (
+    SELECT
+        LTRIM(RTRIM(s.UserId)) AS userid,
+        ISNULL(s.UserName, '') AS username,
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
+        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount
+    FROM UserDetail d WITH (NOLOCK)
+    INNER JOIN UserDetail s WITH (NOLOCK)
+        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    LEFT JOIN RenewedDirects rd
+        ON rd.UserId = LTRIM(RTRIM(d.UserId))
+    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
+      AND ISNULL(s.ActiveStatus, 0) = 1
+    GROUP BY LTRIM(RTRIM(s.UserId)), s.UserName
+    HAVING SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) > 0
+)
+SELECT TOP (" + topCount + @")
+    ROW_NUMBER() OVER (ORDER BY ActiveRenewalDirectCount DESC, ActiveDirectCount DESC, TotalDirectCount DESC, userid ASC) AS RankNo,
+    userid,
+    username,
+    TotalDirectCount,
+    ActiveDirectCount,
+    ActiveRenewalDirectCount,
+    ActiveDirectCount AS DirectCount
+FROM Ranked
+ORDER BY ActiveRenewalDirectCount DESC, ActiveDirectCount DESC, TotalDirectCount DESC, userid ASC";
+
+        return AppendDirectRankColumn(RunTable(sql));
+    }
+
+    public static DataTable GetUserMonthlyRank(string userId)
+    {
+        string uid = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(uid))
+        {
+            return new DataTable();
+        }
+
+        string sql = @"
+;WITH RenewedDirects AS (
+    SELECT DISTINCT LTRIM(RTRIM(sa.UserId)) AS UserId
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    WHERE ISNULL(sa.InstNo, 0) > 1
+      AND " + ApprovedInstallmentStatusFilter("sa") + @"
+      AND " + CurrentMonthRenewalDateFilter("sa") + @"
+),
+Ranked AS (
+    SELECT
+        LTRIM(RTRIM(s.UserId)) AS userid,
+        COUNT(d.UserId) AS TotalDirectCount,
+        SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) AS ActiveDirectCount,
+        SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) AS ActiveRenewalDirectCount,
+        ROW_NUMBER() OVER (
+            ORDER BY SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) DESC,
+                     SUM(CASE WHEN ISNULL(d.SavingStatus, 0) = 1 THEN 1 ELSE 0 END) DESC,
+                     COUNT(d.UserId) DESC,
+                     LTRIM(RTRIM(s.UserId)) ASC
+        ) AS RankNo
+    FROM UserDetail d WITH (NOLOCK)
+    INNER JOIN UserDetail s WITH (NOLOCK)
+        ON LTRIM(RTRIM(d.SponserId)) = LTRIM(RTRIM(s.UserId))
+    LEFT JOIN RenewedDirects rd
+        ON rd.UserId = LTRIM(RTRIM(d.UserId))
+    WHERE NULLIF(LTRIM(RTRIM(d.SponserId)), '') IS NOT NULL
+      AND ISNULL(s.ActiveStatus, 0) = 1
+    GROUP BY LTRIM(RTRIM(s.UserId))
+    HAVING SUM(CASE WHEN rd.UserId IS NOT NULL THEN 1 ELSE 0 END) > 0
+)
+SELECT RankNo, TotalDirectCount, ActiveDirectCount, ActiveRenewalDirectCount
+FROM Ranked
+WHERE userid = '" + SqlEscape(uid) + "'";
+
+        return RunTable(sql);
+    }
+
+    static string ApprovedInstallmentStatusFilter(string alias)
+    {
+        return "(" + alias + ".status = 'Approved'"
+            + " OR " + alias + ".status = '1'"
+            + " OR LOWER(LTRIM(RTRIM(ISNULL(" + alias + ".status, '')))) IN ('approved', 'approve'))";
+    }
+
+    static string CurrentMonthRenewalDateFilter(string alias)
+    {
+        return "YEAR(CONVERT(date, ISNULL(" + alias + ".approvedate, " + alias + @".installmentdate))) = YEAR(GETDATE())
+      AND MONTH(CONVERT(date, ISNULL(" + alias + ".approvedate, " + alias + ".installmentdate))) = MONTH(GETDATE())";
+    }
+
+    static DataTable AppendDirectRankColumn(DataTable dt)
+    {
+        if (dt == null)
+        {
+            return new DataTable();
+        }
+
+        if (!dt.Columns.Contains("DirectRank"))
+        {
+            dt.Columns.Add("DirectRank", typeof(string));
+        }
+
+        foreach (DataRow row in dt.Rows)
+        {
+            int directCount = 0;
+            string countColumn = dt.Columns.Contains("ActiveDirectCount") ? "ActiveDirectCount" : "DirectCount";
+            if (row[countColumn] != null && row[countColumn] != DBNull.Value)
+            {
+                int.TryParse(Convert.ToString(row[countColumn]), out directCount);
+            }
+            row["DirectRank"] = GetRank(directCount);
+        }
+
+        return dt;
+    }
+
+    static DataTable RunTable(string sql)
+    {
+        Data objData = new Data();
+        try
+        {
+            objData.StartConnection();
+            try
+            {
+                return objData.RunDataTable(sql) ?? new DataTable();
+            }
+            finally
+            {
+                objData.EndConnection();
+            }
+        }
+        catch
+        {
+            return new DataTable();
+        }
+    }
+
     static string SqlEscape(string value)
     {
         return (value ?? string.Empty).Replace("'", "''");
