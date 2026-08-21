@@ -28,12 +28,22 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         {
             if (Session["useradmin"] != null)
             {
+                ProductWeightHelper.EnsureWeightColumn();
+                if (txtWeight != null)
+                {
+                    txtWeight.Attributes["step"] = "any";
+                    txtWeight.Attributes["min"] = "0";
+                }
                 loadProduct(false);
             }
             else
             {
                 Response.Redirect("logout.aspx");
             }
+        }
+        else if (ProductData != null)
+        {
+            BindGrid();
         }
     }
 
@@ -73,6 +83,8 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         {
             GridView1.DataSource = null;
             GridView1.DataBind();
+            pnlPager.Visible = false;
+            pnlPager.Controls.Clear();
             return;
         }
 
@@ -99,6 +111,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
 
         GridView1.DataSource = dt;
         GridView1.DataBind();
+        BuildExternalPager();
     }
 
     int GetPageSize()
@@ -126,7 +139,111 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         GridView1.PageIndex = e.NewPageIndex;
         BindGrid();
     }
-    
+
+    void BuildExternalPager()
+    {
+        pnlPager.Controls.Clear();
+
+        DataTable dt = ProductData;
+        if (!GridView1.AllowPaging || dt == null || dt.Rows.Count == 0)
+        {
+            pnlPager.Visible = false;
+            return;
+        }
+
+        int pageSize = GridView1.PageSize;
+        int totalRecords = dt.Rows.Count;
+        int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+        if (totalPages <= 1)
+        {
+            pnlPager.Visible = false;
+            return;
+        }
+
+        int currentPage = GridView1.PageIndex;
+        pnlPager.Visible = true;
+
+        int fromRecord = (currentPage * pageSize) + 1;
+        int toRecord = Math.Min(totalRecords, (currentPage + 1) * pageSize);
+        pnlPager.Controls.Add(new LiteralControl(
+            "<span class=\"admin-pager-info\">Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + "</span>"));
+
+        AddPagerLink("Prev", "nav_prev", currentPage - 1, currentPage > 0, false);
+        AddPagerLink("First", "nav_first", 0, currentPage > 0, false);
+
+        const int windowSize = 4;
+        int startPage = Math.Max(0, currentPage - (windowSize / 2));
+        int endPage = Math.Min(totalPages - 1, startPage + windowSize - 1);
+        startPage = Math.Max(0, endPage - windowSize + 1);
+
+        if (startPage > 0)
+        {
+            AddPagerEllipsis("ell_start");
+        }
+
+        for (int i = startPage; i <= endPage; i++)
+        {
+            AddPagerLink((i + 1).ToString(), "nav_page_" + i, i, true, i == currentPage);
+        }
+
+        if (endPage < totalPages - 1)
+        {
+            AddPagerEllipsis("ell_end");
+        }
+
+        AddPagerLink("Last", "nav_last", totalPages - 1, currentPage < totalPages - 1, false);
+        AddPagerLink("Next", "nav_next", currentPage + 1, currentPage < totalPages - 1, false);
+    }
+
+    void AddPagerEllipsis(string controlId)
+    {
+        Literal ellipsis = new Literal();
+        ellipsis.ID = controlId;
+        ellipsis.Text = "<span class=\"admin-pager-btn is-ellipsis\">.....</span>";
+        pnlPager.Controls.Add(ellipsis);
+    }
+
+    void AddPagerLink(string text, string controlId, int pageIndex, bool enabled, bool isActive)
+    {
+        if (isActive)
+        {
+            Literal active = new Literal();
+            active.ID = controlId + "_active";
+            active.Text = "<span class=\"admin-pager-btn is-active\">" + text + "</span>";
+            pnlPager.Controls.Add(active);
+            return;
+        }
+
+        if (!enabled)
+        {
+            Literal disabled = new Literal();
+            disabled.ID = controlId + "_disabled";
+            disabled.Text = "<span class=\"admin-pager-btn is-disabled\">" + text + "</span>";
+            pnlPager.Controls.Add(disabled);
+            return;
+        }
+
+        LinkButton link = new LinkButton();
+        link.ID = controlId;
+        link.Text = text;
+        link.CssClass = "admin-pager-btn";
+        link.CommandArgument = pageIndex.ToString();
+        link.CausesValidation = false;
+        link.Click += ExternalPager_Click;
+        pnlPager.Controls.Add(link);
+    }
+
+    protected void ExternalPager_Click(object sender, EventArgs e)
+    {
+        LinkButton link = sender as LinkButton;
+        int pageIndex;
+        if (link != null && int.TryParse(link.CommandArgument, out pageIndex))
+        {
+            GridView1.PageIndex = pageIndex;
+            BindGrid();
+        }
+    }
+
     string SaveUploadedImage(FileUpload upload)
     {
         if (upload == null || !upload.HasFile)
@@ -256,7 +373,9 @@ public partial class admin_ProductDetails : System.Web.UI.Page
         objState.BATCHNO = Txtbatchno.Text.Trim();
         objState.CouponCode = Convert.ToString(Math.Round(dp, 0));
         objState.GST = gst;
+        decimal weightGrams = ProductWeightHelper.ParseGrams(txtWeight.Text);
         string res = Update_Product(objState);
+        ProductWeightHelper.SaveByProductId(objState.ProductId, weightGrams);
 
         string fullDesc = (TxtDescription.Content ?? string.Empty).Replace("'", "''");
         string sqlUpdateAddInfo = "update ProductMaster set additionalinfo='" + fullDesc + "' where ProductId='" + SqlEscape(objState.ProductId) + "'";
@@ -373,6 +492,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             Label lblstatename2 = (Label)GridView1.Rows[index].FindControl("lblstatename2");
             Label LblHSNcode = (Label)GridView1.Rows[index].FindControl("LblHSNcode");
             Label LBLBatchno = (Label)GridView1.Rows[index].FindControl("LBLBatchno");
+            Label LblWeight = (Label)GridView1.Rows[index].FindControl("LblWeight");
             if (!string.IsNullOrEmpty(LblStatus.Text) && DDLstStatusEdit.Items.FindByValue(LblStatus.Text) != null)
             {
                 DDLstStatusEdit.SelectedValue = LblStatus.Text;
@@ -388,6 +508,7 @@ public partial class admin_ProductDetails : System.Web.UI.Page
             txtGst.Text = FormatDecimalInput(lblstatenameGST.Text);
             TxtHsncode.Text = LblHSNcode.Text;
             Txtbatchno.Text = LBLBatchno.Text;
+            txtWeight.Text = FormatDecimalInput(LblWeight != null ? LblWeight.Text : "0");
 
             string img1 = GetEditImageUrl(LblImage.Text);
             string img2 = GetEditImageUrl(LblImage2.Text);

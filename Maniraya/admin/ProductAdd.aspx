@@ -194,7 +194,7 @@
                             <div class="admin-form-section">
                                 <h5 class="admin-form-section-title"><i class="fa fa-file-text-o"></i> Tax &amp; Compliance</h5>
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <div class="form-group">
                                             <label for="<%= txtGst.ClientID %>">GST (%)</label>
                                             <div class="admin-input-group">
@@ -203,7 +203,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <div class="form-group">
                                             <label for="<%= txtHSN.ClientID %>">HSN Code</label>
                                             <div class="admin-input-group">
@@ -212,12 +212,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <div class="form-group">
                                             <label for="<%= txtBatch.ClientID %>">Batch Number</label>
                                             <div class="admin-input-group">
                                                 <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
                                                 <asp:TextBox ID="txtBatch" CssClass="form-control" runat="server" placeholder="Enter batch number" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="<%= txtWeight.ClientID %>">Weight (Gram)</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-balance-scale"></i></span>
+                                                <asp:TextBox ID="txtWeight" CssClass="form-control" runat="server" TextMode="Number" placeholder="e.g. 250" />
                                             </div>
                                         </div>
                                     </div>

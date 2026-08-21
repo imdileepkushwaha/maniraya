@@ -120,7 +120,7 @@
 
                     </div>
                 </div>
-      <div class="col-md-12">
+      <div class="col-md-12 admin-report-page">
 
              <div class="box box-primary">
             <div class="box-header with-border">
@@ -144,7 +144,7 @@
                   
                 <div class="form-group table-responsive">
                  <asp:GridView ID="GridView1" runat="server" CssClass="table table-bordered table-hover dataTable" Width="100%" AutoGenerateColumns="False" AllowPaging="true" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowCommand="GridView1_RowCommand" OnRowDataBound="GridView1_RowDataBound"  >
-                                <PagerSettings FirstPageText="First" LastPageText="Last" Mode="NumericFirstLast" Position="Bottom" />
+                                <PagerSettings Visible="false" />
                                 <Columns>
                                 <asp:TemplateField HeaderText="#">
                                     <ItemTemplate>
@@ -159,6 +159,7 @@
                                          <asp:Label ID="LblStatuschk" runat="server" Visible="false" Text='<%#Eval("Status") %>'></asp:Label>
                                             <asp:Label ID="LblHSNcode" runat="server" Visible="false" Text='<%#Eval("HSNCODE") %>'></asp:Label>
                                           <asp:Label ID="LBLBatchno" runat="server" Visible="false" Text='<%#Eval("BATCHNO") %>'></asp:Label>
+                                          <asp:Label ID="LblWeight" runat="server" Visible="false" Text='<%#Eval("Weight") %>'></asp:Label>
                                     </ItemTemplate>
                                 </asp:TemplateField>
                            <asp:TemplateField HeaderText="Category Name">
@@ -208,6 +209,11 @@
                                </ItemTemplate>
 
                            </asp:TemplateField>
+                                       <asp:TemplateField HeaderText="Weight (g)">
+                               <ItemTemplate>
+                                     <asp:Label ID="lblWeightList" runat="server" Text='<%# Eval("Weight") %>'></asp:Label>
+                               </ItemTemplate>
+                           </asp:TemplateField>
                                      <asp:TemplateField HeaderText="Product Image" >
                                <ItemTemplate>
                                    <asp:LinkButton ID="lnkph" runat="server" CommandName="photolarge"  CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
@@ -233,6 +239,7 @@
                                     </asp:TemplateField>
                             </Columns>
                             </asp:GridView>
+                    <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar"></asp:Panel>
               
                 </div>             
              
@@ -340,6 +347,15 @@
                                                 <div class="admin-input-group">
                                                     <span class="admin-input-icon"><i class="fa fa-hashtag"></i></span>
                                                     <asp:TextBox runat="server" CssClass="form-control" ID="Txtbatchno" placeholder="Batch no"></asp:TextBox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label for="<%= txtWeight.ClientID %>">Weight (Gram)</label>
+                                                <div class="admin-input-group">
+                                                    <span class="admin-input-icon"><i class="fa fa-balance-scale"></i></span>
+                                                    <asp:TextBox runat="server" CssClass="form-control" ID="txtWeight" TextMode="Number" placeholder="e.g. 250"></asp:TextBox>
                                                 </div>
                                             </div>
                                         </div>

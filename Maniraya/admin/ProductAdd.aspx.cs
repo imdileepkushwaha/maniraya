@@ -21,6 +21,12 @@ public partial class admin_ProductAdd : System.Web.UI.Page
         {
             if (Session["useradmin"] != null)
             {
+                ProductWeightHelper.EnsureWeightColumn();
+                if (txtWeight != null)
+                {
+                    txtWeight.Attributes["step"] = "any";
+                    txtWeight.Attributes["min"] = "0";
+                }
                 loadCategory();
                
             }
@@ -215,6 +221,7 @@ public partial class admin_ProductAdd : System.Web.UI.Page
         objState.Description = Txtshortdiscription.Text.Trim();
         objState.BV = Convert.ToDecimal(TxtBV.Text);
         objState.DP = Convert.ToString(Convert.ToDecimal(TxtDP.Text));
+        decimal weightGrams = ProductWeightHelper.ParseGrams(txtWeight.Text);
         objState.SubproductArray = getoperatorpermission();
         if (objState.SubproductArray == "")
         {
@@ -225,9 +232,11 @@ public partial class admin_ProductAdd : System.Web.UI.Page
         string res = Insert_Product(objState);
         if (res == "t")
         {
+            ProductWeightHelper.SaveByLatestProduct(objState.ProductName, objState.CategoryId, objState.SubCategoryId, weightGrams);
             string popupScript = "alert('Product Added Successfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             txtstatename.Text = ""; ddcountry.SelectedValue = "0"; TxtAmount.Text = ""; TxtDescription.Content = String.Empty; TxtBV.Text = string.Empty;
+            txtWeight.Text = "";
 
         }
         else if (res == "f")
