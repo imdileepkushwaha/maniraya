@@ -1,0 +1,547 @@
+.upc-page {
+    --upc-card: #ffffff;
+    --upc-text: #1a1d21;
+    --upc-muted: #6b7280;
+    --upc-border: #e8ecf1;
+    --upc-gold: #e5a906;
+    --upc-gold-soft: rgba(246, 207, 99, 0.18);
+    --upc-red: #e52d27;
+    --upc-radius: 14px;
+}
+
+.upc-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    align-items: start;
+}
+
+.upc-card {
+    background: var(--upc-card);
+    border: 1px solid var(--upc-border);
+    border-radius: var(--upc-radius);
+    box-shadow: 0 8px 24px -18px rgba(15, 23, 42, 0.35);
+}
+
+.upc-card-pad {
+    padding: 18px 20px;
+}
+
+.upc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.upc-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.upc-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.upc-link-btn {
+    border: 0;
+    background: none;
+    color: var(--upc-red);
+    font-weight: 700;
+    padding: 0;
+    cursor: pointer;
+}
+
+.upc-link-btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.upc-count {
+    color: var(--upc-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.upc-item {
+    display: grid;
+    grid-template-columns: auto 88px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid var(--upc-border);
+}
+
+.upc-item:first-child {
+    border-top: 0;
+    padding-top: 4px;
+}
+
+.upc-item-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid var(--upc-border);
+}
+
+.upc-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.upc-item-name {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--upc-text);
+    line-height: 1.35;
+}
+
+.upc-item-meta {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    color: var(--upc-muted);
+}
+
+.upc-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.upc-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--upc-text);
+}
+
+.upc-mrp {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.upc-item-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.upc-qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--upc-border);
+    border-radius: 999px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.upc-qty a,
+.upc-qty span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 32px;
+    color: var(--upc-text);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.upc-qty a:hover {
+    background: #f8fafc;
+}
+
+.upc-line-total {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--upc-text);
+}
+
+.upc-remove {
+    color: var(--upc-red) !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.upc-empty {
+    text-align: center;
+    padding: 48px 20px;
+}
+
+.upc-empty i {
+    font-size: 42px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+}
+
+.upc-empty h3 {
+    margin: 0 0 6px;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.upc-empty p {
+    margin: 0 0 18px;
+    color: var(--upc-muted);
+}
+
+.upc-summary {
+    position: sticky;
+    top: 16px;
+}
+
+.upc-summary h3 {
+    margin: 0 0 16px;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.upc-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 0.92rem;
+    color: #475569;
+}
+
+.upc-summary-row strong {
+    color: var(--upc-text);
+}
+
+.upc-summary-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--upc-border);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--upc-text);
+}
+
+.upc-ship-note {
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #64748b;
+}
+
+.upc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.upc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none !important;
+    border: 0;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.upc-btn-primary,
+.upc-page .upc-btn-primary {
+    background: linear-gradient(135deg, #f6cf63 0%, #e5a906 100%);
+    color: #1a1d21 !important;
+    box-shadow: 0 8px 18px -10px rgba(229, 169, 6, 0.7);
+}
+
+.upc-btn-outline {
+    background: #fff;
+    color: #334155 !important;
+    border: 1px solid var(--upc-border);
+}
+
+.upc-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.upc-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--upc-border);
+    background: #fff;
+    color: #94a3b8;
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
+.upc-step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    font-size: 0.78rem;
+}
+
+.upc-step.is-active {
+    border-color: rgba(229, 169, 6, 0.65);
+    background: linear-gradient(135deg, rgba(246, 207, 99, 0.16) 0%, rgba(255, 251, 235, 0.9) 100%);
+    color: #1a1d21;
+}
+
+.upc-step.is-active .upc-step-num,
+.upc-step.is-done .upc-step-num {
+    background: linear-gradient(135deg, #f6cf63 0%, #e5a906 100%);
+    color: #1a1d21;
+}
+
+.upc-step.is-done {
+    color: #334155;
+}
+
+.upc-section-title {
+    margin: 0 0 14px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upc-address-options,
+.upc-pay-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.upc-pay-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.upc-pay-options .upc-choice label {
+    min-height: 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.upc-choice {
+    position: relative;
+}
+
+.upc-choice input[type="radio"],
+.upc-choice > span {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upc-choice label {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: #fff;
+    cursor: pointer;
+    min-height: 84px;
+}
+
+.upc-choice input[type="radio"]:checked + label,
+.upc-choice:has(input[type="radio"]:checked) > label {
+    border-color: rgba(229, 169, 6, 0.65);
+    background: linear-gradient(135deg, rgba(246, 207, 99, 0.16) 0%, rgba(255, 251, 235, 0.9) 100%);
+    box-shadow: 0 8px 20px -14px rgba(229, 169, 6, 0.55);
+}
+
+.upc-choice-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(246, 207, 99, 0.22);
+    color: #92400e;
+    flex-shrink: 0;
+}
+
+.upc-choice-text strong,
+.upc-choice-text b {
+    display: block;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+.upc-choice-text span {
+    display: block;
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.upc-address-preview {
+    white-space: pre-line;
+    margin: 0;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.upc-review-block {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--upc-border);
+}
+
+.upc-review-block:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.upc-review-label {
+    margin: 0 0 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.upc-mini-item {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.upc-mini-item img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--upc-border);
+}
+
+.upc-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.upc-nav .upc-btn {
+    width: auto;
+    min-width: 180px;
+    padding: 0 18px;
+}
+
+.upc-receipt {
+    max-width: 180px;
+    border-radius: 10px;
+    border: 1px solid var(--upc-border);
+}
+
+.upc-page .saving-bank-detail-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.upc-page .saving-bank-detail-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+    font-size: 0.88rem;
+}
+
+.upc-page .saving-bank-detail-list span {
+    color: #64748b;
+}
+
+.upc-page .saving-purchase-info-note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 991px) {
+    .upc-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .upc-summary {
+        position: static;
+    }
+
+    .upc-pay-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .upc-item {
+        grid-template-columns: auto 72px minmax(0, 1fr);
+    }
+
+    .upc-item-side {
+        grid-column: 2 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .upc-address-options,
+    .upc-pay-options,
+    .upc-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .upc-nav .upc-btn {
+        width: 100%;
+    }
+}

@@ -548,8 +548,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Courier Charge</label>
-                                        <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="150.00"></asp:TextBox>
+                                        <label>Shipping Charge</label>
+                                        <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="0.00"></asp:TextBox>
                                     </div>
                                 </div>
                                 <div class="col-md-3">

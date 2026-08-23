@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
@@ -786,7 +786,7 @@ public partial class PurchaseItemRepurchaseDP : System.Web.UI.Page
             TxtTotalSGST.Text = totalSGST.ToString();
             TxtTotalIGST.Text = totalIGST.ToString();
 
-            TxtShipping.Text = "0";
+            TxtShipping.Text = ProductWeightHelper.QuoteFromCart(ViewState["PDT"] as DataTable, total).ShippingAmount.ToString("0.00");
             //if (TxtTotalpurchase.Text != string.Empty)
             //{
             //    if (Convert.ToDecimal(TxtTotalpurchase.Text) < 1000)
@@ -867,6 +867,7 @@ public partial class PurchaseItemRepurchaseDP : System.Web.UI.Page
         string i = AddPurchase(objState, ViewState["PDT"] as DataTable, Convert.ToDecimal(TxtShipping.Text));
         if (i == "1")
         {
+            ProductWeightHelper.SaveOnLatestUserPurchase(objState.UserId, Convert.ToDecimal(TxtShipping.Text));
             string popupScript = "alert('Purchase Successfull');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             GridView1.DataSource = null;

@@ -119,9 +119,12 @@
                     <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-shopping-bag"></i></div>
                     <div class="profile-hero-info">
                         <h2>Purchase Item</h2>
-                        <p class="profile-hero-meta">Add products to cart, fill shipping &amp; payment details, then submit</p>
+                        <p class="profile-hero-meta">Add products to cart, then checkout with address and payment.</p>
                     </div>
                     <div class="profile-hero-actions">
+                        <a href="UserProductCart.aspx" class="profile-btn profile-btn-primary">
+                            <i class="fa fa-shopping-cart"></i> Cart (<asp:Literal ID="litCartCount" runat="server" Text="0" />)
+                        </a>
                         <a id="lnksearch" runat="server" class="profile-btn profile-btn-outline" href="FranchiseeSearchNew.aspx">
                             <i class="fa fa-arrow-left"></i> Back
                         </a>
@@ -312,10 +315,10 @@
                                             <asp:TextBox ID="TxtTotalIGST" CssClass="form-control" runat="server"></asp:TextBox>
                                         </div>
                                     </div>
-                                    <div class="col-md-3" style="display:none;">
+                                    <div class="col-md-3">
                                         <div class="form-group">
-                                            <label>Courier Charge</label>
-                                            <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="150.00"></asp:TextBox>
+                                            <label>Shipping Charge</label>
+                                            <asp:TextBox ID="TxtShipping" CssClass="form-control" runat="server" Enabled="false" Text="0.00"></asp:TextBox>
                                         </div>
                                     </div>
                                     <div class="col-md-3">

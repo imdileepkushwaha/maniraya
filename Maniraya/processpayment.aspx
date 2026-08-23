@@ -359,7 +359,7 @@
                                     <ul class="pay-summary-list">
                                         <li><span>Subtotal</span><asp:Label ID="lblSubtotal" runat="server" CssClass="pay-summary-value" /></li>
                                         <li class="pay-summary-discount"><span>Discount</span><asp:Label ID="lblDiscount" runat="server" CssClass="pay-summary-value" /></li>
-                                        <li><span>Shipping</span><span class="pay-summary-free">Free</span></li>
+                                        <li><span>Shipping</span><asp:Label ID="lblShipping" runat="server" CssClass="pay-summary-free" Text="Free" /></li>
                                         <li><span>Tax</span><asp:Label ID="lblTax" runat="server" CssClass="pay-summary-value" /></li>
                                     </ul>
 

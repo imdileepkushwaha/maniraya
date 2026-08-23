@@ -70,14 +70,24 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
                 HdFiled.Value = DateTime.Now.Ticks.ToString();
 				 RDBtnTRecharge.Checked = true;
 				loaduseraddressdetail();
-				
             }
+
+            BindCartCount();
         }
         else
         {
             Response.Redirect("logout.aspx");
         }
     }
+
+    void BindCartCount()
+    {
+        if (litCartCount != null)
+        {
+            litCartCount.Text = UserPanelCartHelper.GetLineCount(Session).ToString();
+        }
+    }
+
 	 void loaduseraddressdetail()
     {
         DataTable dt = new DataTable();
@@ -392,44 +402,18 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         }
         if (e.CommandName == "BuyProduct")
         {
-            ClearValue();
             string id = e.CommandArgument.ToString();
-            objState.ProductId = id;
-            DataTable Dt = objState.getProduct(objState);
-            DataTable StockDt = objState.getCheckStockfranchisee(objState.ProductId, HdFranchiseeid.Value);
-            if (Dt.Rows.Count > 0)
+            string error;
+            if (!UserPanelCartHelper.AddProduct(Session, Convert.ToString(Session["userid"]), id, HdFranchiseeid.Value, HDPlantype.Value, HDPlanId.Value, 1, out error))
             {
-                HdBuisnessVolume.Value = Dt.Rows[0]["BV"].ToString();
-                HdCatId.Value = Dt.Rows[0]["CategoryID"].ToString();
-                TxtProductCode.Text = Dt.Rows[0]["ProductId"].ToString();
-                TxtProductName.Text = Dt.Rows[0]["ProductName"].ToString();
-                TxtAmount.Text = Dt.Rows[0]["Amount"].ToString();
-                TxtMRP.Text = Dt.Rows[0]["MRP"].ToString();
-                TxtDP.Text = Dt.Rows[0]["DP"].ToString();
-                Txtbv.Text = Dt.Rows[0]["BV"].ToString();
-                LblGST.Text = Dt.Rows[0]["GST"].ToString();
-                int Stock = Convert.ToInt32(StockDt.Rows[0]["Cr"].ToString()) - Convert.ToInt32(StockDt.Rows[0]["Dr"].ToString());
-                ViewState["st"] = Stock.ToString();
-                string Imaget = "";
-                if (Dt.Rows[0]["Image"].ToString() != "../ProductImage/")
-                {
-                    Imaget = Dt.Rows[0]["Image"].ToString();
-                }
-                else
-                {
-                    Imaget = "../ProductImage/images.png";
-                }
-                TxtImage.Text = Imaget;
-                TxtQuantity.Text = "1";
-                TxtTotalAmount.Text = Dt.Rows[0]["Amount"].ToString();
-                TxtTotalSV2.Text = Dt.Rows[0]["BV"].ToString();
-                TxtTotalDP.Text = Dt.Rows[0]["Amount"].ToString();
-                GDoffer.DataSource = null;
-                GDoffer.DataBind();
-                GetofferProductdata(Convert.ToInt32(TxtProductCode.Text), Convert.ToInt32(TxtQuantity.Text));
+                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(),
+                    "alert('" + (error ?? "Unable to add product.").Replace("\\", "\\\\").Replace("'", "\\'") + "');", true);
+                return;
             }
-            BtnAdd.Text = "Add";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal1();", true);
+
+            BindCartCount();
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(),
+                "window.location='UserProductCart.aspx';", true);
         }
     }
     public void CreateDatatable()
@@ -879,7 +863,7 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
             TxtTotalSGST.Text = totalSGST.ToString();
             TxtTotalIGST.Text = totalIGST.ToString();
 
-            TxtShipping.Text = "0";
+            TxtShipping.Text = ProductWeightHelper.QuoteFromCart(ViewState["PDT"] as DataTable, total).ShippingAmount.ToString("0.00");
             //if (TxtTotalpurchase.Text != string.Empty)
             //{
             //    if (Convert.ToDecimal(TxtTotalpurchase.Text) < 1000)
@@ -967,6 +951,7 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         string i = AddPurchase(objState, purchaseForSp, Convert.ToDecimal(TxtShipping.Text));
         if (i == "1")
         {
+            ProductWeightHelper.SaveOnLatestUserPurchase(objState.UserId, Convert.ToDecimal(TxtShipping.Text));
             string popupScript = "alert('Purchase Successfull');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             GridView1.DataSource = null;

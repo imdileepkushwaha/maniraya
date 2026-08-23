@@ -28,7 +28,7 @@ public partial class addtocart : Page
 
     void BindHeroMeta()
     {
-        litHeroFreeShipping.Text = CartSettingsHelper.GetHeroFreeShippingText();
+        litHeroFreeShipping.Text = "₹50/kg shipping · 3 kg free above ₹2500";
     }
 
     public void UpdateBal()
@@ -105,19 +105,18 @@ public partial class addtocart : Page
         }
 
         decimal discount = totalMrp - orderTotal;
-        decimal shipping = 0m;
-        decimal freeShippingMin = CartSettingsHelper.GetFreeShippingMinAmount();
+        ProductWeightHelper.ShippingQuote shippingQuote = ProductWeightHelper.QuoteFromCart(dt, orderTotal);
+        decimal shipping = shippingQuote.ShippingAmount;
 
-        if (orderTotal < freeShippingMin)
-        {
-            shipping = CartSettingsHelper.GetShippingCharge();
-            lblShipping.Text = "₹ " + shipping.ToString("0.00");
-            lblShipping.CssClass = "summary-value";
-        }
-        else
+        if (shipping <= 0)
         {
             lblShipping.Text = "FREE";
             lblShipping.CssClass = "summary-value text-success";
+        }
+        else
+        {
+            lblShipping.Text = "₹ " + shipping.ToString("0.00");
+            lblShipping.CssClass = "summary-value";
         }
 
         decimal payable = orderTotal - walletDeduction + shipping;
@@ -127,16 +126,32 @@ public partial class addtocart : Page
         lblTax.Text = "₹ " + gstTotal.ToString("0.00");
         lblTotal.Text = "₹ " + payable.ToString("0.00");
 
-        BindShippingProgress(orderTotal);
+        BindShippingProgress(shippingQuote);
     }
 
-    void BindShippingProgress(decimal cartTotal)
+    void BindShippingProgress(ProductWeightHelper.ShippingQuote quote)
     {
-        ShippingProgressModel progress = CartSettingsHelper.BuildShippingProgress(cartTotal);
-        litProgressTitle.Text = progress.Title;
-        litProgressMessage.Text = progress.Message;
-        shippingProgressFill.Style["width"] = progress.ProgressPercent + "%";
-        pnlShippingProgress.CssClass = progress.IsUnlocked
+        if (quote == null)
+        {
+            pnlShippingProgress.Visible = false;
+            return;
+        }
+
+        litProgressTitle.Text = quote.Title;
+        litProgressMessage.Text = quote.Message;
+
+        int percent;
+        if (quote.HasFreeThreeKg)
+        {
+            percent = 100;
+        }
+        else
+        {
+            percent = Convert.ToInt32(Math.Min(100m, Math.Round((quote.OrderAmount / ProductWeightHelper.FreeKgThresholdAmount) * 100m, 0)));
+        }
+
+        shippingProgressFill.Style["width"] = percent + "%";
+        pnlShippingProgress.CssClass = quote.HasFreeThreeKg
             ? "cart-delivery-progress is-unlocked"
             : "cart-delivery-progress";
     }

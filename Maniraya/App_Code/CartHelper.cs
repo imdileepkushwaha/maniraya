@@ -13,6 +13,7 @@ public static class CartHelper
         }
 
         string safeUserId = userId.Replace("'", "''");
+        ProductWeightHelper.EnsureWeightColumn();
         string sql = @"
             SELECT
                 s.SubProductID,
@@ -38,6 +39,7 @@ public static class CartHelper
                 p.DP,
                 p.GST,
                 p.BV,
+                ISNULL(p.Weight, 0) AS Weight,
                 p.BV * ct.Quantity AS TOTALBV,
                 p.DP * ct.Quantity AS TOTALDP,
                 ISNULL(p.productimage, '') AS ProductImage,

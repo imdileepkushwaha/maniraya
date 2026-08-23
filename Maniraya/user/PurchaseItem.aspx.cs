@@ -390,21 +390,7 @@ public partial class admin_PurchaseItem : System.Web.UI.Page
             HDTotal.Value = total.ToString();
             TxtTotalpurchase.Text= total.ToString();
             
-            if(TxtTotalpurchase.Text!=string.Empty)
-            {
-                if (Convert.ToDecimal(TxtTotalpurchase.Text) < 1000)
-                {
-                    TxtShipping.Text = "0";
-                }
-                if (Convert.ToDecimal(TxtTotalpurchase.Text) > 1000 && Convert.ToDecimal(TxtTotalpurchase.Text) < 3500)
-                {
-                    TxtShipping.Text = "0";
-                }
-                if (Convert.ToDecimal(TxtTotalpurchase.Text) > 3500 )
-                {
-                    TxtShipping.Text = "0";
-                }
-            }
+            TxtShipping.Text = ProductWeightHelper.QuoteFromCart(ViewState["PDT"] as DataTable, total).ShippingAmount.ToString("0.00");
             if(Decimal.TryParse(TxtTotalpurchase.Text,out tt))
             {
                 TXTTTAmount.Text = Convert.ToString(total + Convert.ToDecimal(TxtShipping.Text));
@@ -447,6 +433,7 @@ public partial class admin_PurchaseItem : System.Web.UI.Page
         string  i = AddPurchase(objState, ViewState["PDT"] as DataTable, Convert.ToDecimal(TxtShipping.Text));
         if (i == "1")
         {
+            ProductWeightHelper.SaveOnLatestUserPurchase(objState.UserId, Convert.ToDecimal(TxtShipping.Text));
             string popupScript = "alert('Purchase Successfull');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
             GridView1.DataSource = null;

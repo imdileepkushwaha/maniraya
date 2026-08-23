@@ -32,8 +32,8 @@ public partial class processpayment : System.Web.UI.Page
     void loadaddcartitem(string id)
     {
         objState.UserId = id;
-        DataTable Dt = objState.getCartItems(objState);
-        if (Dt.Rows.Count > 0)
+        DataTable Dt = CartHelper.GetCartItemsWithImages(id);
+        if (Dt != null && Dt.Rows.Count > 0)
         {
             CalculateSummary(Dt);
         }
@@ -186,12 +186,28 @@ public partial class processpayment : System.Web.UI.Page
 
         decimal discount = TotalMRP - Totaltotal;
         decimal tax = GSTtotal;
+        ProductWeightHelper.ShippingQuote quote = ProductWeightHelper.QuoteFromCart(dt, Totaltotal);
+        decimal shipping = quote.ShippingAmount;
+        decimal payable = Totaltotal + shipping;
 
         lblSubtotal.Text = "₹" + purchaseamounttotal.ToString("0.00");
         lblDiscount.Text = "₹" + discount.ToString("0.00");
         lblTax.Text = "₹" + tax.ToString("0.00");
-        lblTotal.Text = "₹" + Totaltotal.ToString("0.00");
-        lblQrAmount.Text = "₹" + Totaltotal.ToString("0.00");
+        if (lblShipping != null)
+        {
+            if (shipping <= 0)
+            {
+                lblShipping.Text = "Free";
+                lblShipping.CssClass = "pay-summary-free";
+            }
+            else
+            {
+                lblShipping.Text = "₹" + shipping.ToString("0.00");
+                lblShipping.CssClass = "pay-summary-value";
+            }
+        }
+        lblTotal.Text = "₹" + payable.ToString("0.00");
+        lblQrAmount.Text = "₹" + payable.ToString("0.00");
     }
 
     protected string GetBankField(object dataItem, params string[] columnNames)
@@ -334,8 +350,8 @@ public partial class processpayment : System.Web.UI.Page
         }
 
         objState.UserId = Session["userid"].ToString();
-        DataTable Dt = objState.getCartItems(objState);
-        if (Dt.Rows.Count == 0)
+        DataTable Dt = CartHelper.GetCartItemsWithImages(Session["userid"].ToString());
+        if (Dt == null || Dt.Rows.Count == 0)
         {
             ShowAlert("Your cart is empty.");
             return;
@@ -388,9 +404,11 @@ public partial class processpayment : System.Web.UI.Page
         objState.PaymentMode = paymentMethod == "qr" ? "2" : "1";
         Session["CartItem"] = PurchaseDt;
 
-        string i = objState.AddPurchaseOutside(objState, PurchaseDt, Convert.ToDecimal(0));
+        decimal shipping = ProductWeightHelper.QuoteFromCart(Dt, total).ShippingAmount;
+        string i = objState.AddPurchaseOutside(objState, PurchaseDt, shipping);
         if (i == "1")
         {
+            ProductWeightHelper.SaveOnLatestUserPurchase(objState.UserId, shipping);
             ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alert", "alert('Purchase Successfull');window.location.href='index.aspx';", true);
         }
         else if (i == "2")
