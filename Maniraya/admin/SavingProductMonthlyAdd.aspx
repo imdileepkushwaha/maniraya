@@ -1,7 +1,7 @@
 <%@ Page Title="Add Monthly Saving Product" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingProductMonthlyAdd.aspx.cs" Inherits="admin_SavingProductMonthlyAdd" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=77" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=78" />
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
@@ -91,8 +91,29 @@
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="<%= fuImage.ClientID %>">Product Image</label>
-                                                <asp:FileUpload ID="fuImage" runat="server" />
+                                                <label>Product Image</label>
+                                                <div class="admin-product-image-slot is-primary" id="monthlyProductImageSlot">
+                                                    <div class="admin-product-image-slot-head">
+                                                        <p class="admin-product-image-slot-title">Product photo</p>
+                                                        <span class="admin-product-image-slot-badge is-optional">Optional</span>
+                                                    </div>
+                                                    <div class="admin-product-image-preview-box admin-product-image-preview-box">
+                                                        <div class="admin-product-image-placeholder">
+                                                            <i class="fa fa-image"></i>
+                                                            <span>No image selected</span>
+                                                        </div>
+                                                        <img class="admin-product-image-preview-img" alt="Product image preview" />
+                                                    </div>
+                                                    <div class="admin-product-image-dropzone">
+                                                        <asp:FileUpload ID="fuImage" runat="server" CssClass="admin-file-input-hidden" accept="image/*" />
+                                                        <label class="admin-product-image-dropzone-label" for="<%= fuImage.ClientID %>">
+                                                            <i class="fa fa-cloud-upload"></i>
+                                                            <span>Browse or drop image here</span>
+                                                        </label>
+                                                        <span class="admin-product-image-filename admin-product-image-filename">No file selected</span>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">JPG, PNG or WEBP. First image is used as the product photo.</small>
                                             </div>
                                         </div>
                                     </div>

@@ -16,6 +16,7 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
         if (!IsPostBack)
         {
             BindPrizeGrid();
+            SetNextDisplayOrder();
         }
     }
 
@@ -33,7 +34,7 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
         string createdBy = Session["useradmin"] != null ? Session["useradmin"].ToString() : string.Empty;
-        string res = PrizeHelper.AddPrize(txtPrizeName.Text.Trim(), txtPrizeDesc.Text.Trim(), createdBy);
+        string res = PrizeHelper.AddPrize(txtPrizeName.Text.Trim(), txtPrizeDesc.Text.Trim(), createdBy, ParseDisplayOrder(txtDisplayOrder.Text, 0));
 
         switch (res)
         {
@@ -127,6 +128,14 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
         txtPrizeNameEdit.Text = Convert.ToString(row["PrizeName"]);
         txtPrizeDescEdit.Text = row.Table.Columns.Contains("Description") ? Convert.ToString(row["Description"]) : string.Empty;
         chkEditStatus.Checked = !row.Table.Columns.Contains("Status") || Convert.ToBoolean(row["Status"]);
+        if (row.Table.Columns.Contains("DisplayOrder"))
+        {
+            txtDisplayOrderEdit.Text = Convert.ToString(row["DisplayOrder"]);
+        }
+        else
+        {
+            txtDisplayOrderEdit.Text = "1";
+        }
 
         ScriptManager.RegisterStartupScript(
             UpdatePanel1,
@@ -151,7 +160,7 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
             return;
         }
 
-        if (PrizeHelper.UpdatePrize(prizeId, txtPrizeNameEdit.Text.Trim(), txtPrizeDescEdit.Text.Trim(), chkEditStatus.Checked))
+        if (PrizeHelper.UpdatePrize(prizeId, txtPrizeNameEdit.Text.Trim(), txtPrizeDescEdit.Text.Trim(), chkEditStatus.Checked, ParseDisplayOrder(txtDisplayOrderEdit.Text, 1)))
         {
             ShowAlert("Prize updated successfully.");
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "closePrizeEditModal", "closePrizeEditModal();", true);
@@ -192,6 +201,23 @@ public partial class admin_PrizeMaster : System.Web.UI.Page
     {
         txtPrizeName.Text = string.Empty;
         txtPrizeDesc.Text = string.Empty;
+        SetNextDisplayOrder();
+    }
+
+    void SetNextDisplayOrder()
+    {
+        txtDisplayOrder.Text = PrizeHelper.GetNextDisplayOrder().ToString();
+    }
+
+    static int ParseDisplayOrder(string text, int fallback)
+    {
+        int order;
+        if (!int.TryParse((text ?? string.Empty).Trim(), out order) || order < 1)
+        {
+            return fallback > 0 ? fallback : 1;
+        }
+
+        return order;
     }
 
     void ShowAlert(string message)

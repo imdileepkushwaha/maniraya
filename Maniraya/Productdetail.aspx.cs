@@ -46,14 +46,7 @@ public partial class Productdetail : System.Web.UI.Page
             }
             if (Request.QueryString["productid"] != null)
             {
-                if (Request.QueryString["franchiseeid"] != null)
-                {
-                    hffranchiseeid.Value = Request.QueryString["franchiseeid"].ToString();
-                }
-                else if (string.IsNullOrWhiteSpace(hffranchiseeid.Value))
-                {
-                    hffranchiseeid.Value = "F000001";
-                }
+                hffranchiseeid.Value = ResolveFranchiseeId(Request.QueryString["franchiseeid"]);
 
                 string productId = Request.QueryString["productid"].ToString();
                 getproductdetail(productId);
@@ -222,17 +215,63 @@ public partial class Productdetail : System.Web.UI.Page
         rptSizes.DataBind();
     }
 
+    static string ResolveFranchiseeId(string franchiseeId)
+    {
+        string value = (franchiseeId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(value) || value == "0")
+        {
+            return "F000001";
+        }
+
+        return value;
+    }
+
+    static int ReadStockValue(DataTable dt)
+    {
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return 0;
+        }
+
+        int stock;
+        if (dt.Columns.Contains("stockleft"))
+        {
+            int.TryParse(Convert.ToString(dt.Rows[0]["stockleft"]), out stock);
+            return stock;
+        }
+
+        if (dt.Columns.Contains("Cr") && dt.Columns.Contains("Dr"))
+        {
+            int cr;
+            int dr;
+            int.TryParse(Convert.ToString(dt.Rows[0]["Cr"]), out cr);
+            int.TryParse(Convert.ToString(dt.Rows[0]["Dr"]), out dr);
+            return cr - dr;
+        }
+
+        int.TryParse(Convert.ToString(dt.Rows[0][0]), out stock);
+        return stock;
+    }
+
+    static int ResolveProductStock(string franchiseeid, string productid, string color, string size)
+    {
+        franchiseeid = ResolveFranchiseeId(franchiseeid);
+        clsProduct objproduct = new clsProduct();
+        int stock = ReadStockValue(objproduct.getstockbysubproduct(franchiseeid, productid, color, size));
+        if (stock > 0)
+        {
+            return stock;
+        }
+
+        DataTable productStock = objproduct.getCheckStockfranchisee(productid, franchiseeid);
+        stock = ReadStockValue(productStock);
+        return stock > 0 ? stock : 0;
+    }
+
     private void getstockby(string franchiseeid, string productid, string color, string size)
     {
-        clsProduct objproduct = new clsProduct();
-        DataTable res = objproduct.getstockbysubproduct(franchiseeid, productid, color, size);
-        int stock = 0;
-
-        if (res != null && res.Rows.Count > 0)
-        {
-            int.TryParse(Convert.ToString(res.Rows[0][0]), out stock);
-        }
-        else if (!string.IsNullOrWhiteSpace(productid) && GetStaticProductDetail(productid) != null)
+        int stock = ResolveProductStock(franchiseeid, productid, color, size);
+        if (stock <= 0 && !string.IsNullOrWhiteSpace(productid) && GetStaticProductDetail(productid) != null)
         {
             stock = 25;
         }
@@ -280,14 +319,7 @@ public partial class Productdetail : System.Web.UI.Page
     [System.Web.Services.WebMethod]
     public static int GetStock(string franchiseeid, string color, string size, string productId)
     {
-        clsProduct objproduct = new clsProduct();
-        int stock = 0;
-        DataTable res = objproduct.getstockbysubproduct(franchiseeid, productId, color, size);
-        if (res != null && res.Rows.Count > 0)
-        {
-            int.TryParse(Convert.ToString(res.Rows[0][0]), out stock);
-        }
-        return stock;
+        return ResolveProductStock(franchiseeid, productId, color, size);
     }
 
    

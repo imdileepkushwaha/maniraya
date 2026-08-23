@@ -9,6 +9,15 @@
                 name.focus();
                 return false;
             }
+            var order = document.getElementById("<%=txtDisplayOrder.ClientID%>");
+            if (order && order.value.trim() !== "") {
+                var n = parseInt(order.value, 10);
+                if (isNaN(n) || n < 1) {
+                    alert('Enter a valid Order (1 or more). Lower number shows first.');
+                    order.focus();
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -18,6 +27,15 @@
                 alert('Enter Prize Name');
                 name.focus();
                 return false;
+            }
+            var order = document.getElementById("<%=txtDisplayOrderEdit.ClientID%>");
+            if (order && order.value.trim() !== "") {
+                var n = parseInt(order.value, 10);
+                if (isNaN(n) || n < 1) {
+                    alert('Enter a valid Order (1 or more). Lower number shows first.');
+                    order.focus();
+                    return false;
+                }
             }
             return true;
         }
@@ -63,7 +81,7 @@
                             <p class="admin-product-intro">Create prizes that can later be assigned to members.</p>
                             <div class="admin-form-section admin-form-section-last">
                                 <div class="row">
-                                    <div class="col-md-5 col-sm-12">
+                                    <div class="col-md-4 col-sm-12">
                                         <div class="form-group">
                                             <label for="<%= txtPrizeName.ClientID %>">Prize Name</label>
                                             <div class="admin-input-group">
@@ -72,7 +90,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-7 col-sm-12">
+                                    <div class="col-md-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="<%= txtDisplayOrder.ClientID %>">Order</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-sort-numeric-asc"></i></span>
+                                                <asp:TextBox ID="txtDisplayOrder" CssClass="form-control" runat="server" TextMode="Number" min="1" step="1" placeholder="1" />
+                                            </div>
+                                            <p class="help-block" style="margin:6px 0 0;font-size:12px;">1 = top on user dashboard.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12">
                                         <div class="form-group">
                                             <label for="<%= txtPrizeDesc.ClientID %>">Description (optional)</label>
                                             <div class="admin-input-group">
@@ -106,6 +134,7 @@
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:BoundField DataField="PrizeName" HeaderText="Prize Name" />
+                                    <asp:BoundField DataField="DisplayOrder" HeaderText="Order" />
                                     <asp:BoundField DataField="Description" HeaderText="Description" />
                                     <asp:TemplateField HeaderText="Status">
                                         <ItemTemplate>
@@ -156,6 +185,16 @@
                                                 <span class="admin-input-icon"><i class="fa fa-gift"></i></span>
                                                 <asp:TextBox ID="txtPrizeNameEdit" runat="server" CssClass="form-control" placeholder="Enter prize name" />
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="<%= txtDisplayOrderEdit.ClientID %>">Order</label>
+                                            <div class="admin-input-group">
+                                                <span class="admin-input-icon"><i class="fa fa-sort-numeric-asc"></i></span>
+                                                <asp:TextBox ID="txtDisplayOrderEdit" runat="server" CssClass="form-control" TextMode="Number" min="1" step="1" placeholder="1" />
+                                            </div>
+                                            <p class="help-block" style="margin:6px 0 0;font-size:12px;">1 = top on user dashboard.</p>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">

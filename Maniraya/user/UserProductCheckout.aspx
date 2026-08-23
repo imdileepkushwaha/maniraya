@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
-    <link href="assets/css/user-product-cart.css?v=1" rel="stylesheet" />
+    <link href="assets/css/user-product-cart.css?v=6" rel="stylesheet" />
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
@@ -34,6 +34,8 @@
 
                 <asp:HiddenField ID="hfStep" runat="server" Value="1" />
                 <asp:HiddenField ID="HDFilename" runat="server" />
+                <asp:HiddenField ID="hfPaymentMethod" runat="server" Value="online" />
+                <asp:HiddenField ID="hfSelectedBankId" runat="server" />
 
                 <div class="upc-steps">
                     <div class="upc-step" id="step1Box" runat="server">
@@ -63,8 +65,8 @@
                                     </label>
                                 </div>
                                 <div class="upc-choice">
-                                    <asp:RadioButton ID="rbNewAddress" runat="server" GroupName="AddrMode" AutoPostBack="true" OnCheckedChanged="AddressMode_Changed" />
-                                    <label for="<%= rbNewAddress.ClientID %>">
+                                    <asp:RadioButton ID="rbNewAddress" runat="server" GroupName="AddrMode" />
+                                    <label for="<%= rbNewAddress.ClientID %>" onclick="return upcOpenNewAddress(event);">
                                         <span class="upc-choice-icon"><i class="fa fa-plus"></i></span>
                                         <span class="upc-choice-text">
                                             <strong>Add New Address</strong>
@@ -74,45 +76,70 @@
                                 </div>
                             </div>
 
+                            <asp:HiddenField ID="hfShowAddressModal" runat="server" Value="0" />
+                            <asp:HiddenField ID="hfHasNewAddress" runat="server" Value="0" />
+                            <asp:Button ID="btnOpenAddressModal" runat="server" CssClass="upc-addr-hidden-btn" Text="Open address" OnClick="btnOpenAddressModal_Click" CausesValidation="false" TabIndex="-1" aria-hidden="true" />
+
                             <asp:Panel ID="pnlProfileView" runat="server" CssClass="upc-review-block">
                                 <p class="upc-review-label">Profile address</p>
                                 <p class="upc-address-preview"><asp:Literal ID="litProfileAddress" runat="server" /></p>
                             </asp:Panel>
 
-                            <asp:Panel ID="pnlNewAddress" runat="server" Visible="false">
-                                <div class="form-group">
-                                    <label for="<%= txtaddress.ClientID %>"><i class="fa fa-home"></i> Address</label>
-                                    <asp:TextBox ID="txtaddress" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-control" placeholder="House no., street, landmark" />
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= ddstate.ClientID %>"><i class="fa fa-map"></i> State</label>
-                                            <asp:DropDownList ID="ddstate" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddstate_SelectedIndexChanged" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= ddcity.ClientID %>"><i class="fa fa-building"></i> City</label>
-                                            <asp:DropDownList ID="ddcity" runat="server" CssClass="form-control" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= txtareaname.ClientID %>"><i class="fa fa-location-arrow"></i> Area / Locality</label>
-                                            <asp:TextBox ID="txtareaname" runat="server" CssClass="form-control" placeholder="Area or locality" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="<%= txtpincode.ClientID %>"><i class="fa fa-thumb-tack"></i> Pincode</label>
-                                            <asp:TextBox ID="txtpincode" runat="server" CssClass="form-control" MaxLength="6" placeholder="Pincode" />
-                                        </div>
-                                    </div>
-                                </div>
+                            <asp:Panel ID="pnlNewAddressPreview" runat="server" Visible="false" CssClass="upc-review-block">
+                                <p class="upc-review-label">New delivery address</p>
+                                <p class="upc-address-preview"><asp:Literal ID="litNewAddress" runat="server" /></p>
+                                <asp:Button ID="btnEditNewAddress" runat="server" CssClass="upc-addr-edit" Text="Change address" OnClick="btnEditNewAddress_Click" CausesValidation="false" />
                             </asp:Panel>
+
+                            <div id="upcAddressModal" class="upc-addr-modal" aria-hidden="true">
+                                <div class="upc-addr-modal-card" role="dialog" aria-modal="true" aria-labelledby="upcAddressModalTitle">
+                                    <button type="button" class="upc-addr-modal-close" onclick="document.getElementById('<%= btnCancelNewAddress.ClientID %>').click();" aria-label="Close">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="upc-addr-modal-head">
+                                        <h4 id="upcAddressModalTitle">Add new address</h4>
+                                        <p>Enter a different delivery address. This will not change your profile address.</p>
+                                    </div>
+                                    <asp:Panel ID="pnlNewAddress" runat="server">
+                                        <div class="form-group">
+                                            <label for="<%= txtaddress.ClientID %>"><i class="fa fa-home"></i> Address</label>
+                                            <asp:TextBox ID="txtaddress" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-control" placeholder="House no., street, landmark" />
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="<%= ddstate.ClientID %>"><i class="fa fa-map"></i> State</label>
+                                                    <asp:DropDownList ID="ddstate" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddstate_SelectedIndexChanged" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="<%= ddcity.ClientID %>"><i class="fa fa-building"></i> City</label>
+                                                    <asp:DropDownList ID="ddcity" runat="server" CssClass="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="<%= txtareaname.ClientID %>"><i class="fa fa-location-arrow"></i> Area / Locality</label>
+                                                    <asp:TextBox ID="txtareaname" runat="server" CssClass="form-control" placeholder="Area or locality" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="<%= txtpincode.ClientID %>"><i class="fa fa-thumb-tack"></i> Pincode</label>
+                                                    <asp:TextBox ID="txtpincode" runat="server" CssClass="form-control" MaxLength="6" placeholder="Pincode" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="upc-addr-modal-actions">
+                                            <asp:Button ID="btnCancelNewAddress" runat="server" CssClass="upc-btn upc-btn-outline" Text="Cancel" OnClick="btnCancelNewAddress_Click" CausesValidation="false" />
+                                            <asp:Button ID="btnSaveNewAddress" runat="server" CssClass="upc-btn upc-btn-primary" Text="Save address" OnClick="btnSaveNewAddress_Click" CausesValidation="false" />
+                                        </div>
+                                    </asp:Panel>
+                                </div>
+                            </div>
 
                             <div class="upc-nav">
                                 <asp:Button ID="btnToPayment" runat="server" CssClass="upc-btn upc-btn-primary" Text="Continue to Payment" OnClick="btnToPayment_Click" CausesValidation="false" />
@@ -121,87 +148,119 @@
 
                         <asp:Panel ID="pnlStepPayment" runat="server" Visible="false">
                             <h3 class="upc-section-title"><i class="fa fa-credit-card"></i> Payment Method</h3>
-                            <div class="upc-pay-options">
-                                <div class="upc-choice">
-                                    <asp:RadioButton ID="rbUpi" runat="server" GroupName="PayMode" Checked="true" />
-                                    <label for="<%= rbUpi.ClientID %>">
-                                        <span class="upc-choice-icon"><i class="fa fa-qrcode"></i></span>
-                                        <span class="upc-choice-text"><strong>UPI</strong><span>Scan QR and pay</span></span>
-                                    </label>
-                                </div>
-                                <div class="upc-choice">
-                                    <asp:RadioButton ID="rbImps" runat="server" GroupName="PayMode" />
-                                    <label for="<%= rbImps.ClientID %>">
-                                        <span class="upc-choice-icon"><i class="fa fa-bolt"></i></span>
-                                        <span class="upc-choice-text"><strong>IMPS</strong><span>Instant bank transfer</span></span>
-                                    </label>
-                                </div>
-                                <div class="upc-choice">
-                                    <asp:RadioButton ID="rbNeft" runat="server" GroupName="PayMode" />
-                                    <label for="<%= rbNeft.ClientID %>">
-                                        <span class="upc-choice-icon"><i class="fa fa-university"></i></span>
-                                        <span class="upc-choice-text"><strong>NEFT</strong><span>Bank NEFT transfer</span></span>
-                                    </label>
-                                </div>
-                                <div class="upc-choice">
-                                    <asp:RadioButton ID="rbRtgs" runat="server" GroupName="PayMode" />
-                                    <label for="<%= rbRtgs.ClientID %>">
-                                        <span class="upc-choice-icon"><i class="fa fa-exchange-alt"></i></span>
-                                        <span class="upc-choice-text"><strong>RTGS</strong><span>Same-day bank transfer</span></span>
-                                    </label>
-                                </div>
+                            <p class="upc-pay-intro">Choose online bank transfer or scan QR, then submit your transaction ID and payment receipt.</p>
+
+                            <div class="upc-pay-tabs" role="tablist" aria-label="Payment methods">
+                                <button type="button" class="upc-pay-tab is-active" data-method="online" onclick="selectCheckoutPayMethod('online')" role="tab" aria-selected="true">
+                                    <i class="fa fa-university" aria-hidden="true"></i>
+                                    <span>Online</span>
+                                </button>
+                                <button type="button" class="upc-pay-tab" data-method="qr" onclick="selectCheckoutPayMethod('qr')" role="tab" aria-selected="false">
+                                    <i class="fa fa-qrcode" aria-hidden="true"></i>
+                                    <span>QR</span>
+                                </button>
                             </div>
 
-                            <div class="row saving-online-payment-row">
-                                <div class="col-md-5">
-                                    <p class="upc-section-title"><i class="fa fa-qrcode"></i> Scan &amp; Pay</p>
-                                    <asp:Panel ID="pnlNoCompanyAccount" runat="server" Visible="false">
-                                        <p class="upc-ship-note">Company payment account is not available right now. Please contact support.</p>
-                                    </asp:Panel>
-                                    <asp:Panel ID="pnlCompanyAccount" runat="server">
-                                        <asp:Panel ID="pnlBankSelectWrap" runat="server" Visible="false" CssClass="form-group">
-                                            <label for="<%= ddbankaccount.ClientID %>"><i class="fa fa-university"></i> Select Account</label>
-                                            <asp:DropDownList ID="ddbankaccount" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddbankaccount_SelectedIndexChanged" />
-                                        </asp:Panel>
-                                        <div class="topup-qr-card">
-                                            <p class="topup-qr-label"><i class="fa fa-qrcode"></i> Scan to Pay</p>
-                                            <asp:Image ID="imgPaymentQr" runat="server" CssClass="topup-qr-image" AlternateText="Payment QR code" />
-                                        </div>
-                                        <ul class="saving-bank-detail-list">
-                                            <li><span>Account Holder</span><strong><asp:Literal ID="litAccountHolder" runat="server" /></strong></li>
-                                            <li><span>Account No</span><strong><asp:Literal ID="litAccountNo" runat="server" /></strong></li>
-                                            <li><span>Bank</span><strong><asp:Literal ID="litBankName" runat="server" /></strong></li>
-                                            <li><span>IFSC</span><strong><asp:Literal ID="litIfscCode" runat="server" /></strong></li>
-                                        </ul>
-                                    </asp:Panel>
+                            <div class="upc-pay-panel" id="upcOnlineFields" role="tabpanel">
+                                <div class="upc-pay-panel-intro">
+                                    <h4>Online bank transfer</h4>
+                                    <p>Transfer the order amount to the company bank account below.</p>
                                 </div>
-                                <div class="col-md-7">
-                                    <p class="upc-section-title"><i class="fa fa-check-square"></i> Payment Proof</p>
-                                    <div class="form-group">
-                                        <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
-                                        <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR or transaction reference" />
-                                    </div>
-                                    <div class="form-group profile-upload-field topup-payment-upload">
-                                        <label><i class="fa fa-camera"></i> Payment Screenshot</label>
-                                        <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
-                                            <div class="profile-upload-zone-inner">
-                                                <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
-                                                <p class="profile-upload-title">Drop payment screenshot here</p>
-                                                <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
-                                                <p class="profile-upload-meta">JPG, PNG, WEBP — receipt clearly visible</p>
-                                            </div>
-                                            <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+                                <asp:Panel ID="pnlNoCompanyAccount" runat="server" Visible="false">
+                                    <p class="upc-ship-note">Bank details are not available right now. Please contact support.</p>
+                                </asp:Panel>
+                                <asp:Panel ID="pnlCompanyAccount" runat="server" CssClass="upc-bank-list">
+                                    <asp:Repeater ID="rptBankAccounts" runat="server" OnItemDataBound="rptBankAccounts_ItemDataBound">
+                                        <ItemTemplate>
+                                            <article class="upc-bank-card">
+                                                <label class="upc-bank-select">
+                                                    <asp:RadioButton ID="rbBank" runat="server" GroupName="SelectedBank" />
+                                                    <span>
+                                                        <strong><%# GetBankField(Container.DataItem, "BankName", "bankname") %></strong>
+                                                        <em>Account ending <%# MaskAccountNo(GetBankField(Container.DataItem, "AccountNo", "accountno")) %></em>
+                                                    </span>
+                                                </label>
+                                                <asp:HiddenField ID="hfBankId" runat="server" Value='<%# GetBankField(Container.DataItem, "id", "Id") %>' />
+                                                <dl class="upc-bank-details">
+                                                    <div>
+                                                        <dt>Account holder</dt>
+                                                        <dd><%# GetBankField(Container.DataItem, "AccountHolderName", "accountholdername") %></dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>Account number</dt>
+                                                        <dd><%# GetBankField(Container.DataItem, "AccountNo", "accountno") %></dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>IFSC code</dt>
+                                                        <dd><%# GetBankField(Container.DataItem, "IFSCCode", "ifsccode") %></dd>
+                                                    </div>
+                                                </dl>
+                                            </article>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                </asp:Panel>
+                            </div>
+
+                            <div class="upc-pay-panel" id="upcQrFields" role="tabpanel" hidden>
+                                <div class="upc-pay-panel-intro">
+                                    <h4>Scan &amp; pay</h4>
+                                    <p>Scan the QR code using any UPI app and pay the exact order amount.</p>
+                                </div>
+                                <div class="upc-qr-amount">
+                                    <span>Amount to pay</span>
+                                    <asp:Label ID="lblQrAmount" runat="server" Text="₹0.00" />
+                                </div>
+                                <ol class="upc-qr-steps" aria-label="QR payment steps">
+                                    <li><span>1</span> Scan QR</li>
+                                    <li><span>2</span> Pay amount</li>
+                                    <li><span>3</span> Upload proof</li>
+                                </ol>
+                                <asp:Panel ID="pnlQrPayment" runat="server" CssClass="upc-qr-list">
+                                    <asp:Repeater ID="rptQrAccounts" runat="server">
+                                        <ItemTemplate>
+                                            <article class="upc-qr-card">
+                                                <div class="upc-qr-frame">
+                                                    <img src='<%# GetQrImageUrl(Container.DataItem) %>' alt="Payment QR code" />
+                                                </div>
+                                                <p class="upc-qr-hint">Open Google Pay, PhonePe, Paytm or any UPI app</p>
+                                                <p class="upc-qr-bank"><%# GetBankField(Container.DataItem, "BankName", "bankname") %></p>
+                                                <p class="upc-qr-acc">Account ending <%# MaskAccountNo(GetBankField(Container.DataItem, "AccountNo", "accountno")) %></p>
+                                            </article>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                </asp:Panel>
+                                <asp:Panel ID="pnlNoQr" runat="server" Visible="false">
+                                    <p class="upc-ship-note">QR code is not available right now. Please use online bank transfer or contact support.</p>
+                                </asp:Panel>
+                            </div>
+
+                            <div class="upc-pay-proof">
+                                <h4>Payment proof</h4>
+                                <p>After transferring the amount, enter your transaction reference and upload the payment receipt.</p>
+                                <div class="form-group">
+                                    <label for="<%= txttransactionid.ClientID %>"><i class="fa fa-exchange-alt"></i> Transaction ID</label>
+                                    <asp:TextBox ID="txttransactionid" runat="server" CssClass="form-control" placeholder="Enter UTR / transaction reference" />
+                                </div>
+                                <div class="form-group profile-upload-field topup-payment-upload">
+                                    <label><i class="fa fa-camera"></i> Payment receipt</label>
+                                    <div class="profile-upload-zone profile-upload-zone-attach profile-upload-zone-compact topup-payment-upload-zone" id="savingPaymentUploadZone">
+                                        <div class="profile-upload-zone-inner">
+                                            <span class="profile-upload-icon" aria-hidden="true"><i class="fa fa-cloud-upload-alt"></i></span>
+                                            <p class="profile-upload-title">Drop payment screenshot here</p>
+                                            <p class="profile-upload-hint">or <span class="profile-upload-browse">browse from gallery</span></p>
+                                            <p class="profile-upload-meta">JPG, PNG, WEBP — receipt clearly visible</p>
                                         </div>
-                                        <div class="profile-upload-selection profile-upload-selection-attach" id="savingPaymentUploadSelection" hidden>
-                                            <div class="profile-upload-selection-preview profile-upload-selection-preview-doc">
-                                                <img id="savingPaymentUploadPreview" src="" alt="Payment screenshot preview" />
-                                            </div>
-                                            <div class="profile-upload-selection-info">
-                                                <span class="profile-upload-filechip" id="savingPaymentUploadFilechip"></span>
-                                                <button type="button" class="profile-upload-clear" id="savingPaymentUploadClear">
-                                                    <i class="fa fa-times"></i> Remove
-                                                </button>
-                                            </div>
+                                        <asp:FileUpload ID="ImageUpload" runat="server" CssClass="profile-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+                                    </div>
+                                    <div class="profile-upload-selection profile-upload-selection-attach" id="savingPaymentUploadSelection" hidden>
+                                        <div class="profile-upload-selection-preview profile-upload-selection-preview-doc">
+                                            <img id="savingPaymentUploadPreview" src="" alt="Payment screenshot preview" />
+                                        </div>
+                                        <div class="profile-upload-selection-info">
+                                            <span class="profile-upload-filechip" id="savingPaymentUploadFilechip"></span>
+                                            <button type="button" class="profile-upload-clear" id="savingPaymentUploadClear">
+                                                <i class="fa fa-times"></i> Remove
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -280,6 +339,58 @@
 
 <asp:Content ID="Content4" ContentPlaceHolderID="contentScript" runat="Server">
     <script type="text/javascript">
+        function showUpcAddressModal() {
+            var modal = document.getElementById("upcAddressModal");
+            if (!modal) return;
+            modal.classList.add("is-open");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("upc-addr-modal-open");
+        }
+
+        function hideUpcAddressModal() {
+            var modal = document.getElementById("upcAddressModal");
+            if (!modal) return;
+            modal.classList.remove("is-open");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("upc-addr-modal-open");
+        }
+
+        function syncUpcAddressModal() {
+            var field = document.getElementById("<%= hfShowAddressModal.ClientID %>");
+            if (field && field.value === "1") {
+                showUpcAddressModal();
+            } else {
+                hideUpcAddressModal();
+            }
+        }
+
+        function upcOpenNewAddress(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            var openBtn = document.getElementById("<%= btnOpenAddressModal.ClientID %>");
+            if (openBtn) openBtn.click();
+            return false;
+        }
+
+        function selectCheckoutPayMethod(method) {
+            var tabs = document.querySelectorAll(".upc-pay-tab");
+            var onlinePanel = document.getElementById("upcOnlineFields");
+            var qrPanel = document.getElementById("upcQrFields");
+            var methodField = document.getElementById("<%= hfPaymentMethod.ClientID %>");
+
+            tabs.forEach(function (tab) {
+                var active = tab.getAttribute("data-method") === method;
+                tab.classList.toggle("is-active", active);
+                tab.setAttribute("aria-selected", active ? "true" : "false");
+            });
+
+            if (onlinePanel) onlinePanel.hidden = method !== "online";
+            if (qrPanel) qrPanel.hidden = method !== "qr";
+            if (methodField) methodField.value = method || "online";
+        }
+
         (function () {
             var previewUrl = null;
 
@@ -366,14 +477,22 @@
 
             if (document.readyState === 'complete') {
                 initSavingPaymentUpload();
+                selectCheckoutPayMethod(document.getElementById('<%= hfPaymentMethod.ClientID %>').value || 'online');
+                syncUpcAddressModal();
             } else {
-                window.addEventListener('load', initSavingPaymentUpload);
+                window.addEventListener('load', function () {
+                    initSavingPaymentUpload();
+                    selectCheckoutPayMethod(document.getElementById('<%= hfPaymentMethod.ClientID %>').value || 'online');
+                    syncUpcAddressModal();
+                });
             }
             if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
                 Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                     var input = document.getElementById('<%= ImageUpload.ClientID %>');
                     if (input) input.removeAttribute('data-bound');
                     initSavingPaymentUpload();
+                    selectCheckoutPayMethod(document.getElementById('<%= hfPaymentMethod.ClientID %>').value || 'online');
+                    syncUpcAddressModal();
                 });
             }
         })();

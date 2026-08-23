@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -300,5 +301,11 @@ public partial class index : System.Web.UI.Page
 
             loadProduct(1);
         }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public static CatalogCartHelper.AddResult AddToCart(string productId, string franchiseeId, string returnUrl)
+    {
+        return CatalogCartHelper.AddFromListing(productId, franchiseeId, returnUrl);
     }
 }

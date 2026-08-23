@@ -175,23 +175,7 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
     }
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT sd.productid, pd.productname, pd.ImageName, pd.MRP, pd.DP
-            FROM SavingMonthlyProductDetail sd WITH (nolock)
-            LEFT JOIN SavingProductMaster pd WITH (nolock) ON sd.productid = pd.id
-            WHERE sd.Status = 1";
-
-        DataTable dt = null;
-        ObjData.StartConnection();
-        try
-        {
-            dt = ObjData.RunDataTable(str_query);
-        }
-        catch (Exception ex)
-        {
-            dt = null;
-        }
-        ObjData.EndConnection();
-        return dt;
+        return SavingProductHelper.GetProductForInstallment(1);
     }
 
     void loadprevproduct()

@@ -13,3 +13,12 @@ c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogi
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.csproj.CoreCompileInputs.cache
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.dll
 c:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\BusinessLogicTier.pdb
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\BusinessLogicTier.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\BusinessLogicTier.pdb
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\ARA_StringHunt.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\CyberPlatOpenSSL.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\DataTier.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\Newtonsoft.Json.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\RestSharp.dll
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\bin\Release\DataTier.pdb
+C:\Data\Work\Deepak\Maniraya\maniraya\BusinessLogicTier\obj\Release\Business.2FDD14DE.Up2Date

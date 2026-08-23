@@ -32,6 +32,92 @@ public static class SavingProductHelper
         }
     }
 
+    public static void EnsureCatalogColumns()
+    {
+        EnsureStatusColumn();
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingProductMaster', 'GST') IS NULL
+            BEGIN
+                ALTER TABLE SavingProductMaster ADD GST DECIMAL(18,2) NULL;
+            END");
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingProductMaster', 'HSNCODE') IS NULL
+            BEGIN
+                ALTER TABLE SavingProductMaster ADD HSNCODE NVARCHAR(100) NULL;
+            END");
+    }
+
+    public static string AddCatalogProduct(string productName, decimal mrp, decimal dp, string imageName, string entryBy, decimal gst, string hsnCode)
+    {
+        EnsureCatalogColumns();
+
+        productName = (productName ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(productName))
+        {
+            return "0";
+        }
+
+        string safeName = Escape(productName);
+        DataTable exists = RunSelect(
+            "SELECT TOP 1 id FROM SavingProductMaster WITH (NOLOCK) WHERE ProductName = '" + safeName + "'");
+        if (exists != null && exists.Rows.Count > 0)
+        {
+            return "f";
+        }
+
+        System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
+        string image = string.IsNullOrWhiteSpace(imageName) ? "noimage.png" : imageName.Trim();
+
+        // Monthly uniqueness uses EntryDate on the 1st. Catalog rows must not occupy that slot.
+        string entryDateSql = "CASE WHEN DAY(GETDATE()) = 1 THEN DATEADD(DAY, 1, GETDATE()) ELSE GETDATE() END";
+
+        System.Collections.Generic.List<string> cols = new System.Collections.Generic.List<string>
+        {
+            "ProductName", "mrp", "dp", "ImageName", "entryby", "entrydate"
+        };
+        System.Collections.Generic.List<string> vals = new System.Collections.Generic.List<string>
+        {
+            "'" + safeName + "'",
+            mrp.ToString(inv),
+            dp.ToString(inv),
+            "'" + Escape(image) + "'",
+            "'" + Escape(entryBy ?? string.Empty) + "'",
+            entryDateSql
+        };
+
+        if (HasTableColumn("SavingProductMaster", "Status"))
+        {
+            cols.Add("status");
+            vals.Add("1");
+        }
+        if (HasTableColumn("SavingProductMaster", "GST"))
+        {
+            cols.Add("GST");
+            vals.Add(gst.ToString(inv));
+        }
+        if (HasTableColumn("SavingProductMaster", "HSNCODE") || HasTableColumn("SavingProductMaster", "HSNCode"))
+        {
+            cols.Add("HSNCODE");
+            vals.Add("'" + Escape(hsnCode ?? string.Empty) + "'");
+        }
+
+        string sql = "INSERT INTO SavingProductMaster (" + string.Join(", ", cols.ToArray()) + ") VALUES (" +
+                     string.Join(", ", vals.ToArray()) + ")";
+        return RunNonQuery(sql) ? "t" : "0";
+    }
+
+    static bool HasTableColumn(string tableName, string columnName)
+    {
+        DataTable dt = RunSelect(
+            "SELECT COL_LENGTH('" + Escape(tableName) + "', '" + Escape(columnName) + "') AS ColLen");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ColLen"] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
+    }
+
     public static void EnsureDeliveryColumns()
     {
         RunNonQuery(@"
@@ -228,6 +314,113 @@ public static class SavingProductHelper
 
         EnsureStatusColumn();
         return RunNonQuery("UPDATE SavingProductMaster SET Status = " + (active ? "1" : "0") + " WHERE id = " + id);
+    }
+
+    public static void EnsureInstallmentProductAssignTable()
+    {
+        RunNonQuery(@"
+            IF OBJECT_ID('dbo.SavingInstallmentProductAssign', 'U') IS NULL
+            BEGIN
+                CREATE TABLE dbo.SavingInstallmentProductAssign
+                (
+                    Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                    InstallmentNo INT NOT NULL,
+                    ProductId INT NOT NULL,
+                    Status BIT NOT NULL CONSTRAINT DF_SavingInstallmentProductAssign_Status DEFAULT (1),
+                    EntryBy NVARCHAR(100) NULL,
+                    EntryDate DATETIME NOT NULL CONSTRAINT DF_SavingInstallmentProductAssign_EntryDate DEFAULT (GETDATE()),
+                    CONSTRAINT UQ_SavingInstallmentProductAssign_Inst UNIQUE (InstallmentNo)
+                );
+            END");
+    }
+
+    public static DataTable GetActiveProductsForAssign()
+    {
+        EnsureStatusColumn();
+        return RunSelect(@"
+            SELECT id, ProductName, MRP, DP
+            FROM SavingProductMaster WITH (NOLOCK)
+            WHERE ISNULL(Status, 1) = 1
+            ORDER BY ProductName");
+    }
+
+    public static DataTable GetInstallmentAssignmentMap()
+    {
+        EnsureInstallmentProductAssignTable();
+        return RunSelect(@"
+            SELECT n.InstallmentNo,
+                   a.ProductId,
+                   pd.ProductName,
+                   pd.MRP,
+                   pd.DP,
+                   a.EntryBy,
+                   a.EntryDate
+            FROM (
+                SELECT 1 AS InstallmentNo UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
+                UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
+                UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16
+                UNION ALL SELECT 17 UNION ALL SELECT 18
+            ) n
+            LEFT JOIN SavingInstallmentProductAssign a WITH (NOLOCK)
+                ON a.InstallmentNo = n.InstallmentNo AND ISNULL(a.Status, 1) = 1
+            LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON pd.id = a.ProductId
+            ORDER BY n.InstallmentNo");
+    }
+
+    public static DataTable GetProductForInstallment(int installmentNo)
+    {
+        if (installmentNo < 1 || installmentNo > 18)
+        {
+            return new DataTable();
+        }
+
+        EnsureInstallmentProductAssignTable();
+        DataTable dt = RunSelect(@"
+            SELECT a.ProductId AS productid, pd.ProductName AS productname, pd.ImageName, pd.MRP, pd.DP
+            FROM SavingInstallmentProductAssign a WITH (NOLOCK)
+            LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON pd.id = a.ProductId
+            WHERE ISNULL(a.Status, 1) = 1 AND a.InstallmentNo = " + installmentNo);
+
+        if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["productid"] != DBNull.Value
+            && Convert.ToInt32(dt.Rows[0]["productid"]) > 0)
+        {
+            return dt;
+        }
+
+        return RunSelect(@"
+            SELECT sd.productid, pd.productname, pd.ImageName, pd.MRP, pd.DP
+            FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
+            LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON sd.productid = pd.id
+            WHERE sd.Status = 1");
+    }
+
+    public static bool AssignProductToInstallment(int installmentNo, int productId, string entryBy)
+    {
+        if (installmentNo < 1 || installmentNo > 18 || productId <= 0)
+        {
+            return false;
+        }
+
+        EnsureInstallmentProductAssignTable();
+        string safeBy = Escape(entryBy);
+        string sql = @"
+            IF EXISTS (SELECT 1 FROM SavingInstallmentProductAssign WHERE InstallmentNo = " + installmentNo + @")
+            BEGIN
+                UPDATE SavingInstallmentProductAssign
+                SET ProductId = " + productId + @",
+                    Status = 1,
+                    EntryBy = '" + safeBy + @"',
+                    EntryDate = GETDATE()
+                WHERE InstallmentNo = " + installmentNo + @";
+            END
+            ELSE
+            BEGIN
+                INSERT INTO SavingInstallmentProductAssign (InstallmentNo, ProductId, Status, EntryBy, EntryDate)
+                VALUES (" + installmentNo + ", " + productId + ", 1, '" + safeBy + @"', GETDATE());
+            END";
+
+        return RunNonQuery(sql);
     }
 
     public static string GetImageUrl(string imageName)

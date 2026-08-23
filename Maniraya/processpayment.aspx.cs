@@ -42,14 +42,78 @@ public partial class processpayment : System.Web.UI.Page
     void loadaddress(string id)
     {
         DataTable Dt = objuser.getUsercartaddress(id);
-        if (Dt.Rows.Count > 0)
+        if (Dt != null && Dt.Rows.Count > 0)
         {
-            Lblusername.Text = Dt.Rows[0]["UserName"].ToString();
-            Lbladdress.Text = Dt.Rows[0]["Addressfirst"].ToString() + " " + Dt.Rows[0]["AddressSecond"].ToString();
-            Lblcity.Text = Dt.Rows[0]["CityName"].ToString() + " ,";
-            LblPincode.Text = Dt.Rows[0]["Pincode"].ToString();
-            Lblmobile.Text = Dt.Rows[0]["mobile"].ToString();
+            Lblusername.Text = Convert.ToString(Dt.Rows[0]["UserName"]);
+            Lbladdress.Text = (Convert.ToString(Dt.Rows[0]["Addressfirst"]) + " " + Convert.ToString(Dt.Rows[0]["AddressSecond"])).Trim();
+            Lblcity.Text = Convert.ToString(Dt.Rows[0]["CityName"]) + " ,";
+            LblPincode.Text = Convert.ToString(Dt.Rows[0]["Pincode"]);
+            Lblmobile.Text = Convert.ToString(Dt.Rows[0]["mobile"]);
+            return;
         }
+
+        LoadProfileAddress(id);
+    }
+
+    void LoadProfileAddress(string id)
+    {
+        objuser.UserId = id;
+        DataTable dt = objuser.getUserDetail(objuser);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            Lblusername.Text = Convert.ToString(Session["username"]);
+            Lbladdress.Text = "No delivery address found. Please add an address.";
+            return;
+        }
+
+        DataRow row = dt.Rows[0];
+        Lblusername.Text = FirstRowValue(row, "UserName", "username");
+        string address = FirstRowValue(row, "Address", "address");
+        string area = FirstRowValue(row, "AreaName", "areaname");
+        Lbladdress.Text = string.IsNullOrWhiteSpace(address) && string.IsNullOrWhiteSpace(area)
+            ? "No delivery address found. Please add an address."
+            : (address + " " + area).Trim();
+        string cityState = JoinDisplay(FirstRowValue(row, "Cityname", "CityName"), FirstRowValue(row, "statename", "StateName", "statename"));
+        Lblcity.Text = string.IsNullOrWhiteSpace(cityState) ? string.Empty : cityState + " ,";
+        LblPincode.Text = FirstRowValue(row, "Pincode", "pincode");
+        Lblmobile.Text = FirstRowValue(row, "mobile", "Mobile");
+    }
+
+    static string FirstRowValue(DataRow row, params string[] names)
+    {
+        if (row == null || row.Table == null)
+        {
+            return string.Empty;
+        }
+
+        foreach (string name in names)
+        {
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                if (string.Equals(column.ColumnName, name, StringComparison.OrdinalIgnoreCase)
+                    && row[column] != DBNull.Value)
+                {
+                    return Convert.ToString(row[column]).Trim();
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    static string JoinDisplay(string first, string second)
+    {
+        if (string.IsNullOrWhiteSpace(first))
+        {
+            return second ?? string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(second))
+        {
+            return first;
+        }
+
+        return first + ", " + second;
     }
 
     void LoadBankAccounts()
@@ -61,10 +125,9 @@ public partial class processpayment : System.Web.UI.Page
 
         pnlBankAccounts.Visible = hasBanks;
         pnlNoBank.Visible = !hasBanks;
+        pnlQrScanShell.Visible = hasQr;
         pnlQrPayment.Visible = hasQr;
-        pnlNoQr.Visible = false;
-        pnlFallbackQr.Visible = !hasQr;
-        Btnpayment.Enabled = hasBanks || hasQr || !hasQr;
+        pnlNoQr.Visible = !hasQr;
 
         if (hasBanks)
         {
@@ -100,13 +163,37 @@ public partial class processpayment : System.Web.UI.Page
         foreach (DataRow row in dt.Rows)
         {
             string qrFile = GetRowValue(row, "BranchName", "branchname");
-            if (!string.IsNullOrWhiteSpace(qrFile))
+            if (HasQrImageFile(qrFile))
             {
                 qrDt.ImportRow(row);
             }
         }
 
         return qrDt;
+    }
+
+    bool HasQrImageFile(string fileName)
+    {
+        string name = Path.GetFileName((fileName ?? string.Empty).Trim());
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        string ext = Path.GetExtension(name).ToLowerInvariant();
+        if (ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp" && ext != ".gif")
+        {
+            return false;
+        }
+
+        try
+        {
+            return File.Exists(Server.MapPath("~/ProductImage/" + name));
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     string GetRowValue(DataRow row, params string[] columnNames)
@@ -231,13 +318,13 @@ public partial class processpayment : System.Web.UI.Page
 
     protected bool HasQrCode(object dataItem)
     {
-        return !string.IsNullOrWhiteSpace(GetBankField(dataItem, "BranchName", "branchname"));
+        return HasQrImageFile(GetBankField(dataItem, "BranchName", "branchname"));
     }
 
     protected string GetQrImageUrl(object dataItem)
     {
-        string fileName = GetBankField(dataItem, "BranchName", "branchname");
-        if (string.IsNullOrWhiteSpace(fileName))
+        string fileName = Path.GetFileName(GetBankField(dataItem, "BranchName", "branchname"));
+        if (!HasQrImageFile(fileName))
         {
             return string.Empty;
         }
@@ -308,20 +395,15 @@ public partial class processpayment : System.Web.UI.Page
         else if (paymentMethod == "qr")
         {
             DataTable qrDt = FilterQrAccounts(objbank.getBankAccountList());
-            if (qrDt.Rows.Count > 0)
+            if (qrDt == null || qrDt.Rows.Count == 0)
             {
-                if (string.IsNullOrWhiteSpace(bankId))
-                {
-                    bankId = qrDt.Rows[0]["id"].ToString();
-                }
+                ShowAlert("QR code is not available. Please use online bank transfer or contact support.");
+                return;
             }
-            else if (string.IsNullOrWhiteSpace(bankId))
+
+            if (string.IsNullOrWhiteSpace(bankId))
             {
-                DataTable banks = objbank.getBankAccountList();
-                if (banks != null && banks.Rows.Count > 0)
-                {
-                    bankId = banks.Rows[0]["id"].ToString();
-                }
+                bankId = qrDt.Rows[0]["id"].ToString();
             }
         }
 

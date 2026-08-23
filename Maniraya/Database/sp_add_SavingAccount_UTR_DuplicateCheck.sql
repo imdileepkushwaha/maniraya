@@ -57,13 +57,24 @@ BEGIN
         RETURN;
     END
 
-    DECLARE @productid INT;
-    SET @productid = ISNULL((
-        SELECT TOP 1 sd.productid
-        FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
-        LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON sd.productid = pd.id
-        WHERE sd.Status = 1
-    ), 0);
+    DECLARE @productid INT = 0;
+    IF OBJECT_ID('dbo.SavingInstallmentProductAssign', 'U') IS NOT NULL
+    BEGIN
+        SET @productid = ISNULL((
+            SELECT TOP 1 a.ProductId
+            FROM SavingInstallmentProductAssign a WITH (NOLOCK)
+            WHERE ISNULL(a.Status, 1) = 1 AND a.InstallmentNo = 1
+        ), 0);
+    END
+    IF (@productid = 0)
+    BEGIN
+        SET @productid = ISNULL((
+            SELECT TOP 1 sd.productid
+            FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
+            LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON sd.productid = pd.id
+            WHERE sd.Status = 1
+        ), 0);
+    END
 
     DECLARE @gst DECIMAL(18,2);
     SELECT @gst = gst FROM SavingProductMaster pd WITH (NOLOCK) WHERE id = @productid;
@@ -144,13 +155,30 @@ BEGIN
         RETURN;
     END
 
-    DECLARE @productid INT;
-    SET @productid = ISNULL((
-        SELECT TOP 1 sd.productid
-        FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
-        LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON sd.productid = pd.id
-        WHERE sd.Status = 1
-    ), 0);
+    DECLARE @instNo INT = ISNULL((
+        SELECT TOP 1 CONVERT(INT, InstNo)
+        FROM SavingAccountInstallmentDetail WITH (NOLOCK)
+        WHERE id = @id
+    ), 1);
+
+    DECLARE @productid INT = 0;
+    IF OBJECT_ID('dbo.SavingInstallmentProductAssign', 'U') IS NOT NULL
+    BEGIN
+        SET @productid = ISNULL((
+            SELECT TOP 1 a.ProductId
+            FROM SavingInstallmentProductAssign a WITH (NOLOCK)
+            WHERE ISNULL(a.Status, 1) = 1 AND a.InstallmentNo = @instNo
+        ), 0);
+    END
+    IF (@productid = 0)
+    BEGIN
+        SET @productid = ISNULL((
+            SELECT TOP 1 sd.productid
+            FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
+            LEFT JOIN SavingProductMaster pd WITH (NOLOCK) ON sd.productid = pd.id
+            WHERE sd.Status = 1
+        ), 0);
+    END
 
     IF (EXISTS (SELECT id FROM SavingAccountInstallmentDetail WHERE id = @id AND status = 'Pending'))
     BEGIN

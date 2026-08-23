@@ -202,7 +202,7 @@
                                             <p>QR code is not available right now. Please use online bank transfer or contact support.</p>
                                         </asp:Panel>
 
-                                        <div class="pay-qr-scan-shell">
+                                        <div id="pnlQrScanShell" runat="server" class="pay-qr-scan-shell">
                                             <ol class="pay-qr-steps" aria-label="QR payment steps">
                                                 <li><span>1</span> Scan QR</li>
                                                 <li><span>2</span> Pay amount</li>
@@ -237,27 +237,6 @@
                                                     </ItemTemplate>
                                                 </asp:Repeater>
                                             </asp:Panel>
-
-                                            <div class="pay-qr-fallback">
-                                                <asp:Panel ID="pnlFallbackQr" runat="server">
-                                                    <article class="pay-qr-card pay-qr-card--panel pay-qr-card--fallback">
-                                                        <div class="pay-qr-card-visual">
-                                                            <div class="pay-qr-frame" aria-hidden="true">
-                                                                <span class="pay-qr-corner pay-qr-corner--tl"></span>
-                                                                <span class="pay-qr-corner pay-qr-corner--tr"></span>
-                                                                <span class="pay-qr-corner pay-qr-corner--bl"></span>
-                                                                <span class="pay-qr-corner pay-qr-corner--br"></span>
-                                                                <asp:Image ID="imgFallbackQr" runat="server" ImageUrl="~/myassets/assets/images/QRCODE.jpeg" CssClass="pay-qr-image" AlternateText="Payment QR code" />
-                                                            </div>
-                                                            <p class="pay-qr-scan-hint">Open Google Pay, PhonePe, Paytm or any UPI app</p>
-                                                        </div>
-                                                        <div class="pay-qr-card-meta">
-                                                            <p class="pay-qr-bank-name">Company payment QR</p>
-                                                            <p class="pay-qr-account">Scan and pay the exact order total</p>
-                                                        </div>
-                                                    </article>
-                                                </asp:Panel>
-                                            </div>
                                         </div>
                                     </div>
 

@@ -130,6 +130,8 @@ ORDER BY couponcode";
 
     DataTable GetInstallments()
     {
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
+
         string userId = Convert.ToString(Session["userid"]).Trim();
         StringBuilder sql = new StringBuilder();
         sql.Append(@"
@@ -142,7 +144,11 @@ SELECT
     sa.installmentdate,
     sa.status,
     sd.couponcode,
-    pm.productname,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+            THEN LTRIM(RTRIM(assign_pm.ProductName))
+        ELSE 'Not assigned'
+    END AS productname,
     CASE
         WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'approved' THEN 'Paid'
         WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'processing' THEN 'Processing'
@@ -150,7 +156,10 @@ SELECT
     END AS StatusDisplay
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
 WHERE sa.UserId = '").Append(SqlEscape(userId)).Append("'");
 
         string statusFilter = (ddStatus.SelectedValue ?? string.Empty).Trim();
@@ -174,7 +183,10 @@ WHERE sa.UserId = '").Append(SqlEscape(userId)).Append("'");
 
         if (!string.IsNullOrWhiteSpace(txtProduct.Text))
         {
-            sql.Append(" AND pm.productname LIKE '%").Append(SqlEscape(txtProduct.Text.Trim())).Append("%'");
+            string productSearch = SqlEscape(txtProduct.Text.Trim());
+            sql.Append(" AND ISNULL(NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), ''), 'Not assigned') LIKE '%")
+                .Append(productSearch)
+                .Append("%'");
         }
 
         sql.Append(" ORDER BY sa.InstNo ASC, sa.InstallmentDate ASC, sa.id ASC");
@@ -205,6 +217,18 @@ WHERE sa.UserId = '").Append(SqlEscape(userId)).Append("'");
         if (e.Row.RowType != DataControlRowType.DataRow)
         {
             return;
+        }
+
+        Label lblproductname = (Label)e.Row.FindControl("lblproductname");
+        if (lblproductname != null)
+        {
+            string productName = (lblproductname.Text ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(productName)
+                || productName.Equals("Not assigned", StringComparison.OrdinalIgnoreCase))
+            {
+                lblproductname.Text = "Not assigned";
+                lblproductname.CssClass = "dash-saving-product is-unassigned";
+            }
         }
 
         Label lblstatus = (Label)e.Row.FindControl("lblstatus");

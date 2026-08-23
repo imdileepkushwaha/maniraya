@@ -185,10 +185,21 @@ public static class CatalogHelper
 
         if (!dt.Columns.Contains("franchiseeid"))
         {
-            dt.Columns.Add("franchiseeid", typeof(int));
+            dt.Columns.Add("franchiseeid", typeof(string));
             foreach (DataRow row in dt.Rows)
             {
-                row["franchiseeid"] = 0;
+                row["franchiseeid"] = "F000001";
+            }
+        }
+        else
+        {
+            foreach (DataRow row in dt.Rows)
+            {
+                string franchiseeId = Convert.ToString(row["franchiseeid"]).Trim();
+                if (string.IsNullOrWhiteSpace(franchiseeId) || franchiseeId == "0")
+                {
+                    row["franchiseeid"] = "F000001";
+                }
             }
         }
 

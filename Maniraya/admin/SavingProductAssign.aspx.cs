@@ -1,146 +1,145 @@
 using BusinessLogicTier;
 using DataTier;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
 
 public partial class admin_ProductAdd : System.Web.UI.Page
 {
     Data ObjData = new Data();
     clsProduct objState = new clsProduct();
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["useradmin"] == null)
+        {
+            Response.Redirect("logout.aspx");
+            return;
+        }
+
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
+
         if (!IsPostBack)
         {
-            if (Session["useradmin"] != null)
-            {
-
-                loadproduct();
-                loadprevproduct();
-
-
-            }
-            else
-            {
-                Response.Redirect("logout.aspx");
-            }
+            loadproduct();
+            loadinstallments();
+            loadassignmentmap();
         }
     }
-    public DataTable getPrevProduct()
-    {
-        string str_query = @"SELECT sd.productid,pd.productname FROM SavingMonthlyProductDetail sd WITH (nolock) LEFT JOIN SavingProductMaster pd WITH (nolock) ON sd.productid=pd.id WHERE sd.Status=1";
-
-        DataTable dt = null;
-        ObjData.StartConnection();
-        try
-        {
-            dt = ObjData.RunDataTable(str_query);
-        }
-        catch (Exception ex)
-        {
-            dt = null;
-        }
-        ObjData.EndConnection();
-        return dt;
-    }
-    public DataTable getProduct()
-    {
-        string str_query = @"SELECT * from  SavingProductMaster
-                 ORDER BY ProductName";
-
-        DataTable dt = null;
-        ObjData.StartConnection();
-        try
-        {
-            dt = ObjData.RunDataTable(str_query);
-        }
-        catch (Exception ex)
-        {
-            dt = null;
-        }
-        ObjData.EndConnection();
-        return dt;
-    }
-
-    public DataTable getProductDetail(String productid)
-    {
-        string str_query = @"SELECT * from  SavingProductMaster with (nolock)
-                 where id='"+productid+"'";
-
-        DataTable dt = null;
-        ObjData.StartConnection();
-        try
-        {
-            dt = ObjData.RunDataTable(str_query);
-        }
-        catch (Exception ex)
-        {
-            dt = null;
-        }
-        ObjData.EndConnection();
-        return dt;
-    }
-
 
     void loadproduct()
     {
         ddproduct.Items.Clear();
-        DataTable dt = new DataTable();
-        dt = getProduct();
+        DataTable dt = SavingProductHelper.GetActiveProductsForAssign();
         ddproduct.DataSource = dt;
         ddproduct.DataTextField = "ProductName";
         ddproduct.DataValueField = "id";
         ddproduct.DataBind();
-        ListItem li = new ListItem("Select Product", "0");
-        ddproduct.Items.Insert(0, li);
+        ddproduct.Items.Insert(0, new ListItem("Select Product", "0"));
     }
 
-    void loadprevproduct()
+    void loadinstallments()
     {
-      
-        DataTable dt = new DataTable();
-        dt = getPrevProduct();
-        if (dt.Rows.Count > 0)
+        ddinstallment.Items.Clear();
+        ddinstallment.Items.Add(new ListItem("Select Installment", "0"));
+        for (int i = 1; i <= 18; i++)
         {
-            txtproductname.Text = dt.Rows[0]["productname"].ToString();
+            ddinstallment.Items.Add(new ListItem("Installment " + i, i.ToString()));
         }
     }
-    protected void btnSubmit_Click(object sender, EventArgs e)
-    {
-        
 
+    void loadassignmentmap()
+    {
+        gvAssign.DataSource = SavingProductHelper.GetInstallmentAssignmentMap();
+        gvAssign.DataBind();
     }
-    public string Insert_Product(clsProduct objState)
+
+    void bindproductdetail()
     {
+        txtmrp.Text = "";
+        txtdp.Text = "";
+        pnlInstallment.Visible = false;
+        txtprevproduct.Text = "";
 
-        
-        string res = "";
-        string s2 = "";
-        SqlConnection cn;
-        SqlTransaction tr = null;
-        DataSet ds = new DataSet();
-        cn = ObjData.StartConnectionInTransaction();
-        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+        if (ddproduct.SelectedValue == "0")
+        {
+            return;
+        }
 
+        DataTable dt = getProductDetail(ddproduct.SelectedValue);
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            txtmrp.Text = GetCol(dt.Rows[0], "mrp", "MRP");
+            txtdp.Text = GetCol(dt.Rows[0], "dp", "DP");
+            pnlInstallment.Visible = true;
+            bindcurrentassignment();
+        }
+    }
+
+    void bindcurrentassignment()
+    {
+        txtprevproduct.Text = "Not assigned yet";
+        int instNo;
+        if (!int.TryParse(ddinstallment.SelectedValue, out instNo) || instNo < 1)
+        {
+            return;
+        }
+
+        DataTable map = SavingProductHelper.GetInstallmentAssignmentMap();
+        if (map == null)
+        {
+            return;
+        }
+
+        foreach (DataRow row in map.Rows)
+        {
+            if (Convert.ToInt32(row["InstallmentNo"]) != instNo)
+            {
+                continue;
+            }
+
+            string name = Convert.ToString(row["ProductName"]);
+            txtprevproduct.Text = string.IsNullOrWhiteSpace(name) ? "Not assigned yet" : name.Trim();
+            break;
+        }
+    }
+
+    public DataTable getProductDetail(string productid)
+    {
+        string str_query = "SELECT * FROM SavingProductMaster WITH (NOLOCK) WHERE id='" + productid.Replace("'", "''") + "'";
+        DataTable dt = null;
+        ObjData.StartConnection();
         try
         {
-            s2 = "sp_add_SavingMonthlyProductDetail";
-            SqlParameter[] parameter = {                                              
-                new SqlParameter("@ProductId",objState.ProductId),
-                new SqlParameter("@EntryBy",objState.MentionBy),
-               
-                };
-            res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
+            dt = ObjData.RunDataTable(str_query);
+        }
+        catch
+        {
+            dt = null;
+        }
+        ObjData.EndConnection();
+        return dt;
+    }
+
+    public string Insert_Product(clsProduct objState)
+    {
+        string res = "";
+        SqlConnection cn;
+        SqlTransaction tr = null;
+        cn = ObjData.StartConnectionInTransaction();
+        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+        try
+        {
+            SqlParameter[] parameter = {
+                new SqlParameter("@ProductId", objState.ProductId),
+                new SqlParameter("@EntryBy", objState.MentionBy),
+            };
+            res = ObjData.RunInsUpDelQueryTransProcScalar("sp_add_SavingMonthlyProductDetail", tr, parameter);
             tr.Commit();
         }
-        catch (Exception ex)
+        catch
         {
             res = "0";
             tr.Rollback();
@@ -152,48 +151,83 @@ public partial class admin_ProductAdd : System.Web.UI.Page
         }
         return res;
     }
+
     protected void btnSubmit_Click1(object sender, EventArgs e)
     {
-        
-        objState.ProductId = ddproduct.SelectedValue.ToString();
-        
-       
-        objState.MentionBy = Session["useradmin"].ToString();
-        string res = Insert_Product(objState);
-        if (res == "t")
+        int productId;
+        int instNo;
+        if (!int.TryParse(ddproduct.SelectedValue, out productId) || productId <= 0)
         {
-            string popupScript = "alert('Saving Product Assigned Successfully');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-             txtmrp.Text = txtdp.Text = "";
-            ddproduct.SelectedValue = "0";
-            loadprevproduct();
+            ShowAlert("Select Product");
+            return;
         }
-       
-            else
-            {
-                string popupScript = "alert('Unknown error occurred');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            }     
+
+        if (!int.TryParse(ddinstallment.SelectedValue, out instNo) || instNo < 1 || instNo > 18)
+        {
+            ShowAlert("Select Installment (1 to 18)");
+            return;
+        }
+
+        string adminId = Convert.ToString(Session["useradmin"]);
+        bool ok = SavingProductHelper.AssignProductToInstallment(instNo, productId, adminId);
+        if (!ok)
+        {
+            ShowAlert("Unable to assign product");
+            return;
+        }
+
+        if (instNo == 1)
+        {
+            objState.ProductId = productId.ToString();
+            objState.MentionBy = adminId;
+            Insert_Product(objState);
+        }
+
+        loadassignmentmap();
+        bindcurrentassignment();
+        ShowAlert("Installment " + instNo + " pe product assign ho gaya. Naya user join kare to installment 1 ka product milega.");
     }
 
-
-
-
+    protected void btnCancel_Click(object sender, EventArgs e)
+    {
+        ddproduct.SelectedValue = "0";
+        if (ddinstallment.Items.Count > 0)
+        {
+            ddinstallment.SelectedValue = "0";
+        }
+        txtmrp.Text = "";
+        txtdp.Text = "";
+        txtprevproduct.Text = "";
+        pnlInstallment.Visible = false;
+    }
 
     protected void ddproduct_SelectedIndexChanged(object sender, EventArgs e)
     {
-        DataTable dt = new DataTable();
-        dt = getProductDetail(ddproduct.SelectedValue.ToString());
-        if (dt.Rows.Count > 0)
-        {
-            txtmrp.Text = dt.Rows[0]["mrp"].ToString();
-            txtdp.Text = dt.Rows[0]["dp"].ToString();
-        }
-        else
-        {
-            txtmrp.Text = "";
-            txtdp.Text = "";
+        bindproductdetail();
+    }
 
+    protected void ddinstallment_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        bindcurrentassignment();
+        pnlInstallment.Visible = ddproduct.SelectedValue != "0";
+    }
+
+    static string GetCol(DataRow row, params string[] names)
+    {
+        foreach (string name in names)
+        {
+            if (row.Table.Columns.Contains(name) && row[name] != DBNull.Value)
+            {
+                return Convert.ToString(row[name]).Trim();
+            }
         }
+
+        return string.Empty;
+    }
+
+    void ShowAlert(string message)
+    {
+        string popupScript = "alert('" + (message ?? string.Empty).Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
     }
 }

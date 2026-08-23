@@ -22,12 +22,14 @@ BEGIN
         RETURN;
     END
 
-    -- One product per month
+    -- One monthly product per calendar month (only rows dated 1st of month).
+    -- Catalog add (SavingProductAdd) uses GETDATE() and must not block monthly add.
     IF EXISTS (
         SELECT 1
         FROM SavingProductMaster WITH (NOLOCK)
         WHERE YEAR(EntryDate) = YEAR(@EntryDay)
           AND MONTH(EntryDate) = MONTH(@EntryDay)
+          AND DAY(EntryDate) = 1
     )
     BEGIN
         SELECT 'm'; -- month already used

@@ -14,6 +14,7 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
     clsState objCState = new clsState();
     clsfranchisee objF = new clsfranchisee();
     clsAccount objaccount = new clsAccount();
+    clsBank objbank = new clsBank();
     Data ObjData = new Data();
 
     protected void Page_Load(object sender, EventArgs e)
@@ -36,16 +37,18 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         {
             LoadStates();
             LoadAddress();
-            LoadCompanyAccounts();
             BindSummary();
             ApplyStep();
         }
+
+        LoadCompanyAccounts();
     }
 
     protected void Page_PreRender(object sender, EventArgs e)
     {
         BindSummary();
         ApplyStep();
+        RegisterAddressModalScript();
     }
 
     void BindSummary()
@@ -55,6 +58,10 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         litShipping.Text = totals.Shipping.ToString("0.00");
         litPayable.Text = totals.Payable.ToString("0.00");
         litShipNote.Text = totals.Quote == null ? string.Empty : totals.Quote.Message;
+        if (lblQrAmount != null)
+        {
+            lblQrAmount.Text = "₹" + totals.Payable.ToString("0.00");
+        }
     }
 
     void ApplyStep()
@@ -84,7 +91,8 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
     {
         if (rbProfileAddress.Checked)
         {
-            RestoreProfileFields();
+            hfShowAddressModal.Value = "0";
+            hfHasNewAddress.Value = "0";
         }
 
         ApplyAddressMode();
@@ -93,25 +101,112 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
     void ApplyAddressMode()
     {
         bool useNew = rbNewAddress.Checked;
-        pnlNewAddress.Visible = useNew;
-        pnlProfileView.Visible = !useNew;
+        bool hasNew = hfHasNewAddress.Value == "1";
+        pnlNewAddress.Visible = true;
+        pnlProfileView.Visible = !useNew || !hasNew;
+        pnlNewAddressPreview.Visible = useNew && hasNew;
+    }
+
+    void RegisterAddressModalScript()
+    {
+        if (GetStep() != 1)
+        {
+            hfShowAddressModal.Value = "0";
+        }
+
+        string script = hfShowAddressModal.Value == "1" ? "showUpcAddressModal();" : "hideUpcAddressModal();";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "upcAddressModal", script, true);
     }
 
     protected void ddstate_SelectedIndexChanged(object sender, EventArgs e)
     {
         LoadCities();
+        if (GetStep() == 1 && rbNewAddress.Checked)
+        {
+            hfShowAddressModal.Value = "1";
+        }
     }
 
-    protected void ddbankaccount_SelectedIndexChanged(object sender, EventArgs e)
+    protected void btnOpenAddressModal_Click(object sender, EventArgs e)
     {
-        LoadCompanyAccountDetail();
+        OpenNewAddressModal(true);
+    }
+
+    protected void btnEditNewAddress_Click(object sender, EventArgs e)
+    {
+        OpenNewAddressModal(false);
+    }
+
+    protected void btnSaveNewAddress_Click(object sender, EventArgs e)
+    {
+        hfShowAddressModal.Value = "1";
+        rbNewAddress.Checked = true;
+        rbProfileAddress.Checked = false;
+
+        if (!ValidateAddress())
+        {
+            ApplyAddressMode();
+            return;
+        }
+
+        SaveNewAddressToViewState();
+        hfHasNewAddress.Value = "1";
+        hfShowAddressModal.Value = "0";
+        litNewAddress.Text = Server.HtmlEncode(FormatCurrentAddress());
+        ApplyAddressMode();
+    }
+
+    protected void btnCancelNewAddress_Click(object sender, EventArgs e)
+    {
+        hfShowAddressModal.Value = "0";
+
+        if (hfHasNewAddress.Value == "1")
+        {
+            RestoreNewAddressFields();
+            litNewAddress.Text = Server.HtmlEncode(FormatCurrentAddress());
+            rbNewAddress.Checked = true;
+            rbProfileAddress.Checked = false;
+        }
+        else if (HasSavedProfile())
+        {
+            rbProfileAddress.Checked = true;
+            rbNewAddress.Checked = false;
+            ClearNewAddressForm();
+        }
+        else
+        {
+            rbNewAddress.Checked = true;
+            rbProfileAddress.Checked = false;
+            ClearNewAddressForm();
+        }
+
+        ApplyAddressMode();
+    }
+
+    void OpenNewAddressModal(bool clearForm)
+    {
+        rbNewAddress.Checked = true;
+        rbProfileAddress.Checked = false;
+
+        if (clearForm)
+        {
+            ClearNewAddressForm();
+            hfHasNewAddress.Value = "0";
+        }
+        else
+        {
+            RestoreNewAddressFields();
+        }
+
+        hfShowAddressModal.Value = "1";
+        ApplyAddressMode();
     }
 
     protected void btnToPayment_Click(object sender, EventArgs e)
     {
-        if (rbProfileAddress.Checked)
+        if (!PrepareSelectedAddress())
         {
-            RestoreProfileFields();
+            return;
         }
 
         if (!ValidateAddress())
@@ -149,9 +244,11 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
 
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
-        if (rbProfileAddress.Checked)
+        if (!PrepareSelectedAddress())
         {
-            RestoreProfileFields();
+            hfStep.Value = "1";
+            ApplyStep();
+            return;
         }
 
         if (!ValidateAddress())
@@ -185,10 +282,16 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
             return;
         }
 
-        string bankId = ddbankaccount.SelectedValue;
-        if (string.IsNullOrWhiteSpace(bankId) || bankId == "0")
+        string bankId = GetSelectedBankId();
+        if (string.IsNullOrWhiteSpace(bankId))
         {
-            Alert("Select a company bank account.");
+            EnsureBankSelected();
+            bankId = GetSelectedBankId();
+        }
+
+        if (string.IsNullOrWhiteSpace(bankId))
+        {
+            Alert("Company bank account is not available. Please contact support.");
             hfStep.Value = "2";
             ApplyStep();
             return;
@@ -304,15 +407,27 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
 
     bool ValidatePaymentAndUpload()
     {
-        if (pnlBankSelectWrap.Visible && (ddbankaccount.SelectedValue == "0" || string.IsNullOrWhiteSpace(ddbankaccount.SelectedValue)))
+        EnsureBankSelected();
+        string bankId = GetSelectedBankId();
+        if (GetSelectedPaymentMethod() == "qr" && FilterQrAccounts(GetBankAccounts()).Rows.Count == 0)
         {
-            Alert("Select a company bank account.");
+            Alert("QR code is not available. Please use online bank transfer or contact support.");
             return false;
         }
 
+        if (string.IsNullOrWhiteSpace(bankId))
+        {
+            Alert("Company bank account is not available. Please contact support.");
+            return false;
+        }
+
+        hfSelectedBankId.Value = bankId;
+        ViewState["CheckoutBankId"] = bankId;
+        Session["CheckoutBankId"] = bankId;
+
         if (string.IsNullOrWhiteSpace(txttransactionid.Text))
         {
-            Alert("Enter UTR / Transaction ID.");
+            Alert("Please enter transaction ID.");
             return false;
         }
 
@@ -347,10 +462,164 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
 
     string GetPaymentMode()
     {
-        if (rbRtgs.Checked) return "RTGS";
-        if (rbNeft.Checked) return "NEFT";
-        if (rbImps.Checked) return "IMPS";
-        return "UPI";
+        return GetSelectedPaymentMethod() == "qr" ? "QR" : "Online";
+    }
+
+    string GetSelectedPaymentMethod()
+    {
+        string method = hfPaymentMethod != null ? (hfPaymentMethod.Value ?? string.Empty).Trim().ToLowerInvariant() : "online";
+        return method == "qr" ? "qr" : "online";
+    }
+
+    string GetSelectedBankId()
+    {
+        string bankId = NormalizeBankId(hfSelectedBankId != null ? hfSelectedBankId.Value : null);
+        if (!string.IsNullOrWhiteSpace(bankId))
+        {
+            return bankId;
+        }
+
+        bankId = NormalizeBankId(ViewState["CheckoutBankId"]);
+        if (!string.IsNullOrWhiteSpace(bankId))
+        {
+            return bankId;
+        }
+
+        bankId = NormalizeBankId(Session["CheckoutBankId"]);
+        if (!string.IsNullOrWhiteSpace(bankId))
+        {
+            return bankId;
+        }
+
+        bankId = GetCheckedRepeaterBankId();
+        if (!string.IsNullOrWhiteSpace(bankId))
+        {
+            return bankId;
+        }
+
+        bankId = GetRepeaterBankId(0);
+        if (!string.IsNullOrWhiteSpace(bankId))
+        {
+            return bankId;
+        }
+
+        DataTable dt = GetBankAccounts();
+        if (GetSelectedPaymentMethod() == "qr")
+        {
+            bankId = GetFirstAccountId(FilterQrAccounts(dt));
+            if (!string.IsNullOrWhiteSpace(bankId))
+            {
+                return bankId;
+            }
+        }
+
+        return GetFirstAccountId(dt);
+    }
+
+    void EnsureBankSelected()
+    {
+        string bankId = GetSelectedBankId();
+        if (string.IsNullOrWhiteSpace(bankId))
+        {
+            bankId = GetFirstAccountId(GetBankAccounts());
+        }
+
+        if (string.IsNullOrWhiteSpace(bankId))
+        {
+            return;
+        }
+
+        hfSelectedBankId.Value = bankId;
+        ViewState["CheckoutBankId"] = bankId;
+        Session["CheckoutBankId"] = bankId;
+    }
+
+    DataTable GetBankAccounts()
+    {
+        DataTable dt = null;
+        try
+        {
+            dt = objbank.getBankAccountList();
+        }
+        catch
+        {
+            dt = null;
+        }
+
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return dt;
+        }
+
+        try
+        {
+            dt = objaccount.getCompanyAccountDetail();
+        }
+        catch
+        {
+            dt = null;
+        }
+
+        return dt ?? new DataTable();
+    }
+
+    static string NormalizeBankId(object value)
+    {
+        string bankId = Convert.ToString(value);
+        if (string.IsNullOrWhiteSpace(bankId) || bankId == "0")
+        {
+            return string.Empty;
+        }
+
+        return bankId.Trim();
+    }
+
+    string GetCheckedRepeaterBankId()
+    {
+        if (rptBankAccounts == null)
+        {
+            return string.Empty;
+        }
+
+        foreach (RepeaterItem item in rptBankAccounts.Items)
+        {
+            RadioButton rbBank = item.FindControl("rbBank") as RadioButton;
+            HiddenField hfBankId = item.FindControl("hfBankId") as HiddenField;
+            if (rbBank != null && rbBank.Checked && hfBankId != null)
+            {
+                return NormalizeBankId(hfBankId.Value);
+            }
+        }
+
+        return string.Empty;
+    }
+
+    string GetRepeaterBankId(int itemIndex)
+    {
+        if (rptBankAccounts == null || rptBankAccounts.Items.Count <= itemIndex)
+        {
+            return string.Empty;
+        }
+
+        HiddenField hfBankId = rptBankAccounts.Items[itemIndex].FindControl("hfBankId") as HiddenField;
+        return hfBankId == null ? string.Empty : NormalizeBankId(hfBankId.Value);
+    }
+
+    static string GetFirstAccountId(DataTable dt)
+    {
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        DataRow row = dt.Rows[0];
+        string id = GetValue(row, "id", "Id", "ID", "BankAccountId", "AccountId");
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            return NormalizeBankId(id);
+        }
+
+        return NormalizeBankId(row[0]);
     }
 
     string FormatCurrentAddress()
@@ -362,53 +631,217 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         return FormatAddress(txtaddress.Text, txtareaname.Text, city, state, txtpincode.Text);
     }
 
+    bool PrepareSelectedAddress()
+    {
+        if (rbNewAddress.Checked)
+        {
+            if (hfHasNewAddress.Value != "1")
+            {
+                Alert("Please add and save a delivery address.");
+                hfShowAddressModal.Value = "1";
+                ApplyAddressMode();
+                return false;
+            }
+
+            RestoreNewAddressFields();
+            return true;
+        }
+
+        if (!HasSavedProfile())
+        {
+            Alert("Please add and save a delivery address.");
+            OpenNewAddressModal(true);
+            return false;
+        }
+
+        RestoreProfileFields();
+        return true;
+    }
+
+    bool HasSavedProfile()
+    {
+        return HasDisplayableProfile() && IsValidId(Convert.ToString(ViewState["ProfileCityId"]));
+    }
+
+    bool HasDisplayableProfile()
+    {
+        return !string.IsNullOrWhiteSpace(Convert.ToString(ViewState["ProfileAddress"]))
+            || !string.IsNullOrWhiteSpace(Convert.ToString(ViewState["ProfileArea"]))
+            || !string.IsNullOrWhiteSpace(Convert.ToString(ViewState["ProfilePincode"]));
+    }
+
+    static bool IsValidId(string value)
+    {
+        string id = NormalizeId(value);
+        return !string.IsNullOrWhiteSpace(id) && id != "0";
+    }
+
+    static string NormalizeId(string value)
+    {
+        string text = (value ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        int id;
+        if (int.TryParse(text, out id))
+        {
+            return id.ToString();
+        }
+
+        decimal dec;
+        if (decimal.TryParse(text, out dec))
+        {
+            return ((int)dec).ToString();
+        }
+
+        return text;
+    }
+
+    void SaveNewAddressToViewState()
+    {
+        ViewState["NewAddress"] = txtaddress.Text.Trim();
+        ViewState["NewArea"] = txtareaname.Text.Trim();
+        ViewState["NewPincode"] = txtpincode.Text.Trim();
+        ViewState["NewStateId"] = ddstate.SelectedValue;
+        ViewState["NewCityId"] = ddcity.SelectedValue;
+    }
+
+    void RestoreNewAddressFields()
+    {
+        FillFields(
+            Convert.ToString(ViewState["NewAddress"]),
+            Convert.ToString(ViewState["NewArea"]),
+            Convert.ToString(ViewState["NewPincode"]),
+            Convert.ToString(ViewState["NewStateId"]),
+            Convert.ToString(ViewState["NewCityId"]));
+    }
+
+    void ClearNewAddressForm()
+    {
+        txtaddress.Text = string.Empty;
+        txtareaname.Text = string.Empty;
+        txtpincode.Text = string.Empty;
+        if (ddstate.Items.Count > 0)
+        {
+            ddstate.ClearSelection();
+            ddstate.SelectedIndex = 0;
+        }
+        LoadCities();
+    }
+
     void LoadAddress()
     {
-        DataTable dt = GetUserAddressDetail(Session["userid"].ToString());
-        if (dt == null || dt.Rows.Count == 0)
+        ClearNewAddressForm();
+        hfHasNewAddress.Value = "0";
+        hfShowAddressModal.Value = "0";
+        rbProfileAddress.Checked = true;
+        rbNewAddress.Checked = false;
+
+        DataRow row = GetProfileAddressRow();
+        if (row == null)
         {
             litProfileAddress.Text = "No profile address found. Please add a new delivery address.";
-            rbNewAddress.Checked = true;
-            rbProfileAddress.Checked = false;
             ApplyAddressMode();
             return;
         }
 
-        DataRow row = dt.Rows[0];
-        ViewState["ProfileAddress"] = GetValue(row, "address", "Address");
-        ViewState["ProfileArea"] = GetValue(row, "AreaName");
-        ViewState["ProfilePincode"] = GetValue(row, "Pincode");
-        ViewState["ProfileStateId"] = GetValue(row, "stateid", "StateId");
-        ViewState["ProfileCityId"] = GetValue(row, "cityid", "CityId");
-
-        string shipAddress = GetValue(row, "Shippingaddress", "ShippingAddress");
-        bool hasProfile = !string.IsNullOrWhiteSpace(Convert.ToString(ViewState["ProfileAddress"]))
-            && !string.IsNullOrWhiteSpace(Convert.ToString(ViewState["ProfileCityId"]));
-        bool hasShipping = !string.IsNullOrWhiteSpace(shipAddress);
-
-        if (hasProfile)
+        BindProfileRow(row);
+        if (HasDisplayableProfile())
         {
-            RestoreProfileFields();
-            litProfileAddress.Text = Server.HtmlEncode(FormatCurrentAddress());
+            litProfileAddress.Text = Server.HtmlEncode(FormatStoredAddress(
+                Convert.ToString(ViewState["ProfileAddress"]),
+                Convert.ToString(ViewState["ProfileArea"]),
+                Convert.ToString(ViewState["ProfilePincode"]),
+                Convert.ToString(ViewState["ProfileStateId"]),
+                Convert.ToString(ViewState["ProfileCityId"])));
         }
         else
         {
-            litProfileAddress.Text = "No complete profile address found.";
-            rbNewAddress.Checked = true;
-            rbProfileAddress.Checked = false;
-        }
-
-        if (!hasProfile && hasShipping)
-        {
-            FillFields(
-                shipAddress,
-                GetValue(row, "ShippingAreaName"),
-                GetValue(row, "ShippingPincode"),
-                GetValue(row, "Shippingstateid", "ShippingStateId"),
-                GetValue(row, "ShippingCityId"));
+            litProfileAddress.Text = "No profile address found. Please add a new delivery address.";
         }
 
         ApplyAddressMode();
+    }
+
+    DataRow GetProfileAddressRow()
+    {
+        DataTable dt = GetUserAddressDetail(Session["userid"].ToString());
+        if (RowHasAddress(dt))
+        {
+            return dt.Rows[0];
+        }
+
+        clsUser objUser = new clsUser();
+        objUser.UserId = Session["userid"].ToString();
+        dt = objUser.getUserDetail(objUser);
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return dt.Rows[0];
+        }
+
+        return null;
+    }
+
+    bool RowHasAddress(DataTable dt)
+    {
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return false;
+        }
+
+        DataRow row = dt.Rows[0];
+        return !string.IsNullOrWhiteSpace(GetAddressValue(row))
+            || !string.IsNullOrWhiteSpace(GetValue(row, "AreaName", "areaname"))
+            || !string.IsNullOrWhiteSpace(GetValue(row, "Pincode", "pincode"));
+    }
+
+    void BindProfileRow(DataRow row)
+    {
+        ViewState["ProfileAddress"] = GetAddressValue(row);
+        ViewState["ProfileArea"] = GetValue(row, "AreaName", "areaname", "Area");
+        ViewState["ProfilePincode"] = GetValue(row, "Pincode", "pincode");
+        ViewState["ProfileStateId"] = NormalizeId(GetValue(row, "stateid", "StateId", "StateID"));
+        ViewState["ProfileCityId"] = NormalizeId(GetValue(row, "cityid", "CityId", "CityID"));
+        ViewState["ProfileCityName"] = GetValue(row, "Cityname", "CityName", "cityname");
+        ViewState["ProfileStateName"] = GetValue(row, "Statename", "StateName", "statename");
+    }
+
+    static string GetAddressValue(DataRow row)
+    {
+        return GetValue(row, "address", "Address", "Addressfirst", "AddressFirst", "Address1");
+    }
+
+    string FormatStoredAddress(string address, string area, string pincode, string stateId, string cityId)
+    {
+        string stateName = Convert.ToString(ViewState["ProfileStateName"]);
+        string cityName = Convert.ToString(ViewState["ProfileCityName"]);
+        ListItem stateItem = !IsValidId(stateId) ? null : ddstate.Items.FindByValue(NormalizeId(stateId));
+        if (stateItem != null && stateItem.Text != "Select State")
+        {
+            stateName = stateItem.Text;
+        }
+
+        if (IsValidId(stateId))
+        {
+            objCState.StateId = NormalizeId(stateId);
+            DataTable cities = objCState.getCity(objCState);
+            if (cities != null)
+            {
+                string normalizedCityId = NormalizeId(cityId);
+                foreach (DataRow cityRow in cities.Rows)
+                {
+                    if (string.Equals(NormalizeId(GetValue(cityRow, "CityID", "CityId")), normalizedCityId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        cityName = GetValue(cityRow, "CityName");
+                        break;
+                    }
+                }
+            }
+        }
+
+        return FormatAddress(address, area, cityName, stateName, pincode);
     }
 
     void RestoreProfileFields()
@@ -427,14 +860,27 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         txtaddress.Text = address ?? string.Empty;
         txtareaname.Text = area ?? string.Empty;
         txtpincode.Text = pincode ?? string.Empty;
-        if (!string.IsNullOrWhiteSpace(stateId) && ddstate.Items.FindByValue(stateId) != null)
+        string stateIdNorm = NormalizeId(stateId);
+        string cityIdNorm = NormalizeId(cityId);
+        if (IsValidId(stateIdNorm) && ddstate.Items.FindByValue(stateIdNorm) != null)
         {
-            ddstate.SelectedValue = stateId;
+            ddstate.ClearSelection();
+            ddstate.SelectedValue = stateIdNorm;
             LoadCities();
-            if (!string.IsNullOrWhiteSpace(cityId) && ddcity.Items.FindByValue(cityId) != null)
+            if (IsValidId(cityIdNorm) && ddcity.Items.FindByValue(cityIdNorm) != null)
             {
-                ddcity.SelectedValue = cityId;
+                ddcity.ClearSelection();
+                ddcity.SelectedValue = cityIdNorm;
             }
+        }
+        else
+        {
+            if (ddstate.Items.Count > 0)
+            {
+                ddstate.ClearSelection();
+                ddstate.SelectedIndex = 0;
+            }
+            LoadCities();
         }
     }
 
@@ -483,74 +929,126 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
 
     void LoadCompanyAccounts()
     {
-        ddbankaccount.Items.Clear();
-        DataTable dt = objaccount.getCompanyAccountDetail();
-        if (dt == null || dt.Rows.Count == 0)
+        DataTable dt = GetBankAccounts();
+        bool hasBanks = dt != null && dt.Rows.Count > 0;
+        DataTable qrDt = FilterQrAccounts(dt);
+        bool hasQr = qrDt != null && qrDt.Rows.Count > 0;
+
+        pnlNoCompanyAccount.Visible = !hasBanks;
+        pnlCompanyAccount.Visible = hasBanks;
+        pnlQrPayment.Visible = hasQr;
+        pnlNoQr.Visible = !hasQr;
+
+        if (hasBanks)
         {
-            pnlNoCompanyAccount.Visible = true;
-            pnlCompanyAccount.Visible = false;
-            pnlBankSelectWrap.Visible = false;
-            return;
+            rptBankAccounts.DataSource = dt;
+            rptBankAccounts.DataBind();
+        }
+        else
+        {
+            rptBankAccounts.DataSource = null;
+            rptBankAccounts.DataBind();
         }
 
-        pnlNoCompanyAccount.Visible = false;
-        pnlCompanyAccount.Visible = true;
-        pnlBankSelectWrap.Visible = dt.Rows.Count > 1;
-        ddbankaccount.DataSource = dt;
-        ddbankaccount.DataTextField = "accno2";
-        ddbankaccount.DataValueField = "id";
-        ddbankaccount.DataBind();
-        if (dt.Rows.Count > 1)
+        if (hasQr)
         {
-            ddbankaccount.Items.Insert(0, new ListItem("Select Account", "0"));
+            rptQrAccounts.DataSource = qrDt;
+            rptQrAccounts.DataBind();
+        }
+        else
+        {
+            rptQrAccounts.DataSource = null;
+            rptQrAccounts.DataBind();
         }
 
-        LoadCompanyAccountDetail();
+        EnsureBankSelected();
     }
 
-    void LoadCompanyAccountDetail()
+    DataTable FilterQrAccounts(DataTable dt)
     {
-        if (ddbankaccount.Items.Count == 0)
-        {
-            pnlNoCompanyAccount.Visible = true;
-            pnlCompanyAccount.Visible = false;
-            return;
-        }
-
-        if (pnlBankSelectWrap.Visible && ddbankaccount.SelectedValue == "0")
-        {
-            litAccountHolder.Text = "-";
-            litAccountNo.Text = "-";
-            litBankName.Text = "-";
-            litIfscCode.Text = "-";
-            imgPaymentQr.ImageUrl = ResolveUrl("~/ProductImage/noimage.png");
-            return;
-        }
-
-        string accountId = ddbankaccount.SelectedValue;
-        if (string.IsNullOrWhiteSpace(accountId) || accountId == "0")
-        {
-            accountId = ddbankaccount.Items[0].Value;
-        }
-
-        objaccount.Id = accountId;
-        DataTable dt = objaccount.getCompanyAccountDetailById(objaccount);
         if (dt == null || dt.Rows.Count == 0)
         {
-            pnlNoCompanyAccount.Visible = true;
-            pnlCompanyAccount.Visible = false;
+            return new DataTable();
+        }
+
+        DataTable qrDt = dt.Clone();
+        foreach (DataRow row in dt.Rows)
+        {
+            if (!string.IsNullOrWhiteSpace(GetValue(row, "BranchName", "branchname")))
+            {
+                qrDt.ImportRow(row);
+            }
+        }
+
+        return qrDt;
+    }
+
+    protected void rptBankAccounts_ItemDataBound(object sender, RepeaterItemEventArgs e)
+    {
+        if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+        {
             return;
         }
 
-        DataRow row = dt.Rows[0];
-        litAccountHolder.Text = GetValue(row, "AccountHolderName");
-        litAccountNo.Text = GetValue(row, "AccountNo", "accountno");
-        litBankName.Text = GetValue(row, "BankName");
-        litIfscCode.Text = GetValue(row, "IFSCCode");
-        string qrImage = GetValue(row, "BranchName");
-        imgPaymentQr.ImageUrl = string.IsNullOrWhiteSpace(qrImage)
-            ? ResolveUrl("~/ProductImage/noimage.png")
-            : ResolveUrl("~/ProductImage/" + qrImage);
+        RadioButton rbBank = e.Item.FindControl("rbBank") as RadioButton;
+        HiddenField hfBankId = e.Item.FindControl("hfBankId") as HiddenField;
+        if (rbBank == null || hfBankId == null)
+        {
+            return;
+        }
+
+        string bankId = hfBankId.Value;
+        rbBank.Checked = bankId == hfSelectedBankId.Value;
+        rbBank.Attributes["onclick"] = string.Format(
+            "document.getElementById('{0}').value='{1}';",
+            hfSelectedBankId.ClientID,
+            bankId.Replace("'", "\\'"));
+    }
+
+    protected string GetBankField(object dataItem, params string[] columnNames)
+    {
+        DataRowView row = dataItem as DataRowView;
+        if (row == null)
+        {
+            return string.Empty;
+        }
+
+        foreach (string columnName in columnNames)
+        {
+            if (row.Row.Table.Columns.Contains(columnName) && row[columnName] != DBNull.Value)
+            {
+                return Convert.ToString(row[columnName]).Trim();
+            }
+        }
+
+        return string.Empty;
+    }
+
+    protected string GetQrImageUrl(object dataItem)
+    {
+        string fileName = GetBankField(dataItem, "BranchName", "branchname");
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return ResolveUrl("~/ProductImage/noimage.png");
+        }
+
+        return ResolveUrl("~/ProductImage/" + fileName);
+    }
+
+    protected string MaskAccountNo(string accountNo)
+    {
+        if (string.IsNullOrWhiteSpace(accountNo))
+        {
+            return string.Empty;
+        }
+
+        string trimmed = accountNo.Trim();
+        if (trimmed.Length <= 4)
+        {
+            return trimmed;
+        }
+
+        return trimmed.Substring(trimmed.Length - 4);
     }
 
     string UploadImage()

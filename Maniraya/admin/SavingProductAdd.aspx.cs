@@ -39,81 +39,111 @@ public partial class admin_ProductAdd : System.Web.UI.Page
     }
     public string Insert_Product(clsProduct objState)
     {
-        string res = "";
-        string s2 = "";
-        SqlConnection cn;
-        SqlTransaction tr = null;
-        DataSet ds = new DataSet();
-        cn = ObjData.StartConnectionInTransaction();
-        tr = cn.BeginTransaction(IsolationLevel.Serializable);
+        decimal dp;
+        if (!decimal.TryParse(Convert.ToString(objState.DP), System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out dp)
+            && !decimal.TryParse(Convert.ToString(objState.DP), out dp))
+        {
+            return "0";
+        }
 
+        return SavingProductHelper.AddCatalogProduct(
+            objState.ProductName,
+            objState.MRP,
+            dp,
+            objState.ProductImage,
+            objState.MentionBy,
+            objState.GST,
+            objState.HSNCODE);
+    }
+
+    protected void btnSubmit_Click1(object sender, EventArgs e)
+    {
+        decimal mrp;
+        decimal gst;
+        decimal dp;
+        if (!decimal.TryParse(txtmrp.Text.Trim(), out mrp) || mrp < 0)
+        {
+            ShowAlert("Enter valid MRP.");
+            return;
+        }
+        if (!decimal.TryParse(txtdp.Text.Trim(), out dp) || dp < 0)
+        {
+            ShowAlert("Enter valid DP.");
+            return;
+        }
+        if (!decimal.TryParse(txtgst.Text.Trim(), out gst) || gst < 0)
+        {
+            ShowAlert("Enter valid GST.");
+            return;
+        }
+
+        string str_imagename = "noimage.png";
         try
         {
-            // EntryDate must be 1st of month; one product/month (starts Sep-2026 on monthly page).
-            DateTime entryDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            s2 = "sp_add_SavingProductMaster";
-            SqlParameter[] parameter = {                                              
-                new SqlParameter("@ProductName",objState.ProductName),
-                new SqlParameter("@MRP",objState.MRP),
-                new SqlParameter("@DP",objState.DP),
-                new SqlParameter("@ImageName",objState.ProductImage),
-                new SqlParameter("@EntryBy",objState.MentionBy),
-                new SqlParameter("@HSNCODE",objState.HSNCODE),
-                new SqlParameter("@GST",objState.GST),
-                new SqlParameter("@EntryDate", entryDate)
+            if (FileUpload1.HasFile)
+            {
+                string folder = Server.MapPath("~/ProductImage/");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
 
-                };
-            res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
-            tr.Commit();
+                string safeName = Path.GetFileName(FileUpload1.FileName);
+                str_imagename = Guid.NewGuid().ToString("N").Substring(0, 8) + "_" + safeName;
+                FileUpload1.SaveAs(Path.Combine(folder, str_imagename));
+            }
         }
         catch (Exception ex)
         {
-            res = "0";
-            tr.Rollback();
-        }
-        finally
-        {
-            ObjData.EndConnection();
-            tr.Dispose();
-        }
-        return res;
-    }
-    protected void btnSubmit_Click1(object sender, EventArgs e)
-    {
-        string str_imagename = "noimage.png";
-        if (FileUpload1.HasFile)
-        {
-            str_imagename = Guid.NewGuid().ToString().Substring(0, 8) + "_" + FileUpload1.FileName;
-            FileUpload1.SaveAs(Server.MapPath("~/ProductImage/") + str_imagename);
+            ShowAlert("Image upload failed: " + ex.Message);
+            return;
         }
 
-        objState.ProductName = txtproductname.Text;
-        objState.MRP = Convert.ToDecimal( txtmrp.Text);
-        objState.DP = txtdp.Text;
-        objState.HSNCODE = txthsncode.Text;
-        objState.GST = Convert.ToDecimal( txtgst.Text);
+        if (Session["useradmin"] == null)
+        {
+            Response.Redirect("logout.aspx");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtproductname.Text))
+        {
+            ShowAlert("Enter Product Name.");
+            return;
+        }
+
+        objState.ProductName = txtproductname.Text.Trim();
+        objState.MRP = mrp;
+        objState.DP = dp.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        objState.HSNCODE = txthsncode.Text.Trim();
+        objState.GST = gst;
         objState.ProductImage = str_imagename;
-       
         objState.MentionBy = Session["useradmin"].ToString();
-        string res = Insert_Product(objState);
+
+        string res = (Insert_Product(objState) ?? string.Empty).Trim().ToLowerInvariant();
         if (res == "t")
         {
-            string popupScript = "alert('Saving Product Added Successfully');";
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-           txtgst.Text=txthsncode.Text= txtproductname.Text = txtmrp.Text = txtdp.Text = "";
-
+            ShowAlert("Saving Product Added Successfully");
+            txtgst.Text = txthsncode.Text = txtproductname.Text = txtmrp.Text = txtdp.Text = "";
+        }
+        else if (res == "f")
+        {
+            ShowAlert("Product Already Exists");
+        }
+        else if (res == "m")
+        {
+            ShowAlert("A product for this month already exists. Use Add Monthly Saving Product for month-wise products.");
         }
         else
-            if (res == "f")
-            {
-                string popupScript = "alert('Product Already Exists');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            }
-            else
-            {
-                string popupScript = "alert('Unknown error occurred');";
-                ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
-            }     
+        {
+            ShowAlert("Unable to save product. Please try again.");
+        }
+    }
+
+    void ShowAlert(string message)
+    {
+        string popupScript = "alert('" + (message ?? string.Empty).Replace("\\", "\\\\").Replace("'", "\\'") + "');";
+        ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
     }
 
 

@@ -138,14 +138,12 @@ public partial class WebMasterPage : System.Web.UI.MasterPage
 
     void loadaddcartitem()
     {
+        CatalogCartHelper.TryCompletePendingAdd();
         if (Session["userid"] != null)
         {
             objState.UserId = Session["userid"].ToString();
             DataTable Dt = objState.getCartItems(objState);
-            if (Dt != null && Dt.Rows.Count > 0)
-            {
-                cartCount.Text = Dt.Rows.Count.ToString();
-            }
+            cartCount.Text = (Dt != null ? Dt.Rows.Count : 0).ToString();
         }
     }
 

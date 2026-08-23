@@ -38,6 +38,11 @@
             font-weight: 700;
             color: #64748b;
         }
+        .dash-saving-product.is-unassigned {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 600;
+        }
     </style>
 </asp:Content>
 
@@ -137,7 +142,7 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Product">
                                         <ItemTemplate>
-                                            <span class="dash-saving-product"><%# Eval("productname") %></span>
+                                            <asp:Label ID="lblproductname" runat="server" CssClass="dash-saving-product" Text='<%# Eval("productname") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Status">

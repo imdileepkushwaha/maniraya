@@ -71,11 +71,6 @@
                                             <span class="dash-saving-amount"><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblamount" runat="server" Text='<%# Eval("amount") %>'></asp:Label></span>
                                         </ItemTemplate>
                                     </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Product">
-                                        <ItemTemplate>
-                                            <span class="dash-saving-product"><asp:Label ID="lblproductname" runat="server" Text='<%# Eval("productname") %>'></asp:Label></span>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Status">
                                         <ItemTemplate>
                                             <asp:Label ID="lblstatus" runat="server" Text='<%# Eval("status") %>' CssClass="dash-saving-status"></asp:Label>

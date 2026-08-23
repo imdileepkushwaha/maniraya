@@ -673,7 +673,14 @@ namespace BusinessLogicTier
 
         public DataTable getUseraddress(string Userid)
         {
-            string str_query = "SELECT ID AddressId,Userid,Addressfirst,AddressSecond,C.CityId,c.CityName,areaname,Pincode,mobile,Type,DefaultAdd,CASE WHEN DefaultAdd=1 THEN 'YES' ELSE 'NO' END ISdefault,C.Stateid  FROM useraddress U JOIN citymaster C ON U.Cityid=C.CityId  where 1=1 and userid='" + Userid + "'";
+            string str_query = @"SELECT U.ID AddressId, U.Userid, U.Addressfirst, U.AddressSecond,
+                ISNULL(C.CityId, U.Cityid) AS CityId, ISNULL(C.CityName, '') AS CityName,
+                U.areaname, U.Pincode, U.mobile, U.Type, U.DefaultAdd,
+                CASE WHEN U.DefaultAdd = 1 THEN 'YES' ELSE 'NO' END AS ISdefault,
+                ISNULL(C.Stateid, 0) AS Stateid
+                FROM useraddress U
+                LEFT JOIN citymaster C ON U.Cityid = C.CityId
+                WHERE U.userid = '" + Userid + "'";
             DataTable dt = null;
             ObjData.StartConnection();
             try
@@ -690,7 +697,14 @@ namespace BusinessLogicTier
 
         public DataTable getUseraddressById(string userId, string addressId)
         {
-            string str_query = "SELECT ID AddressId,Userid,Addressfirst,AddressSecond,C.CityId,c.CityName,areaname,Pincode,mobile,Type,DefaultAdd,CASE WHEN DefaultAdd=1 THEN 'YES' ELSE 'NO' END ISdefault,C.Stateid FROM useraddress U JOIN citymaster C ON U.Cityid=C.CityId WHERE U.ID='" + addressId + "' AND U.userid='" + userId + "'";
+            string str_query = @"SELECT U.ID AddressId, U.Userid, U.Addressfirst, U.AddressSecond,
+                ISNULL(C.CityId, U.Cityid) AS CityId, ISNULL(C.CityName, '') AS CityName,
+                U.areaname, U.Pincode, U.mobile, U.Type, U.DefaultAdd,
+                CASE WHEN U.DefaultAdd = 1 THEN 'YES' ELSE 'NO' END AS ISdefault,
+                ISNULL(C.Stateid, 0) AS Stateid
+                FROM useraddress U
+                LEFT JOIN citymaster C ON U.Cityid = C.CityId
+                WHERE U.ID = '" + addressId + "' AND U.userid = '" + userId + "'";
             DataTable dt = null;
             ObjData.StartConnection();
             try

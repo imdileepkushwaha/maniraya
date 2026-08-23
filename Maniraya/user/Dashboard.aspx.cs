@@ -267,6 +267,11 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
             string lastMonthLabel = PrizeHelper.FormatPrizeMonth(lastMonthKey);
 
             DataTable dt = PrizeHelper.GetAllWinners(200, lastMonthKey);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                dt = SortPrizeWinnersByDisplayOrder(dt);
+            }
+
             pnlPrizes.Visible = true;
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -302,6 +307,35 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
             pnlPrizeGrid.Visible = false;
             pnlPrizeEmpty.Visible = true;
         }
+    }
+
+    static DataTable SortPrizeWinnersByDisplayOrder(DataTable dt)
+    {
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return dt;
+        }
+
+        bool hasOrder = dt.Columns.Contains("DisplayOrder");
+        bool hasCreated = dt.Columns.Contains("CreatedOn");
+        bool hasId = dt.Columns.Contains("Id");
+        if (!hasOrder && !hasCreated && !hasId)
+        {
+            return dt;
+        }
+
+        string sort = hasOrder ? "DisplayOrder ASC" : string.Empty;
+        if (hasCreated)
+        {
+            sort += (sort.Length > 0 ? ", " : "") + "CreatedOn DESC";
+        }
+        if (hasId)
+        {
+            sort += (sort.Length > 0 ? ", " : "") + "Id DESC";
+        }
+
+        dt.DefaultView.Sort = sort;
+        return dt.DefaultView.ToTable();
     }
 
     void LoadTopDirectRanking()

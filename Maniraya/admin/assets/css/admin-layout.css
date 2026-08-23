@@ -3824,13 +3824,23 @@ body.admin-app.modal-open .content-wrapper {
     display: none !important;
 }
 
-.admin-product-form .admin-file-input-hidden {
+.admin-product-form .admin-file-input-hidden,
+.admin-product-image-dropzone .admin-file-input-hidden {
     position: absolute;
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
     overflow: hidden;
     z-index: -1;
+}
+
+.admin-product-image-slot-badge.is-optional {
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+.admin-report-page .admin-product-image-slot {
+    max-width: 280px;
 }
 
 .admin-product-image-dropzone {
@@ -6823,4 +6833,29 @@ body.admin-app > .admin-image-preview-modal .modal-footer,
     .contact-settings-tab-content {
         padding: 14px 12px 10px;
     }
+}
+
+/* Assign saving product to 18 installments */
+.admin-assign-grid {
+    margin-bottom: 0;
+}
+
+.admin-assign-grid th {
+    white-space: nowrap;
+    background: #f8fafc;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+}
+
+.admin-assign-grid td {
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+.admin-product-form .admin-form-section-last {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }

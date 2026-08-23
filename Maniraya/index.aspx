@@ -449,8 +449,9 @@
                                             </svg>
                                             <span>View</span>
                                         </a>
-                                        <a class="add-btn"
-                                            href='Productdetail.aspx?productid=<%# Eval("ProductID") %>&franchiseeid=<%# Eval("franchiseeid") %>'>
+                                        <button type="button" class="add-btn catalog-add-cart"
+                                            data-productid='<%# Eval("ProductID") %>'
+                                            data-franchiseeid='<%# Eval("franchiseeid") %>'>
                                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                                                 aria-hidden="true">
                                                 <path d="M4 7h16l-1.4 11H5.4L4 7Z" stroke="currentColor"
@@ -459,7 +460,7 @@
                                                     stroke-linecap="round" />
                                             </svg>
                                             <span>Add to Cart</span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </article>

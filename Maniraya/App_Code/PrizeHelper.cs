@@ -20,9 +20,21 @@ public static class PrizeHelper
                     Description NVARCHAR(500) NULL,
                     Status BIT NOT NULL DEFAULT 1,
                     CreatedBy NVARCHAR(100) NULL,
-                    CreatedOn DATETIME NOT NULL DEFAULT GETDATE()
+                    CreatedOn DATETIME NOT NULL DEFAULT GETDATE(),
+                    DisplayOrder INT NOT NULL DEFAULT 0
                 )
             END");
+
+        RunNonQuery(@"
+            IF COL_LENGTH('PrizeMaster', 'DisplayOrder') IS NULL
+            BEGIN
+                ALTER TABLE PrizeMaster ADD DisplayOrder INT NOT NULL CONSTRAINT DF_PrizeMaster_DisplayOrder DEFAULT 0
+            END");
+
+        RunNonQuery(@"
+            UPDATE PrizeMaster
+            SET DisplayOrder = Id
+            WHERE ISNULL(DisplayOrder, 0) <= 0");
 
         RunNonQuery(@"
             IF OBJECT_ID('PrizeAssignment', 'U') IS NULL
@@ -54,9 +66,10 @@ public static class PrizeHelper
                 ISNULL(Description, '') AS Description,
                 ISNULL(Status, 1) AS Status,
                 CASE WHEN ISNULL(Status, 1) = 1 THEN 'Active' ELSE 'Inactive' END AS StatusText,
+                ISNULL(DisplayOrder, Id) AS DisplayOrder,
                 CreatedOn
             FROM PrizeMaster
-            ORDER BY Id DESC");
+            ORDER BY ISNULL(DisplayOrder, 999999) ASC, Id ASC");
     }
 
     public static DataTable GetActivePrizes()
@@ -66,7 +79,7 @@ public static class PrizeHelper
             SELECT Id, PrizeName
             FROM PrizeMaster
             WHERE ISNULL(Status, 1) = 1
-            ORDER BY PrizeName");
+            ORDER BY ISNULL(DisplayOrder, 999999) ASC, PrizeName");
     }
 
     public static DataTable GetPrizeById(int id)
@@ -80,7 +93,24 @@ public static class PrizeHelper
         return RunSelect("SELECT * FROM PrizeMaster WHERE Id = " + id);
     }
 
+    public static int GetNextDisplayOrder()
+    {
+        EnsureTables();
+        DataTable dt = RunSelect("SELECT ISNULL(MAX(DisplayOrder), 0) + 1 AS NextOrder FROM PrizeMaster");
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return Convert.ToInt32(dt.Rows[0]["NextOrder"]);
+        }
+
+        return 1;
+    }
+
     public static string AddPrize(string prizeName, string description, string createdBy)
+    {
+        return AddPrize(prizeName, description, createdBy, 0);
+    }
+
+    public static string AddPrize(string prizeName, string description, string createdBy, int displayOrder)
     {
         if (string.IsNullOrWhiteSpace(prizeName))
         {
@@ -97,16 +127,23 @@ public static class PrizeHelper
             return "exists";
         }
 
+        int order = displayOrder > 0 ? displayOrder : GetNextDisplayOrder();
         string sql = string.Format(
-            "INSERT INTO PrizeMaster (PrizeName, Description, Status, CreatedBy, CreatedOn) VALUES ('{0}', '{1}', 1, '{2}', GETDATE())",
+            "INSERT INTO PrizeMaster (PrizeName, Description, Status, CreatedBy, CreatedOn, DisplayOrder) VALUES ('{0}', '{1}', 1, '{2}', GETDATE(), {3})",
             safeName,
             Escape((description ?? string.Empty).Trim()),
-            Escape((createdBy ?? string.Empty).Trim()));
+            Escape((createdBy ?? string.Empty).Trim()),
+            order);
 
         return RunNonQuery(sql) ? "ok" : "error";
     }
 
     public static bool UpdatePrize(int id, string prizeName, string description, bool status)
+    {
+        return UpdatePrize(id, prizeName, description, status, 0);
+    }
+
+    public static bool UpdatePrize(int id, string prizeName, string description, bool status, int displayOrder)
     {
         if (id <= 0 || string.IsNullOrWhiteSpace(prizeName))
         {
@@ -115,11 +152,13 @@ public static class PrizeHelper
 
         EnsureTables();
 
+        int order = displayOrder > 0 ? displayOrder : GetNextDisplayOrder();
         string sql = string.Format(
-            "UPDATE PrizeMaster SET PrizeName='{0}', Description='{1}', Status={2} WHERE Id={3}",
+            "UPDATE PrizeMaster SET PrizeName='{0}', Description='{1}', Status={2}, DisplayOrder={3} WHERE Id={4}",
             Escape(prizeName.Trim()),
             Escape((description ?? string.Empty).Trim()),
             status ? "1" : "0",
+            order,
             id);
 
         return RunNonQuery(sql);
@@ -314,6 +353,7 @@ public static class PrizeHelper
                 ISNULL(pa.UserName, '') AS UserName,
                 ISNULL(pm.PrizeName, pa.PrizeName) AS PrizeName,
                 ISNULL(pa.PrizeMonth, '') AS PrizeMonth,
+                ISNULL(pm.DisplayOrder, 999999) AS DisplayOrder,
                 pa.CreatedOn
             FROM PrizeAssignment pa
             LEFT JOIN PrizeMaster pm ON pa.PrizeId = pm.Id
@@ -324,7 +364,7 @@ public static class PrizeHelper
             sql += " AND LTRIM(RTRIM(ISNULL(pa.PrizeMonth, ''))) = '" + Escape(prizeMonth.Trim()) + "'";
         }
 
-        sql += " ORDER BY pa.Id DESC";
+        sql += " ORDER BY ISNULL(pm.DisplayOrder, 999999) ASC, pa.CreatedOn DESC, pa.Id DESC";
         return RunSelect(sql);
     }
 

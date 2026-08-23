@@ -211,7 +211,8 @@ public partial class admin_SavingProductMonthlyAdd : Page
                     string sql =
                         "SELECT TOP 1 id FROM SavingProductMaster WITH (NOLOCK) " +
                         "WHERE YEAR(EntryDate) = " + candidate.Year +
-                        " AND MONTH(EntryDate) = " + candidate.Month;
+                        " AND MONTH(EntryDate) = " + candidate.Month +
+                        " AND DAY(EntryDate) = 1";
 
                     DataTable dt = ObjData.RunDataTable(sql);
                     if (dt == null || dt.Rows.Count == 0)
@@ -244,7 +245,8 @@ public partial class admin_SavingProductMonthlyAdd : Page
                 string sql =
                     "SELECT TOP 1 id FROM SavingProductMaster WITH (NOLOCK) " +
                     "WHERE YEAR(EntryDate) = " + entryDate.Year +
-                    " AND MONTH(EntryDate) = " + entryDate.Month;
+                    " AND MONTH(EntryDate) = " + entryDate.Month +
+                    " AND DAY(EntryDate) = 1";
                 DataTable dt = ObjData.RunDataTable(sql);
                 return dt != null && dt.Rows.Count > 0;
             }
@@ -293,6 +295,12 @@ public partial class admin_SavingProductMonthlyAdd : Page
         txtDp.Text = string.Empty;
         txtGst.Text = string.Empty;
         txtHsnCode.Text = string.Empty;
+        ScriptManager.RegisterStartupScript(
+            this,
+            GetType(),
+            "resetMonthlyProductImage",
+            "if (window.AdminImageUpload) { AdminImageUpload.reset(document.getElementById('monthlyProductImageSlot')); }",
+            true);
     }
 
     bool TryGetEntryDate(out DateTime entryDate)

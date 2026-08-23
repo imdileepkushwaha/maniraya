@@ -60,10 +60,12 @@
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.6 12C3.9 8.1 7.6 5.5 12 5.5C16.4 5.5 20.1 8.1 21.4 12C20.1 15.9 16.4 18.5 12 18.5C7.6 18.5 3.9 15.9 2.6 12Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg>
                                                     <span>View</span>
                                                 </a>
-                                                <a class="add-btn" href='Productdetail.aspx?productid=<%# Eval("ProductID") %>&franchiseeid=<%# Eval("franchiseeid") %>'>
+                                                <button type="button" class="add-btn catalog-add-cart"
+                                                    data-productid='<%# Eval("ProductID") %>'
+                                                    data-franchiseeid='<%# Eval("franchiseeid") %>'>
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16l-1.4 11H5.4L4 7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 11v6M15 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                                                     <span>Add to Cart</span>
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </article>

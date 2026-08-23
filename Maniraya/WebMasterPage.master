@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
  
-  <link rel="stylesheet" href="myassets/assets/css/style.css?v=50" />
+  <link rel="stylesheet" href="myassets/assets/css/style.css?v=51" />
   <link rel="stylesheet" href="myassets/assets/css/maniraya-loader.css?v=1" />
     <asp:ContentPlaceHolder id="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -433,6 +433,7 @@
 
    <script src="myassets/assets/js/maniraya-loader.js?v=1"></script>
    <script src="myassets/assets/js/script.js?v=4"></script>
+   <script src="myassets/assets/js/catalog-cart.js?v=1"></script>
           <asp:ContentPlaceHolder ID="contentScript" runat="server">
   </asp:ContentPlaceHolder>
     </form>
