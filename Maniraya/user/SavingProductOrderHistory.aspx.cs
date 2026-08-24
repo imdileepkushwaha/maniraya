@@ -47,6 +47,7 @@ public partial class user_SavingProductOrderHistory : Page
 
         SavingProductHelper.EnsureDeliveryColumns();
         SavingProductHelper.EnsureInstallmentDeliveryColumns();
+        SavingProductHelper.ProcessBulkSavingSchedule();
 
         if (!IsPostBack)
         {

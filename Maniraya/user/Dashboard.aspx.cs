@@ -173,8 +173,12 @@ SELECT COUNT(1) AS PendingCount
 FROM TeamCTE t
 INNER JOIN SavingAccountInstallmentDetail sa WITH (NOLOCK)
     ON LTRIM(RTRIM(sa.UserId)) = t.UserId
+LEFT JOIN SavingAccountDetail sd WITH (NOLOCK)
+    ON sa.OrderId = sd.orderid
+   AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
 WHERE LTRIM(RTRIM(ISNULL(sa.Status, ''))) = 'Pending'
   AND ISNULL(sa.InstNo, 0) > 1
+  AND ISNULL(sd.Amount, 0) < 15000
 OPTION (MAXRECURSION 10)";
 
         try
@@ -528,6 +532,10 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
             return;
         }
 
+        SavingProductHelper.EnsureBulkColumns();
+        SavingProductHelper.EnsureBulkInstallmentsForUser(userId);
+        SavingProductHelper.ProcessBulkSavingSchedule();
+
         DataTable dt = GetCouponInstallmentSummary(userId);
         if (dt == null || dt.Rows.Count == 0)
         {
@@ -545,12 +553,12 @@ WHERE UserID = '" + SqlEscape(userId) + "'";
     DataTable GetCouponInstallmentSummary(string userId)
     {
         // One card per coupon.
-        // Paid = Approved, Unpaid = Pending.
-        // CurrentMonthPending = current month installmentdate + Pending (Approved => 0).
+        // Paid = Approved or prepaid Paid. Unpaid = Pending.
+        // Month 1 lives on SavingAccountDetail, so it is unioned into the count.
         string sql = @"
 SELECT
     x.CouponCode,
-    SUM(CASE WHEN x.StatusNorm = 'approved' THEN 1 ELSE 0 END) AS PaidCount,
+    SUM(CASE WHEN x.StatusNorm IN ('approved', 'paid') THEN 1 ELSE 0 END) AS PaidCount,
     SUM(CASE WHEN x.StatusNorm = 'pending' THEN 1 ELSE 0 END) AS UnpaidCount,
     SUM(CASE
             WHEN x.IsCurrentMonth = 1 AND x.StatusNorm = 'pending' THEN 1
@@ -560,7 +568,11 @@ FROM (
     SELECT DISTINCT
         sa.Id AS InstallmentId,
         LTRIM(RTRIM(sd.couponcode)) AS CouponCode,
-        LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) AS StatusNorm,
+        CASE
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('approved', 'paid', 'approve', '1') THEN 'approved'
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'pending' THEN 'pending'
+            ELSE LOWER(LTRIM(RTRIM(ISNULL(sa.Status, ''))))
+        END AS StatusNorm,
         CASE
             WHEN sa.installmentdate IS NOT NULL
              AND YEAR(sa.installmentdate) = YEAR(GETDATE())
@@ -573,6 +585,32 @@ FROM (
        AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
     WHERE LTRIM(RTRIM(sd.UserId)) = '" + SqlEscape(userId) + @"'
       AND NULLIF(LTRIM(RTRIM(sd.couponcode)), '') IS NOT NULL
+    UNION ALL
+    SELECT
+        sd.Id AS InstallmentId,
+        LTRIM(RTRIM(sd.couponcode)) AS CouponCode,
+        CASE
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.Status, '')))) IN ('approved', 'paid', 'approve', '1', 'active') THEN 'approved'
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.Status, '')))) = 'pending' THEN 'pending'
+            ELSE LOWER(LTRIM(RTRIM(ISNULL(sd.Status, ''))))
+        END AS StatusNorm,
+        CASE
+            WHEN ISNULL(sd.ApproveDate, sd.EntryDate) IS NOT NULL
+             AND YEAR(ISNULL(sd.ApproveDate, sd.EntryDate)) = YEAR(GETDATE())
+             AND MONTH(ISNULL(sd.ApproveDate, sd.EntryDate)) = MONTH(GETDATE())
+            THEN 1 ELSE 0
+        END AS IsCurrentMonth
+    FROM SavingAccountDetail sd WITH (NOLOCK)
+    WHERE LTRIM(RTRIM(sd.UserId)) = '" + SqlEscape(userId) + @"'
+      AND NULLIF(LTRIM(RTRIM(sd.couponcode)), '') IS NOT NULL
+      AND LOWER(LTRIM(RTRIM(ISNULL(sd.Status, '')))) NOT IN ('rejected', 'cancelled')
+      AND NOT EXISTS (
+            SELECT 1
+            FROM SavingAccountInstallmentDetail sa1 WITH (NOLOCK)
+            WHERE sa1.OrderId = sd.orderid
+              AND LTRIM(RTRIM(sa1.UserId)) = LTRIM(RTRIM(sd.UserId))
+              AND ISNULL(TRY_CONVERT(INT, sa1.InstNo), 0) = 1
+      )
 ) x
 GROUP BY x.CouponCode
 ORDER BY x.CouponCode ASC";

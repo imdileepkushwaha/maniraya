@@ -186,6 +186,11 @@
                                                     <asp:Label ID="lblaprodmount" runat="server" CssClass="admin-amount-text" Text='<%#Eval("amount") %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Type">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lblpurchasetype" runat="server" Text='<%#Eval("PurchaseType") %>'></asp:Label>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Product">
                                                 <ItemTemplate>
                                                     <asp:Label ID="lblamount" runat="server" Text='<%#Eval("productname") %>'></asp:Label>

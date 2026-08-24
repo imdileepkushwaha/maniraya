@@ -28,6 +28,7 @@
                     </div>
                     <div class="profile-hero-actions">
                         <a href="SavingProductPurchase.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-shopping-cart"></i> Buy Product</a>
+                        <a href="SavingProductBulkPurchase.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-layer-group"></i> Bulk Purchase</a>
                         <a href="SavingDashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-university"></i> Saving Dashboard</a>
                     </div>
                 </div>

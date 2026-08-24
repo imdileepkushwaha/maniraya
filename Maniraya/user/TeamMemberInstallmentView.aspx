@@ -153,7 +153,7 @@
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Amount">
                                             <ItemTemplate>
-                                                <span class="dash-saving-amount"><i class="fa fa-rupee-sign"></i> <%# Eval("amount") %></span>
+                                                <span class="dash-saving-amount"><i class="fa fa-rupee-sign"></i> <%# SavingProductHelper.FormatMoney(Eval("amount")) %></span>
                                             </ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Product">

@@ -36,12 +36,20 @@ BEGIN
             FROM SavingLevelIncomeDetail ld WITH (NOLOCK)
             WHERE ld.userid = ua.userid
         ), 0) AS levelincome,
-        COUNT(ib.Id) AS totalemi,
-        SUM(CASE WHEN ib.Status = 'Approved' THEN 1 ELSE 0 END) AS paidemi,
+        COUNT(ib.Id) + CASE
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(ua.Status, '')))) IN ('approved', '1', 'active') THEN 1
+            ELSE 0
+        END AS totalemi,
+        SUM(CASE WHEN ib.Status IN ('Approved', 'Paid') THEN 1 ELSE 0 END) + CASE
+            WHEN LOWER(LTRIM(RTRIM(ISNULL(ua.Status, '')))) IN ('approved', '1', 'active') THEN 1
+            ELSE 0
+        END AS paidemi,
         SUM(CASE WHEN ib.Status = 'Pending' THEN 1 ELSE 0 END) AS pendingemi,
         CASE
             WHEN LOWER(LTRIM(RTRIM(ISNULL(ua.Status, '')))) IN ('rejected', '2', 'cancelled', 'canceled', 'deactive', 'inactive')
             THEN 0
+            WHEN ISNULL(ua.Amount, 0) >= 15000
+            THEN ISNULL(SUM(ROUND(ua.Amount / 18.0, 2)), 0) + ROUND(ua.Amount / 18.0, 2)
             ELSE ISNULL(SUM(ib.Amount), 0) + 2000
         END AS maturityamount,
         ua.ApproveDate AS approvedate,
@@ -64,7 +72,9 @@ BEGIN
         ua.userid,
         ua.ApproveDate,
         ua.EntryDate,
-        ua.MaturityDate
+        ua.MaturityDate,
+        ua.Amount,
+        ua.Status
     ORDER BY ua.Id DESC;
 END
 GO

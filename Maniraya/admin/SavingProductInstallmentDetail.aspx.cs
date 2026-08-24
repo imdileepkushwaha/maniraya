@@ -64,27 +64,39 @@ public partial class admin_SavingProductInstallmentDetail : System.Web.UI.Page
         }
 
         SavingProductHelper.EnsureInstallmentProductAssignTable();
+        SavingProductHelper.EnsureBulkColumns();
+        SavingProductHelper.EnsureBulkInstallmentsForCoupon(CouponCode);
 
         string str_query = @"SELECT sa.*, ud.username, sd.couponcode, sd.userid, sd.orderid, sd.imagename,
+            ISNULL(sd.PlanType, '') AS PlanType,
+            sd.ApproveDate AS ParentApproveDate,
+            sd.EntryDate AS ParentEntryDate,
+            sd.OnlineTransactionId AS ParentOnlineTransactionId,
+            sd.Amount AS ParentAmount,
             CASE
                 WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
                     THEN LTRIM(RTRIM(assign_pm.ProductName))
                 ELSE 'Not assigned'
             END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-            LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+            LEFT JOIN SavingAccountDetail sd WITH (NOLOCK)
+                ON sa.OrderId = sd.orderid
+               AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
             LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
                 ON ISNULL(ipa.Status, 1) = 1
+               AND ISNULL(ipa.ProductId, 0) > 0
                AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
             LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
-            WHERE sd.couponcode = '" + SqlEscape(CouponCode) + @"'
+            WHERE LTRIM(RTRIM(sd.couponcode)) = '" + SqlEscape(CouponCode) + @"'
             ORDER BY sa.instno";
         DataTable dt = null;
         ObjData.StartConnection();
         try
         {
             dt = ObjData.RunDataTable(str_query);
+            SavingProductHelper.AddMissingFirstInstallmentRows(dt, CouponCode);
+            SavingProductHelper.ApplyBulkInstallmentDisplayFallbacks(dt);
         }
         catch (Exception ex)
         {
@@ -106,6 +118,9 @@ public partial class admin_SavingProductInstallmentDetail : System.Web.UI.Page
 
             CouponCode = oid;
         }
+
+        SavingProductHelper.EnsureBulkInstallmentsForCoupon(CouponCode);
+        SavingProductHelper.ProcessBulkSavingSchedule();
 
         DataTable dt = getPrevProduct();
         if (GridView1 != null)
@@ -172,13 +187,48 @@ public partial class admin_SavingProductInstallmentDetail : System.Web.UI.Page
             lblremark.Visible = false;
             txtremark.Visible = false;
 
-            if (lblstatus.Text == "Pending")
+            if (lblstatus == null)
+            {
+                return;
+            }
+
+            string planType = string.Empty;
+            DataRowView drv = e.Row.DataItem as DataRowView;
+            if (drv != null && drv.Row.Table.Columns.Contains("PlanType"))
+            {
+                planType = Convert.ToString(drv["PlanType"]).Trim();
+            }
+
+            bool isBulk = planType.Equals("Bulk18", StringComparison.OrdinalIgnoreCase);
+            int instNo = 0;
+            if (drv != null && drv.Row.Table.Columns.Contains("InstNo"))
+            {
+                int.TryParse(Convert.ToString(drv["InstNo"]), out instNo);
+            }
+
+            if (instNo == 1 || (isBulk && lblstatus.Text == "Pending"))
+            {
+                lblstatus.Text = "Paid";
+                lblstatus.CssClass = "label label-success";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
+            }
+            else if (lblstatus.Text == "Pending")
             {
                 lblstatus.Text = "Pending";
                 lblstatus.CssClass = "label label-warning";
                 btnApprove.Visible = true;
                 btnReject.Visible = true;
                 txtremark.Visible = true;
+            }
+            else if (lblstatus.Text == "Paid")
+            {
+                lblstatus.Text = "Paid";
+                lblstatus.CssClass = "label label-success";
+                btnApprove.Visible = false;
+                btnReject.Visible = false;
+                lblremark.Visible = true;
             }
             else
                 if (lblstatus.Text == "Approved")

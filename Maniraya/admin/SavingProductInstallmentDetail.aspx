@@ -77,7 +77,7 @@
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Amount">
                                                 <ItemTemplate>
-                                                    <asp:Label ID="lblaprodmount" runat="server" CssClass="admin-amount-text" Text='<%# Eval("amount") %>'></asp:Label>
+                                                    <asp:Label ID="lblaprodmount" runat="server" CssClass="admin-amount-text" Text='<%# SavingProductHelper.FormatMoney(Eval("amount")) %>'></asp:Label>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Product">

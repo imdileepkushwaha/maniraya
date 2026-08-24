@@ -42,6 +42,8 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
         if (!IsPostBack)
         {
+            SavingProductHelper.EnsureBulkColumns();
+            SavingProductHelper.ProcessBulkSavingSchedule();
             loadprevproduct();
             loadqrocde();
         }
@@ -70,21 +72,30 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             return new DataTable();
 
         SavingProductHelper.EnsureInstallmentProductAssignTable();
+        SavingProductHelper.EnsureBulkInstallmentsForCoupon(CouponCode);
 
         string str_query = @"SELECT sa.*, ud.username, sd.couponcode,
+            ISNULL(sd.PlanType, '') AS PlanType,
+            sd.ApproveDate AS ParentApproveDate,
+            sd.EntryDate AS ParentEntryDate,
+            sd.OnlineTransactionId AS ParentOnlineTransactionId,
+            sd.Amount AS ParentAmount,
             CASE
                 WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
                     THEN LTRIM(RTRIM(assign_pm.ProductName))
                 ELSE 'Not assigned'
             END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-            LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
+            LEFT JOIN SavingAccountDetail sd WITH (NOLOCK)
+                ON sa.OrderId = sd.orderid
+               AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
             LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
                 ON ISNULL(ipa.Status, 1) = 1
+               AND ISNULL(ipa.ProductId, 0) > 0
                AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
             LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
-            WHERE sd.couponcode = '" + SqlEscape(CouponCode) + @"'
+            WHERE LTRIM(RTRIM(sd.couponcode)) = '" + SqlEscape(CouponCode) + @"'
             ORDER BY sa.instno";
 
         DataTable dt = null;
@@ -92,6 +103,8 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         try
         {
             dt = ObjData.RunDataTable(str_query);
+            SavingProductHelper.AddMissingFirstInstallmentRows(dt, CouponCode);
+            SavingProductHelper.ApplyBulkInstallmentDisplayFallbacks(dt);
         }
         catch
         {
@@ -185,6 +198,8 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             CouponCode = oid;
         }
 
+        SavingProductHelper.EnsureBulkInstallmentsForCoupon(CouponCode);
+        SavingProductHelper.ProcessBulkSavingSchedule();
         ShowCouponChip();
 
         DataTable dt = getPrevProduct();
@@ -228,17 +243,77 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
             Label lblstatus = (Label)e.Row.FindControl("lblstatus");
             LinkButton lbEdit = (LinkButton)e.Row.FindControl("lbEdit");
-            lbEdit.Visible = false;
-
+            if (lbEdit != null)
+            {
+                lbEdit.Visible = false;
+            }
 
             if (lblstatus == null)
                 return;
 
-            if (lblstatus.Text == "Pending")
+            string status = (lblstatus.Text ?? string.Empty).Trim();
+            string planType = string.Empty;
+            bool isBulkPrepaidFlag = false;
+            DataRowView drv = e.Row.DataItem as DataRowView;
+            if (drv != null)
+            {
+                if (drv.Row.Table.Columns.Contains("PlanType"))
+                {
+                    planType = Convert.ToString(drv["PlanType"]).Trim();
+                }
+                if (drv.Row.Table.Columns.Contains("IsBulkPrepaid") && drv["IsBulkPrepaid"] != DBNull.Value)
+                {
+                    string prepaid = Convert.ToString(drv["IsBulkPrepaid"]).Trim();
+                    isBulkPrepaidFlag = prepaid == "1"
+                        || prepaid.Equals("True", StringComparison.OrdinalIgnoreCase)
+                        || prepaid.Equals("Y", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            bool isBulkPrepaid = planType.Equals("Bulk18", StringComparison.OrdinalIgnoreCase)
+                || isBulkPrepaidFlag;
+
+            int instNo = 0;
+            if (drv != null && drv.Row.Table.Columns.Contains("InstNo"))
+            {
+                int.TryParse(Convert.ToString(drv["InstNo"]), out instNo);
+            }
+
+            if (instNo == 1)
+            {
+                if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                {
+                    lblstatus.Text = "Paid";
+                    lblstatus.CssClass = "dash-saving-status is-approved";
+                }
+                if (lbEdit != null)
+                {
+                    lbEdit.Visible = false;
+                }
+            }
+            else if ((isBulkPrepaid && status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                || status.Equals("Paid", StringComparison.OrdinalIgnoreCase))
+            {
+                lblstatus.Text = "Paid";
+                lblstatus.CssClass = "dash-saving-status is-approved";
+                if (lbEdit != null)
+                {
+                    lbEdit.Visible = false;
+                }
+            }
+            else if (lblstatus.Text == "Pending")
             {
                 lblstatus.Text = "Pending";
                 lblstatus.CssClass = "dash-saving-status is-pending";
-                lbEdit.Visible = true;
+                if (lbEdit != null)
+                {
+                    lbEdit.Visible = true;
+                }
+            }
+            else if (lblstatus.Text == "Paid")
+            {
+                lblstatus.Text = "Paid";
+                lblstatus.CssClass = "dash-saving-status is-approved";
             }
             else if (lblstatus.Text == "Approved")
             {
@@ -249,7 +324,10 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             {
                 lblstatus.Text = "Rejected";
                 lblstatus.CssClass = "dash-saving-status is-rejected";
-                lbEdit.Visible = true;
+                if (lbEdit != null)
+                {
+                    lbEdit.Visible = true;
+                }
             }
         }
     }

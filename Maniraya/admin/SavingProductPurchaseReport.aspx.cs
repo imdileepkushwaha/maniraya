@@ -23,6 +23,8 @@ public partial class admin_UserReport : System.Web.UI.Page
 
 
             }
+            SavingProductHelper.EnsureBulkColumns();
+            SavingProductHelper.ProcessBulkSavingSchedule();
         }
         else
         {
@@ -36,7 +38,9 @@ public partial class admin_UserReport : System.Web.UI.Page
     }
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT ud.username, sd.*,pm.productname FROM SavingAccountDetail sd WITH (nolock) LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 ";
+        string str_query = @"SELECT ud.username, sd.*, pm.productname,
+            CASE WHEN LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18' THEN '18 Month' ELSE '1 Month' END AS PurchaseType
+            FROM SavingAccountDetail sd WITH (nolock) LEFT JOIN savingproductmaster pm WITH (nolock) ON sd.productid=pm.id left join userdetail ud with(nolock) on ud.userid=sd.userid where 1=1 ";
         if (txtfromdate.Text != "" && txttodate.Text != "")
         {
             str_query += "  and convert(date, sd.entrydate)  >= convert(date,'" + Message.GetIndianDate(txtfromdate.Text) + "' )  and convert(date,sd.entrydate  ) <= convert(date,'" + Message.GetIndianDate(txttodate.Text) + "') ";
@@ -66,9 +70,19 @@ public partial class admin_UserReport : System.Web.UI.Page
         {
             dt = ObjData.RunDataTable(str_query);
         }
-        catch (Exception ex)
+        catch
         {
-            dt = null;
+            try
+            {
+                string fallback = str_query.Replace(
+                    "CASE WHEN LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18' THEN '18 Month' ELSE '1 Month' END AS PurchaseType",
+                    "'1 Month' AS PurchaseType");
+                dt = ObjData.RunDataTable(fallback);
+            }
+            catch
+            {
+                dt = null;
+            }
         }
         ObjData.EndConnection();
         return dt;
@@ -458,6 +472,19 @@ public partial class admin_UserReport : System.Web.UI.Page
 
                 };
             res = ObjData.RunInsUpDelQueryTransProcScalar(s2, tr, parameter);
+            if ((res ?? string.Empty).Trim() == "t")
+            {
+                try
+                {
+                    SqlParameter[] bulkParameter = {
+                        new SqlParameter("@id", str_id)
+                    };
+                    ObjData.RunInsUpDelQueryTransProcScalar("sp_markSavingBulkPrepaid", tr, bulkParameter);
+                }
+                catch
+                {
+                }
+            }
             tr.Commit();
         }
         catch (Exception ex)
@@ -708,6 +735,7 @@ public partial class admin_UserReport : System.Web.UI.Page
         export.Columns.Add("Date of Request", typeof(string));
         export.Columns.Add("Approve Date", typeof(string));
         export.Columns.Add("Amount", typeof(string));
+        export.Columns.Add("Type", typeof(string));
         export.Columns.Add("Product", typeof(string));
         export.Columns.Add("Transaction Id", typeof(string));
         export.Columns.Add("Status", typeof(string));
@@ -722,6 +750,7 @@ public partial class admin_UserReport : System.Web.UI.Page
             outRow["Date of Request"] = FormatExportDate(row["entrydate"]);
             outRow["Approve Date"] = FormatExportDate(row["approvedate"]);
             outRow["Amount"] = Convert.ToString(row["amount"]);
+            outRow["Type"] = row.Table.Columns.Contains("PurchaseType") ? Convert.ToString(row["PurchaseType"]) : string.Empty;
             outRow["Product"] = Convert.ToString(row["productname"]);
             outRow["Transaction Id"] = Convert.ToString(row["OnlineTransactionId"]);
             outRow["Status"] = Convert.ToString(row["status"]);

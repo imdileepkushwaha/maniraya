@@ -37,6 +37,9 @@ public partial class user_TeamMemberInstallmentView : Page
             MemberUserId = uid;
             pnlAccessDenied.Visible = false;
             pnlContent.Visible = true;
+            SavingProductHelper.EnsureBulkColumns();
+            SavingProductHelper.EnsureBulkInstallmentsForUser(uid);
+            SavingProductHelper.ProcessBulkSavingSchedule();
             BindMemberInfo();
             LoadCoupons();
             LoadInstallments();
@@ -248,53 +251,110 @@ ORDER BY couponcode";
 
     DataTable GetInstallments()
     {
+        string amountSql = SavingProductHelper.DisplayEmiAmountSql("sd", "sa");
+        string firstAmountSql = SavingProductHelper.DisplayEmiAmountSql("sd", "sd");
         StringBuilder sql = new StringBuilder();
         sql.Append(@"
+SELECT
+    x.id,
+    x.userid,
+    x.orderid,
+    x.instno,
+    x.amount,
+    x.installmentdate,
+    x.status,
+    x.couponcode,
+    x.productname,
+    x.StatusDisplay
+FROM (
 SELECT
     sa.id,
     sa.userid,
     sa.orderid,
     sa.instno,
-    sa.amount,
+    ").Append(amountSql).Append(@" AS amount,
     sa.installmentdate,
     sa.status,
     sd.couponcode,
-    pm.productname,
+    ISNULL(NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), ''), 'Not assigned') AS productname,
     CASE
-        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'approved' THEN 'Paid'
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('approved', 'paid') THEN 'Paid'
         WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'processing' THEN 'Processing'
         ELSE 'Unpaid'
     END AS StatusDisplay
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON sd.productid = pm.id
-WHERE sa.UserId = '").Append(SqlEscape(MemberUserId)).Append("'");
+LEFT JOIN SavingAccountDetail sd WITH (NOLOCK)
+    ON sa.OrderId = sd.orderid
+   AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
+WHERE sa.UserId = '").Append(SqlEscape(MemberUserId)).Append(@"'
+UNION ALL
+SELECT
+    sd.id,
+    sd.userid,
+    sd.orderid,
+    1 AS instno,
+    ").Append(firstAmountSql).Append(@" AS amount,
+    CONVERT(datetime, CONVERT(date, ISNULL(sd.ApproveDate, sd.EntryDate))) AS installmentdate,
+    CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', 'approve', '1', 'active') THEN 'Approved'
+        ELSE sd.status
+    END AS status,
+    sd.couponcode,
+    ISNULL(NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), ''), 'Not assigned') AS productname,
+    CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('approved', 'approve', '1', 'active', 'paid') THEN 'Paid'
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sd.status, '')))) = 'processing' THEN 'Processing'
+        ELSE 'Unpaid'
+    END AS StatusDisplay
+FROM SavingAccountDetail sd WITH (NOLOCK)
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = 1
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
+WHERE LTRIM(RTRIM(sd.UserId)) = '").Append(SqlEscape(MemberUserId)).Append(@"'
+  AND NULLIF(LTRIM(RTRIM(sd.couponcode)), '') IS NOT NULL
+  AND LOWER(LTRIM(RTRIM(ISNULL(sd.Status, '')))) NOT IN ('rejected', 'cancelled')
+  AND NOT EXISTS (
+        SELECT 1
+        FROM SavingAccountInstallmentDetail sa1 WITH (NOLOCK)
+        WHERE sa1.OrderId = sd.orderid
+          AND LTRIM(RTRIM(sa1.UserId)) = LTRIM(RTRIM(sd.UserId))
+          AND ISNULL(TRY_CONVERT(INT, sa1.InstNo), 0) = 1
+  )
+) x
+WHERE 1 = 1");
 
         string statusFilter = (ddStatus.SelectedValue ?? string.Empty).Trim();
         if (statusFilter == "Paid")
         {
-            sql.Append(" AND LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'approved'");
+            sql.Append(" AND x.StatusDisplay = 'Paid'");
         }
         else if (statusFilter == "Processing")
         {
-            sql.Append(" AND LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) = 'processing'");
+            sql.Append(" AND x.StatusDisplay = 'Processing'");
         }
         else if (statusFilter == "Unpaid")
         {
-            sql.Append(" AND LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) NOT IN ('approved', 'processing')");
+            sql.Append(" AND x.StatusDisplay = 'Unpaid'");
         }
 
         if (!string.IsNullOrWhiteSpace(ddCouponCode.SelectedValue))
         {
-            sql.Append(" AND LTRIM(RTRIM(sd.couponcode)) = '").Append(SqlEscape(ddCouponCode.SelectedValue.Trim())).Append("'");
+            sql.Append(" AND LTRIM(RTRIM(x.couponcode)) = '").Append(SqlEscape(ddCouponCode.SelectedValue.Trim())).Append("'");
         }
 
         if (!string.IsNullOrWhiteSpace(txtProduct.Text))
         {
-            sql.Append(" AND pm.productname LIKE '%").Append(SqlEscape(txtProduct.Text.Trim())).Append("%'");
+            sql.Append(" AND ISNULL(x.productname, '') LIKE '%").Append(SqlEscape(txtProduct.Text.Trim())).Append("%'");
         }
 
-        sql.Append(" ORDER BY sa.InstNo ASC, sa.InstallmentDate ASC, sa.id ASC");
+        sql.Append(" ORDER BY x.InstNo ASC, x.InstallmentDate ASC, x.id ASC");
 
         DataTable dt = new DataTable();
         try

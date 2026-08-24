@@ -30,6 +30,8 @@ public partial class admin_SavingInstallmentOrderDetails : Page
 
         if (!IsPostBack)
         {
+            SavingProductHelper.EnsureBulkColumns();
+            SavingProductHelper.ProcessBulkSavingSchedule();
             LoadOrders();
         }
         else if (OrderData != null)

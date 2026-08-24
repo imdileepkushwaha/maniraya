@@ -178,9 +178,10 @@
 					</li>
 
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">6</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">7</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="SavingProductPurchasebulk.aspx">Purchase Saving Product</a></li>
+                          <li><a class="slide-item" href="SavingProductBulkPurchase.aspx">Bulk Purchase</a></li>
                           <li><a class="slide-item" href="SAvingProductPurchaseReport.aspx">Saving Installment Purchase</a></li>
                           <li><a class="slide-item" href="SavingProductInstallmentList.aspx">Installment List</a></li>
                           <li><a class="slide-item" href="TeamSavingInstallmentReport.aspx">Team Installment Report</a></li>

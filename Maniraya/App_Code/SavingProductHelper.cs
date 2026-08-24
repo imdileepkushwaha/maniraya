@@ -1,6 +1,7 @@
 using DataTier;
 using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Web;
 
 public static class SavingProductHelper
@@ -515,6 +516,609 @@ THEN 1 ELSE 0 END";
         catch
         {
             return false;
+        }
+    }
+
+    public static void EnsureBulkColumns()
+    {
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountDetail', 'PlanType') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountDetail ADD PlanType NVARCHAR(50) NULL;
+            END");
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'IsBulkPrepaid') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD IsBulkPrepaid BIT NULL;
+            END");
+        RunNonQuery(@"
+            IF COL_LENGTH('SavingAccountInstallmentDetail', 'IncomeReleased') IS NULL
+            BEGIN
+                ALTER TABLE SavingAccountInstallmentDetail ADD IncomeReleased BIT NULL;
+            END");
+    }
+
+    public static bool SetAccountPlanType(string orderId, string planType)
+    {
+        if (string.IsNullOrWhiteSpace(orderId))
+        {
+            return false;
+        }
+
+        EnsureBulkColumns();
+        return RunNonQuery(
+            "UPDATE SavingAccountDetail SET PlanType = '" + Escape(planType ?? string.Empty)
+            + "' WHERE orderid = '" + Escape(orderId.Trim()) + "'");
+    }
+
+    public static string InsertBulkSavingAccount(
+        string orderId,
+        string userId,
+        decimal amount,
+        string onlineTransactionId,
+        string imageName,
+        string entryBy)
+    {
+        EnsureBulkColumns();
+
+        orderId = (orderId ?? string.Empty).Trim();
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(userId))
+        {
+            return "0";
+        }
+
+        if (IsOnlineTransactionIdUsed(onlineTransactionId))
+        {
+            return "u";
+        }
+
+        DataTable pending = RunSelect(@"
+SELECT TOP 1 id FROM SavingAccountDetail WITH (NOLOCK)
+WHERE LTRIM(RTRIM(userid)) = '" + Escape(userId) + @"'
+  AND LOWER(LTRIM(RTRIM(ISNULL(status, '')))) IN ('pending', '0')");
+        if (pending != null && pending.Rows.Count > 0)
+        {
+            return "f";
+        }
+
+        bool hasExisting = false;
+        DataTable existing = RunSelect(@"
+SELECT TOP 1 id FROM SavingAccountDetail WITH (NOLOCK)
+WHERE LTRIM(RTRIM(userid)) = '" + Escape(userId) + @"'
+  AND LOWER(LTRIM(RTRIM(ISNULL(status, '')))) NOT IN ('rejected', '2', 'cancelled', 'canceled')");
+        if (existing != null && existing.Rows.Count > 0)
+        {
+            hasExisting = true;
+        }
+
+        string orderType = hasExisting ? "Repurchase" : "FreshPurchase";
+        System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
+        string amountSql = amount.ToString("0.##", inv);
+        string utr = Escape((onlineTransactionId ?? string.Empty).Trim());
+        string image = Escape(imageName ?? string.Empty);
+        string by = Escape(entryBy ?? string.Empty);
+
+        string planCol = HasTableColumn("SavingAccountDetail", "PlanType") ? ", PlanType" : string.Empty;
+        string planVal = HasTableColumn("SavingAccountDetail", "PlanType") ? ", 'Bulk18'" : string.Empty;
+
+        string sql = @"
+DECLARE @productid INT = 0;
+IF OBJECT_ID('dbo.SavingInstallmentProductAssign', 'U') IS NOT NULL
+BEGIN
+    SET @productid = ISNULL((
+        SELECT TOP 1 a.ProductId
+        FROM SavingInstallmentProductAssign a WITH (NOLOCK)
+        WHERE ISNULL(a.Status, 1) = 1 AND a.InstallmentNo = 1
+    ), 0);
+END
+IF (@productid = 0)
+BEGIN
+    SET @productid = ISNULL((
+        SELECT TOP 1 sd.productid
+        FROM SavingMonthlyProductDetail sd WITH (NOLOCK)
+        WHERE sd.Status = 1
+    ), 0);
+END
+
+DECLARE @gst DECIMAL(18,2) = ISNULL((SELECT gst FROM SavingProductMaster WITH (NOLOCK) WHERE id = @productid), 0);
+DECLARE @sgst DECIMAL(18,2), @cgst DECIMAL(18,2), @igst DECIMAL(18,2), @stateid INT;
+SET @stateid = ISNULL((
+    SELECT cm.stateid
+    FROM UserDetail ud WITH (NOLOCK)
+    LEFT JOIN CityMaster cm WITH (NOLOCK) ON cm.CityId = ud.CityId
+    WHERE ud.userid = '" + Escape(userId) + @"'
+), 0);
+
+IF (@stateid = 14)
+BEGIN
+    SET @sgst = (@gst / 2);
+    SET @cgst = (@gst / 2);
+    SET @igst = 0;
+END
+ELSE
+BEGIN
+    SET @sgst = 0;
+    SET @cgst = 0;
+    SET @igst = @gst;
+END
+
+INSERT INTO SavingAccountDetail (
+    OrderId, UserId, Amount, OnlineTransactionId, ImageName, Status, EntryBy, EntryDate,
+    productid, couponcode, sgst, cgst, igst, ordertype" + planCol + @"
+)
+VALUES (
+    '" + Escape(orderId) + @"', '" + Escape(userId) + @"', " + amountSql + @",
+    '" + utr + @"', '" + image + @"', 'Pending', '" + by + @"', GETDATE(),
+    @productid, NULL, @sgst, @cgst, @igst, '" + orderType + @"'" + planVal + @"
+);";
+
+        if (!RunNonQuery(sql))
+        {
+            return "0";
+        }
+
+        SetAccountPlanType(orderId, "Bulk18");
+        return "t";
+    }
+
+    public static void EnsureBulkInstallmentsForCoupon(string couponCode)
+    {
+        couponCode = (couponCode ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(couponCode))
+        {
+            return;
+        }
+
+        EnsureBulkColumns();
+        EnsureInstallmentProductAssignTable();
+        EnsureInstallmentDeliveryColumns();
+
+        bool hasPlanType = HasTableColumn("SavingAccountDetail", "PlanType");
+        string bulkFilter = hasPlanType
+            ? @" AND (
+                    LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'
+                    OR ISNULL(sd.Amount, 0) >= 15000
+                )"
+            : " AND ISNULL(sd.Amount, 0) >= 15000";
+
+        DataTable accounts = RunSelect(@"
+SELECT sd.id, sd.orderid, sd.userid, sd.amount, sd.status,
+       sd.approvedate, sd.entrydate, sd.OnlineTransactionId
+FROM SavingAccountDetail sd WITH (NOLOCK)
+WHERE LTRIM(RTRIM(sd.couponcode)) = '" + Escape(couponCode) + "'" + bulkFilter);
+
+        if (accounts == null || accounts.Rows.Count == 0)
+        {
+            return;
+        }
+
+        bool hasPrepaid = HasTableColumn("SavingAccountInstallmentDetail", "IsBulkPrepaid");
+        bool hasIncome = HasTableColumn("SavingAccountInstallmentDetail", "IncomeReleased");
+        bool hasDelivery = HasTableColumn("SavingAccountInstallmentDetail", "DeliveryStatus");
+
+        foreach (DataRow row in accounts.Rows)
+        {
+            string orderId = GetRowString(row, "orderid");
+            string userId = GetRowString(row, "userid");
+            if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(userId))
+            {
+                continue;
+            }
+
+            string parentStatus = GetRowString(row, "status").ToLowerInvariant();
+            bool parentApproved = parentStatus == "approved" || parentStatus == "approve" || parentStatus == "1" || parentStatus == "active";
+            if (!parentApproved)
+            {
+                continue;
+            }
+
+            DateTime joinDate = DateTime.Today;
+            DateTime parsedJoin;
+            if (row["approvedate"] != DBNull.Value
+                && DateTime.TryParse(Convert.ToString(row["approvedate"]), out parsedJoin))
+            {
+                joinDate = parsedJoin;
+            }
+            else if (row.Table.Columns.Contains("entrydate") && row["entrydate"] != DBNull.Value
+                && DateTime.TryParse(Convert.ToString(row["entrydate"]), out parsedJoin))
+            {
+                joinDate = parsedJoin;
+            }
+
+            string parentUtr = GetRowString(row, "OnlineTransactionId");
+            if (string.IsNullOrWhiteSpace(parentUtr))
+            {
+                parentUtr = "BULK-" + orderId;
+            }
+
+            decimal parentAmount = 0m;
+            if (row.Table.Columns.Contains("amount") && row["amount"] != DBNull.Value)
+            {
+                decimal.TryParse(Convert.ToString(row["amount"]), out parentAmount);
+            }
+            decimal monthlyAmount = parentAmount >= 15000m
+                ? Math.Round(parentAmount / 18m, 2)
+                : 1000m;
+            if (monthlyAmount <= 0m)
+            {
+                monthlyAmount = 1000m;
+            }
+
+            string extra = "";
+            if (hasPrepaid)
+            {
+                extra += ", sa.IsBulkPrepaid = 1";
+            }
+            if (hasIncome)
+            {
+                extra += ", sa.IncomeReleased = ISNULL(sa.IncomeReleased, 0)";
+            }
+            if (hasDelivery)
+            {
+                extra += @", sa.DeliveryStatus = CASE
+                    WHEN NULLIF(LTRIM(RTRIM(ISNULL(sa.DeliveryStatus, ''))), '') IS NULL
+                        OR LOWER(LTRIM(RTRIM(sa.DeliveryStatus))) = 'scheduled'
+                    THEN 'Scheduled' ELSE sa.DeliveryStatus END
+                , sa.DeliveryStatusUpdatedOn = GETDATE()
+                , sa.DeliveryStatusUpdatedBy = 'SYSTEM-BULK'";
+            }
+
+            string sql = @"
+UPDATE sa
+SET
+    sa.Amount = " + monthlyAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + @",
+    sa.Status = CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('approved', 'rejected', 'cancelled')
+            THEN sa.Status
+        ELSE 'Paid'
+    END,
+    sa.ApproveDate = CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+            THEN sa.ApproveDate
+        ELSE NULL
+    END,
+    sa.RequestDate = ISNULL(sa.RequestDate, GETDATE()),
+    sa.OnlineTransactionId = CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(sa.OnlineTransactionId, ''))), '') IS NULL
+            OR sa.OnlineTransactionId LIKE 'BULK-%'
+        THEN '" + Escape(parentUtr) + @"'
+        ELSE sa.OnlineTransactionId
+    END,
+    sa.productid = CASE WHEN ISNULL(ipa.ProductId, 0) > 0 THEN ipa.ProductId ELSE sa.productid END,
+    sa.InstallmentDate = CASE
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+            THEN sa.InstallmentDate
+        ELSE DATEADD(MONTH, ISNULL(TRY_CONVERT(INT, sa.InstNo), 2) - 1, CONVERT(date, '" + joinDate.ToString("yyyy-MM-dd") + @"'))
+    END
+    " + extra + @"
+FROM SavingAccountInstallmentDetail sa
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+WHERE sa.OrderId = '" + Escape(orderId) + @"'
+  AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM('" + Escape(userId) + @"'))
+  AND ISNULL(TRY_CONVERT(INT, sa.InstNo), 0) > 1
+  AND LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) NOT IN ('rejected', 'cancelled');";
+
+            RunNonQuery(sql);
+            SetAccountPlanType(orderId, "Bulk18");
+        }
+    }
+
+    public static void EnsureBulkInstallmentsForUser(string userId)
+    {
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        EnsureBulkColumns();
+        bool hasPlanType = HasTableColumn("SavingAccountDetail", "PlanType");
+        string bulkFilter = hasPlanType
+            ? @" AND (
+                    LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'
+                    OR ISNULL(sd.Amount, 0) >= 15000
+                )"
+            : " AND ISNULL(sd.Amount, 0) >= 15000";
+
+        DataTable coupons = RunSelect(@"
+SELECT DISTINCT LTRIM(RTRIM(sd.couponcode)) AS couponcode
+FROM SavingAccountDetail sd WITH (NOLOCK)
+WHERE LTRIM(RTRIM(sd.UserId)) = LTRIM(RTRIM('" + Escape(userId) + @"'))
+  AND NULLIF(LTRIM(RTRIM(sd.couponcode)), '') IS NOT NULL" + bulkFilter);
+
+        if (coupons == null || coupons.Rows.Count == 0)
+        {
+            return;
+        }
+
+        foreach (DataRow row in coupons.Rows)
+        {
+            EnsureBulkInstallmentsForCoupon(GetRowString(row, "couponcode"));
+        }
+    }
+
+    public static string FormatMoney(object value)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return "0.00";
+        }
+
+        decimal amount;
+        if (decimal.TryParse(Convert.ToString(value), System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out amount)
+            || decimal.TryParse(Convert.ToString(value), out amount))
+        {
+            return amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        return "0.00";
+    }
+
+    public static string DisplayEmiAmountSql(string parentAlias, string amountAlias)
+    {
+        parentAlias = string.IsNullOrWhiteSpace(parentAlias) ? "sd" : parentAlias;
+        amountAlias = string.IsNullOrWhiteSpace(amountAlias) ? parentAlias : amountAlias;
+        string bulkCheck = HasTableColumn("SavingAccountDetail", "PlanType")
+            ? "(LTRIM(RTRIM(ISNULL(" + parentAlias + ".PlanType, ''))) = 'Bulk18' OR ISNULL(" + parentAlias + ".Amount, 0) >= 15000)"
+            : "(ISNULL(" + parentAlias + ".Amount, 0) >= 15000)";
+
+        return @"CAST(CASE
+            WHEN " + bulkCheck + @"
+            THEN ROUND(CASE WHEN ISNULL(" + parentAlias + @".Amount, 0) > 0 THEN " + parentAlias + @".Amount ELSE 18000 END / CAST(18 AS DECIMAL(18,2)), 2)
+            ELSE ISNULL(" + amountAlias + @".Amount, 0)
+        END AS DECIMAL(18,2))";
+    }
+
+    public static void AddMissingFirstInstallmentRows(DataTable dt, string couponCode)
+    {
+        couponCode = (couponCode ?? string.Empty).Trim();
+        if (dt == null || dt.Columns.Count == 0 || string.IsNullOrWhiteSpace(couponCode))
+        {
+            return;
+        }
+
+        string instCol = FindColumn(dt, "InstNo");
+        if (!string.IsNullOrEmpty(instCol))
+        {
+            foreach (DataRow row in dt.Rows)
+            {
+                int instNo;
+                if (int.TryParse(Convert.ToString(row[instCol]), out instNo) && instNo == 1)
+                {
+                    return;
+                }
+            }
+        }
+
+        EnsureInstallmentProductAssignTable();
+        EnsureBulkColumns();
+        string planSelect = HasTableColumn("SavingAccountDetail", "PlanType")
+            ? "ISNULL(sd.PlanType, '') AS PlanType"
+            : "CAST('' AS NVARCHAR(50)) AS PlanType";
+        DataTable parent = RunSelect(@"
+SELECT TOP 1
+    sd.id,
+    sd.userid,
+    sd.orderid,
+    sd.amount,
+    sd.status,
+    sd.approvedate,
+    sd.entrydate,
+    sd.OnlineTransactionId,
+    sd.couponcode,
+    sd.remark,
+    " + planSelect + @",
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+            THEN LTRIM(RTRIM(assign_pm.ProductName))
+        ELSE 'Not assigned'
+    END AS productname
+FROM SavingAccountDetail sd WITH (NOLOCK)
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = 1
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
+WHERE LTRIM(RTRIM(sd.couponcode)) = '" + Escape(couponCode) + @"'
+  AND LOWER(LTRIM(RTRIM(ISNULL(sd.Status, '')))) NOT IN ('rejected', 'cancelled')
+ORDER BY sd.id DESC");
+
+        if (parent == null || parent.Rows.Count == 0)
+        {
+            return;
+        }
+
+        DataRow src = parent.Rows[0];
+        decimal parentAmount = 0m;
+        decimal.TryParse(Convert.ToString(src["amount"]), out parentAmount);
+        bool isBulk = GetRowString(src, "PlanType").Equals("Bulk18", StringComparison.OrdinalIgnoreCase)
+            || parentAmount >= 15000m;
+        decimal monthly = isBulk
+            ? Math.Round((parentAmount > 0m ? parentAmount : 18000m) / 18m, 2)
+            : parentAmount;
+
+        string parentStatus = GetRowString(src, "status");
+        string statusNorm = parentStatus.ToLowerInvariant();
+        bool parentApproved = statusNorm == "approved" || statusNorm == "approve" || statusNorm == "1" || statusNorm == "active";
+        if (!parentApproved)
+        {
+            return;
+        }
+
+        DataRow dest = dt.NewRow();
+        SetDisplayValue(dest, "id", src["id"]);
+        SetDisplayValue(dest, "userid", src["userid"]);
+        SetDisplayValue(dest, "orderid", src["orderid"]);
+        SetDisplayValue(dest, "instno", 1);
+        SetDisplayValue(dest, "amount", monthly);
+        SetDisplayValue(dest, "installmentdate", src["approvedate"] != DBNull.Value ? src["approvedate"] : src["entrydate"]);
+        SetDisplayValue(dest, "approvedate", src["approvedate"]);
+        SetDisplayValue(dest, "status", parentApproved ? "Approved" : parentStatus);
+        SetDisplayValue(dest, "couponcode", src["couponcode"]);
+        SetDisplayValue(dest, "OnlineTransactionId", src["OnlineTransactionId"]);
+        SetDisplayValue(dest, "productname", src["productname"]);
+        SetDisplayValue(dest, "PlanType", src["PlanType"]);
+        SetDisplayValue(dest, "remark", src["remark"]);
+        SetDisplayValue(dest, "ParentAmount", parentAmount);
+        SetDisplayValue(dest, "ParentApproveDate", src["approvedate"]);
+        SetDisplayValue(dest, "ParentEntryDate", src["entrydate"]);
+        SetDisplayValue(dest, "ParentOnlineTransactionId", src["OnlineTransactionId"]);
+        dt.Rows.InsertAt(dest, 0);
+    }
+
+    static void SetDisplayValue(DataRow row, string columnName, object value)
+    {
+        string col = FindColumn(row.Table, columnName);
+        if (string.IsNullOrEmpty(col) || value == null)
+        {
+            return;
+        }
+
+        try
+        {
+            row[col] = value;
+        }
+        catch
+        {
+        }
+    }
+
+    static string GetRowString(DataRow row, string columnName)
+    {
+        if (row == null || row.Table == null || !row.Table.Columns.Contains(columnName) || row[columnName] == DBNull.Value)
+        {
+            return string.Empty;
+        }
+
+        return Convert.ToString(row[columnName]).Trim();
+    }
+
+    public static void ApplyBulkInstallmentDisplayFallbacks(DataTable dt)
+    {
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return;
+        }
+
+        string dateCol = FindColumn(dt, "installmentdate");
+        string txnCol = FindColumn(dt, "OnlineTransactionId");
+        string instCol = FindColumn(dt, "InstNo");
+        string amountCol = FindColumn(dt, "amount");
+        string parentDateCol = FindColumn(dt, "ParentApproveDate");
+        string parentEntryCol = FindColumn(dt, "ParentEntryDate");
+        string parentTxnCol = FindColumn(dt, "ParentOnlineTransactionId");
+        string parentAmtCol = FindColumn(dt, "ParentAmount");
+        string planCol = FindColumn(dt, "PlanType");
+
+        foreach (DataRow row in dt.Rows)
+        {
+            decimal parentAmount = 0m;
+            if (!string.IsNullOrEmpty(parentAmtCol) && row[parentAmtCol] != DBNull.Value)
+            {
+                decimal.TryParse(Convert.ToString(row[parentAmtCol]), out parentAmount);
+            }
+
+            string planType = string.IsNullOrEmpty(planCol) ? string.Empty : Convert.ToString(row[planCol]).Trim();
+            bool isBulk = planType.Equals("Bulk18", StringComparison.OrdinalIgnoreCase) || parentAmount >= 15000m;
+            if (isBulk && !string.IsNullOrEmpty(amountCol))
+            {
+                decimal monthly = Math.Round((parentAmount > 0m ? parentAmount : 18000m) / 18m, 2);
+                try
+                {
+                    row[amountCol] = monthly;
+                }
+                catch
+                {
+                    row[amountCol] = monthly.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(dateCol)
+                && (row[dateCol] == DBNull.Value || string.IsNullOrWhiteSpace(Convert.ToString(row[dateCol]))))
+            {
+                DateTime joinDate;
+                bool hasJoin = false;
+                if (!string.IsNullOrEmpty(parentDateCol) && row[parentDateCol] != DBNull.Value
+                    && DateTime.TryParse(Convert.ToString(row[parentDateCol]), out joinDate))
+                {
+                    hasJoin = true;
+                }
+                else if (!string.IsNullOrEmpty(parentEntryCol) && row[parentEntryCol] != DBNull.Value
+                    && DateTime.TryParse(Convert.ToString(row[parentEntryCol]), out joinDate))
+                {
+                    hasJoin = true;
+                }
+                else
+                {
+                    joinDate = DateTime.Today;
+                }
+
+                int instNo = 2;
+                if (!string.IsNullOrEmpty(instCol))
+                {
+                    int.TryParse(Convert.ToString(row[instCol]), out instNo);
+                    if (instNo < 1)
+                    {
+                        instNo = 2;
+                    }
+                }
+
+                if (hasJoin || instNo > 0)
+                {
+                    row[dateCol] = joinDate.Date.AddMonths(instNo - 1);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(txnCol)
+                && string.IsNullOrWhiteSpace(Convert.ToString(row[txnCol]))
+                && !string.IsNullOrEmpty(parentTxnCol)
+                && !string.IsNullOrWhiteSpace(Convert.ToString(row[parentTxnCol])))
+            {
+                row[txnCol] = Convert.ToString(row[parentTxnCol]).Trim();
+            }
+        }
+    }
+
+    static string FindColumn(DataTable dt, string name)
+    {
+        if (dt == null || string.IsNullOrWhiteSpace(name))
+        {
+            return string.Empty;
+        }
+
+        foreach (DataColumn col in dt.Columns)
+        {
+            if (string.Equals(col.ColumnName, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return col.ColumnName;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    public static void ProcessBulkSavingSchedule()
+    {
+        EnsureBulkColumns();
+        Data objData = new Data();
+        try
+        {
+            objData.StartConnection();
+            try
+            {
+                objData.RunDataTableProcedure("sp_processSavingBulkSchedule", new SqlParameter[0]);
+            }
+            finally
+            {
+                objData.EndConnection();
+            }
+        }
+        catch
+        {
         }
     }
 }
