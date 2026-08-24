@@ -4,6 +4,11 @@
     <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <link href="assets/css/dashboard-modern.css?v=26" rel="stylesheet" />
     <style>
+        .dash-saving-product.is-unassigned {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 600;
+        }
         .dash-pay-installment-modal .modal-dialog {
             max-width: 920px;
             margin: 1.5rem auto;

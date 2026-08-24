@@ -69,10 +69,20 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         if (string.IsNullOrWhiteSpace(CouponCode))
             return new DataTable();
 
-        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
+
+        string str_query = @"SELECT sa.*, ud.username, sd.couponcode,
+            CASE
+                WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+                    THEN LTRIM(RTRIM(assign_pm.ProductName))
+                ELSE 'Not assigned'
+            END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
             LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
-            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sa.productid = pm.id
+            LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+                ON ISNULL(ipa.Status, 1) = 1
+               AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+            LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
             WHERE sd.couponcode = '" + SqlEscape(CouponCode) + @"'
             ORDER BY sa.instno";
@@ -203,6 +213,19 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
     {
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
+            Label lblproductname = (Label)e.Row.FindControl("lblproductname");
+            if (lblproductname != null)
+            {
+                string productName = (lblproductname.Text ?? string.Empty).Trim();
+                if (string.IsNullOrWhiteSpace(productName)
+                    || productName.Equals("Not assigned", StringComparison.OrdinalIgnoreCase)
+                    || productName.Equals("Not assign", StringComparison.OrdinalIgnoreCase))
+                {
+                    lblproductname.Text = "Not assigned";
+                    lblproductname.CssClass = "dash-saving-product is-unassigned";
+                }
+            }
+
             Label lblstatus = (Label)e.Row.FindControl("lblstatus");
             LinkButton lbEdit = (LinkButton)e.Row.FindControl("lbEdit");
             lbEdit.Visible = false;

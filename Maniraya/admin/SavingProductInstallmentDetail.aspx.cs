@@ -63,10 +63,20 @@ public partial class admin_SavingProductInstallmentDetail : System.Web.UI.Page
             return new DataTable();
         }
 
-        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, sd.userid, sd.orderid, sd.imagename, pm.productname
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
+
+        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, sd.userid, sd.orderid, sd.imagename,
+            CASE
+                WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+                    THEN LTRIM(RTRIM(assign_pm.ProductName))
+                ELSE 'Not assigned'
+            END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
             LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid
-            LEFT JOIN savingproductmaster pm WITH (NOLOCK) ON sd.productid = pm.id
+            LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+                ON ISNULL(ipa.Status, 1) = 1
+               AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+            LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sd.userid
             WHERE sd.couponcode = '" + SqlEscape(CouponCode) + @"'
             ORDER BY sa.instno";
