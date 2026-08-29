@@ -370,7 +370,7 @@
                         </div>
                     </div>
                     <div class="dash-subpage-panel-body">
-                        <p class="dash-saving-report-intro">Pending installments can be paid from the action column when payment is enabled.</p>
+                        <p class="dash-saving-report-intro">Status comes from SavingAccountInstallmentDetail: Approved, Pending, Processing, or Rejected. Pending / Rejected installments can be paid from the action column.</p>
                         <div class="dash-saving-report-table-wrap">
                             <asp:GridView ID="GridView1" runat="server" CssClass="dash-saving-report-table" Width="100%" AutoGenerateColumns="False" OnRowDataBound="grdGetHelp_RowDataBound" GridLines="None" OnRowCommand="GridView1_RowCommand">
                                 <Columns>
@@ -378,6 +378,11 @@
                                         <ItemTemplate>
                                             <span class="dash-saving-sno"><%# Container.DataItemIndex + 1 %></span>
                                             <asp:Label ID="lblid" runat="server" Visible="false" Text='<%# Eval("id") %>'></asp:Label>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Inst No">
+                                        <ItemTemplate>
+                                            <asp:Label ID="lblinstno" runat="server" Text='<%# Eval("instno") %>'></asp:Label>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Installment Date">

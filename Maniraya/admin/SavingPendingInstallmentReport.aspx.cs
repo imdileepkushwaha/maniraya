@@ -410,6 +410,13 @@ WHERE 1 = 1");
         }
     }
 
+    protected void btnOpenReminder_Click(object sender, EventArgs e)
+    {
+        SyncReminderFiltersFromMain();
+        BindReminderGrid();
+        ShowReminderModal();
+    }
+
     protected void btnReminderSearch_Click(object sender, EventArgs e)
     {
         BindReminderGrid();
@@ -418,18 +425,33 @@ WHERE 1 = 1");
 
     protected void btnReminderReset_Click(object sender, EventArgs e)
     {
-        txtReminderInstNo.Text = string.Empty;
-        ddReminderStatus.ClearSelection();
-        ListItem pending = ddReminderStatus.Items.FindByValue("Pending");
-        if (pending != null)
-        {
-            pending.Selected = true;
-        }
-        gvReminder.DataSource = null;
-        gvReminder.DataBind();
-        lblReminderSummary.Text = "Search by Installment No and Status to load records.";
+        // Keep main report date/user filters; reset only popup-specific fields to main values.
+        SyncReminderFiltersFromMain();
+        BindReminderGrid();
         lblReminderSendStatus.Text = string.Empty;
         ShowReminderModal();
+    }
+
+    void SyncReminderFiltersFromMain()
+    {
+        txtReminderInstNo.Text = (txtInstNo.Text ?? string.Empty).Trim();
+
+        ddReminderStatus.ClearSelection();
+        string status = ddStatus.SelectedValue ?? string.Empty;
+        ListItem match = ddReminderStatus.Items.FindByValue(status);
+        if (match != null)
+        {
+            match.Selected = true;
+        }
+        else
+        {
+            // Main may have All/Processing/etc. Keep Pending if exact value not in reminder ddl.
+            ListItem pending = ddReminderStatus.Items.FindByValue("Pending");
+            if (pending != null)
+            {
+                pending.Selected = true;
+            }
+        }
     }
 
     void BindReminderGrid()
@@ -438,15 +460,47 @@ WHERE 1 = 1");
         gvReminder.DataSource = dt;
         gvReminder.DataBind();
 
+        string filterInfo = BuildReminderFilterSummary();
         if (dt == null || dt.Rows.Count == 0)
         {
-            lblReminderSummary.Text = "No records found for selected Installment No / Status.";
+            lblReminderSummary.Text = "No records found. " + filterInfo;
         }
         else
         {
-            lblReminderSummary.Text = "Showing " + dt.Rows.Count + " record(s). Select users and click Send Reminder.";
+            lblReminderSummary.Text = "Showing " + dt.Rows.Count + " record(s). " + filterInfo
+                + " Select users and click Send Reminder.";
         }
         lblReminderSendStatus.Text = string.Empty;
+    }
+
+    string BuildReminderFilterSummary()
+    {
+        StringBuilder parts = new StringBuilder();
+        parts.Append("Filters: ")
+            .Append(UseApproveDateFilter() ? "Approve Date" : "Installment Date");
+
+        if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
+        {
+            parts.Append(" · From ").Append(txtFromDate.Text.Trim());
+        }
+        if (!string.IsNullOrWhiteSpace(txtToDate.Text))
+        {
+            parts.Append(" · To ").Append(txtToDate.Text.Trim());
+        }
+        if (!string.IsNullOrWhiteSpace(txtUserId.Text))
+        {
+            parts.Append(" · User ").Append(txtUserId.Text.Trim());
+        }
+        if (!string.IsNullOrWhiteSpace(txtReminderInstNo.Text))
+        {
+            parts.Append(" · InstNo ").Append(txtReminderInstNo.Text.Trim());
+        }
+        if (!string.IsNullOrWhiteSpace(ddReminderStatus.SelectedValue))
+        {
+            parts.Append(" · Status ").Append(ddReminderStatus.SelectedValue);
+        }
+        parts.Append(".");
+        return parts.ToString();
     }
 
     DataTable GetReminderData()
@@ -466,6 +520,26 @@ FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON LTRIM(RTRIM(ud.UserId)) = LTRIM(RTRIM(sa.UserId))
 WHERE 1 = 1");
 
+        // Same date / user filters as main report (Date Filter By, From, To, User Id).
+        string dateColumn = GetDateFilterColumn();
+
+        if (!string.IsNullOrWhiteSpace(txtFromDate.Text))
+        {
+            sql.Append(" AND CONVERT(date, ").Append(dateColumn).Append(") >= CONVERT(date, '")
+                .Append(Message.GetIndianDate(txtFromDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtToDate.Text))
+        {
+            sql.Append(" AND CONVERT(date, ").Append(dateColumn).Append(") <= CONVERT(date, '")
+                .Append(Message.GetIndianDate(txtToDate.Text.Trim()).ToString("yyyy-MM-dd")).Append("')");
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtUserId.Text))
+        {
+            sql.Append(" AND sa.UserId = '").Append(SqlEscape(txtUserId.Text.Trim())).Append("'");
+        }
+
         if (!string.IsNullOrWhiteSpace(ddReminderStatus.SelectedValue))
         {
             sql.Append(" AND sa.status = '").Append(SqlEscape(ddReminderStatus.SelectedValue)).Append("'");
@@ -477,7 +551,14 @@ WHERE 1 = 1");
             sql.Append(" AND sa.InstNo = ").Append(instNo);
         }
 
-        sql.Append(" ORDER BY sa.InstallmentDate DESC, sa.id DESC");
+        if (UseApproveDateFilter())
+        {
+            sql.Append(" ORDER BY sa.approvedate DESC, sa.id DESC");
+        }
+        else
+        {
+            sql.Append(" ORDER BY sa.InstallmentDate DESC, sa.id DESC");
+        }
 
         DataTable dt = new DataTable();
         try

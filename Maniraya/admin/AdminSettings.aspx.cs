@@ -79,6 +79,7 @@ public partial class admin_AdminSettings : Page
         if (mainCount > 0)
         {
             EnsureSettingsMenuExists();
+            EnsureVirtualFranchiseMenuExists();
             return;
         }
 
@@ -156,6 +157,42 @@ WHERE LOWER(LTRIM(RTRIM(URL))) IN ('subadmin.aspx','subadminreport.aspx','adminm
             ObjData.RunInsUpDelQuery(
                 "INSERT INTO Menu (MainMenuId, MenuName, URL, Status) VALUES (" +
                 mainId + ", 'Admin users & menu access', 'AdminSettings.aspx', 1)");
+        }
+        catch
+        {
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+    }
+
+    void EnsureVirtualFranchiseMenuExists()
+    {
+        try
+        {
+            ObjData.StartConnection();
+            DataTable dt = ObjData.RunDataTable(
+                "SELECT TOP 1 id FROM Menu WHERE URL = 'VirtualFranchisePlanRequestReport.aspx'");
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return;
+            }
+
+            DataTable mainDt = ObjData.RunDataTable(
+                "SELECT TOP 1 id FROM MainMenu WHERE MainMenuName = 'Virtual Franchise'");
+            int mainId;
+            if (mainDt == null || mainDt.Rows.Count == 0)
+            {
+                ObjData.RunInsUpDelQuery(
+                    "INSERT INTO MainMenu (MainMenuName, URL, Status) VALUES ('Virtual Franchise', '', 1)");
+                mainDt = ObjData.RunDataTable("SELECT MAX(id) AS Id FROM MainMenu");
+            }
+            mainId = Convert.ToInt32(mainDt.Rows[0][0]);
+
+            ObjData.RunInsUpDelQuery(
+                "INSERT INTO Menu (MainMenuId, MenuName, URL, Status) VALUES (" +
+                mainId + ", 'Plan Request Approval', 'VirtualFranchisePlanRequestReport.aspx', 1)");
         }
         catch
         {
@@ -263,8 +300,12 @@ WHERE LOWER(LTRIM(RTRIM(URL))) IN ('subadmin.aspx','subadminreport.aspx','adminm
             "Add Saving Product Stock|SavingProductStockAdd.aspx",
             "Add Saving Session|SavingSessionDetailAdd.aspx",
             "EMI Purchase Report|SavingInstallmentReport.aspx",
+            "Bulk EMI Payment Report|SavingBulkInstallmentPaymentReport.aspx",
             "Pending Installment Report|SavingPendingInstallmentReport.aspx",
             "Coupon Report|CouponReport.aspx"));
+
+        list.Add(MakeGroup("Virtual Franchise",
+            "Plan Request Approval|VirtualFranchisePlanRequestReport.aspx"));
 
         list.Add(MakeGroup("Purchase Management",
             "Approve Purchase|UserRepurchaseReport.aspx",

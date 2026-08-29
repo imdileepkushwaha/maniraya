@@ -26,12 +26,12 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
                                 <div class="box-tools pull-right">
-                                    <button type="button" class="btn admin-send-reminder-btn"
-                                        onclick="showAdminModal('sendReminderModal'); return false;"
-                                        title="Open reminder popup">
+                                    <asp:LinkButton ID="btnOpenReminder" runat="server" CssClass="btn admin-send-reminder-btn"
+                                        OnClick="btnOpenReminder_Click" CausesValidation="false"
+                                        ToolTip="Open reminder with current filters">
                                         <i class="fa fa-bell"></i>
                                         <span>Send Reminder</span>
-                                    </button>
+                                    </asp:LinkButton>
                                 </div>
                             </div>
                             <div class="box-body admin-search-form">
@@ -194,7 +194,7 @@
                                 <h4 class="modal-title" id="sendReminderModalTitle"><i class="fa fa-bell"></i> Send Reminder</h4>
                             </div>
                             <div class="modal-body">
-                                <p class="admin-report-intro" style="margin-top:0;">Search by Installment No and Status, then select rows to send SMS reminder (name only is personalized).</p>
+                                <p class="admin-report-intro" style="margin-top:0;">Uses the same Date Filter By / From / To / User Id from the main report. You can further filter by Installment No and Status, then select rows to send SMS.</p>
                                 <div class="row">
                                     <div class="col-md-4 col-sm-6">
                                         <div class="form-group">
@@ -207,6 +207,10 @@
                                             <label for="<%= ddReminderStatus.ClientID %>">Status</label>
                                             <asp:DropDownList ID="ddReminderStatus" runat="server" CssClass="form-control">
                                                 <asp:ListItem Value="Pending" Selected="True">Pending</asp:ListItem>
+                                                <asp:ListItem Value="">All Status</asp:ListItem>
+                                                <asp:ListItem Value="Processing">Processing</asp:ListItem>
+                                                <asp:ListItem Value="Approved">Approved</asp:ListItem>
+                                                <asp:ListItem Value="Rejected">Rejected</asp:ListItem>
                                             </asp:DropDownList>
                                         </div>
                                     </div>
@@ -289,6 +293,7 @@
         </ContentTemplate>
         <Triggers>
             <asp:PostBackTrigger ControlID="btnExcel" />
+            <asp:PostBackTrigger ControlID="btnOpenReminder" />
             <asp:PostBackTrigger ControlID="btnSendReminderWhatsApp" />
             <asp:PostBackTrigger ControlID="btnSendReminderWhatsAppTop" />
             <asp:PostBackTrigger ControlID="btnReminderSearch" />

@@ -253,6 +253,11 @@ public static class SavingProductHelper
         return Convert.ToInt32(dt.Rows[0]["ColLen"]) > 0;
     }
 
+    public static bool HasInstallmentCouponCodeColumn()
+    {
+        return HasTableColumn("SavingAccountInstallmentDetail", "CouponCode");
+    }
+
     public static DataTable GetAllProducts()
     {
         EnsureStatusColumn();
@@ -448,6 +453,16 @@ public static class SavingProductHelper
         }
 
         string safe = Escape(utr);
+        string bulkUtrSql = HasTable("SavingBulkInstallmentPayment")
+            ? @"
+OR EXISTS (
+    SELECT 1
+    FROM SavingBulkInstallmentPayment WITH (NOLOCK)
+    WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER('" + safe + @"')
+      AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED'
+)"
+            : string.Empty;
+
         string sql = @"
 SELECT CASE WHEN EXISTS (
     SELECT 1
@@ -462,6 +477,7 @@ OR EXISTS (
       AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED'
       AND (" + excludeInstallmentId + @" <= 0 OR id <> " + excludeInstallmentId + @")
 )
+" + bulkUtrSql + @"
 THEN 1 ELSE 0 END";
 
         DataTable dt = RunSelect(sql);
@@ -675,12 +691,13 @@ VALUES (
         EnsureInstallmentDeliveryColumns();
 
         bool hasPlanType = HasTableColumn("SavingAccountDetail", "PlanType");
-        string bulkFilter = hasPlanType
-            ? @" AND (
-                    LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'
-                    OR ISNULL(sd.Amount, 0) >= 15000
-                )"
-            : " AND ISNULL(sd.Amount, 0) >= 15000";
+        if (!hasPlanType)
+        {
+            return;
+        }
+
+        // Only true Bulk18 prepaid plans — do not treat high EMI amount as bulk.
+        string bulkFilter = @" AND LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'";
 
         DataTable accounts = RunSelect(@"
 SELECT sd.id, sd.orderid, sd.userid, sd.amount, sd.status,
@@ -769,14 +786,16 @@ UPDATE sa
 SET
     sa.Amount = " + monthlyAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + @",
     sa.Status = CASE
-        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('approved', 'rejected', 'cancelled')
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('approved', 'rejected', 'cancelled', 'pending', 'processing')
             THEN sa.Status
-        ELSE 'Paid'
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(sa.Status, ''))), '') IS NULL
+            THEN 'Paid'
+        ELSE sa.Status
     END,
     sa.ApproveDate = CASE
         WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
             THEN sa.ApproveDate
-        ELSE NULL
+        ELSE sa.ApproveDate
     END,
     sa.RequestDate = ISNULL(sa.RequestDate, GETDATE()),
     sa.OnlineTransactionId = CASE
@@ -787,7 +806,7 @@ SET
     END,
     sa.productid = CASE WHEN ISNULL(ipa.ProductId, 0) > 0 THEN ipa.ProductId ELSE sa.productid END,
     sa.InstallmentDate = CASE
-        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'approved'
+        WHEN LOWER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('approved', 'pending', 'processing', 'rejected')
             THEN sa.InstallmentDate
         ELSE DATEADD(MONTH, ISNULL(TRY_CONVERT(INT, sa.InstNo), 2) - 1, CONVERT(date, '" + joinDate.ToString("yyyy-MM-dd") + @"'))
     END
@@ -816,12 +835,12 @@ WHERE sa.OrderId = '" + Escape(orderId) + @"'
 
         EnsureBulkColumns();
         bool hasPlanType = HasTableColumn("SavingAccountDetail", "PlanType");
-        string bulkFilter = hasPlanType
-            ? @" AND (
-                    LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'
-                    OR ISNULL(sd.Amount, 0) >= 15000
-                )"
-            : " AND ISNULL(sd.Amount, 0) >= 15000";
+        if (!hasPlanType)
+        {
+            return;
+        }
+
+        string bulkFilter = @" AND LTRIM(RTRIM(ISNULL(sd.PlanType, ''))) = 'Bulk18'";
 
         DataTable coupons = RunSelect(@"
 SELECT DISTINCT LTRIM(RTRIM(sd.couponcode)) AS couponcode
@@ -958,6 +977,7 @@ ORDER BY sd.id DESC");
         SetDisplayValue(dest, "installmentdate", src["approvedate"] != DBNull.Value ? src["approvedate"] : src["entrydate"]);
         SetDisplayValue(dest, "approvedate", src["approvedate"]);
         SetDisplayValue(dest, "status", parentApproved ? "Approved" : parentStatus);
+        SetDisplayValue(dest, "ParentStatus", parentStatus);
         SetDisplayValue(dest, "couponcode", src["couponcode"]);
         SetDisplayValue(dest, "OnlineTransactionId", src["OnlineTransactionId"]);
         SetDisplayValue(dest, "productname", src["productname"]);
@@ -1013,6 +1033,7 @@ ORDER BY sd.id DESC");
         string parentTxnCol = FindColumn(dt, "ParentOnlineTransactionId");
         string parentAmtCol = FindColumn(dt, "ParentAmount");
         string planCol = FindColumn(dt, "PlanType");
+        string statusCol = FindColumn(dt, "status");
 
         foreach (DataRow row in dt.Rows)
         {
@@ -1078,7 +1099,19 @@ ORDER BY sd.id DESC");
                 && !string.IsNullOrEmpty(parentTxnCol)
                 && !string.IsNullOrWhiteSpace(Convert.ToString(row[parentTxnCol])))
             {
-                row[txnCol] = Convert.ToString(row[parentTxnCol]).Trim();
+                string rowStatus = string.IsNullOrEmpty(statusCol)
+                    ? string.Empty
+                    : Convert.ToString(row[statusCol]).Trim().ToLowerInvariant();
+                bool isApproved = rowStatus == "approved"
+                    || rowStatus == "approve"
+                    || rowStatus == "1"
+                    || rowStatus == "active";
+                bool isBulkPrepaid = planType.Equals("Bulk18", StringComparison.OrdinalIgnoreCase)
+                    && rowStatus == "paid";
+                if (isApproved || isBulkPrepaid)
+                {
+                    row[txnCol] = Convert.ToString(row[parentTxnCol]).Trim();
+                }
             }
         }
     }
@@ -1104,6 +1137,7 @@ ORDER BY sd.id DESC");
     public static void ProcessBulkSavingSchedule()
     {
         EnsureBulkColumns();
+        ConfirmDueBulkInstallmentDeliveries();
         Data objData = new Data();
         try
         {
@@ -1120,5 +1154,308 @@ ORDER BY sd.id DESC");
         catch
         {
         }
+    }
+
+    const int BulkPaySchemaVersion = 3;
+    static int AppliedBulkPaySchemaVersion;
+
+    static bool HasTable(string tableName)
+    {
+        DataTable dt = RunSelect(
+            "SELECT OBJECT_ID('dbo." + Escape(tableName) + "', 'U') AS ObjId");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["ObjId"] == DBNull.Value)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void EnsureBulkInstallmentPaymentSchema()
+    {
+        if (AppliedBulkPaySchemaVersion == BulkPaySchemaVersion)
+        {
+            return;
+        }
+
+        EnsureBulkColumns();
+        RunNonQuery(@"
+IF OBJECT_ID('dbo.SavingBulkInstallmentPayment', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SavingBulkInstallmentPayment
+    (
+        Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        UserId NVARCHAR(100) NOT NULL,
+        OrderId NVARCHAR(100) NULL,
+        CouponCode NVARCHAR(100) NULL,
+        AccountId INT NULL,
+        Amount DECIMAL(18,2) NULL,
+        InstCount INT NULL,
+        OnlineTransactionId NVARCHAR(100) NULL,
+        ImageName NVARCHAR(MAX) NULL,
+        Status NVARCHAR(50) NOT NULL CONSTRAINT DF_SavingBulkInstPay_Status DEFAULT ('Processing'),
+        RequestDate DATETIME NOT NULL CONSTRAINT DF_SavingBulkInstPay_RequestDate DEFAULT (GETDATE()),
+        ApproveDate DATETIME NULL,
+        ApproveBy NVARCHAR(100) NULL,
+        Remark NVARCHAR(MAX) NULL,
+        EntryBy NVARCHAR(100) NULL,
+        EntryDate DATETIME NOT NULL CONSTRAINT DF_SavingBulkInstPay_EntryDate DEFAULT (GETDATE())
+    );
+END");
+        RunNonQuery(@"
+IF COL_LENGTH('dbo.SavingAccountInstallmentDetail', 'BulkPaymentId') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingAccountInstallmentDetail ADD BulkPaymentId INT NULL;
+END");
+        EnsureInstallmentDeliveryColumns();
+
+        RecreateProcedure("sp_add_SavingBulkInstallmentPayment", GetAddBulkInstallmentPaymentProcSql());
+        RecreateProcedure("sp_approveSavingBulkInstallmentPayment", GetApproveBulkInstallmentPaymentProcSql());
+        RecreateProcedure("sp_rejectSavingBulkInstallmentPayment", GetRejectBulkInstallmentPaymentProcSql());
+
+        if (HasTable("SavingBulkInstallmentPayment")
+            && ProcedureExists("sp_add_SavingBulkInstallmentPayment")
+            && ProcedureExists("sp_approveSavingBulkInstallmentPayment")
+            && ProcedureExists("sp_rejectSavingBulkInstallmentPayment"))
+        {
+            AppliedBulkPaySchemaVersion = BulkPaySchemaVersion;
+        }
+    }
+
+    static bool ProcedureExists(string procName)
+    {
+        DataTable dt = RunSelect(
+            "SELECT OBJECT_ID('dbo." + Escape(procName) + "', 'P') AS ObjId");
+        return dt != null && dt.Rows.Count > 0 && dt.Rows[0]["ObjId"] != DBNull.Value;
+    }
+
+    static void RecreateProcedure(string procName, string createSql)
+    {
+        RunNonQuery("IF OBJECT_ID('dbo." + Escape(procName) + "', 'P') IS NOT NULL DROP PROCEDURE dbo." + procName + ";");
+        RunNonQuery(createSql == null ? string.Empty : createSql.Trim());
+    }
+
+    public static void ConfirmDueBulkInstallmentDeliveries()
+    {
+        if (!HasTableColumn("SavingAccountInstallmentDetail", "BulkPaymentId")
+            || !HasTableColumn("SavingAccountInstallmentDetail", "DeliveryStatus"))
+        {
+            return;
+        }
+
+        RunNonQuery(@"
+UPDATE sa
+SET
+    sa.DeliveryStatus = 'Confirmed',
+    sa.DeliveryStatusUpdatedOn = GETDATE(),
+    sa.DeliveryStatusUpdatedBy = 'SYSTEM-BULK17'
+FROM SavingAccountInstallmentDetail sa
+WHERE ISNULL(sa.BulkPaymentId, 0) > 0
+  AND UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('APPROVED', 'APPROVE', '1')
+  AND CONVERT(date, ISNULL(sa.ApproveDate, '99991231')) <= CONVERT(date, GETDATE())
+  AND (
+        UPPER(LTRIM(RTRIM(ISNULL(sa.DeliveryStatus, '')))) IN ('SCHEDULED', '')
+        OR sa.DeliveryStatus IS NULL
+      )");
+    }
+
+    public static string ExecuteScalarProc(string procName, SqlParameter[] parameters)
+    {
+        Data objData = new Data();
+        string res = "0";
+        SqlConnection cn = null;
+        SqlTransaction tr = null;
+        try
+        {
+            cn = objData.StartConnectionInTransaction();
+            tr = cn.BeginTransaction(IsolationLevel.Serializable);
+            res = objData.RunInsUpDelQueryTransProcScalar(procName, tr, parameters ?? new SqlParameter[0]);
+            tr.Commit();
+        }
+        catch
+        {
+            res = "0";
+            if (tr != null)
+            {
+                try { tr.Rollback(); }
+                catch { }
+            }
+        }
+        finally
+        {
+            try { objData.EndConnection(); }
+            catch { }
+            if (tr != null)
+            {
+                tr.Dispose();
+            }
+        }
+
+        return string.IsNullOrWhiteSpace(res) ? "0" : res.Trim();
+    }
+
+    static string GetAddBulkInstallmentPaymentProcSql()
+    {
+        return @"
+CREATE PROC dbo.sp_add_SavingBulkInstallmentPayment
+    @UserId NVARCHAR(100),
+    @CouponCode NVARCHAR(100),
+    @OnlineTransactionId NVARCHAR(100),
+    @ImageName NVARCHAR(MAX),
+    @EntryBy NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @user NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@UserId, '')));
+    DECLARE @coupon NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@CouponCode, '')));
+    DECLARE @utr NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@OnlineTransactionId, '')));
+    DECLARE @image NVARCHAR(MAX) = LTRIM(RTRIM(ISNULL(@ImageName, '')));
+    DECLARE @by NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@EntryBy, @user)));
+    IF (@user = '' OR @coupon = '') BEGIN SELECT 'n'; RETURN; END
+    IF (
+        @utr <> '' AND @utr NOT LIKE 'CASH-%'
+        AND (
+            EXISTS (SELECT 1 FROM SavingAccountDetail WITH (NOLOCK) WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER(@utr) AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED')
+            OR EXISTS (SELECT 1 FROM SavingAccountInstallmentDetail WITH (NOLOCK) WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER(@utr) AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED')
+            OR EXISTS (SELECT 1 FROM SavingBulkInstallmentPayment WITH (NOLOCK) WHERE UPPER(LTRIM(RTRIM(ISNULL(OnlineTransactionId, '')))) = UPPER(@utr) AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) <> 'REJECTED')
+        )
+    ) BEGIN SELECT 'u'; RETURN; END
+    DECLARE @accountId INT, @orderId NVARCHAR(100), @planType NVARCHAR(50);
+    SELECT TOP 1 @accountId = sd.id, @orderId = sd.orderid
+    FROM SavingAccountDetail sd WITH (NOLOCK)
+    WHERE LTRIM(RTRIM(sd.UserId)) = @user
+      AND LTRIM(RTRIM(ISNULL(sd.couponcode, ''))) = @coupon
+      AND UPPER(LTRIM(RTRIM(ISNULL(sd.status, '')))) IN ('APPROVED', 'APPROVE', '1', 'ACTIVE')
+    ORDER BY sd.id DESC;
+    IF (@accountId IS NULL OR ISNULL(@orderId, '') = '') BEGIN SELECT 'n'; RETURN; END
+    IF COL_LENGTH('SavingAccountDetail', 'PlanType') IS NOT NULL
+    BEGIN
+        SELECT @planType = PlanType FROM SavingAccountDetail WITH (NOLOCK) WHERE id = @accountId;
+        IF (UPPER(LTRIM(RTRIM(ISNULL(@planType, '')))) = 'BULK18') BEGIN SELECT 'n'; RETURN; END
+    END
+    IF EXISTS (
+        SELECT 1 FROM SavingBulkInstallmentPayment WITH (NOLOCK)
+        WHERE LTRIM(RTRIM(UserId)) = @user AND LTRIM(RTRIM(ISNULL(CouponCode, ''))) = @coupon
+          AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) = 'PROCESSING'
+    ) BEGIN SELECT 'f'; RETURN; END
+    DECLARE @pendingCount INT = 0, @blockedCount INT = 0, @totalAmount DECIMAL(18,2) = 0;
+    DECLARE @hasInstCoupon BIT = CASE WHEN COL_LENGTH('SavingAccountInstallmentDetail', 'CouponCode') IS NOT NULL THEN 1 ELSE 0 END;
+    SELECT
+        @pendingCount = SUM(CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) NOT IN ('PROCESSING', 'APPROVED', 'APPROVE', '1', 'ACTIVE', 'PAID') THEN 1 ELSE 0 END),
+        @blockedCount = SUM(CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'PROCESSING' THEN 1 ELSE 0 END),
+        @totalAmount = SUM(CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) NOT IN ('PROCESSING', 'APPROVED', 'APPROVE', '1', 'ACTIVE', 'PAID') THEN ISNULL(sa.Amount, 0) ELSE 0 END)
+    FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
+    WHERE LTRIM(RTRIM(sa.UserId)) = @user
+      AND ISNULL(TRY_CONVERT(INT, sa.InstNo), 0) BETWEEN 2 AND 18
+      AND (
+            (@hasInstCoupon = 1 AND (
+                LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))) = @coupon
+                OR (NULLIF(LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))), '') IS NULL AND sa.OrderId = @orderId)
+            ))
+            OR (@hasInstCoupon = 0 AND sa.OrderId = @orderId)
+          );
+    IF (ISNULL(@pendingCount, 0) <= 0 OR ISNULL(@blockedCount, 0) <> 0)
+    BEGIN SELECT 'n'; RETURN; END
+    INSERT INTO SavingBulkInstallmentPayment (UserId, OrderId, CouponCode, AccountId, Amount, InstCount, OnlineTransactionId, ImageName, Status, RequestDate, EntryBy, EntryDate)
+    VALUES (@user, @orderId, @coupon, @accountId, ISNULL(@totalAmount, 0), ISNULL(@pendingCount, 0), @utr, @image, 'Processing', GETDATE(), @by, GETDATE());
+    DECLARE @bulkId INT = SCOPE_IDENTITY();
+    UPDATE SavingAccountInstallmentDetail
+    SET Status = 'Processing', OnlineTransactionId = @utr, ImageName = @image, RequestDate = GETDATE(), Remark = NULL, BulkPaymentId = @bulkId
+    WHERE LTRIM(RTRIM(UserId)) = @user
+      AND ISNULL(TRY_CONVERT(INT, InstNo), 0) BETWEEN 2 AND 18
+      AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) NOT IN ('PROCESSING', 'APPROVED', 'APPROVE', '1', 'ACTIVE', 'PAID')
+      AND (
+            (@hasInstCoupon = 1 AND (
+                LTRIM(RTRIM(ISNULL(CouponCode, ''))) = @coupon
+                OR (NULLIF(LTRIM(RTRIM(ISNULL(CouponCode, ''))), '') IS NULL AND OrderId = @orderId)
+            ))
+            OR (@hasInstCoupon = 0 AND OrderId = @orderId)
+          );
+    SELECT 't';
+END";
+    }
+
+    static string GetApproveBulkInstallmentPaymentProcSql()
+    {
+        return @"
+CREATE PROC dbo.sp_approveSavingBulkInstallmentPayment
+    @id INT,
+    @Approveby NVARCHAR(100),
+    @Remark NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @status NVARCHAR(50), @orderId NVARCHAR(100), @userId NVARCHAR(100), @requestDate DATETIME, @bulkId INT = @id;
+    SELECT @status = bp.Status, @orderId = bp.OrderId, @userId = bp.UserId, @requestDate = bp.RequestDate
+    FROM SavingBulkInstallmentPayment bp WHERE bp.Id = @bulkId;
+    IF (@status IS NULL) BEGIN SELECT '0'; RETURN; END
+    IF (UPPER(LTRIM(RTRIM(ISNULL(@status, '')))) <> 'PROCESSING') BEGIN SELECT 'f'; RETURN; END
+    DECLARE @baseDate DATE = CONVERT(date, ISNULL(@requestDate, GETDATE()));
+    DECLARE @remarkText NVARCHAR(MAX) = LTRIM(RTRIM(ISNULL(@Remark, '')));
+    DECLARE @adminUser NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@Approveby, '')));
+    UPDATE SavingBulkInstallmentPayment
+    SET Status = 'Approved', ApproveDate = GETDATE(), ApproveBy = @adminUser,
+        Remark = CASE WHEN @remarkText = '' THEN Remark ELSE @remarkText END
+    WHERE Id = @bulkId;
+    UPDATE sa
+    SET sa.Status = 'Approved',
+        sa.ApproveDate = DATEADD(MONTH, ISNULL(TRY_CONVERT(INT, sa.InstNo), 2) - 1, @baseDate),
+        sa.OnlineTransactionId = ISNULL(NULLIF(LTRIM(RTRIM(sa.OnlineTransactionId)), ''), bp.OnlineTransactionId),
+        sa.ImageName = ISNULL(NULLIF(LTRIM(RTRIM(sa.ImageName)), ''), bp.ImageName),
+        sa.Remark = CASE WHEN @remarkText = '' THEN sa.Remark ELSE @remarkText END,
+        sa.BulkPaymentId = @bulkId,
+        sa.productid = CASE WHEN ISNULL(ipa.ProductId, 0) > 0 THEN ipa.ProductId ELSE sa.productid END
+    FROM SavingAccountInstallmentDetail sa
+    INNER JOIN SavingBulkInstallmentPayment bp ON bp.Id = @bulkId
+    LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+        ON ISNULL(ipa.Status, 1) = 1 AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+    WHERE (ISNULL(sa.BulkPaymentId, 0) = @bulkId
+        OR (LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(@userId))
+            AND LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))) = LTRIM(RTRIM(ISNULL(bp.CouponCode, '')))
+            AND ISNULL(TRY_CONVERT(INT, sa.InstNo), 0) BETWEEN 2 AND 18
+            AND UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) = 'PROCESSING'))
+      AND UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('PROCESSING', 'PENDING');
+    IF COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatus') IS NOT NULL
+    BEGIN
+        UPDATE SavingAccountInstallmentDetail
+        SET DeliveryStatus = 'Scheduled', DeliveryStatusUpdatedOn = GETDATE(), DeliveryStatusUpdatedBy = @adminUser
+        WHERE ISNULL(BulkPaymentId, 0) = @bulkId
+          AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) IN ('APPROVED', 'APPROVE', '1');
+    END
+    SELECT 't';
+END";
+    }
+
+    static string GetRejectBulkInstallmentPaymentProcSql()
+    {
+        return @"
+CREATE PROC dbo.sp_rejectSavingBulkInstallmentPayment
+    @id INT,
+    @Approveby NVARCHAR(100),
+    @Remark NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @status NVARCHAR(50), @orderId NVARCHAR(100), @userId NVARCHAR(100), @bulkId INT = @id;
+    DECLARE @remarkText NVARCHAR(MAX) = LTRIM(RTRIM(ISNULL(@Remark, '')));
+    DECLARE @rejectBy NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@Approveby, '')));
+    IF (@remarkText = '') BEGIN SELECT 'r'; RETURN; END
+    SELECT @status = bp.Status, @orderId = bp.OrderId, @userId = bp.UserId
+    FROM SavingBulkInstallmentPayment bp WHERE bp.Id = @bulkId;
+    IF (@status IS NULL) BEGIN SELECT '0'; RETURN; END
+    IF (UPPER(LTRIM(RTRIM(ISNULL(@status, '')))) <> 'PROCESSING') BEGIN SELECT 'f'; RETURN; END
+    UPDATE SavingBulkInstallmentPayment
+    SET Status = 'Rejected', ApproveDate = GETDATE(), ApproveBy = @rejectBy, Remark = @remarkText
+    WHERE Id = @bulkId;
+    UPDATE SavingAccountInstallmentDetail
+    SET Status = 'Rejected', Remark = @remarkText, BulkPaymentId = @bulkId
+    WHERE ISNULL(BulkPaymentId, 0) = @bulkId
+       OR (LTRIM(RTRIM(UserId)) = LTRIM(RTRIM(@userId))
+           AND LTRIM(RTRIM(ISNULL(CouponCode, ''))) = (
+                SELECT LTRIM(RTRIM(ISNULL(CouponCode, ''))) FROM SavingBulkInstallmentPayment WHERE Id = @bulkId)
+           AND ISNULL(TRY_CONVERT(INT, InstNo), 0) BETWEEN 2 AND 18
+           AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) = 'PROCESSING');
+    SELECT 't';
+END";
     }
 }
