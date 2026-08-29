@@ -59,16 +59,27 @@ public partial class admin_UserReport : System.Web.UI.Page
                 )"
             : " AND sa.OrderId = sd0.orderid";
 
-        string str_query = @"SELECT sa.*, ud.username, " + couponSelect + @", pm.productname
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
+
+        string str_query = @"SELECT sa.*, ud.username, " + couponSelect + @",
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+            THEN LTRIM(RTRIM(assign_pm.ProductName))
+        ELSE 'Not assigned'
+    END AS productname
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 OUTER APPLY (
-    SELECT TOP 1 sd0.couponcode, sd0.productid
+    SELECT TOP 1 sd0.couponcode
     FROM SavingAccountDetail sd0 WITH (NOLOCK)
     WHERE LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
     " + parentMatch + @"
     ORDER BY sd0.id DESC
 ) sd
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
 WHERE LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing', 'approved', 'rejected', '1', 'active', '2', 'cancelled', 'canceled') ";
 
@@ -406,6 +417,18 @@ WHERE LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing', 'approved', '
     {
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
+            Label lblProductName = (Label)e.Row.FindControl("lblamount");
+            if (lblProductName != null)
+            {
+                string productName = (lblProductName.Text ?? string.Empty).Trim();
+                if (string.IsNullOrWhiteSpace(productName)
+                    || productName.Equals("Not assigned", StringComparison.OrdinalIgnoreCase)
+                    || productName.Equals("Not assign", StringComparison.OrdinalIgnoreCase))
+                {
+                    lblProductName.Text = "Not assigned";
+                }
+            }
+
             Label lblstatus = (Label)e.Row.FindControl("lblstatus");
             Label lblremark = (Label)e.Row.FindControl("lblremark");
             TextBox txtremark = (TextBox)e.Row.FindControl("txtremark");

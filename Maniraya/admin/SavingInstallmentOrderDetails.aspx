@@ -1,7 +1,7 @@
 <%@ Page Title="Saving Installment Orders" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="SavingInstallmentOrderDetails.aspx.cs" Inherits="admin_SavingInstallmentOrderDetails" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="assets/css/admin-layout.css?v=68" />
+    <link rel="stylesheet" href="assets/css/admin-layout.css?v=69" />
     <style>
         .saving-order-address-cell {
             display: flex;
@@ -152,6 +152,18 @@
         .saving-order-product-item strong {
             color: #0f766e;
             white-space: nowrap;
+        }
+
+        .saving-order-product-item.is-unassigned,
+        .saving-order-modal-products li.is-unassigned {
+            background: #fff7ed;
+            border-color: #fdba74;
+            color: #9a3412;
+        }
+
+        .saving-order-product-item.is-unassigned strong,
+        .saving-order-modal-products li.is-unassigned strong {
+            color: #c2410c;
         }
 
         .saving-order-product-count {

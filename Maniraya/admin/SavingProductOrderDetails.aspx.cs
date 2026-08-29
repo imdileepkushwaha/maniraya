@@ -138,12 +138,29 @@ public partial class admin_SavingProductOrderDetails : Page
             "<span class=\"admin-pager-info\">Showing " + fromRecord + "–" + toRecord + " of " + totalRecords + "</span>"));
 
         AddPagerLink("First", 0, currentPage > 0, false);
+        AddPagerLink("Prev", currentPage - 1, currentPage > 0, false);
 
-        for (int i = 0; i < totalPages; i++)
+        const int windowSize = 5;
+        int startPage = Math.Max(0, currentPage - (windowSize / 2));
+        int endPage = Math.Min(totalPages - 1, startPage + windowSize - 1);
+        startPage = Math.Max(0, endPage - windowSize + 1);
+
+        if (startPage > 0)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-ellipsis\">...</span>"));
+        }
+
+        for (int i = startPage; i <= endPage; i++)
         {
             AddPagerLink((i + 1).ToString(), i, true, i == currentPage);
         }
 
+        if (endPage < totalPages - 1)
+        {
+            pnlPager.Controls.Add(new LiteralControl("<span class=\"admin-pager-btn is-ellipsis\">...</span>"));
+        }
+
+        AddPagerLink("Next", currentPage + 1, currentPage < totalPages - 1, false);
         AddPagerLink("Last", totalPages - 1, currentPage < totalPages - 1, false);
     }
 
@@ -162,10 +179,12 @@ public partial class admin_SavingProductOrderDetails : Page
         }
 
         LinkButton link = new LinkButton();
+        link.ID = "pagerBtn_" + pageIndex + "_" + text.Replace(" ", "");
         link.Text = text;
         link.CssClass = "admin-pager-btn";
         link.CommandArgument = pageIndex.ToString();
         link.Click += ExternalPager_Click;
+        link.CausesValidation = false;
         pnlPager.Controls.Add(link);
     }
 

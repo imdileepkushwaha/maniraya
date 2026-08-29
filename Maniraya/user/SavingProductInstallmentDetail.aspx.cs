@@ -108,8 +108,6 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             CASE
                 WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
                     THEN LTRIM(RTRIM(assign_pm.ProductName))
-                WHEN NULLIF(LTRIM(RTRIM(ISNULL(pm.ProductName, ''))), '') IS NOT NULL
-                    THEN LTRIM(RTRIM(pm.ProductName))
                 ELSE 'Not assigned'
             END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
@@ -125,7 +123,6 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
                AND ISNULL(ipa.ProductId, 0) > 0
                AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
             LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
-            LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON pm.id = sa.productid
             LEFT JOIN userdetail ud WITH (NOLOCK) ON ud.userid = sa.userid
             WHERE LTRIM(RTRIM(sa.UserId)) = '" + SqlEscape(userId) + @"'
             " + couponFilter + @"

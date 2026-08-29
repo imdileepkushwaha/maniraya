@@ -27,6 +27,7 @@ public partial class admin_SavingInstallmentOrderDetails : Page
         }
 
         SavingProductHelper.EnsureInstallmentDeliveryColumns();
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
 
         if (!IsPostBack)
         {
@@ -230,7 +231,7 @@ SELECT
     sa.InstNo,
     ud.username,
     ud.mobile,
-    pm.productname,
+    ").Append(AssignedProductNameSql()).Append(@" AS productname,
     sa.amount,
     sa.approvedate,
     sd.couponcode,
@@ -258,18 +259,14 @@ SELECT
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 OUTER APPLY (
     SELECT TOP 1
-        sd0.couponcode,
-        sd0.productid
+        sd0.couponcode
     FROM SavingAccountDetail sd0 WITH (NOLOCK)
     WHERE sd0.orderid = sa.orderid
       AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
-    ORDER BY
-        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
-        sd0.id ASC
+    ORDER BY sd0.id ASC
 ) sd
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
-    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+").Append(AssignedProductJoinSql("sa.InstNo")).Append(@"
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
@@ -463,10 +460,43 @@ WHERE ").Append(GetApprovedStatusFilter("sa"));
         return string.IsNullOrWhiteSpace(status) ? "Confirmed" : status;
     }
 
+    static string AssignedProductNameSql()
+    {
+        return @"CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+            THEN LTRIM(RTRIM(assign_pm.ProductName))
+        ELSE 'Not assigned'
+    END";
+    }
+
+    static string AssignedProductJoinSql(string instNoExpr)
+    {
+        return @"
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, " + instNoExpr + @")
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId";
+    }
+
+    static string GetAssignedProductName(object value)
+    {
+        string productName = Convert.ToString(value);
+        return string.IsNullOrWhiteSpace(productName) ? "Not assigned" : productName.Trim();
+    }
+
+    static bool IsUnassignedProduct(string productName)
+    {
+        return string.IsNullOrWhiteSpace(productName)
+            || productName.Equals("Not assigned", StringComparison.OrdinalIgnoreCase)
+            || productName.Equals("Not assign", StringComparison.OrdinalIgnoreCase);
+    }
+
     static string BuildSingleProductHtml(DataRow row)
     {
         StringBuilder sb = new StringBuilder();
-        string productName = Convert.ToString(row["productname"]);
+        string productName = GetAssignedProductName(row["productname"]);
+        bool unassigned = IsUnassignedProduct(productName);
         int instNo = GetIntValue(row, "InstNo", "instno");
         if (instNo > 0)
         {
@@ -474,7 +504,9 @@ WHERE ").Append(GetApprovedStatusFilter("sa"));
         }
 
         sb.Append("<div class=\"saving-order-products\">");
-        sb.Append("<div class=\"saving-order-product-item\"><span>")
+        sb.Append("<div class=\"saving-order-product-item")
+            .Append(unassigned ? " is-unassigned" : string.Empty)
+            .Append("\"><span>")
             .Append(HttpUtility.HtmlEncode(productName))
             .Append("</span><strong>")
             .Append(HttpUtility.HtmlEncode(Convert.ToString(row["amount"])))
@@ -491,10 +523,13 @@ WHERE ").Append(GetApprovedStatusFilter("sa"));
         }
 
         StringBuilder sb = new StringBuilder("<ul class=\"saving-order-modal-products\">");
-        foreach (DataRow row in rows.OrderBy(r => Convert.ToString(r["productname"])))
+        foreach (DataRow row in rows.OrderBy(r => GetAssignedProductName(r["productname"])))
         {
-            sb.Append("<li><span>")
-                .Append(HttpUtility.HtmlEncode(Convert.ToString(row["productname"])))
+            string productName = GetAssignedProductName(row["productname"]);
+            sb.Append("<li")
+                .Append(IsUnassignedProduct(productName) ? " class=\"is-unassigned\"" : string.Empty)
+                .Append("><span>")
+                .Append(HttpUtility.HtmlEncode(productName))
                 .Append("</span><strong>")
                 .Append(HttpUtility.HtmlEncode(Convert.ToString(row["amount"])))
                 .Append("</strong></li>");
@@ -570,7 +605,7 @@ SELECT
     sa.userid,
     ud.username,
     ud.mobile,
-    pm.productname,
+    " + AssignedProductNameSql() + @" AS productname,
     sa.amount,
     sa.approvedate,
     sd.couponcode,
@@ -579,18 +614,14 @@ SELECT
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 OUTER APPLY (
     SELECT TOP 1
-        sd0.couponcode,
-        sd0.productid
+        sd0.couponcode
     FROM SavingAccountDetail sd0 WITH (NOLOCK)
     WHERE sd0.orderid = sa.orderid
       AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
-    ORDER BY
-        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
-        sd0.id ASC
+    ORDER BY sd0.id ASC
 ) sd
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
-    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+" + AssignedProductJoinSql("sa.InstNo") + @"
 WHERE sa.id = " + id + @"
   AND " + GetApprovedStatusFilter("sa");
 
@@ -629,7 +660,7 @@ SELECT
     sa.userid,
     ud.username,
     ud.mobile,
-    pm.productname,
+    " + AssignedProductNameSql() + @" AS productname,
     sa.amount,
     sa.approvedate,
     sd.couponcode,
@@ -657,18 +688,14 @@ SELECT
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
 OUTER APPLY (
     SELECT TOP 1
-        sd0.couponcode,
-        sd0.productid
+        sd0.couponcode
     FROM SavingAccountDetail sd0 WITH (NOLOCK)
     WHERE sd0.orderid = sa.orderid
       AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
-    ORDER BY
-        CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
-        sd0.id ASC
+    ORDER BY sd0.id ASC
 ) sd
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
-    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
+" + AssignedProductJoinSql("sa.InstNo") + @"
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
