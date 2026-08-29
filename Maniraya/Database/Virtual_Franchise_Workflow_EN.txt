@@ -1,0 +1,278 @@
+================================================================================
+VIRTUAL FRANCHISE PLAN — WORKFLOW RECORD
+Project : Maniraya / MPremium
+Date    : 27 August 2026
+Language: English
+================================================================================
+
+This document records the complete Virtual Franchise Plan workflow:
+database tables, stored procedures, user request, admin approval,
+ROI generation, and level income credit.
+
+
+1) OVERVIEW
+--------------------------------------------------------------------------------
+The user selects a Virtual Franchise plan and submits a request using Cash
+or Online payment. The request is saved with Pending status and sent to admin.
+
+Admin reviews the transaction ID and pay slip, then Approves or Rejects.
+
+On Approve:
+  - Request status becomes Approved
+  - A 40-month monthly ROI schedule is generated for the buyer
+  - Level 1 income is credited instantly to the buyer's sponsor
+  - 10% admin charge and 2% TDS are deducted, then the net amount is posted
+    to the transaction table. The user report shows Gross, Admin, TDS, and Net
+
+On Reject:
+  - Request status becomes Rejected
+  - The admin rejection reason is shown to the user on their report
+
+
+2) PLANS  (Table: Virtual_Franchise_Plan_Master)
+--------------------------------------------------------------------------------
+id | Plan Name       | Amount      | ROI | Direct ROI | ROI Time | Status
+---+-----------------+-------------+-----+------------+----------+--------
+1  | Basic Tier      | 100,000     | 5%  | 0          | 40 month | Active
+2  | Premium Tier    | 500,000     | 5%  | 0          | 40 month | Active
+3  | Executive Tier  | 1,000,000   | 5%  | 0          | 40 month | Active
+
+Create date: 27/08/2026
+
+Columns:
+  id, plan_planname, plan_amount, roi, directroi, createdate, roitime, status
+
+
+3) LEVEL INCOME MASTER  (Table: Virtual_Level_Master)
+--------------------------------------------------------------------------------
+Level | Income %
+------+---------
+1     | 5%
+2     | 2%
+3     | 3%
+4     | 4%
+5     | 5%
+
+On approve, only Level 1 (5%) is credited instantly.
+Levels 2–5 are stored in the master for future use.
+
+
+4) ROI / CASHBACK CALCULATION
+--------------------------------------------------------------------------------
+Formula:
+  Monthly ROI    = Plan Amount x (ROI % / 100)
+  Total cashback = Monthly ROI x 40 months
+
+Examples:
+  Basic     : 100,000  x 5% = 5,000  per month
+              40 x 5,000     = 200,000  total cashback
+
+  Premium   : 500,000  x 5% = 25,000 per month
+              40 x 25,000    = 1,000,000 total cashback
+
+  Executive : 1,000,000 x 5% = 50,000 per month
+              40 x 50,000    = 2,000,000 total cashback
+
+ROI schedule:
+  Month 1  = Approve date + 1 month
+  Month 2  = Approve date + 2 months
+  ...
+  Month 40 = Approve date + 40 months
+
+When the ROI date is due, status changes from Pending to Paid and the amount
+is credited to the buyer's wallet / TransactionDetail.
+Transaction type: "Virtual Franchise ROI"
+
+
+5) LEVEL 1 INCOME (INSTANT ON APPROVE)
+--------------------------------------------------------------------------------
+Receiver : Buyer's sponsor (UserDetail.SponserId)
+Formula  : Plan Amount x 5%
+
+Charges:
+  Admin charge = 10% of gross income
+  TDS          = 2%  of gross income
+  Net payable  = Gross - Admin - TDS
+
+Example (Basic plan 100,000):
+  Gross income = 5,000
+  Admin 10%    = 500
+  TDS 2%       = 100
+  Net credit   = 4,400   (TransactionDetail + wallet)
+
+Example (Premium 500,000):
+  Gross = 25,000 | Admin = 2,500 | TDS = 500 | Net = 22,000
+
+Example (Executive 1,000,000):
+  Gross = 50,000 | Admin = 5,000 | TDS = 1,000 | Net = 44,000
+
+If the sponsor is missing / 0 / admin, level income is skipped.
+
+Details are saved in: Virtual_Level_Income_Detail
+Transaction type: "Virtual Level Income"
+The remark stores Gross, Admin 10%, TDS 2%, and Net.
+
+
+6) DATABASE TABLES
+--------------------------------------------------------------------------------
+A. Virtual_Franchise_Plan_Master
+   Plan list (Basic / Premium / Executive)
+
+B. Virtual_Level_Master
+   Income % by level
+
+C. Virtual_Franchise_Request
+   User plan request
+   Main columns:
+     id, userid, planid, planname, planamount, roi, roitime,
+     monthlyroi, totalcashback, paymentmethod, onlinetransactionid,
+     imagename (pay slip), status, remark, entryby, entrydate,
+     approveby, approvedate
+   Status values: Pending / Approved / Rejected
+
+D. Virtual_Franchise_ROI_Detail
+   40-month ROI schedule
+   Main columns:
+     id, requestid, userid, planname, monthno, roidate, roiamount,
+     status (Pending/Paid), paiddate, transactionid
+
+E. Virtual_Level_Income_Detail
+   Level income detail (with admin charge and TDS)
+   Main columns:
+     id, requestid, userid (income receiver / sponsor), fromuserid (buyer),
+     levelno, planname, planamount, incomeper, income,
+     adminper, admincharge, tdsper, tdscharge, payableamount,
+     transactionid, status, mentiondate
+
+
+7) STORED PROCEDURES
+--------------------------------------------------------------------------------
+sp_add_VirtualFranchiseRequest
+  Saves the user request (status = Pending)
+  Return codes:
+    t = success
+    f = another request is already pending
+    u = UTR / transaction ID already used
+    n = invalid user / plan
+
+sp_approve_VirtualFranchiseRequest
+  Sets status = Approved
+  Generates 40-month ROI
+  Credits Level 1 income to the sponsor (after 10% admin + 2% TDS)
+  Updates TransactionDetail and wallet
+  Return: t = success, f = already processed
+
+sp_reject_VirtualFranchiseRequest
+  Sets status = Rejected
+  Saves the remark (rejection reason) — visible to the user
+  Return: t = success, f = already processed, r = remark required
+
+sp_processVirtualFranchiseROI
+  Marks due ROI rows as Paid and credits wallet / TransactionDetail
+  when the ROI date is today or earlier
+
+
+8) USER WORKFLOW
+--------------------------------------------------------------------------------
+Page: user/VirtualFranchisePlanPurchase.aspx
+Menu: Virtual Franchise > Purchase Plan
+
+Steps:
+  1. Logged-in user ID is filled automatically
+  2. Select a plan (Basic / Premium / Executive)
+  3. Plan amount, monthly ROI, and total cashback fill automatically
+  4. Choose payment method:
+       Cash   — request goes directly to admin
+       Online — company QR / bank details, UTR number, payment screenshot
+  5. Submit Request
+  6. Request is saved as Pending and queued for admin approval
+
+Rules:
+  - Only one Pending request at a time
+  - Online payment requires UTR and screenshot
+  - Duplicate UTR is not allowed
+  - Cash payment generates a CASH-xxxxx transaction ID
+
+User reports:
+  VirtualFranchisePlanReport.aspx
+    Menu: Virtual Franchise > My Plan Requests
+    Shows plan, amount, monthly ROI, total cashback, payment, UTR,
+    request date, approve date, status, and rejection remark
+
+  VirtualFranchiseROIReport.aspx
+    Menu: Virtual Franchise > ROI Report
+    40-month schedule: month no, ROI date, amount, Pending/Paid, paid date
+
+  VirtualFranchiseLevelIncomeReport.aspx
+    Menu: Virtual Franchise > Level Income Report
+          My Income > Virtual Franchise Level Income
+    Date, from user, plan, level, %, gross, admin 10%, TDS 2%,
+    net payable, transaction ID
+
+
+9) ADMIN WORKFLOW
+--------------------------------------------------------------------------------
+Page: admin/VirtualFranchisePlanRequestReport.aspx
+Menu: Virtual Franchise > Plan Request Approval
+
+Admin can see:
+  User ID, name, plan, amount, monthly ROI, total cashback,
+  payment type, request date, UTR / transaction ID, pay slip image, status
+
+Approve:
+  Status = Approved
+  40-month ROI is generated
+  Level 1 income is credited instantly (to sponsor, after charges)
+
+Reject:
+  Remark / reason is required
+  Status = Rejected
+  The same reason is shown on the user's My Plan Requests page
+
+Filters: date range, user id, status (Pending / Approved / Rejected / All), UTR
+
+
+10) PAGE / FILE LIST
+--------------------------------------------------------------------------------
+SQL script:
+  Maniraya/Database/sp_VirtualFranchisePlan.sql
+
+Helper (pages also ensure schema on first load):
+  Maniraya/App_Code/VirtualFranchiseHelper.cs
+
+User:
+  Maniraya/user/VirtualFranchisePlanPurchase.aspx
+  Maniraya/user/VirtualFranchisePlanPurchase.aspx.cs
+  Maniraya/user/VirtualFranchisePlanReport.aspx
+  Maniraya/user/VirtualFranchisePlanReport.aspx.cs
+  Maniraya/user/VirtualFranchiseROIReport.aspx
+  Maniraya/user/VirtualFranchiseROIReport.aspx.cs
+  Maniraya/user/VirtualFranchiseLevelIncomeReport.aspx
+  Maniraya/user/VirtualFranchiseLevelIncomeReport.aspx.cs
+
+Admin:
+  Maniraya/admin/VirtualFranchisePlanRequestReport.aspx
+  Maniraya/admin/VirtualFranchisePlanRequestReport.aspx.cs
+
+Menus:
+  Maniraya/user/MasterPage.master
+  Maniraya/admin/adminmaster.master
+  Maniraya/admin/AdminSettings.aspx.cs
+
+
+11) STATUS FLOW
+--------------------------------------------------------------------------------
+User Submit   -->  Pending
+Admin Approve -->  Approved  (+ 40-month ROI + Level 1 income)
+Admin Reject  -->  Rejected  (reason visible to the user)
+
+
+12) TRANSACTION TYPES
+--------------------------------------------------------------------------------
+Virtual Level Income     = Net Level 1 amount to sponsor (after 10% + 2%)
+Virtual Franchise ROI    = Monthly cashback to buyer when the due date arrives
+
+
+================================================================================
+End of record
+================================================================================

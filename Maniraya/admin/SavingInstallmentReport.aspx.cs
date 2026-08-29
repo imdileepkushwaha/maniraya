@@ -42,9 +42,32 @@ public partial class admin_UserReport : System.Web.UI.Page
 
     public DataTable getPrevProduct()
     {
-        string str_query = @"SELECT sa.*, ud.username, sd.couponcode, pm.productname
+        bool hasInstCoupon = SavingProductHelper.HasInstallmentCouponCodeColumn();
+        string couponSelect = hasInstCoupon
+            ? "COALESCE(NULLIF(LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))), ''), sd.couponcode) AS couponcodedisplay"
+            : "sd.couponcode AS couponcodedisplay";
+        string parentMatch = hasInstCoupon
+            ? @" AND (
+                    (
+                        NULLIF(LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))), '') IS NOT NULL
+                        AND LTRIM(RTRIM(ISNULL(sd0.couponcode, ''))) = LTRIM(RTRIM(sa.CouponCode))
+                    )
+                    OR (
+                        NULLIF(LTRIM(RTRIM(ISNULL(sa.CouponCode, ''))), '') IS NULL
+                        AND sa.OrderId = sd0.orderid
+                    )
+                )"
+            : " AND sa.OrderId = sd0.orderid";
+
+        string str_query = @"SELECT sa.*, ud.username, " + couponSelect + @", pm.productname
 FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
-LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sa.OrderId = sd.orderid AND LTRIM(RTRIM(sa.UserId)) = LTRIM(RTRIM(sd.UserId))
+OUTER APPLY (
+    SELECT TOP 1 sd0.couponcode, sd0.productid
+    FROM SavingAccountDetail sd0 WITH (NOLOCK)
+    WHERE LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
+    " + parentMatch + @"
+    ORDER BY sd0.id DESC
+) sd
 LEFT JOIN SavingProductMaster pm WITH (NOLOCK) ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
 WHERE LOWER(LTRIM(RTRIM(ISNULL(sa.status, '')))) IN ('processing', 'approved', 'rejected', '1', 'active', '2', 'cancelled', 'canceled') ";
