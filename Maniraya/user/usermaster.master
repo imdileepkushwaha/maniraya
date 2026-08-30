@@ -510,7 +510,8 @@
                         </a>
                         <ul class="treeview-menu">
                             <li><a href="account_Ledger.aspx"><i class="fa fa-angle-right"></i>Account Ledger</a></li>
-                               <li><a href="TransactionReport.aspx"><i class="fa fa-angle-right"></i>Transaction Report </a></li>   
+                               <li><a href="TransactionReport.aspx"><i class="fa fa-angle-right"></i>Transaction Report </a></li>
+                               <li><a href="FastTrackReport.aspx"><i class="fa fa-angle-right"></i>Thailand Trip Bonanza</a></li> 
                         </ul>
                     </li>
                 </ul>

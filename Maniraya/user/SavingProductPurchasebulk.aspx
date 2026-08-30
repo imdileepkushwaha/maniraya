@@ -1,6 +1,7 @@
 <%@ Page Title="Purchase Saving Product" Language="C#" MasterPageFile="masterpage.master" AutoEventWireup="true" CodeFile="SavingProductPurchasebulk.aspx.cs" Inherits="user_SavingProductPurchasebulk" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <style>
         .saving-purchase-page .saving-product-showcase {
@@ -436,6 +437,67 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .saving-cashfree-box {
+            margin: 8px 0 18px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+        }
+
+        .saving-cashfree-box h4 {
+            margin: 0 0 6px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1e3a8a;
+        }
+
+        .saving-cashfree-box p {
+            margin: 0 0 14px;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .saving-cashfree-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-cashfree {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #fff !important;
+        }
+
+        .btn-cashfree:hover {
+            background: #1d4ed8 !important;
+            border-color: #1d4ed8 !important;
+            color: #fff !important;
+        }
+
+        .saving-manual-divider {
+            margin: 8px 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .saving-manual-divider::before,
+        .saving-manual-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
     </style>
     <script type="text/javascript">
         var __bulkUtrUsed = false;
@@ -572,7 +634,7 @@
                     <div class="profile-hero-avatar" aria-hidden="true"><i class="fa fa-shopping-bag"></i></div>
                     <div class="profile-hero-info">
                         <h2>Purchase Saving Product</h2>
-                        <p class="profile-hero-meta">Complete your payment and submit the transaction details with payment proof for verification.</p>
+                        <p class="profile-hero-meta">Pay online with Cashfree, submit a UTR with screenshot, or choose cash for admin approval.</p>
                     </div>
                     <div class="profile-hero-actions">
                         <a href="Dashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-home"></i> Dashboard</a>
@@ -602,7 +664,7 @@
                                 <div class="saving-product-showcase-content">
                                     <p class="saving-product-showcase-eyebrow">Selected Product</p>
                                     <h3 class="saving-product-showcase-title"><asp:Literal ID="litProductName" runat="server" /></h3>
-                                    <p class="saving-product-showcase-desc">Complete payment for this saving product and submit your UTR with payment screenshot for admin verification.</p>
+                                    <p class="saving-product-showcase-desc">Pay online with Cashfree, submit UTR with screenshot, or choose cash for admin approval.</p>
                                     <div class="saving-product-price-grid">
                                         <div class="saving-product-price-item">
                                             <span>MRP</span>
@@ -775,7 +837,7 @@
                                     <span class="saving-shipping-type-icon"><i class="fa fa-qrcode"></i></span>
                                     <span class="saving-shipping-type-text">
                                         <strong>Online</strong>
-                                        <span>Pay via QR and upload payment proof</span>
+                                        <span>Pay with Cashfree, or submit UTR proof</span>
                                     </span>
                                 </label>
                             </div>
@@ -787,6 +849,18 @@
                         </asp:Panel>
 
                         <asp:Panel ID="pnlOnlinePaymentSection" runat="server">
+                            <div class="saving-cashfree-box">
+                                <h4><i class="fa fa-shield-alt"></i> Pay Online with Cashfree</h4>
+                                <p>UPI, card or net banking. After payment Cashfree will confirm the order automatically. Quantity total will be charged.</p>
+                                <div class="saving-cashfree-actions">
+                                    <asp:Button ID="btnPayCashfree" runat="server" CssClass="btn btn-primary btn-cashfree profile-btn-primary-action"
+                                        Text="Pay with Cashfree" CausesValidation="false" OnClick="btnPayCashfree_Click" />
+                                    <asp:Label ID="lblCashfreeHint" runat="server" CssClass="saving-shipping-empty-text" />
+                                </div>
+                            </div>
+
+                            <div class="saving-manual-divider">Or submit UTR payment proof</div>
+
                             <div class="row saving-online-payment-row">
                                 <div class="col-md-5">
                                     <p class="profile-subsection-title"><i class="fa fa-qrcode"></i> Scan &amp; Pay</p>
@@ -858,6 +932,7 @@
         </ContentTemplate>
         <Triggers>
             <asp:PostBackTrigger ControlID="btnSubmit" />
+            <asp:PostBackTrigger ControlID="btnPayCashfree" />
         </Triggers>
     </asp:UpdatePanel>
 </asp:Content>
@@ -1050,5 +1125,51 @@
                 document.addEventListener('DOMContentLoaded', initPaymentMethodToggle);
             }
         })();
+
+        window.startCashfreeCheckout = function (sessionId, mode) {
+            if (!sessionId) {
+                alert('Cashfree session is missing. Please try again.');
+                return;
+            }
+
+            function openCheckout() {
+                if (typeof Cashfree !== 'function') {
+                    alert('Cashfree checkout could not load. Please refresh and try again.');
+                    return;
+                }
+
+                try {
+                    var cashfree = Cashfree({ mode: mode || 'production' });
+                    var result = cashfree.checkout({
+                        paymentSessionId: sessionId,
+                        redirectTarget: '_self'
+                    });
+                    if (result && typeof result.then === 'function') {
+                        result.then(function (res) {
+                            if (res && res.error) {
+                                alert(res.error.message || 'Unable to open Cashfree checkout.');
+                            }
+                        }).catch(function () {
+                            alert('Unable to open Cashfree checkout. Please try again.');
+                        });
+                    }
+                } catch (ex) {
+                    alert((ex && ex.message) ? ex.message : 'Unable to open Cashfree checkout.');
+                }
+            }
+
+            if (window.Cashfree) {
+                openCheckout();
+                return;
+            }
+
+            var script = document.createElement('script');
+            script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+            script.onload = openCheckout;
+            script.onerror = function () {
+                alert('Unable to load Cashfree checkout. Please try again.');
+            };
+            document.head.appendChild(script);
+        };
     </script>
 </asp:Content>

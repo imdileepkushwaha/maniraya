@@ -80,6 +80,7 @@ public partial class admin_AdminSettings : Page
         {
             EnsureSettingsMenuExists();
             EnsureVirtualFranchiseMenuExists();
+            EnsurePrizeCampaignMenusExist();
             return;
         }
 
@@ -157,6 +158,50 @@ WHERE LOWER(LTRIM(RTRIM(URL))) IN ('subadmin.aspx','subadminreport.aspx','adminm
             ObjData.RunInsUpDelQuery(
                 "INSERT INTO Menu (MainMenuId, MenuName, URL, Status) VALUES (" +
                 mainId + ", 'Admin users & menu access', 'AdminSettings.aspx', 1)");
+        }
+        catch
+        {
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+    }
+
+    void EnsurePrizeCampaignMenusExist()
+    {
+        try
+        {
+            ObjData.StartConnection();
+            ObjData.RunInsUpDelQuery(@"
+UPDATE Menu
+SET MenuName = 'Director Rank', Status = 1
+WHERE LOWER(LTRIM(RTRIM(URL))) = 'bonanza.aspx'");
+
+            DataTable existing = ObjData.RunDataTable(
+                "SELECT TOP 1 id FROM Menu WHERE LOWER(LTRIM(RTRIM(URL))) = 'fasttrack.aspx'");
+            if (existing != null && existing.Rows.Count > 0)
+            {
+                ObjData.RunInsUpDelQuery(@"
+UPDATE Menu
+SET MenuName = 'Thailand Trip Bonanza', Status = 1
+WHERE LOWER(LTRIM(RTRIM(URL))) = 'fasttrack.aspx'");
+                return;
+            }
+
+            DataTable mainDt = ObjData.RunDataTable(
+                "SELECT TOP 1 id FROM MainMenu WHERE MainMenuName = 'Prize'");
+            int mainId;
+            if (mainDt == null || mainDt.Rows.Count == 0)
+            {
+                ObjData.RunInsUpDelQuery(
+                    "INSERT INTO MainMenu (MainMenuName, URL, Status) VALUES ('Prize', '', 1)");
+                mainDt = ObjData.RunDataTable("SELECT MAX(id) AS Id FROM MainMenu");
+            }
+            mainId = Convert.ToInt32(mainDt.Rows[0][0]);
+            ObjData.RunInsUpDelQuery(
+                "INSERT INTO Menu (MainMenuId, MenuName, URL, Status) VALUES (" +
+                mainId + ", 'Thailand Trip Bonanza', 'FastTrack.aspx', 1)");
         }
         catch
         {
@@ -316,7 +361,8 @@ WHERE LOWER(LTRIM(RTRIM(URL))) IN ('subadmin.aspx','subadminreport.aspx','adminm
         list.Add(MakeGroup("Prize",
             "Prize Master|PrizeMaster.aspx",
             "Assign Prize|AssignPrize.aspx",
-            "Bonanza|Bonanza.aspx"));
+            "Director Rank|Bonanza.aspx",
+            "Thailand Trip Bonanza|FastTrack.aspx"));
 
         return list;
     }

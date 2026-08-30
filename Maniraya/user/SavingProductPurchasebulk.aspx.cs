@@ -48,6 +48,11 @@ public partial class user_SavingProductPurchasebulk : System.Web.UI.Page
                 LoadCompanyAccounts();
                 ApplyShippingTypeVisibility();
                 ApplyPaymentMethodVisibility();
+                lblCashfreeHint.Text = !CashfreeHelper.IsConfigured
+                    ? "Add CashfreeAppId and CashfreeSecretKey in Web.config to enable Pay Now."
+                    : (CashfreeHelper.IsSandbox
+                        ? "Sandbox mode. Use Cashfree test payment methods."
+                        : "Secure online payment.");
             }
         }
         else
@@ -918,6 +923,85 @@ else if (res == "r")
             ShowAlert("Unable to submit purchase request. Please try again.");
         }
     }
+
+    protected void btnPayCashfree_Click(object sender, EventArgs e)
+    {
+        rbOnlinePayment.Checked = true;
+        rbCashPayment.Checked = false;
+        ApplyPaymentMethodVisibility();
+
+        if (txtuserid.Text == "")
+        {
+            Message.Show("Enter User Id...!!!");
+            return;
+        }
+
+        if (txtusername.Text == "")
+        {
+            Message.Show("Enter User Name...!!!");
+            return;
+        }
+
+        RecalculateTotalAmount();
+
+        decimal unitAmount;
+        if (!decimal.TryParse(txtamount.Text, out unitAmount) || unitAmount <= 0)
+        {
+            Message.Show("Invalid amount.");
+            return;
+        }
+
+        int quantity = 1;
+        int.TryParse(txtquantity.Text.Trim(), out quantity);
+        if (quantity <= 0)
+        {
+            quantity = 1;
+        }
+
+        decimal totalAmount = unitAmount * quantity;
+        if (totalAmount <= 0)
+        {
+            Message.Show("Invalid payable amount.");
+            return;
+        }
+
+        if (IsCourierDelivery() && !EnsureShippingAddressSaved())
+        {
+            return;
+        }
+
+        string userId = Session["userid"].ToString();
+        objUser.UserId = userId;
+        DataTable userDt = objUser.getUserDetail(objUser);
+        string mobile = userDt != null && userDt.Rows.Count > 0 ? Convert.ToString(userDt.Rows[0]["Mobile"]) : string.Empty;
+        string email = userDt != null && userDt.Rows.Count > 0 ? Convert.ToString(userDt.Rows[0]["Email"]) : string.Empty;
+
+        CashfreeHelper.CreateOrderResult result = CashfreeHelper.StartSavingPurchase(
+            userId,
+            txtusername.Text.Trim(),
+            mobile,
+            email,
+            totalAmount,
+            Request,
+            "First",
+            quantity,
+            GetShippingType());
+
+        if (!result.Ok)
+        {
+            Message.Show(string.IsNullOrWhiteSpace(result.ErrorMessage)
+                ? "Unable to start Cashfree payment."
+                : result.ErrorMessage);
+            return;
+        }
+
+        string sessionId = (result.PaymentSessionId ?? string.Empty).Replace("\\", "").Replace("'", "").Replace("\"", "");
+        string mode = string.IsNullOrWhiteSpace(result.Mode) ? "production" : result.Mode.Replace("'", "");
+        string script = "setTimeout(function(){ if (typeof window.startCashfreeCheckout === 'function') { window.startCashfreeCheckout('" +
+            sessionId + "', '" + mode + "'); } else { alert('Cashfree checkout script is missing. Please refresh.'); } }, 300);";
+        ClientScript.RegisterStartupScript(GetType(), "cfCheckout", script, true);
+    }
+
     protected void btnCancel_Click(object sender, EventArgs e)
     {
         Response.Redirect("Dashboard.aspx");

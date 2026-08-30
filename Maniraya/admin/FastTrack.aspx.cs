@@ -4,58 +4,19 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class admin_Bonanza : Page
+public partial class admin_FastTrack : Page
 {
     const string AdminExcludeUserId = "MP000001";
-    const int DefaultRequiredQualifyingLegs = 10;
-    const int MinActiveUnderLeg = 10;
-    const int DefaultRequiredTeamActive = 500;
 
     Data ObjData = new Data();
 
     DataTable ReportData
     {
-        get { return ViewState["BonanzaData"] as DataTable; }
-        set { ViewState["BonanzaData"] = value; }
-    }
-
-    int GetRequiredTeamActive()
-    {
-        int teamActive;
-        if (txtTeamActive != null && int.TryParse((txtTeamActive.Text ?? string.Empty).Trim(), out teamActive) && teamActive > 0)
-        {
-            return teamActive;
-        }
-        return DefaultRequiredTeamActive;
-    }
-
-    int GetRequiredQualifyingLegs()
-    {
-        int legs;
-        if (txtQualifyingLegs != null && int.TryParse((txtQualifyingLegs.Text ?? string.Empty).Trim(), out legs) && legs > 0)
-        {
-            return legs;
-        }
-        return DefaultRequiredQualifyingLegs;
-    }
-
-    /// <summary>
-    /// Optional upper bound. Returns 0 when blank/invalid (no max limit).
-    /// </summary>
-    int GetMaximumTeamActive()
-    {
-        int maxTeamActive;
-        if (txtMaxTeamActive != null
-            && int.TryParse((txtMaxTeamActive.Text ?? string.Empty).Trim(), out maxTeamActive)
-            && maxTeamActive > 0)
-        {
-            return maxTeamActive;
-        }
-        return 0;
+        get { return ViewState["FastTrackData"] as DataTable; }
+        set { ViewState["FastTrackData"] = value; }
     }
 
     protected void Page_Load(object sender, EventArgs e)
@@ -66,13 +27,14 @@ public partial class admin_Bonanza : Page
             return;
         }
 
+        SavingProductHelper.EnsureBulkColumns();
+
         if (!IsPostBack)
         {
-            lblSummary.Text = "Run search to check Director Rank qualification.";
+            LoadReport();
         }
         else if (ReportData != null)
         {
-            // Rebuild pager only — rebinding GridView here breaks RowCommand / View click.
             BuildExternalPager();
         }
     }
@@ -80,7 +42,7 @@ public partial class admin_Bonanza : Page
     protected void btnSearch_Click(object sender, EventArgs e)
     {
         GridView1.PageIndex = 0;
-        pnlLegs.Visible = false;
+        pnlSales.Visible = false;
         LoadReport();
     }
 
@@ -88,17 +50,13 @@ public partial class admin_Bonanza : Page
     {
         txtUserId.Text = string.Empty;
         ddlStatus.SelectedIndex = 0;
-        txtMinDirects.Text = "10";
-        txtQualifyingLegs.Text = DefaultRequiredQualifyingLegs.ToString();
-        txtTeamActive.Text = DefaultRequiredTeamActive.ToString();
-        txtMaxTeamActive.Text = string.Empty;
         GridView1.PageIndex = 0;
-        pnlLegs.Visible = false;
+        pnlSales.Visible = false;
         ReportData = null;
         GridView1.DataSource = null;
         GridView1.DataBind();
         BuildExternalPager();
-        lblSummary.Text = "Run search to check Director Rank qualification.";
+            lblSummary.Text = "Run search to check Thailand Trip Bonanza qualification.";
         ShowLoadError(null);
     }
 
@@ -132,30 +90,18 @@ public partial class admin_Bonanza : Page
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        if (!string.Equals(e.CommandName, "viewlegs", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(e.CommandName, "viewsales", StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
-        string userId = Convert.ToString(e.CommandArgument);
-        LoadLegs(userId);
-    }
-
-    protected void lnkLegs_Click(object sender, EventArgs e)
-    {
-        LinkButton link = sender as LinkButton;
-        if (link == null)
-        {
-            return;
-        }
-
-        LoadLegs(Convert.ToString(link.CommandArgument));
+        LoadSales(Convert.ToString(e.CommandArgument));
     }
 
     void LoadReport()
     {
         string loadError;
-        ReportData = GetBonanzaReport(out loadError);
+        ReportData = GetFastTrackReport(out loadError);
         ShowLoadError(loadError);
         BindGrid();
     }
@@ -213,17 +159,28 @@ public partial class admin_Bonanza : Page
         }
 
         lblSummary.Text = total + " user(s) · " + qualified + " Qualified · Need "
-            + GetRequiredQualifyingLegs() + " legs (≥" + MinActiveUnderLeg + " under each) · Team Active ≥ "
-            + GetRequiredTeamActive()
-            + (GetMaximumTeamActive() > 0 ? " and ≤ " + GetMaximumTeamActive() : "")
-            + " · Exclude " + AdminExcludeUserId;
+            + FastTrackHelper.RequiredSelfDirects + " self directs AND "
+            + FastTrackHelper.RequiredCompleteLegs + " of those with "
+            + FastTrackHelper.RequiredDirectsPerLeg + " directs each · "
+            + FastTrackHelper.OfferStartDate.ToString("dd MMM yyyy") + " to "
+            + FastTrackHelper.OfferEndDate.ToString("dd MMM yyyy");
         BuildExternalPager();
     }
 
-    void LoadLegs(string userId)
+    void LoadSales(string userId)
     {
-        string loadError;
-        DataTable legs = GetLegBreakup(userId, out loadError);
+        string loadError = string.Empty;
+        DataTable directs;
+        try
+        {
+            directs = FastTrackHelper.GetDirectBreakup(userId);
+        }
+        catch (Exception ex)
+        {
+            loadError = "Unable to load directs. " + (ex != null ? ex.Message : string.Empty);
+            directs = new DataTable();
+        }
+
         if (!string.IsNullOrWhiteSpace(loadError))
         {
             ShowLoadError(loadError);
@@ -233,19 +190,18 @@ public partial class admin_Bonanza : Page
             ShowLoadError(null);
         }
 
-        litLegsUser.Text = Server.HtmlEncode((userId ?? string.Empty).Trim());
-        gvLegs.DataSource = legs;
-        gvLegs.DataBind();
-        pnlLegs.Visible = true;
+        litSalesUser.Text = Server.HtmlEncode((userId ?? string.Empty).Trim());
+        gvLevel1.DataSource = directs;
+        gvLevel1.DataBind();
+        pnlSales.Visible = true;
 
-        // Keep main grid visible after click
         if (ReportData != null)
         {
             BindGrid();
         }
 
-        ScriptManager.RegisterStartupScript(this, GetType(), "bonanzaScrollLegs",
-            "setTimeout(function(){var el=document.getElementById('" + pnlLegs.ClientID + "'); if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}},50);",
+        ScriptManager.RegisterStartupScript(this, GetType(), "fastTrackScrollSales",
+            "setTimeout(function(){var el=document.getElementById('" + pnlSales.ClientID + "'); if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}},50);",
             true);
     }
 
@@ -364,54 +320,32 @@ public partial class admin_Bonanza : Page
         pnlPager.Controls.Add(link);
     }
 
-    DataTable GetBonanzaReport(out string loadError)
+    DataTable GetFastTrackReport(out string loadError)
     {
         loadError = string.Empty;
-
-        int minDirects = 10;
-        int parsedMin;
-        if (int.TryParse((txtMinDirects.Text ?? string.Empty).Trim(), out parsedMin) && parsedMin >= 0)
-        {
-            minDirects = parsedMin;
-        }
-
-        int requiredTeamActive = GetRequiredTeamActive();
-        int maximumTeamActive = GetMaximumTeamActive();
-        int requiredQualifyingLegs = GetRequiredQualifyingLegs();
-        if (maximumTeamActive > 0 && maximumTeamActive < requiredTeamActive)
-        {
-            maximumTeamActive = requiredTeamActive;
-        }
-
+        DataTable result = CreateReportTable();
         string search = (txtUserId.Text ?? string.Empty).Trim();
         string statusFilter = (ddlStatus.SelectedValue ?? string.Empty).Trim();
 
-        BonanzaNetwork network;
+        DataTable sales;
         try
         {
-            network = LoadNetwork();
+            sales = FastTrackHelper.LoadQualifyingSales();
         }
         catch (Exception ex)
         {
-            loadError = "Unable to load Director Rank data. " + (ex != null ? ex.Message : string.Empty);
-            return new DataTable();
+            loadError = "Unable to load Thailand Trip Bonanza data. " + (ex != null ? ex.Message : string.Empty);
+            return result;
         }
 
-        DataTable result = CreateReportTable();
-        Dictionary<string, int> teamActiveCache = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, HashSet<string>> directMap = FastTrackHelper.BuildDirectMap(sales);
+        Dictionary<string, UserInfo> users = string.IsNullOrWhiteSpace(search)
+            ? LoadActiveUsers()
+            : LoadUsersBySearch(search);
 
-        foreach (KeyValuePair<string, BonanzaUser> pair in network.Users)
+        foreach (KeyValuePair<string, UserInfo> pair in users)
         {
-            BonanzaUser user = pair.Value;
-            if (!user.IsActive)
-            {
-                continue;
-            }
-
-            if (string.Equals(user.UserId, AdminExcludeUserId, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
+            UserInfo user = pair.Value;
 
             if (!string.IsNullOrWhiteSpace(search)
                 && user.UserId.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0
@@ -420,27 +354,8 @@ public partial class admin_Bonanza : Page
                 continue;
             }
 
-            List<string> activeDirects = GetActiveDirects(network, user.UserId);
-            int activeDirectCount = activeDirects.Count;
-            if (activeDirectCount < minDirects)
-            {
-                continue;
-            }
-
-            int qualifyingLegs = 0;
-            foreach (string legId in activeDirects)
-            {
-                int underActive = GetTeamActiveCount(network, legId, teamActiveCache);
-                if (underActive >= MinActiveUnderLeg)
-                {
-                    qualifyingLegs++;
-                }
-            }
-
-            int teamActive = GetTeamActiveCount(network, user.UserId, teamActiveCache);
-            bool isQualified = qualifyingLegs >= requiredQualifyingLegs
-                && teamActive >= requiredTeamActive
-                && (maximumTeamActive <= 0 || teamActive <= maximumTeamActive);
+            FastTrackHelper.Progress progress = FastTrackHelper.GetProgress(user.UserId, directMap);
+            bool isQualified = progress.IsAchieved;
 
             if (string.Equals(statusFilter, "Qualified", StringComparison.OrdinalIgnoreCase) && !isQualified)
             {
@@ -456,89 +371,64 @@ public partial class admin_Bonanza : Page
             row["userid"] = user.UserId;
             row["username"] = user.UserName;
             row["mobile"] = user.Mobile;
-            row["activedirects"] = activeDirectCount;
-            row["qualifyinglegs"] = qualifyingLegs;
-            row["teamactive"] = teamActive;
+            row["selfdirects"] = progress.SelfDirects;
+            row["completelegs"] = progress.CompleteLegs;
+            row["selfpending"] = progress.SelfDirectsPending;
+            row["legspending"] = progress.CompleteLegsPending;
             row["isqualified"] = isQualified;
             row["statuslabel"] = isQualified ? "Qualified" : "Not Qualified";
             result.Rows.Add(row);
         }
 
         DataView view = result.DefaultView;
-        view.Sort = "isqualified DESC, qualifyinglegs DESC, teamactive DESC, userid ASC";
+        view.Sort = "isqualified ASC, selfdirects DESC, completelegs DESC, userid ASC";
         return view.ToTable();
     }
 
-    DataTable GetLegBreakup(string userId, out string loadError)
-    {
-        loadError = string.Empty;
-        userId = (userId ?? string.Empty).Trim();
-        DataTable legs = CreateLegTable();
-
-        if (string.IsNullOrWhiteSpace(userId)
-            || string.Equals(userId, AdminExcludeUserId, StringComparison.OrdinalIgnoreCase))
-        {
-            return legs;
-        }
-
-        BonanzaNetwork network;
-        try
-        {
-            network = LoadNetwork();
-        }
-        catch (Exception ex)
-        {
-            loadError = "Unable to load leg breakup. " + (ex != null ? ex.Message : string.Empty);
-            return legs;
-        }
-
-        Dictionary<string, int> teamActiveCache = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        foreach (string legId in GetActiveDirects(network, userId))
-        {
-            BonanzaUser leg;
-            if (!network.Users.TryGetValue(legId, out leg))
-            {
-                continue;
-            }
-
-            int underActive = GetTeamActiveCount(network, legId, teamActiveCache);
-            DataRow row = legs.NewRow();
-            row["leguserid"] = leg.UserId;
-            row["legusername"] = leg.UserName;
-            row["underactive"] = underActive;
-            row["iscounted"] = underActive >= MinActiveUnderLeg;
-            legs.Rows.Add(row);
-        }
-
-        DataView view = legs.DefaultView;
-        view.Sort = "underactive DESC, leguserid ASC";
-        return view.ToTable();
-    }
-
-    BonanzaNetwork LoadNetwork()
+    Dictionary<string, UserInfo> LoadActiveUsers()
     {
         string sql = @"
-SELECT
-    LTRIM(RTRIM(UserId)) AS UserId,
-    LTRIM(RTRIM(ISNULL(SponserId, ''))) AS SponserId,
-    ISNULL(SavingStatus, 0) AS SavingStatus,
-    ISNULL(UserName, '') AS UserName,
-    ISNULL(Mobile, '') AS Mobile
+SELECT LTRIM(RTRIM(UserId)) AS UserId, ISNULL(UserName, '') AS UserName, ISNULL(Mobile, '') AS Mobile
 FROM UserDetail WITH (NOLOCK)
-WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
+WHERE ISNULL(SavingStatus, 0) = 1
+  AND LTRIM(RTRIM(UserId)) <> '" + SqlEscape(AdminExcludeUserId) + @"'
+  AND NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
+        return MapUsers(RunUserQuery(sql));
+    }
 
-        DataTable dt;
+    Dictionary<string, UserInfo> LoadUsersBySearch(string search)
+    {
+        string safe = SqlEscape(search);
+        string sql = @"
+SELECT LTRIM(RTRIM(UserId)) AS UserId, ISNULL(UserName, '') AS UserName, ISNULL(Mobile, '') AS Mobile
+FROM UserDetail WITH (NOLOCK)
+WHERE ISNULL(SavingStatus, 0) = 1
+  AND LTRIM(RTRIM(UserId)) <> '" + SqlEscape(AdminExcludeUserId) + @"'
+  AND (UserId LIKE '%" + safe + @"%' OR UserName LIKE '%" + safe + @"%')";
+        return MapUsers(RunUserQuery(sql));
+    }
+
+    DataTable RunUserQuery(string sql)
+    {
         ObjData.StartConnection();
         try
         {
-            dt = ObjData.RunDataTable(sql) ?? new DataTable();
+            return ObjData.RunDataTable(sql) ?? new DataTable();
         }
         finally
         {
             ObjData.EndConnection();
         }
+    }
 
-        var network = new BonanzaNetwork();
+    static Dictionary<string, UserInfo> MapUsers(DataTable dt)
+    {
+        var map = new Dictionary<string, UserInfo>(StringComparer.OrdinalIgnoreCase);
+        if (dt == null)
+        {
+            return map;
+        }
+
         foreach (DataRow row in dt.Rows)
         {
             string userId = Convert.ToString(row["UserId"]).Trim();
@@ -547,118 +437,62 @@ WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
                 continue;
             }
 
-            if (string.Equals(userId, AdminExcludeUserId, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var user = new BonanzaUser
+            map[userId] = new UserInfo
             {
                 UserId = userId,
-                SponserId = Convert.ToString(row["SponserId"]).Trim(),
-                IsActive = Convert.ToInt32(row["SavingStatus"]) == 1,
                 UserName = Convert.ToString(row["UserName"]).Trim(),
                 Mobile = Convert.ToString(row["Mobile"]).Trim()
             };
-
-            network.Users[userId] = user;
         }
 
-        foreach (BonanzaUser user in network.Users.Values)
-        {
-            if (string.IsNullOrWhiteSpace(user.SponserId)
-                || string.Equals(user.SponserId, AdminExcludeUserId, StringComparison.OrdinalIgnoreCase)
-                || string.Equals(user.SponserId, user.UserId, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (!network.Users.ContainsKey(user.SponserId))
-            {
-                continue;
-            }
-
-            List<string> children;
-            if (!network.Children.TryGetValue(user.SponserId, out children))
-            {
-                children = new List<string>();
-                network.Children[user.SponserId] = children;
-            }
-
-            children.Add(user.UserId);
-        }
-
-        return network;
+        return map;
     }
 
-    static List<string> GetActiveDirects(BonanzaNetwork network, string userId)
+    static bool IsCountableSponsor(string userId)
     {
-        List<string> result = new List<string>();
-        List<string> children;
-        if (!network.Children.TryGetValue(userId, out children))
-        {
-            return result;
-        }
-
-        foreach (string childId in children)
-        {
-            BonanzaUser child;
-            if (network.Users.TryGetValue(childId, out child) && child.IsActive)
-            {
-                result.Add(childId);
-            }
-        }
-
-        return result;
+        return !string.IsNullOrWhiteSpace(userId)
+            && !string.Equals(userId, AdminExcludeUserId, StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(userId, "0", StringComparison.OrdinalIgnoreCase);
     }
 
-    static int GetTeamActiveCount(BonanzaNetwork network, string rootUserId, Dictionary<string, int> cache)
+    static void AddCount(Dictionary<string, int> map, string key)
     {
-        int cached;
-        if (cache.TryGetValue(rootUserId, out cached))
+        int current;
+        map.TryGetValue(key, out current);
+        map[key] = current + 1;
+    }
+
+    static int GetCount(Dictionary<string, int> map, string key)
+    {
+        int current;
+        return map.TryGetValue(key, out current) ? current : 0;
+    }
+
+    static decimal GetDecimalValue(object value)
+    {
+        decimal parsed;
+        if (value == null || value == DBNull.Value)
         {
-            return cached;
+            return 0m;
         }
 
-        int count = 0;
-        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<string>();
-        queue.Enqueue(rootUserId);
-        visited.Add(rootUserId);
+        return decimal.TryParse(Convert.ToString(value), out parsed) ? parsed : 0m;
+    }
 
-        while (queue.Count > 0)
+    static DateTime GetDateValue(object value)
+    {
+        DateTime parsed;
+        if (value == null || value == DBNull.Value)
         {
-            string current = queue.Dequeue();
-            List<string> children;
-            if (!network.Children.TryGetValue(current, out children))
-            {
-                continue;
-            }
-
-            foreach (string childId in children)
-            {
-                if (!visited.Add(childId))
-                {
-                    continue;
-                }
-
-                BonanzaUser child;
-                if (!network.Users.TryGetValue(childId, out child))
-                {
-                    continue;
-                }
-
-                if (child.IsActive)
-                {
-                    count++;
-                }
-
-                queue.Enqueue(childId);
-            }
+            return DateTime.MinValue;
         }
 
-        cache[rootUserId] = count;
-        return count;
+        return DateTime.TryParse(Convert.ToString(value), out parsed) ? parsed : DateTime.MinValue;
+    }
+
+    static string SqlEscape(string value)
+    {
+        return (value ?? string.Empty).Replace("'", "''");
     }
 
     static DataTable CreateReportTable()
@@ -667,21 +501,27 @@ WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
         dt.Columns.Add("userid", typeof(string));
         dt.Columns.Add("username", typeof(string));
         dt.Columns.Add("mobile", typeof(string));
-        dt.Columns.Add("activedirects", typeof(int));
-        dt.Columns.Add("qualifyinglegs", typeof(int));
-        dt.Columns.Add("teamactive", typeof(int));
+        dt.Columns.Add("selfdirects", typeof(int));
+        dt.Columns.Add("completelegs", typeof(int));
+        dt.Columns.Add("selfpending", typeof(int));
+        dt.Columns.Add("legspending", typeof(int));
         dt.Columns.Add("isqualified", typeof(bool));
         dt.Columns.Add("statuslabel", typeof(string));
         return dt;
     }
 
-    static DataTable CreateLegTable()
+    static DataTable CreateSaleTable(bool includeDirect)
     {
         DataTable dt = new DataTable();
-        dt.Columns.Add("leguserid", typeof(string));
-        dt.Columns.Add("legusername", typeof(string));
-        dt.Columns.Add("underactive", typeof(int));
-        dt.Columns.Add("iscounted", typeof(bool));
+        dt.Columns.Add("buyerid", typeof(string));
+        dt.Columns.Add("buyername", typeof(string));
+        dt.Columns.Add("orderid", typeof(string));
+        dt.Columns.Add("amount", typeof(decimal));
+        dt.Columns.Add("saledate", typeof(DateTime));
+        if (includeDirect)
+        {
+            dt.Columns.Add("directid", typeof(string));
+        }
         return dt;
     }
 
@@ -717,7 +557,7 @@ WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
 
         Response.Clear();
         Response.Buffer = true;
-        Response.AddHeader("content-disposition", "attachment;filename=DirectorRankReport_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls");
+        Response.AddHeader("content-disposition", "attachment;filename=FastTrackReport_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls");
         Response.Charset = "";
         Response.ContentType = "application/vnd.ms-excel";
         using (StringWriter sw = new StringWriter())
@@ -744,18 +584,10 @@ WHERE NULLIF(LTRIM(RTRIM(UserId)), '') IS NOT NULL";
         }
     }
 
-    sealed class BonanzaNetwork
-    {
-        public Dictionary<string, BonanzaUser> Users = new Dictionary<string, BonanzaUser>(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<string, List<string>> Children = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-    }
-
-    sealed class BonanzaUser
+    sealed class UserInfo
     {
         public string UserId;
-        public string SponserId;
         public string UserName;
         public string Mobile;
-        public bool IsActive;
     }
 }

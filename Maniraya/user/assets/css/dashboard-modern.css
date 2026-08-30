@@ -1309,7 +1309,7 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
     align-items: center;
-    padding: 11px 20px;
+    padding: 7px 20px;
 }
 
 .dash-incentive-export-income-head {
@@ -1885,7 +1885,7 @@ a.dash-incentive-tab {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
     align-items: center;
-    padding: 7px 14px;
+    padding: 5px 14px;
 }
 
 .dash-incentive-income-head {

@@ -175,7 +175,7 @@
                              <li class="admin-side-group">
                                 <button type="button" class="admin-side-toggle"><i class="fa fa-cube admin-side-icon"></i> Saving Product <i class="fa fa-chevron-down admin-side-chevron"></i></button>
                                 <ul class="admin-side-submenu">
-                                    <li><a href="SavingProductAdd.aspx">Add Saving Product</a></li>
+                                    <!--<li><a href="SavingProductAdd.aspx">Add Saving Product</a></li>-->
                                     <li><a href="SavingProductMonthlyAdd.aspx">Add Monthly Saving Product</a></li>
                                       <li><a href="SavingProductPurchaseReport.aspx">Saving Purchase Report</a></li>
                                     
@@ -211,7 +211,8 @@
                                 <ul class="admin-side-submenu">
                                     <li><a href="PrizeMaster.aspx">Prize Master</a></li>
                                     <li><a href="AssignPrize.aspx">Assign Prize</a></li>
-                                    <li><a href="Bonanza.aspx">Bonanza</a></li>
+                                    <li><a href="Bonanza.aspx">Director Rank</a></li>
+                                    <li><a href="FastTrack.aspx">Thailand Trip Bonanza</a></li>
                                 </ul>
                             </li>
 

@@ -1,24 +1,34 @@
-<%@ Page Title="Director Rank" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="Bonanza.aspx.cs" Inherits="admin_Bonanza" %>
+<%@ Page Title="Thailand Trip Bonanza" Language="C#" MasterPageFile="adminmaster.master" AutoEventWireup="true" CodeFile="FastTrack.aspx.cs" Inherits="admin_FastTrack" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link rel="stylesheet" href="assets/css/admin-layout.css?v=74" />
     <style>
-        .bonanza-rules {
+        .fasttrack-banner {
+            display: block;
+            width: 100%;
+            max-height: 360px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #fde68a;
+        }
+
+        .fasttrack-rules {
             margin: 0 0 16px;
             padding: 14px 16px;
             border-radius: 12px;
-            background: linear-gradient(135deg, rgba(229, 169, 6, 0.12) 0%, rgba(229, 169, 6, 0.04) 100%);
-            border: 1px solid rgba(229, 169, 6, 0.28);
+            background: linear-gradient(135deg, rgba(229, 169, 6, 0.14) 0%, rgba(14, 116, 144, 0.06) 100%);
+            border: 1px solid rgba(229, 169, 6, 0.32);
             color: #78350f;
             font-size: 13px;
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
-        .bonanza-rules strong {
+        .fasttrack-rules strong {
             color: #92400e;
         }
 
-        .bonanza-badge {
+        .fasttrack-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -30,13 +40,13 @@
             white-space: nowrap;
         }
 
-        .bonanza-badge.is-yes {
+        .fasttrack-badge.is-yes {
             background: #ecfdf5;
             color: #047857;
             border: 1px solid #a7f3d0;
         }
 
-        .bonanza-badge.is-no {
+        .fasttrack-badge.is-no {
             background: #fef2f2;
             color: #b91c1c;
             border: 1px solid #fecaca;
@@ -99,11 +109,11 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <section class="content-header">
-        <h1>Director Rank</h1>
+        <h1>Thailand Trip Bonanza</h1>
         <ol class="breadcrumb">
             <li><a href="Dashboard.aspx"><i class="fa fa-dashboard"></i> Home</a></li>
             <li><a href="#">Prize</a></li>
-            <li class="active">Director Rank</li>
+            <li class="active">Thailand Trip Bonanza</li>
         </ol>
     </section>
 </asp:Content>
@@ -117,17 +127,16 @@
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-sitemap"></i> Director Rank Check</h3>
+                                <h3 class="box-title"><i class="fa fa-plane"></i> Thailand Trip Bonanza</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <div class="bonanza-rules">
-                                    <strong>Rules:</strong>
-                                    Active user ke niche selected <strong>Qualifying Legs</strong> chahiye.
-                                    Har leg ke niche minimum <strong>10 active</strong> hone chahiye — kam hone par woh leg count nahi hogi.
-                                    Overall team active <strong>Team Active Required</strong> se kam nahi hona chahiye.
-                                    Optional <strong>Team Active Required (Max)</strong> set ho to usse zyada team active qualify nahi hoga.
-                                    <strong>MP000001</strong> (admin) poori calculation se exclude hai.
-                                    Active = <strong>SavingStatus = 1</strong>.
+                                <!-- <img src="assets/images/fast-track-thailand.png" alt="Fast Track Thailand Trip" class="fasttrack-banner" /> -->
+                                <div class="fasttrack-rules">
+                                    <strong>Applicable to Savings Plans only.</strong>
+                                    Qualify in the offer window <strong>25 Aug 2026 – 30 Oct 2026</strong> when <strong>both</strong> are met:<br />
+                                    1) Self ke <strong>10 directs</strong> (₹18,000 / Bulk18 approved)<br />
+                                    2) Un <strong>10 directs mein se har ek ke neeche alag 10 directs</strong> hone chahiye<br />
+                                    Counted direct = approved ₹18,000 / Bulk18 saving purchase in the window. Admin user <strong>MP000001</strong> is excluded.
                                 </div>
                                 <div class="admin-form-section admin-form-section-last">
                                     <h5 class="admin-form-section-title"><i class="fa fa-search"></i> Filters</h5>
@@ -151,42 +160,6 @@
                                                 </asp:DropDownList>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtMinDirects.ClientID %>">Min Active Directs (pre-filter)</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-users"></i></span>
-                                                    <asp:TextBox ID="txtMinDirects" runat="server" CssClass="form-control" Text="10" placeholder="e.g. 10" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtQualifyingLegs.ClientID %>">Qualifying Legs Required</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-check-circle"></i></span>
-                                                    <asp:TextBox ID="txtQualifyingLegs" runat="server" CssClass="form-control" Text="10" placeholder="e.g. 10" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtTeamActive.ClientID %>">Team Active Required (Min)</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-sitemap"></i></span>
-                                                    <asp:TextBox ID="txtTeamActive" runat="server" CssClass="form-control" Text="500" placeholder="e.g. 500 / 1000" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="<%= txtMaxTeamActive.ClientID %>">Team Active Required (Max)</label>
-                                                <div class="admin-input-group">
-                                                    <span class="admin-input-icon"><i class="fa fa-filter"></i></span>
-                                                    <asp:TextBox ID="txtMaxTeamActive" runat="server" CssClass="form-control" Text="" placeholder="Optional e.g. 2000" />
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +173,7 @@
                     <div class="col-md-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-trophy"></i> Director Rank Status</h3>
+                                <h3 class="box-title"><i class="fa fa-trophy"></i> Thailand Trip Bonanza Status</h3>
                                 <div class="box-tools admin-record-filter-tools">
                                     <asp:ImageButton ID="imgExcel" runat="server" CssClass="admin-export-excel-btn"
                                         ImageUrl="../user/img/excel123.png" Height="25px" Width="25px"
@@ -226,7 +199,7 @@
                                 <div class="admin-table-toolbar">
                                     <span class="admin-table-caption">
                                         <i class="fa fa-list"></i>
-                                        <asp:Label ID="lblSummary" runat="server" Text="Run search to check Director Rank qualification." />
+                                        <asp:Label ID="lblSummary" runat="server" Text="Run search to check Thailand Trip Bonanza qualification." />
                                     </span>
                                 </div>
 
@@ -247,23 +220,24 @@
                                                 <asp:BoundField DataField="userid" HeaderText="User ID" />
                                                 <asp:BoundField DataField="username" HeaderText="Name" />
                                                 <asp:BoundField DataField="mobile" HeaderText="Mobile" />
-                                                <asp:BoundField DataField="activedirects" HeaderText="Active Directs" />
-                                                <asp:BoundField DataField="qualifyinglegs" HeaderText="Qualifying Legs" />
-                                                <asp:BoundField DataField="teamactive" HeaderText="Team Active" />
+                                                <asp:BoundField DataField="selfdirects" HeaderText="Self Directs (10)" />
+                                                <asp:BoundField DataField="completelegs" HeaderText="Legs with 10 (10)" />
+                                                <asp:BoundField DataField="selfpending" HeaderText="Need Directs" />
+                                                <asp:BoundField DataField="legspending" HeaderText="Need Legs" />
                                                 <asp:TemplateField HeaderText="Status">
                                                     <ItemTemplate>
-                                                        <span class='bonanza-badge <%# Convert.ToBoolean(Eval("isqualified")) ? "is-yes" : "is-no" %>'>
+                                                        <span class='fasttrack-badge <%# Convert.ToBoolean(Eval("isqualified")) ? "is-yes" : "is-no" %>'>
                                                             <i class='fa <%# Convert.ToBoolean(Eval("isqualified")) ? "fa-check" : "fa-times" %>'></i>
                                                             <%# Eval("statuslabel") %>
                                                         </span>
                                                     </ItemTemplate>
                                                 </asp:TemplateField>
-                                                <asp:TemplateField HeaderText="Legs">
+                                                <asp:TemplateField HeaderText="Sales">
                                                     <ItemTemplate>
-                                                        <asp:LinkButton ID="lnkLegs" runat="server" CssClass="admin-action-btn is-view"
-                                                            CommandName="viewlegs" CommandArgument='<%# Eval("userid") %>'
-                                                            OnClick="lnkLegs_Click" CausesValidation="false">
-                                                            <i class="fa fa-sitemap"></i> View
+                                                        <asp:LinkButton ID="lnkSales" runat="server" CssClass="admin-action-btn is-view"
+                                                            CommandName="viewsales" CommandArgument='<%# Eval("userid") %>'
+                                                            CausesValidation="false">
+                                                            <i class="fa fa-list"></i> View
                                                         </asp:LinkButton>
                                                     </ItemTemplate>
                                                 </asp:TemplateField>
@@ -273,34 +247,37 @@
                                     <asp:Panel ID="pnlPager" runat="server" CssClass="admin-table-pager-bar"></asp:Panel>
                                 </div>
 
-                                <asp:Panel ID="pnlLegs" runat="server" Visible="false" style="margin-top:20px;">
+                                <asp:Panel ID="pnlSales" runat="server" Visible="false" style="margin-top:20px;">
                                     <div class="admin-table-toolbar">
                                         <span class="admin-table-caption">
-                                            <i class="fa fa-sitemap"></i>
-                                            Direct legs for
-                                            <asp:Literal ID="litLegsUser" runat="server" />
-                                            (legs with under-active &lt; 10 are not counted)
+                                            <i class="fa fa-users"></i>
+                                            Qualifying sales for
+                                            <asp:Literal ID="litSalesUser" runat="server" />
+                                            (offer window 25 Aug 2026 – 30 Oct 2026)
                                         </span>
                                     </div>
+                                    <h4 style="font-size:14px;font-weight:700;margin:12px 0 8px;">Self Directs (each needs 10 directs to count as a complete leg)</h4>
                                     <div class="admin-table-wrap table-responsive">
-                                        <asp:GridView ID="gvLegs" runat="server"
+                                        <asp:GridView ID="gvLevel1" runat="server"
                                             CssClass="table table-bordered table-hover dataTable"
                                             Width="100%" AutoGenerateColumns="False" GridLines="None"
-                                            EmptyDataText="No active direct legs found.">
+                                            EmptyDataText="No qualifying directs found.">
                                             <Columns>
                                                 <asp:TemplateField HeaderText="S.No">
                                                     <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
                                                 </asp:TemplateField>
-                                                <asp:BoundField DataField="leguserid" HeaderText="Leg User ID" />
-                                                <asp:BoundField DataField="legusername" HeaderText="Name" />
-                                                <asp:BoundField DataField="underactive" HeaderText="Active Under Leg" />
-                                                <asp:TemplateField HeaderText="Counted">
+                                                <asp:BoundField DataField="buyerid" HeaderText="Direct User ID" />
+                                                <asp:BoundField DataField="buyername" HeaderText="Name" />
+                                                <asp:BoundField DataField="underdirects" HeaderText="Their Directs" />
+                                                <asp:BoundField DataField="underpending" HeaderText="Need for 10" />
+                                                <asp:TemplateField HeaderText="Counted (10/10)">
                                                     <ItemTemplate>
-                                                        <span class='bonanza-badge <%# Convert.ToBoolean(Eval("iscounted")) ? "is-yes" : "is-no" %>'>
+                                                        <span class='fasttrack-badge <%# Convert.ToBoolean(Eval("iscounted")) ? "is-yes" : "is-no" %>'>
                                                             <%# Convert.ToBoolean(Eval("iscounted")) ? "Yes" : "No" %>
                                                         </span>
                                                     </ItemTemplate>
                                                 </asp:TemplateField>
+                                                <asp:BoundField DataField="saledate" HeaderText="Sale Date" DataFormatString="{0:dd/MM/yyyy}" />
                                             </Columns>
                                         </asp:GridView>
                                     </div>

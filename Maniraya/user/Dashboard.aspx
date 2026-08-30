@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=50" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=51" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -446,6 +446,34 @@
                                         <div class="dash-incentive-income-row">
                                             <span>Self Business Bonus</span>
                                             <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblCashBackIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Renewal Direct Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblRenewalDirectIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Renewals Level Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblRenewalsLevelIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Director Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblDirectorIncomeCard" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Fast Track Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblFastTrackIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Super Fast Track Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblSuperFastTrackIncome" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Repurchase Income</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblRepurchaseIncomeCard" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-incentive-income-row">
+                                            <span>Virtual Franchise Bonus</span>
+                                            <strong><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblVirtualFranchiseBonus" runat="server" Text="0.00" /></strong>
                                         </div>
                                         <div class="dash-incentive-income-row is-wallet">
                                             <span>Product Wallet Balance</span>
@@ -3399,6 +3427,13 @@ Profit Share Budget</p>
             setExportAmount('exportPremiumDirect', getIncentiveLabelText('<%= lblSavingInstallmentIncome.ClientID %>'));
             setExportAmount('exportTeamBonus', getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'));
             setExportAmount('exportSelfBonus', getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'));
+            setExportAmount('exportRenewalDirect', getIncentiveLabelText('<%= lblRenewalDirectIncome.ClientID %>'));
+            setExportAmount('exportRenewalsLevel', getIncentiveLabelText('<%= lblRenewalsLevelIncome.ClientID %>'));
+            setExportAmount('exportDirectorIncome', getIncentiveLabelText('<%= lblDirectorIncomeCard.ClientID %>'));
+            setExportAmount('exportFastTrack', getIncentiveLabelText('<%= lblFastTrackIncome.ClientID %>'));
+            setExportAmount('exportSuperFastTrack', getIncentiveLabelText('<%= lblSuperFastTrackIncome.ClientID %>'));
+            setExportAmount('exportRepurchaseIncome', getIncentiveLabelText('<%= lblRepurchaseIncomeCard.ClientID %>'));
+            setExportAmount('exportVirtualFranchise', getIncentiveLabelText('<%= lblVirtualFranchiseBonus.ClientID %>'));
             setExportAmount('exportWallet', getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'));
             setExportAmount('exportTotal', getIncentiveLabelText('<%= lblIncentiveTotal.ClientID %>'));
             setExportText('exportIncentiveUpdated', getIncentiveLabelText('<%= lblIncentiveUpdated.ClientID %>'));
@@ -3427,6 +3462,13 @@ Profit Share Budget</p>
                 'Saving Installment Income: ₹ ' + getIncentiveLabelText('<%= lblSavingInstallmentIncome.ClientID %>'),
                 'Team Bonus: ₹ ' + getIncentiveLabelText('<%= lblMatchingIncomeCard.ClientID %>'),
                 'Self Business Bonus: ₹ ' + getIncentiveLabelText('<%= lblCashBackIncome.ClientID %>'),
+                'Renewal Direct Income: ₹ ' + getIncentiveLabelText('<%= lblRenewalDirectIncome.ClientID %>'),
+                'Renewals Level Income: ₹ ' + getIncentiveLabelText('<%= lblRenewalsLevelIncome.ClientID %>'),
+                'Director Income: ₹ ' + getIncentiveLabelText('<%= lblDirectorIncomeCard.ClientID %>'),
+                'Fast Track Income: ₹ ' + getIncentiveLabelText('<%= lblFastTrackIncome.ClientID %>'),
+                'Super Fast Track Income: ₹ ' + getIncentiveLabelText('<%= lblSuperFastTrackIncome.ClientID %>'),
+                'Repurchase Income: ₹ ' + getIncentiveLabelText('<%= lblRepurchaseIncomeCard.ClientID %>'),
+                'Virtual Franchise Bonus: ₹ ' + getIncentiveLabelText('<%= lblVirtualFranchiseBonus.ClientID %>'),
                 'Product Wallet Balance: ₹ ' + getIncentiveLabelText('<%= lblProductWalletBalance.ClientID %>'),
                 'Total Incentive: ₹ ' + getIncentiveLabelText('<%= lblIncentiveTotal.ClientID %>'),
                 '',
@@ -3575,7 +3617,7 @@ Profit Share Budget</p>
             }
 
             var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>MPremium Incentive Summary</title>';
-            html += '<link rel="stylesheet" href="assets/css/dashboard-modern.css?v=40" />';
+            html += '<link rel="stylesheet" href="assets/css/dashboard-modern.css?v=51" />';
             html += '<style>';
             html += 'body{margin:0;padding:24px;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
             html += '.dash-incentive-export-card{max-width:520px;margin:0 auto;box-shadow:none !important;}';
@@ -3895,6 +3937,13 @@ Profit Share Budget</p>
                 <div class="dash-incentive-export-income-row"><span>Saving Installment Income</span><strong id="exportPremiumDirect"></strong></div>
                 <div class="dash-incentive-export-income-row"><span>Team Bonus</span><strong id="exportTeamBonus"></strong></div>
                 <div class="dash-incentive-export-income-row"><span>Self Business Bonus</span><strong id="exportSelfBonus"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Renewal Direct Income</span><strong id="exportRenewalDirect"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Renewals Level Income</span><strong id="exportRenewalsLevel"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Director Income</span><strong id="exportDirectorIncome"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Fast Track Income</span><strong id="exportFastTrack"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Super Fast Track Income</span><strong id="exportSuperFastTrack"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Repurchase Income</span><strong id="exportRepurchaseIncome"></strong></div>
+                <div class="dash-incentive-export-income-row"><span>Virtual Franchise Bonus</span><strong id="exportVirtualFranchise"></strong></div>
                 <div class="dash-incentive-export-income-row is-wallet"><span>Product Wallet Balance</span><strong id="exportWallet"></strong></div>
                 <div class="dash-incentive-export-income-total"><span>Total Incentive</span><strong id="exportTotal"></strong></div>
             </div>

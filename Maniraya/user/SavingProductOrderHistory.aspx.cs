@@ -47,6 +47,7 @@ public partial class user_SavingProductOrderHistory : Page
 
         SavingProductHelper.EnsureDeliveryColumns();
         SavingProductHelper.EnsureInstallmentDeliveryColumns();
+        SavingProductHelper.EnsureInstallmentProductAssignTable();
         SavingProductHelper.ProcessBulkSavingSchedule();
 
         if (!IsPostBack)
@@ -261,8 +262,12 @@ SELECT
     sa.status AS OrderStatus,
     ISNULL(sa.approvedate, sa.installmentdate) AS OrderDate,
     ISNULL(NULLIF(LTRIM(RTRIM(sd.couponcode)), ''), '-') AS couponcode,
-    ISNULL(NULLIF(LTRIM(RTRIM(pm.productname)), ''), 'Saving Product') AS productname,
-    COALESCE(NULLIF(sa.productid, 0), sd.productid) AS productid,
+    CASE
+        WHEN NULLIF(LTRIM(RTRIM(ISNULL(assign_pm.ProductName, ''))), '') IS NOT NULL
+            THEN LTRIM(RTRIM(assign_pm.ProductName))
+        ELSE 'Not assigned'
+    END AS productname,
+    CASE WHEN ISNULL(ipa.ProductId, 0) > 0 THEN ipa.ProductId ELSE NULL END AS productid,
     ud.username,
     " + deliveryStatusSelect + @",
     " + deliveryDateSelect + @",
@@ -299,9 +304,12 @@ OUTER APPLY (
         CASE WHEN sd0.productid = sa.productid THEN 0 ELSE 1 END,
         sd0.id ASC
 ) sd
+LEFT JOIN SavingInstallmentProductAssign ipa WITH (NOLOCK)
+    ON ISNULL(ipa.Status, 1) = 1
+   AND ISNULL(ipa.ProductId, 0) > 0
+   AND ipa.InstallmentNo = TRY_CONVERT(INT, sa.InstNo)
+LEFT JOIN SavingProductMaster assign_pm WITH (NOLOCK) ON assign_pm.id = ipa.ProductId
 LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = sa.UserId
-LEFT JOIN SavingProductMaster pm WITH (NOLOCK)
-    ON COALESCE(NULLIF(sa.productid, 0), sd.productid) = pm.id
 LEFT JOIN CityMaster CS WITH (NOLOCK) ON ud.ShippingCityId = CS.CityId
 LEFT JOIN StateMaster SS WITH (NOLOCK) ON CS.StateId = SS.StateId
 LEFT JOIN CityMaster C WITH (NOLOCK) ON ud.CityId = C.CityId
