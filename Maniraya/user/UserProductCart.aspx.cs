@@ -40,6 +40,18 @@ public partial class user_UserProductCart : System.Web.UI.Page
         litPayable.Text = totals.Payable.ToString("0.00");
         litShipNote.Text = totals.Quote == null ? string.Empty : totals.Quote.Message;
 
+        SavingProductHelper.BulkCouponInfo coupon = SavingProductHelper.GetActiveCoupon(Session, Convert.ToString(Session["userid"]));
+        if (pnlCouponNote != null)
+        {
+            pnlCouponNote.Visible = coupon != null;
+            if (coupon != null)
+            {
+                litCartCouponCode.Text = coupon.CouponCode;
+                litCartCouponAmt.Text = coupon.Amount.ToString("0.00");
+                litCartCouponMin.Text = coupon.Amount.ToString("0.00");
+            }
+        }
+
         rptCart.DataSource = cart;
         rptCart.DataBind();
         chkSelectAll.Checked = false;

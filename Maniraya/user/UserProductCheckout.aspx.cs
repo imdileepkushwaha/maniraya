@@ -37,6 +37,12 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         {
             LoadStates();
             LoadAddress();
+            SavingProductHelper.BulkCouponInfo coupon = SavingProductHelper.GetActiveCoupon(Session, Convert.ToString(Session["userid"]));
+            if (coupon != null && chkApplyCoupon != null)
+            {
+                UserPanelCartHelper.CartTotals firstTotals = UserPanelCartHelper.GetTotals(Session);
+                chkApplyCoupon.Checked = firstTotals.Subtotal >= coupon.Amount;
+            }
             BindSummary();
             ApplyStep();
         }
@@ -54,14 +60,138 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
     void BindSummary()
     {
         UserPanelCartHelper.CartTotals totals = UserPanelCartHelper.GetTotals(Session);
+        decimal shipping = totals.Shipping;
+        decimal payableProducts = totals.Subtotal;
+        decimal discount = 0;
+        SavingProductHelper.BulkCouponInfo coupon = SavingProductHelper.GetActiveCoupon(Session, Convert.ToString(Session["userid"]));
+        bool hasCoupon = coupon != null;
+        if (pnlBulkCoupon != null)
+        {
+            pnlBulkCoupon.Visible = hasCoupon;
+        }
+
+        if (hasCoupon)
+        {
+            hfCouponRewardId.Value = coupon.Id.ToString();
+            hfCouponAmount.Value = coupon.Amount.ToString("0.00");
+            hfCouponCode.Value = coupon.CouponCode;
+            litCouponCode.Text = coupon.CouponCode;
+            litCouponAmount.Text = coupon.Amount.ToString("0.00");
+            litCouponMinDp.Text = coupon.Amount.ToString("0.00");
+            litCouponPayCode.Text = coupon.CouponCode;
+            if (lblCouponMsg != null)
+            {
+                lblCouponMsg.Text = string.Empty;
+            }
+
+            if (chkApplyCoupon != null && chkApplyCoupon.Checked)
+            {
+                if (totals.Subtotal < coupon.Amount)
+                {
+                    if (lblCouponMsg != null)
+                    {
+                        lblCouponMsg.Text = SavingProductHelper.GetCouponMinPurchaseMessage(coupon.Amount);
+                    }
+                }
+                else
+                {
+                    discount = coupon.Amount;
+                    payableProducts = Math.Max(0m, totals.Subtotal - coupon.Amount);
+                }
+            }
+        }
+
+        decimal payable = payableProducts + shipping;
+        bool coversFull = hasCoupon && chkApplyCoupon != null && chkApplyCoupon.Checked && discount > 0 && payable <= 0.009m;
+        hfCouponCoversFull.Value = coversFull ? "1" : "0";
+        if (pnlCouponSummary != null)
+        {
+            pnlCouponSummary.Visible = discount > 0;
+        }
+        litCouponDiscount.Text = discount.ToString("0.00");
+
         litSubtotal.Text = totals.Subtotal.ToString("0.00");
         litShipping.Text = totals.Shipping.ToString("0.00");
-        litPayable.Text = totals.Payable.ToString("0.00");
+        litPayable.Text = payable.ToString("0.00");
         litShipNote.Text = totals.Quote == null ? string.Empty : totals.Quote.Message;
         if (lblQrAmount != null)
         {
-            lblQrAmount.Text = "₹" + totals.Payable.ToString("0.00");
+            lblQrAmount.Text = "₹" + payable.ToString("0.00");
         }
+        ViewState["CheckoutPayableProducts"] = payableProducts;
+        ViewState["CheckoutCouponDiscount"] = discount;
+        ViewState["CheckoutCartDp"] = totals.Subtotal;
+    }
+
+    bool CouponCoversFull()
+    {
+        return hfCouponCoversFull != null && hfCouponCoversFull.Value == "1";
+    }
+
+    bool ShouldApplyCoupon()
+    {
+        return pnlBulkCoupon != null && pnlBulkCoupon.Visible && chkApplyCoupon != null && chkApplyCoupon.Checked;
+    }
+
+    bool ValidateCouponMinDp(bool showAlert)
+    {
+        if (!ShouldApplyCoupon())
+        {
+            return true;
+        }
+
+        SavingProductHelper.BulkCouponInfo coupon = SavingProductHelper.GetActiveCoupon(Session, Convert.ToString(Session["userid"]));
+        if (coupon == null)
+        {
+            if (showAlert)
+            {
+                Alert("Coupon is not available.");
+            }
+            return false;
+        }
+
+        decimal couponAmt = coupon.Amount;
+        decimal parsedAmt;
+        if (decimal.TryParse(hfCouponAmount.Value, out parsedAmt) && parsedAmt > 0)
+        {
+            couponAmt = parsedAmt;
+        }
+
+        decimal cartDp = UserPanelCartHelper.GetTotals(Session).Subtotal;
+        if (cartDp < couponAmt)
+        {
+            if (showAlert)
+            {
+                Alert(SavingProductHelper.GetCouponMinPurchaseMessage(couponAmt));
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    void ApplyCouponPaymentPlaceholder()
+    {
+        if (string.IsNullOrWhiteSpace(txttransactionid.Text))
+        {
+            txttransactionid.Text = hfCouponCode.Value;
+        }
+        if (string.IsNullOrWhiteSpace(HDFilename.Value))
+        {
+            HDFilename.Value = "bulk-coupon.png";
+        }
+        EnsureBankSelected();
+    }
+
+    protected void chkApplyCoupon_CheckedChanged(object sender, EventArgs e)
+    {
+        if (chkApplyCoupon != null && chkApplyCoupon.Checked && !ValidateCouponMinDp(true))
+        {
+            chkApplyCoupon.Checked = false;
+        }
+
+        BindSummary();
+        ApplyStep();
     }
 
     void ApplyStep()
@@ -73,6 +203,15 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         SetStepClass(step1Box, step, 1);
         SetStepClass(step2Box, step, 2);
         SetStepClass(step3Box, step, 3);
+        bool coversFull = CouponCoversFull();
+        if (pnlCouponPaySkip != null)
+        {
+            pnlCouponPaySkip.Visible = step == 2 && coversFull;
+        }
+        if (pnlPaymentDetails != null)
+        {
+            pnlPaymentDetails.Visible = step != 2 || !coversFull;
+        }
         ApplyAddressMode();
     }
 
@@ -214,6 +353,11 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
             return;
         }
 
+        if (!ValidateCouponMinDp(true))
+        {
+            return;
+        }
+
         hfStep.Value = "2";
         ApplyStep();
     }
@@ -226,7 +370,16 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
 
     protected void btnToReview_Click(object sender, EventArgs e)
     {
-        if (!ValidatePaymentAndUpload())
+        if (!ValidateCouponMinDp(true))
+        {
+            return;
+        }
+
+        if (CouponCoversFull())
+        {
+            ApplyCouponPaymentPlaceholder();
+        }
+        else if (!ValidatePaymentAndUpload())
         {
             return;
         }
@@ -258,7 +411,11 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(HDFilename.Value) || string.IsNullOrWhiteSpace(txttransactionid.Text))
+        if (CouponCoversFull())
+        {
+            ApplyCouponPaymentPlaceholder();
+        }
+        else if (string.IsNullOrWhiteSpace(HDFilename.Value) || string.IsNullOrWhiteSpace(txttransactionid.Text))
         {
             Alert("Enter transaction ID and upload payment screenshot.");
             hfStep.Value = "2";
@@ -280,6 +437,23 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         {
             Alert("Buy any product.");
             return;
+        }
+
+        decimal couponAmt = 0;
+        decimal.TryParse(hfCouponAmount.Value, out couponAmt);
+        bool applyCoupon = ShouldApplyCoupon();
+        if (applyCoupon)
+        {
+            if (!ValidateCouponMinDp(true))
+            {
+                return;
+            }
+        }
+
+        decimal payableProducts = totals.Subtotal;
+        if (applyCoupon)
+        {
+            payableProducts = Math.Max(0m, totals.Subtotal - couponAmt);
         }
 
         string bankId = GetSelectedBankId();
@@ -311,7 +485,7 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
             totals.Cgst,
             totals.Sgst,
             totals.Igst,
-            totals.Subtotal,
+            payableProducts,
             meta.FranchiseeId,
             meta.PlanType,
             purchaseForSp,
@@ -320,17 +494,37 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
             GetPaymentMode(),
             HDFilename.Value);
 
-        HandlePurchaseResult(result, totals.Shipping, meta);
+        HandlePurchaseResult(result, totals.Shipping, meta, applyCoupon, couponAmt, totals.Subtotal, payableProducts);
     }
 
-    void HandlePurchaseResult(string result, decimal shipping, UserPanelCartHelper.CartMeta meta)
+    void HandlePurchaseResult(string result, decimal shipping, UserPanelCartHelper.CartMeta meta, bool applyCoupon, decimal couponAmt, decimal cartDp, decimal payableProducts)
     {
         if (result == "1")
         {
             ProductWeightHelper.SaveOnLatestUserPurchase(Session["userid"].ToString(), shipping);
+            string okMessage = "Purchase Successful";
+            if (applyCoupon)
+            {
+                int rewardId;
+                int.TryParse(hfCouponRewardId.Value, out rewardId);
+                string userId = Convert.ToString(Session["userid"]);
+                string remark = "Purchase DP " + cartDp.ToString("0.00") + " | Discount " + couponAmt.ToString("0.00")
+                    + " | Payable " + payableProducts.ToString("0.00");
+                string orderNo = SavingProductHelper.GetLatestRepurchaseOrderNo(userId);
+                string redeemRes = SavingProductHelper.RedeemBulkCoupon(rewardId, userId, remark, orderNo);
+                SavingProductHelper.ClearCouponRedeem(Session);
+                if (redeemRes == "t")
+                {
+                    okMessage = "Purchase successful. Coupon discount Rs. " + couponAmt.ToString("0.00") + " applied on billing.";
+                }
+                else
+                {
+                    okMessage = "Purchase successful. Coupon could not be marked redeemed. Please contact admin.";
+                }
+            }
             UserPanelCartHelper.Clear(Session);
             string catalog = UserPanelCartHelper.GetCatalogUrl(meta);
-            ScriptManager.RegisterStartupScript(this, GetType(), "ok", "alert('Purchase Successful'); window.location='" + catalog.Replace("'", "") + "';", true);
+            ScriptManager.RegisterStartupScript(this, GetType(), "ok", "alert('" + okMessage.Replace("'", "\\'") + "'); window.location='" + catalog.Replace("'", "") + "';", true);
             return;
         }
 
@@ -453,15 +647,34 @@ public partial class user_UserProductCheckout : System.Web.UI.Page
         litReviewTxn.Text = txttransactionid.Text.Trim();
         rptReview.DataSource = UserPanelCartHelper.GetCart(Session);
         rptReview.DataBind();
-        if (!string.IsNullOrWhiteSpace(HDFilename.Value))
+        decimal discount = 0;
+        object discountObj = ViewState["CheckoutCouponDiscount"];
+        if (discountObj != null)
+        {
+            decimal.TryParse(Convert.ToString(discountObj), out discount);
+        }
+        if (pnlReviewCoupon != null)
+        {
+            pnlReviewCoupon.Visible = discount > 0;
+            litReviewCouponDiscount.Text = discount.ToString("0.00");
+        }
+        if (!string.IsNullOrWhiteSpace(HDFilename.Value) && !string.Equals(HDFilename.Value, "bulk-coupon.png", StringComparison.OrdinalIgnoreCase))
         {
             imgReviewReceipt.Visible = true;
             imgReviewReceipt.ImageUrl = ResolveUrl("~/ProductImage/" + HDFilename.Value);
+        }
+        else
+        {
+            imgReviewReceipt.Visible = false;
         }
     }
 
     string GetPaymentMode()
     {
+        if (CouponCoversFull())
+        {
+            return "Bulk Coupon";
+        }
         return GetSelectedPaymentMethod() == "qr" ? "QR" : "Online";
     }
 

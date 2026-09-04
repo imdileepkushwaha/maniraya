@@ -31,7 +31,7 @@
 
              <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Generate Repurchase Closing</h3>
+              <h3 class="box-title">Generate Repurchase Compression Closing</h3>
             </div>
             <!-- /.box-header -->
             <!-- form start -->

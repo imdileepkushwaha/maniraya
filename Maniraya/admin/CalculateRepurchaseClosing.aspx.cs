@@ -17,13 +17,11 @@ public partial class CalculateRepurchaseClosing : System.Web.UI.Page
         if (!IsPostBack)
         {
             TxtTodate.Attributes.Add("readonly", "readonly");
-            TxtTodate.Text = DateTime.Now.ToString("dd/MMM/yyyy");
-            
-            if (Session["useradmin"] != null)
-            {
-                TxtFromdate.Text = objCl.GetClosingDate("REPURCHASE").ToString("dd/MMM/yyyy");
-            }
-            else
+            TxtFromdate.Attributes.Add("readonly", "readonly");
+            TxtFromdate.Text = "03/Aug/2026";
+            TxtTodate.Text = "30/Aug/2026";
+
+            if (Session["useradmin"] == null)
             {
                 Response.Redirect("logout.aspx");
             }
@@ -55,10 +53,9 @@ public partial class CalculateRepurchaseClosing : System.Web.UI.Page
     }   
     public void CalculateweeklyClosing()
     {
-        int h = objCl.CalculateClosingNew(TxtTodate.Text, "REPURCHASE");
+        int h = objCl.CalculateRepurchaseCompression(TxtFromdate.Text, TxtTodate.Text);
         if (h == 1)
         {
-            TxtFromdate.Text = objCl.GetClosingDate("REPURCHASE").ToString("dd/MMM/yyyy");
             string popupScript = "alert('Closing Calculate succfully');";
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }

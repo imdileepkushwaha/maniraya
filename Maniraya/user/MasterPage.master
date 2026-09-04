@@ -178,7 +178,7 @@
 					</li>
 
 					<li class="slide" >
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">8</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-briefcase"></i><span class="side-menu__label">Saving Product</span><span class="badge badge-warning side-badge">9</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 							<li><a class="slide-item" href="SavingProductPurchasebulk.aspx">Purchase Saving Product</a></li>
                          
@@ -189,6 +189,7 @@
                           <li><a class="slide-item" href="TeamSavingInstallmentReport.aspx">Team Installment Report</a></li>
                           <li><a class="slide-item" href="TeamPendingInstallmentReport.aspx">Team Pending Installment</a></li>
                           <li><a class="slide-item" href="SavingProductOrderHistory.aspx">Order History</a></li>
+                          <li><a class="slide-item" href="SavingBulkRewardReport.aspx">Shopping Point / Coupon</a></li>
 							
 						</ul>
 					</li>
@@ -235,7 +236,7 @@
 					</li>
                     <li><h3>My Income</h3></li>
 					<li class="slide">
-						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">My Income</span><span class="badge badge-warning side-badge">1</span><i class="angle fe fe-chevron-down"></i></a>
+						<a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-wallet  menu-icon"></i><span class="side-menu__label">My Income</span><span class="badge badge-warning side-badge">5</span><i class="angle fe fe-chevron-down"></i></a>
 						<ul class="slide-menu">
 						<%--	<li><a class="slide-item" href="">Matching Income</a></li>
                             <li><a class="slide-item" href="#">Bonus Income</a></li>
@@ -250,7 +251,7 @@
 							<li><a class="slide-item" href="SavingDirectIncomeReport.aspx">Saving Direct Income</a></li>
 							<li><a class="slide-item" href="SavingLevelInstIncomeReport.aspx">Saving Level Installment Income</a></li>
 							<li><a class="slide-item" href="VirtualFranchiseLevelIncomeReport.aspx">Virtual Franchise Level Income</a></li>
-							<li><a class="slide-item" href="#">Repurchase Income</a></li>
+							<li><a class="slide-item" href="RepurchaseLevelIncome.aspx">Repurchase Level Income</a></li>
 						</ul>
 					</li>
                      <li style="display:none"><h3>Topup Request</h3></li>

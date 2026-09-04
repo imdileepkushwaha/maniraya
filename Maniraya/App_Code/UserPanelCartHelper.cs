@@ -271,6 +271,28 @@ public static class UserPanelCartHelper
         }
     }
 
+    public static decimal GetMrpTotal(DataTable cart)
+    {
+        decimal mrp = 0;
+        if (cart == null)
+        {
+            return 0;
+        }
+
+        foreach (DataRow row in cart.Rows)
+        {
+            int qty = ToInt(row["Quantity"]);
+            if (qty < 1)
+            {
+                qty = 1;
+            }
+
+            mrp += ToDecimal(row["MRP"]) * qty;
+        }
+
+        return mrp;
+    }
+
     public static CartTotals GetTotals(HttpSessionState session)
     {
         DataTable cart = GetCart(session);

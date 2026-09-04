@@ -229,7 +229,7 @@ WHERE 1 = 1";
             new SqlParameter("@Remark", remark)
         });
 
-        ShowResult(res, "Bulk EMI payment approved. Inst 2-18 approve dates are set one month apart from the pay date.");
+        ShowResult(res, "Bulk EMI payment approved. User received 20000 shopping point (redeem after 18 months) and 2000 coupon.");
     }
 
     protected void btnReject_click(object sender, EventArgs e)

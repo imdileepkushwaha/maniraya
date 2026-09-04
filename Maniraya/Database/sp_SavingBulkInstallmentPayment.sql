@@ -2,6 +2,7 @@
 -- User submits one UTR + one attachment. Admin approves/rejects in one shot.
 -- On approve, Inst 2-18 ApproveDate is staggered one month each from the pay date:
 --   Pay 26/08/2026 -> Inst 2 = 26/09/2026, Inst 3 = 26/10/2026, ...
+-- Also credits: 20000 shopping point (locked 18 months) + 2000 coupon in TransactionDetail_dummy.
 -- Run this script on the database (app pages also create these objects if missing).
 
 IF OBJECT_ID('dbo.SavingBulkInstallmentPayment', 'U') IS NULL
@@ -31,6 +32,48 @@ GO
 IF COL_LENGTH('dbo.SavingAccountInstallmentDetail', 'BulkPaymentId') IS NULL
 BEGIN
     ALTER TABLE dbo.SavingAccountInstallmentDetail ADD BulkPaymentId INT NULL;
+END
+GO
+
+IF OBJECT_ID('dbo.SavingBulkReward', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SavingBulkReward
+    (
+        Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        BulkPaymentId INT NOT NULL,
+        UserId NVARCHAR(100) NOT NULL,
+        OrderId NVARCHAR(100) NULL,
+        CouponCode NVARCHAR(100) NULL,
+        ShoppingPointAmount DECIMAL(18,2) NOT NULL CONSTRAINT DF_SavingBulkReward_Shop DEFAULT (20000),
+        CouponAmount DECIMAL(18,2) NOT NULL CONSTRAINT DF_SavingBulkReward_Coupon DEFAULT (2000),
+        EntryDate DATETIME NOT NULL CONSTRAINT DF_SavingBulkReward_Entry DEFAULT (GETDATE()),
+        RedeemDate DATETIME NOT NULL,
+        Status NVARCHAR(50) NOT NULL CONSTRAINT DF_SavingBulkReward_Status DEFAULT ('Locked'),
+        ApproveBy NVARCHAR(100) NULL,
+        DummyTransactionId INT NULL,
+        Remark NVARCHAR(MAX) NULL
+    );
+    CREATE UNIQUE INDEX UQ_SavingBulkReward_BulkPaymentId ON dbo.SavingBulkReward(BulkPaymentId);
+END
+GO
+
+IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.TransactionDetail_dummy
+    (
+        Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        transactionid INT NULL,
+        cramount DECIMAL(18,2) NULL,
+        dramount DECIMAL(18,2) NULL,
+        oldBalance DECIMAL(18,2) NULL,
+        currentBalance DECIMAL(18,2) NULL,
+        userid NVARCHAR(100) NULL,
+        transactiontype NVARCHAR(200) NULL,
+        remark NVARCHAR(MAX) NULL,
+        mentionby NVARCHAR(100) NULL,
+        mentiondate DATETIME NULL,
+        type INT NULL
+    );
 END
 GO
 
@@ -213,6 +256,7 @@ BEGIN
     DECLARE @status NVARCHAR(50);
     DECLARE @orderId NVARCHAR(100);
     DECLARE @userId NVARCHAR(100);
+    DECLARE @couponCode NVARCHAR(100);
     DECLARE @requestDate DATETIME;
     DECLARE @bulkId INT = @id;
 
@@ -220,6 +264,7 @@ BEGIN
         @status = bp.Status,
         @orderId = bp.OrderId,
         @userId = bp.UserId,
+        @couponCode = bp.CouponCode,
         @requestDate = bp.RequestDate
     FROM SavingBulkInstallmentPayment bp
     WHERE bp.Id = @bulkId;
@@ -239,12 +284,13 @@ BEGIN
     DECLARE @baseDate DATE = CONVERT(date, ISNULL(@requestDate, GETDATE()));
     DECLARE @remarkText NVARCHAR(MAX) = LTRIM(RTRIM(ISNULL(@Remark, '')));
     DECLARE @adminUser NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@Approveby, '')));
+    DECLARE @now DATETIME = GETDATE();
     DECLARE @hasDelivery BIT = CASE WHEN COL_LENGTH('SavingAccountInstallmentDetail', 'DeliveryStatus') IS NOT NULL THEN 1 ELSE 0 END;
 
     UPDATE SavingBulkInstallmentPayment
     SET
         Status = 'Approved',
-        ApproveDate = GETDATE(),
+        ApproveDate = @now,
         ApproveBy = @adminUser,
         Remark = CASE WHEN @remarkText = '' THEN Remark ELSE @remarkText END
     WHERE Id = @bulkId;
@@ -284,6 +330,49 @@ BEGIN
         FROM SavingAccountInstallmentDetail sa
         WHERE ISNULL(sa.BulkPaymentId, 0) = @bulkId
           AND UPPER(LTRIM(RTRIM(ISNULL(sa.Status, '')))) IN ('APPROVED', 'APPROVE', '1');
+    END
+
+    IF OBJECT_ID('dbo.SavingBulkReward', 'U') IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM SavingBulkReward WITH (NOLOCK) WHERE BulkPaymentId = @bulkId)
+    BEGIN
+        DECLARE @couponAmt DECIMAL(18,2) = 2000;
+        DECLARE @shopAmt DECIMAL(18,2) = 20000;
+        DECLARE @oldBal DECIMAL(18,2) = 0;
+        DECLARE @newBal DECIMAL(18,2) = 0;
+        DECLARE @txnId INT = 0;
+
+        IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NOT NULL
+        BEGIN
+            SELECT @oldBal = ISNULL(SUM(ISNULL(cramount, 0)), 0) - ISNULL(SUM(ISNULL(dramount, 0)), 0)
+            FROM TransactionDetail_dummy WITH (NOLOCK)
+            WHERE LTRIM(RTRIM(userid)) = LTRIM(RTRIM(@userId));
+
+            SET @newBal = @oldBal + @couponAmt;
+            SELECT @txnId = ISNULL(MAX(transactionid), 0) + 1 FROM TransactionDetail_dummy;
+
+            INSERT INTO TransactionDetail_dummy (
+                transactionid, cramount, dramount, oldBalance, currentBalance,
+                userid, transactiontype, remark, mentionby, mentiondate, type
+            )
+            VALUES (
+                @txnId, @couponAmt, 0, @oldBal, @newBal,
+                @userId, N'Bulk Coupon',
+                N'Bulk EMI coupon reward | Coupon ' + ISNULL(@couponCode, '') + N' | Request #' + CONVERT(NVARCHAR(20), @bulkId),
+                @adminUser, @now, 4
+            );
+        END
+
+        INSERT INTO SavingBulkReward (
+            BulkPaymentId, UserId, OrderId, CouponCode,
+            ShoppingPointAmount, CouponAmount, EntryDate, RedeemDate,
+            Status, ApproveBy, DummyTransactionId, Remark
+        )
+        VALUES (
+            @bulkId, @userId, @orderId, @couponCode,
+            @shopAmt, @couponAmt, @now, DATEADD(MONTH, 18, @now),
+            N'Locked', @adminUser, NULLIF(@txnId, 0),
+            N'Bulk EMI shopping point 20000 (redeem after 18 months) + coupon 2000'
+        );
     END
 
     SELECT 't';

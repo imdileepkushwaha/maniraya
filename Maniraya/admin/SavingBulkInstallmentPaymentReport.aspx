@@ -25,7 +25,7 @@
                                 <h3 class="box-title"><i class="fa fa-filter"></i> Search Criteria</h3>
                             </div>
                             <div class="box-body admin-search-form">
-                                <p class="admin-report-intro">Approve or reject 17-EMI bulk payment requests. On approve, Inst 2–18 get approve dates one month apart from the user pay date. Rejection reason is shown to the user.</p>
+                                <p class="admin-report-intro">Approve or reject 17-EMI bulk payment requests. On approve, Inst 2–18 get approve dates one month apart from the user pay date. User also gets 20000 shopping point (redeem after 18 months) and 2000 coupon. Rejection reason is shown to the user.</p>
                                 <div class="admin-form-section">
                                     <h5 class="admin-form-section-title"><i class="fa fa-calendar"></i> Date Range</h5>
                                     <div class="row">

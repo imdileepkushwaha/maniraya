@@ -1458,6 +1458,47 @@ namespace BusinessLogicTier
              }
              return h;
          }
+         public int CalculateRepurchaseCompression(string fromdate, string todate)
+         {
+             int h = 0;
+             SqlConnection cn;
+             SqlTransaction tr = null;
+             cn = ObjData.StartConnectionInTransaction();
+             tr = cn.BeginTransaction(IsolationLevel.Serializable);
+             try
+             {
+                 SqlParameter[] sqm = new SqlParameter[]
+                 {
+                     new SqlParameter("@FromDate", Convert.ToDateTime(fromdate)),
+                     new SqlParameter("@ToDate", Convert.ToDateTime(todate)),
+                 };
+                 ObjData.RunInsUpDelQueryTransProc("Closing_RepurchaseCompression", tr, sqm);
+                 h = 1;
+                 tr.Commit();
+             }
+             catch (Exception ex)
+             {
+                 h = 0;
+                 if (ex != null && ex.Message != null
+                     && ex.Message.IndexOf("Already generated", StringComparison.OrdinalIgnoreCase) >= 0)
+                 {
+                     h = 2;
+                 }
+                 try
+                 {
+                     tr.Rollback();
+                 }
+                 catch
+                 {
+                 }
+             }
+             finally
+             {
+                 ObjData.EndConnection();
+                 tr.Dispose();
+             }
+             return h;
+         }
          public DataTable getClosingReport(string FromDate, string Todate, string UserId, string Type)
          {
              {

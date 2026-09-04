@@ -26,6 +26,11 @@
                     <div class="profile-hero-info">
                         <h2>Find Franchisee</h2>
                         <p class="profile-hero-meta">Search nearby franchisees and continue to repurchase products</p>
+                        <asp:Panel ID="pnlBulkCouponNotice" runat="server" Visible="false" CssClass="alert alert-success" style="margin:12px 0 0;">
+                            Redeem coupon <strong><asp:Label ID="lblBulkCouponNoticeCode" runat="server" /></strong>
+                            (Rs. <asp:Label ID="lblBulkCouponNoticeAmt" runat="server" />) on the next purchase as a DP / billing discount.
+                            Minimum Rs. 2000 DP in a single invoice. Select a franchisee to continue.
+                        </asp:Panel>
                     </div>
                     <div class="profile-hero-actions">
                         <a id="lnksearch" class="profile-btn rp-search-trigger" href="javascript:showSearchModal();">

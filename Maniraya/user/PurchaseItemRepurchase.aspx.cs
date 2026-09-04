@@ -51,6 +51,7 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
         {
             if (!IsPostBack)
             {
+                SavingProductHelper.EnsureBulkInstallmentPaymentSchema();
                 if (Request.QueryString["FID"] != null)
                 {
                     string Val = Request.QueryString["FID"].ToString();
@@ -1015,6 +1016,7 @@ public partial class user_PurchaseItemRepurchase : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), Guid.NewGuid().ToString(), popupScript, true);
         }
     }
+
     Data ObjData = new Data();
 
     /// <summary>

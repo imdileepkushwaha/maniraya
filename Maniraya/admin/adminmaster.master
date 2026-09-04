@@ -160,6 +160,7 @@
                                     <li><a href="SavingLevelinstDetail.aspx">Saving Level Inst Income</a></li>
                                     <li><a href="PayoutReportSavingLevel.aspx">Saving Level Payout Report</a></li>
                                     <li><a href="SavingProductGSTReport.aspx">Saving Product GST Reports</a></li>
+                                    <li><a href="RepurchaseLevelIncome.aspx">Repurchase Level Income Report</a></li>
                                 </ul>
                             </li>
 
@@ -186,6 +187,7 @@
                                     <li><a href="SavingBulkInstallmentPaymentReport.aspx">Bulk EMI Payment Report</a></li>
                                     <li><a href="SavingPendingInstallmentReport.aspx">Pending Installment Report</a></li>
                                     <li><a href="CouponReport.aspx">Coupon Report</a></li>
+                                    <li><a href="SavingBulkRewardReport.aspx">Bulk Reward Report</a></li>
                                 </ul>
                             </li>
 

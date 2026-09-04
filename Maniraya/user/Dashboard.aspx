@@ -211,7 +211,7 @@
      
     <!--(Ends)-->
     <link href="../dist/css/user-profile.css" rel="stylesheet" />
-    <link href="assets/css/dashboard-modern.css?v=51" rel="stylesheet" />
+    <link href="assets/css/dashboard-modern.css?v=52" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="contentPageHeading" runat="Server">
     <div Style="display: none">
@@ -350,6 +350,71 @@
                                     </div>
                                 </ItemTemplate>
                             </asp:Repeater>
+                        </div>
+                    </asp:Panel>
+
+                    <asp:Panel ID="pnlBulkRewards" runat="server" Visible="false" CssClass="dash-coupon-section dash-bulk-reward-section">
+                        <div class="dash-section-head dash-section-head--member">
+                            <div class="dash-section-head-main">
+                                <span class="dash-section-head-icon" aria-hidden="true"><i class="fa fa-gift"></i></span>
+                                <div class="dash-section-head-copy">
+                                    <h3 class="dash-section-title">Bulk EMI Rewards</h3>
+                                    <p class="dash-section-sub">Shopping point unlocks after 18 months. Coupon is available to redeem now.</p>
+                                </div>
+                            </div>
+                            <span class="dash-section-head-tag">Reward</span>
+                        </div>
+                        <div class="row dash-coupon-grid">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dash-coupon-card dash-reward-card is-shopping">
+                                    <div class="dash-coupon-card-top">
+                                        <span class="dash-coupon-card-icon is-shopping" aria-hidden="true"><i class="fa fa-shopping-bag"></i></span>
+                                        <div class="dash-coupon-card-code-wrap">
+                                            <span class="dash-coupon-card-label">Shopping Point</span>
+                                            <strong class="dash-coupon-card-code"><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblBulkShoppingPoint" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                    </div>
+                                    <div class="dash-coupon-card-stats">
+                                        <div class="dash-coupon-stat is-paid">
+                                            <span class="dash-coupon-stat-label">Entry Date</span>
+                                            <strong class="dash-coupon-stat-value is-date"><asp:Label ID="lblBulkShoppingEntryDate" runat="server" Text="-" /></strong>
+                                        </div>
+                                        <div class="dash-coupon-stat is-current">
+                                            <span class="dash-coupon-stat-label">Redeem After (18 Months)</span>
+                                            <strong class="dash-coupon-stat-value is-date"><asp:Label ID="lblBulkShoppingRedeemDate" runat="server" Text="-" /></strong>
+                                        </div>
+                                    </div>
+                                    <a href="SavingBulkRewardReport.aspx" class="dash-coupon-card-link">
+                                        View details <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dash-coupon-card dash-reward-card is-coupon">
+                                    <div class="dash-coupon-card-top">
+                                        <span class="dash-coupon-card-icon is-couponamt" aria-hidden="true"><i class="fa fa-ticket-alt"></i></span>
+                                        <div class="dash-coupon-card-code-wrap">
+                                            <span class="dash-coupon-card-label">Coupon Amount</span>
+                                            <strong class="dash-coupon-card-code"><i class="fa fa-rupee-sign"></i> <asp:Label ID="lblBulkCouponAmount" runat="server" Text="0.00" /></strong>
+                                            <span class="dash-coupon-card-label" style="margin-top:6px;">Coupon Code</span>
+                                            <strong class="dash-coupon-card-code"><asp:Label ID="lblBulkCouponCode" runat="server" Text="-" /></strong>
+                                        </div>
+                                    </div>
+                                    <div class="dash-coupon-card-stats">
+                                        <div class="dash-coupon-stat is-paid">
+                                            <span class="dash-coupon-stat-label">Available Now</span>
+                                            <strong class="dash-coupon-stat-value"><asp:Label ID="lblBulkCouponBalance" runat="server" Text="0.00" /></strong>
+                                        </div>
+                                        <div class="dash-coupon-stat is-current">
+                                            <span class="dash-coupon-stat-label">Redeem Status</span>
+                                            <strong class="dash-coupon-stat-value is-date"><asp:Label ID="lblBulkCouponStatus" runat="server" Text="Ready to redeem" /></strong>
+                                        </div>
+                                    </div>
+                                    <a href="SavingBulkRewardReport.aspx" class="dash-coupon-card-link">
+                                        View details <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </asp:Panel>
 

@@ -103,6 +103,11 @@
                             <strong>&#8377;<asp:Literal ID="litShipping" runat="server" /></strong>
                         </div>
                         <p class="upc-ship-note"><asp:Literal ID="litShipNote" runat="server" /></p>
+                        <asp:Panel ID="pnlCouponNote" runat="server" Visible="false" CssClass="alert alert-info" style="margin:12px 0 0;padding:10px 12px;">
+                            Coupon <strong><asp:Literal ID="litCartCouponCode" runat="server" /></strong>
+                            (Rs. <asp:Literal ID="litCartCouponAmt" runat="server" />) will apply as a billing discount on checkout.
+                            Use it on a single invoice with minimum Rs. <asp:Literal ID="litCartCouponMin" runat="server" /> DP (product amount).
+                        </asp:Panel>
                         <div class="upc-summary-total">
                             <span>Total</span>
                             <span>&#8377;<asp:Literal ID="litPayable" runat="server" /></span>
