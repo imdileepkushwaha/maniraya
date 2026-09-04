@@ -84,9 +84,12 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Action">
                                         <ItemTemplate>
-                                            <a href='SavingProductInstallmentDetail.aspx?oid=<%# Eval("couponcode") %>' class="dash-saving-action-btn is-view">
+                                            <asp:HyperLink ID="lnkInstallments" runat="server"
+                                                CssClass="dash-saving-action-btn is-view"
+                                                NavigateUrl='<%# "SavingProductInstallmentDetail.aspx?oid=" + Eval("couponcode") %>'
+                                                Visible='<%# CanShowInstallments(Eval("status"), Eval("couponcode")) %>'>
                                                 <i class="fa fa-calendar-check"></i> Installments
-                                            </a>
+                                            </asp:HyperLink>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>

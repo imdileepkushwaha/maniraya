@@ -26,6 +26,7 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
     Data ObjData = new Data();
     clsProduct objproduct = new clsProduct();
+    clsUser objUser = new clsUser();
     string CouponCode
     {
         get { return ViewState["InstallmentCouponCode"] as string ?? string.Empty; }
@@ -38,6 +39,15 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         {
             Response.Redirect("logout.aspx");
             return;
+        }
+
+        if (lblCashfreeHint != null)
+        {
+            lblCashfreeHint.Text = !CashfreeHelper.IsConfigured
+                ? "Add CashfreeAppId and CashfreeSecretKey in Web.config to enable Pay Now."
+                : (CashfreeHelper.IsSandbox
+                    ? "Sandbox mode. Use Cashfree test payment methods."
+                    : "Secure online payment.");
         }
 
         if (!IsPostBack)
@@ -74,6 +84,9 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             return new DataTable();
 
         SavingProductHelper.EnsureInstallmentProductAssignTable();
+        SavingProductHelper.EnsureBulkColumns();
+        SavingProductHelper.EnsureBulkInstallmentPaymentSchema();
+        SavingProductHelper.EnsureBulkInstallmentsForCoupon(CouponCode);
 
         bool hasInstCoupon = SavingProductHelper.HasInstallmentCouponCodeColumn();
         string couponSelect = hasInstCoupon
@@ -103,6 +116,8 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             sa.OnlineTransactionId,
             sa.remark,
             sa.productid,
+            ISNULL(sa.BulkPaymentId, 0) AS BulkPaymentId,
+            ISNULL(sd.PlanType, '') AS PlanType,
             ud.username,
             " + couponSelect + @",
             CASE
@@ -112,7 +127,7 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             END AS productname
             FROM SavingAccountInstallmentDetail sa WITH (NOLOCK)
             OUTER APPLY (
-                SELECT TOP 1 sd0.couponcode
+                SELECT TOP 1 sd0.couponcode, sd0.PlanType
                 FROM SavingAccountDetail sd0 WITH (NOLOCK)
                 WHERE sd0.orderid = sa.OrderId
                   AND LTRIM(RTRIM(sd0.UserId)) = LTRIM(RTRIM(sa.UserId))
@@ -229,11 +244,50 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         ShowCouponChip();
 
         DataTable dt = getPrevProduct();
+        ActiveBulkPayStatus = GetActiveBulkInstallmentPayStatus(CouponCode);
         if (GridView1 != null)
         {
             GridView1.DataSource = dt;
             GridView1.DataBind();
         }
+    }
+
+    string ActiveBulkPayStatus
+    {
+        get { return ViewState["ActiveBulkPayStatus"] as string ?? string.Empty; }
+        set { ViewState["ActiveBulkPayStatus"] = value; }
+    }
+
+    string GetActiveBulkInstallmentPayStatus(string couponCode)
+    {
+        if (string.IsNullOrWhiteSpace(couponCode))
+            return string.Empty;
+
+        string sql = @"SELECT TOP 1 LTRIM(RTRIM(ISNULL(Status, ''))) AS Status
+            FROM SavingBulkInstallmentPayment WITH (NOLOCK)
+            WHERE LTRIM(RTRIM(ISNULL(CouponCode, ''))) = '" + SqlEscape(couponCode) + @"'
+              AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) IN ('PROCESSING', 'APPROVED', 'APPROVE', 'PAID')
+            ORDER BY Id DESC";
+
+        DataTable dt = null;
+        ObjData.StartConnection();
+        try
+        {
+            dt = ObjData.RunDataTable(sql);
+        }
+        catch
+        {
+            dt = null;
+        }
+        finally
+        {
+            ObjData.EndConnection();
+        }
+
+        if (dt == null || dt.Rows.Count == 0)
+            return string.Empty;
+
+        return Convert.ToString(dt.Rows[0]["Status"]).Trim();
     }
 
     void ShowCouponChip()
@@ -282,21 +336,50 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
             return;
         }
 
+        DataRowView drv = e.Row.DataItem as DataRowView;
+        string planType = GetRowValue(drv, "PlanType");
+        int instNo = 0;
+        int.TryParse(GetRowValue(drv, "instno"), out instNo);
+        int bulkPaymentId = 0;
+        int.TryParse(GetRowValue(drv, "BulkPaymentId"), out bulkPaymentId);
+
         string rawStatus = (lblstatus.Text ?? string.Empty).Trim();
         string statusNorm = rawStatus.ToLowerInvariant();
+        bool isBulk18 = planType.Equals("Bulk18", StringComparison.OrdinalIgnoreCase);
+        bool isRejected = statusNorm == "rejected" || statusNorm == "2" || statusNorm == "cancelled" || statusNorm == "canceled";
+        bool isApproved = statusNorm == "approved" || statusNorm == "approve" || statusNorm == "1" || statusNorm == "active";
+        bool isPaid = statusNorm == "paid";
+        bool isProcessing = statusNorm == "processing";
+        string bulkPayStatus = (ActiveBulkPayStatus ?? string.Empty).Trim();
+        bool bulkPayActive = bulkPayStatus.Equals("Processing", StringComparison.OrdinalIgnoreCase)
+            || bulkPayStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase)
+            || bulkPayStatus.Equals("Approve", StringComparison.OrdinalIgnoreCase)
+            || bulkPayStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase);
+        bool coveredByBulkPay = !isRejected && instNo != 1 && (bulkPaymentId > 0 || bulkPayActive);
+        bool prepaidCovered = !isRejected && (isBulk18 || instNo == 1 || isPaid || coveredByBulkPay);
         bool canPay = false;
 
-        if (statusNorm == "approved" || statusNorm == "approve" || statusNorm == "1" || statusNorm == "active")
+        if (isApproved)
         {
             lblstatus.Text = "Approved";
             lblstatus.CssClass = "dash-saving-status is-approved";
         }
-        else if (statusNorm == "processing")
+        else if (prepaidCovered && (isProcessing || bulkPayStatus.Equals("Processing", StringComparison.OrdinalIgnoreCase)) && !isPaid && !isBulk18 && instNo != 1)
         {
             lblstatus.Text = "Processing";
             lblstatus.CssClass = "dash-saving-status is-pending";
         }
-        else if (statusNorm == "rejected" || statusNorm == "2")
+        else if (prepaidCovered)
+        {
+            lblstatus.Text = "Paid";
+            lblstatus.CssClass = "dash-saving-status is-approved";
+        }
+        else if (isProcessing)
+        {
+            lblstatus.Text = "Processing";
+            lblstatus.CssClass = "dash-saving-status is-pending";
+        }
+        else if (isRejected)
         {
             lblstatus.Text = "Rejected";
             lblstatus.CssClass = "dash-saving-status is-rejected";
@@ -313,6 +396,23 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
         {
             lbEdit.Visible = canPay;
         }
+    }
+
+    static string GetRowValue(DataRowView drv, string column)
+    {
+        if (drv == null || drv.Row == null || drv.Row.Table == null || string.IsNullOrWhiteSpace(column))
+            return string.Empty;
+
+        foreach (DataColumn col in drv.Row.Table.Columns)
+        {
+            if (string.Equals(col.ColumnName, column, StringComparison.OrdinalIgnoreCase)
+                && drv[col.ColumnName] != DBNull.Value)
+            {
+                return Convert.ToString(drv[col.ColumnName]).Trim();
+            }
+        }
+
+        return string.Empty;
     }
 
     protected void btncancel_Click(object sender, EventArgs e)
@@ -417,5 +517,65 @@ public partial class user_SavingProductInstallmentDetail : System.Web.UI.Page
 
             ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
         }
+    }
+
+    protected void btnPayCashfree_Click(object sender, EventArgs e)
+    {
+        if (rbOnlinePayment != null) rbOnlinePayment.Checked = true;
+        if (rbCashPayment != null) rbCashPayment.Checked = false;
+
+        int installmentId;
+        if (!int.TryParse((lblidedit.Text ?? string.Empty).Trim(), out installmentId) || installmentId <= 0)
+        {
+            Message.Show("Installment is missing. Please click Pay again.");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            return;
+        }
+
+        decimal amount;
+        string amountText = (txtamountedit.Text ?? string.Empty).Replace("₹", "").Replace(",", "").Trim();
+        if (!decimal.TryParse(amountText, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out amount)
+            && !decimal.TryParse(amountText, out amount))
+        {
+            amount = 0m;
+        }
+
+        if (amount <= 0)
+        {
+            Message.Show("Invalid installment amount.");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            return;
+        }
+
+        string userId = Session["userid"].ToString();
+        objUser.UserId = userId;
+        DataTable userDt = objUser.getUserDetail(objUser);
+        string userName = userDt != null && userDt.Rows.Count > 0 ? Convert.ToString(userDt.Rows[0]["UserName"]) : string.Empty;
+        string mobile = userDt != null && userDt.Rows.Count > 0 ? Convert.ToString(userDt.Rows[0]["Mobile"]) : string.Empty;
+        string email = userDt != null && userDt.Rows.Count > 0 ? Convert.ToString(userDt.Rows[0]["Email"]) : string.Empty;
+
+        CashfreeHelper.CreateOrderResult result = CashfreeHelper.StartSavingInstallment(
+            userId,
+            userName,
+            mobile,
+            email,
+            amount,
+            installmentId,
+            Request);
+
+        if (!result.Ok)
+        {
+            Message.Show(string.IsNullOrWhiteSpace(result.ErrorMessage)
+                ? "Unable to start Cashfree payment."
+                : result.ErrorMessage);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showModal();", true);
+            return;
+        }
+
+        string sessionId = (result.PaymentSessionId ?? string.Empty).Replace("\\", "").Replace("'", "").Replace("\"", "");
+        string mode = string.IsNullOrWhiteSpace(result.Mode) ? "production" : result.Mode.Replace("'", "");
+        string script = "setTimeout(function(){ Closepopup(); if (typeof window.startCashfreeCheckout === 'function') { window.startCashfreeCheckout('" +
+            sessionId + "', '" + mode + "'); } else { alert('Cashfree checkout script is missing. Please refresh.'); } }, 200);";
+        ClientScript.RegisterStartupScript(GetType(), "cfCheckout", script, true);
     }
 }

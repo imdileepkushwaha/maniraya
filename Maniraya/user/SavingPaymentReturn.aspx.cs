@@ -58,6 +58,16 @@ public partial class user_SavingPaymentReturn : Page
 
         if (status == "paid")
         {
+            if (string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
+            {
+                string extra = row.SavingResult == "f"
+                    ? "Payment is successful, but this installment is already in process. Admin will review it."
+                    : "Payment is successful. Your installment request is submitted. Admin will verify and approve it, same as UTR or cash.";
+                SetInstallmentReturnLinks(row.InstallmentId);
+                SetState("paid", "Installment payment successful", extra, "Paid", amountText, paymentId);
+                return;
+            }
+
             string coupon = CashfreeHelper.GetApprovedCoupon(row.UserId, row.CfPaymentId);
             string extra;
             if (!string.IsNullOrWhiteSpace(coupon))
@@ -79,17 +89,36 @@ public partial class user_SavingPaymentReturn : Page
 
         if (status == "failed")
         {
+            if (string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
+            {
+                SetInstallmentReturnLinks(row.InstallmentId);
+            }
             SetState("failed", "Payment failed", "Cashfree could not complete this payment. You can try again from the purchase page.", "Failed", amountText, paymentId);
             return;
         }
 
         if (status == "dropped")
         {
+            if (string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
+            {
+                SetInstallmentReturnLinks(row.InstallmentId);
+            }
             SetState("failed", "Payment cancelled", "The checkout was closed before payment completed. You can try again.", "Dropped", amountText, paymentId);
             return;
         }
 
         SetState("pending", "Payment is processing", "If you already paid, wait a few seconds and refresh. The webhook will confirm the payment automatically.", "Pending", amountText, paymentId);
+    }
+
+    void SetInstallmentReturnLinks(int installmentId)
+    {
+        string coupon = CashfreeHelper.GetInstallmentCoupon(installmentId);
+        string installmentUrl = string.IsNullOrWhiteSpace(coupon)
+            ? "SavingProductInstallmentList.aspx"
+            : ("SavingProductInstallmentDetail.aspx?oid=" + HttpUtility.UrlEncode(coupon));
+        lnkPrimaryAction.HRef = installmentUrl;
+        litPrimaryAction.Text = "Installment Details";
+        lnkTryAgain.HRef = installmentUrl;
     }
 
     void SetState(string tone, string title, string message, string status, string amount, string paymentId = "-")

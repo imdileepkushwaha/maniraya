@@ -107,8 +107,8 @@
                 </div>
             </div>
             <div class="cf-return-actions">
-                <a href="SavingProductOrderHistory.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-list"></i> Order History</a>
-                <a href="SavingProductPurchase.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-undo"></i> Try Again</a>
+                <a id="lnkPrimaryAction" runat="server" href="SavingProductOrderHistory.aspx" class="profile-btn profile-btn-primary"><i class="fa fa-list"></i> <asp:Literal ID="litPrimaryAction" runat="server" Text="Order History" /></a>
+                <a id="lnkTryAgain" runat="server" href="SavingProductPurchase.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-undo"></i> Try Again</a>
                 <a href="Dashboard.aspx" class="profile-btn profile-btn-outline"><i class="fa fa-home"></i> Dashboard</a>
             </div>
         </div>

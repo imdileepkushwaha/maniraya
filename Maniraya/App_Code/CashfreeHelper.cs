@@ -40,6 +40,7 @@ public static class CashfreeHelper
         public string PlanType;
         public int Quantity;
         public string ShippingType;
+        public int InstallmentId;
     }
 
     public static bool IsConfigured
@@ -117,6 +118,10 @@ END
 IF COL_LENGTH('SavingCashfreePayment', 'ShippingType') IS NULL
 BEGIN
     ALTER TABLE dbo.SavingCashfreePayment ADD ShippingType NVARCHAR(50) NULL;
+END
+IF COL_LENGTH('SavingCashfreePayment', 'InstallmentId') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingCashfreePayment ADD InstallmentId INT NULL;
 END");
     }
 
@@ -127,10 +132,20 @@ END");
 
     public static CreateOrderResult StartSavingPurchase(string userId, string userName, string mobile, string email, decimal amount, HttpRequest request, string purchaseType, int quantity)
     {
-        return StartSavingPurchase(userId, userName, mobile, email, amount, request, purchaseType, quantity, string.Empty);
+        return StartSavingPurchase(userId, userName, mobile, email, amount, request, purchaseType, quantity, string.Empty, 0);
     }
 
     public static CreateOrderResult StartSavingPurchase(string userId, string userName, string mobile, string email, decimal amount, HttpRequest request, string purchaseType, int quantity, string shippingType)
+    {
+        return StartSavingPurchase(userId, userName, mobile, email, amount, request, purchaseType, quantity, shippingType, 0);
+    }
+
+    public static CreateOrderResult StartSavingInstallment(string userId, string userName, string mobile, string email, decimal amount, int installmentId, HttpRequest request)
+    {
+        return StartSavingPurchase(userId, userName, mobile, email, amount, request, "Installment", 1, string.Empty, installmentId);
+    }
+
+    public static CreateOrderResult StartSavingPurchase(string userId, string userName, string mobile, string email, decimal amount, HttpRequest request, string purchaseType, int quantity, string shippingType, int installmentId)
     {
         CreateOrderResult result = new CreateOrderResult { Mode = CheckoutMode };
         if (!IsConfigured)
@@ -150,7 +165,20 @@ END");
             quantity = 1;
         }
 
-        purchaseType = string.Equals(purchaseType, "Bulk", StringComparison.OrdinalIgnoreCase) ? "Bulk" : "First";
+        if (string.Equals(purchaseType, "Installment", StringComparison.OrdinalIgnoreCase))
+        {
+            purchaseType = "Installment";
+        }
+        else
+        {
+            purchaseType = string.Equals(purchaseType, "Bulk", StringComparison.OrdinalIgnoreCase) ? "Bulk" : "First";
+        }
+
+        if (purchaseType == "Installment" && installmentId <= 0)
+        {
+            result.ErrorMessage = "Installment is missing. Please open Pay again.";
+            return result;
+        }
 
         string phone = NormalizePhone(mobile);
         if (string.IsNullOrWhiteSpace(phone))
@@ -171,7 +199,9 @@ END");
         body["order_id"] = orderId;
         body["order_amount"] = amount;
         body["order_currency"] = "INR";
-        body["order_note"] = purchaseType == "Bulk" ? "Saving Bulk Purchase" : "Saving First Purchase";
+        body["order_note"] = purchaseType == "Installment"
+            ? "Saving Installment Payment"
+            : (purchaseType == "Bulk" ? "Saving Bulk Purchase" : "Saving First Purchase");
         body["customer_details"] = new JObject
         {
             { "customer_id", customerId },
@@ -201,7 +231,7 @@ END");
             return result;
         }
 
-        InsertPending(orderId, userId, amount, userName, phone, customerEmail, sessionId, JsonText(json, "cf_order_id"), purchaseType, quantity, shippingType);
+        InsertPending(orderId, userId, amount, userName, phone, customerEmail, sessionId, JsonText(json, "cf_order_id"), purchaseType, quantity, shippingType, installmentId);
 
         result.Ok = true;
         result.OrderId = orderId;
@@ -221,7 +251,8 @@ END");
 
         DataTable dt = RunSelect(
             "SELECT TOP 1 OrderId, UserId, Amount, Status, CfPaymentId, SavingInserted, SavingResult, EntryDate, " +
-            "ISNULL(PlanType, 'First') AS PlanType, ISNULL(Quantity, 1) AS Quantity, ISNULL(ShippingType, '') AS ShippingType " +
+            "ISNULL(PlanType, 'First') AS PlanType, ISNULL(Quantity, 1) AS Quantity, ISNULL(ShippingType, '') AS ShippingType, " +
+            "ISNULL(InstallmentId, 0) AS InstallmentId " +
             "FROM SavingCashfreePayment WITH (NOLOCK) WHERE OrderId = '" + Escape(orderId) + "'");
         if (dt == null || dt.Rows.Count == 0)
         {
@@ -248,7 +279,8 @@ END");
             EntryDate = row["EntryDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["EntryDate"]),
             PlanType = Convert.ToString(row["PlanType"]),
             Quantity = quantity,
-            ShippingType = Convert.ToString(row["ShippingType"])
+            ShippingType = Convert.ToString(row["ShippingType"]),
+            InstallmentId = ToInt(row["InstallmentId"])
         };
     }
 
@@ -439,7 +471,11 @@ END");
 
         string txnId = string.IsNullOrWhiteSpace(cfPaymentId) ? ("CF-" + orderId) : cfPaymentId.Trim();
         string res;
-        if (string.Equals(row.PlanType, "Bulk", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
+        {
+            res = InsertInstallmentPayment(row.InstallmentId, txnId);
+        }
+        else if (string.Equals(row.PlanType, "Bulk", StringComparison.OrdinalIgnoreCase))
         {
             res = InsertBulkSavingAccount(row.UserId, row.Amount, txnId);
         }
@@ -448,8 +484,8 @@ END");
             decimal unitAmount = row.Quantity > 1 ? decimal.Round(row.Amount / row.Quantity, 2) : row.Amount;
             res = InsertSavingAccount(row.UserId, unitAmount, txnId, orderId, row.Quantity);
         }
-        bool inserted = res == "t" || res == "u";
-        if (inserted)
+        bool inserted = res == "t" || res == "u" || (res ?? string.Empty).StartsWith("t/");
+        if (inserted && !string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
         {
             ApplyPurchaseMeta(row.UserId, txnId, "Online", row.ShippingType);
             string approveRes = AutoApproveSavingPurchase(row.UserId, txnId);
@@ -470,6 +506,19 @@ END");
     {
         if (row == null)
         {
+            return;
+        }
+
+        if (string.Equals(row.PlanType, "Installment", StringComparison.OrdinalIgnoreCase))
+        {
+            string instTxn = string.IsNullOrWhiteSpace(row.CfPaymentId) ? ("CF-" + row.OrderId) : row.CfPaymentId.Trim();
+            string instRes = InsertInstallmentPayment(row.InstallmentId, instTxn);
+            if (!string.IsNullOrWhiteSpace(instRes) && instRes != "0")
+            {
+                RunNonQuery(
+                    "UPDATE SavingCashfreePayment SET SavingResult = '" + Escape(instRes) + "'" +
+                    " WHERE OrderId = '" + Escape(row.OrderId) + "'");
+            }
             return;
         }
 
@@ -779,10 +828,68 @@ END");
         }
     }
 
-    static void InsertPending(string orderId, string userId, decimal amount, string name, string phone, string email, string sessionId, string cfOrderId, string planType, int quantity, string shippingType)
+    static string InsertInstallmentPayment(int installmentId, string transactionId)
+    {
+        if (installmentId <= 0)
+        {
+            return "0";
+        }
+
+        string res = SavingProductHelper.ExecuteScalarProc("sp_add_SavingAccountInstallmentDetail", new[]
+        {
+            new SqlParameter("@id", installmentId),
+            new SqlParameter("@OnlineTransactionId", transactionId ?? string.Empty),
+            new SqlParameter("@ImageName", "cashfree-online")
+        });
+
+        return string.IsNullOrWhiteSpace(res) ? "0" : res.Trim();
+    }
+
+    public static string GetInstallmentCoupon(int installmentId)
+    {
+        if (installmentId <= 0)
+        {
+            return string.Empty;
+        }
+
+        string couponSelect = SavingProductHelper.HasInstallmentCouponCodeColumn()
+            ? "COALESCE(NULLIF(LTRIM(RTRIM(ISNULL(sa.CouponCode,''))), ''), LTRIM(RTRIM(ISNULL(sd.couponcode,''))))"
+            : "LTRIM(RTRIM(ISNULL(sd.couponcode,'')))";
+        DataTable dt = RunSelect(
+            "SELECT TOP 1 " + couponSelect + " AS couponcode " +
+            "FROM SavingAccountInstallmentDetail sa WITH (NOLOCK) " +
+            "LEFT JOIN SavingAccountDetail sd WITH (NOLOCK) ON sd.orderid = sa.OrderId AND LTRIM(RTRIM(sd.UserId)) = LTRIM(RTRIM(sa.UserId)) " +
+            "WHERE sa.id = " + installmentId + " ORDER BY sd.id DESC");
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        return Convert.ToString(dt.Rows[0]["couponcode"]).Trim();
+    }
+
+    public static bool IsInstallmentApproved(int installmentId)
+    {
+        if (installmentId <= 0)
+        {
+            return false;
+        }
+
+        DataTable dt = RunSelect(
+            "SELECT TOP 1 UPPER(LTRIM(RTRIM(ISNULL(Status,'')))) AS Status FROM SavingAccountInstallmentDetail WITH (NOLOCK) WHERE id = " + installmentId);
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return false;
+        }
+
+        string status = Convert.ToString(dt.Rows[0]["Status"]);
+        return status == "APPROVED" || status == "APPROVE" || status == "1" || status == "ACTIVE";
+    }
+
+    static void InsertPending(string orderId, string userId, decimal amount, string name, string phone, string email, string sessionId, string cfOrderId, string planType, int quantity, string shippingType, int installmentId)
     {
         RunNonQuery(
-            "INSERT INTO SavingCashfreePayment (OrderId, UserId, Amount, CustomerName, CustomerPhone, CustomerEmail, PaymentSessionId, CfOrderId, Status, PlanType, Quantity, ShippingType) VALUES (" +
+            "INSERT INTO SavingCashfreePayment (OrderId, UserId, Amount, CustomerName, CustomerPhone, CustomerEmail, PaymentSessionId, CfOrderId, Status, PlanType, Quantity, ShippingType, InstallmentId) VALUES (" +
             "'" + Escape(orderId) + "'," +
             "'" + Escape(userId) + "'," +
             amount.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," +
@@ -794,7 +901,8 @@ END");
             "'Pending'," +
             "'" + Escape(planType) + "'," +
             quantity + "," +
-            "'" + Escape(shippingType ?? string.Empty) + "')");
+            "'" + Escape(shippingType ?? string.Empty) + "'," +
+            installmentId + ")");
     }
 
     static void UpdatePaymentStatus(string orderId, string status, string cfPaymentId, string rawPayload)
@@ -1043,6 +1151,12 @@ END");
     static string Escape(string value)
     {
         return (value ?? string.Empty).Replace("'", "''");
+    }
+
+    static int ToInt(object value)
+    {
+        int number;
+        return int.TryParse(Convert.ToString(value), out number) ? number : 0;
     }
 
     static decimal ToDecimal(object value)

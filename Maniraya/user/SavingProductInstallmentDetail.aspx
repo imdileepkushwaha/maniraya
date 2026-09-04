@@ -1,6 +1,7 @@
 <%@ Page Title="My Savings Installment" Language="C#" MasterPageFile="MasterPage.master" AutoEventWireup="true" CodeFile="SavingProductInstallmentDetail.aspx.cs" Inherits="user_SavingProductInstallmentDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <link href="assets/css/user-profile.css?v=11" rel="stylesheet" />
     <link href="assets/css/dashboard-modern.css?v=26" rel="stylesheet" />
     <style>
@@ -314,6 +315,59 @@
         .dash-pay-modal-grid.is-cash {
             grid-template-columns: 1fr;
         }
+        .saving-cashfree-box {
+            margin: 14px 0 8px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+        }
+        .saving-cashfree-box h4 {
+            margin: 0 0 6px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #1e3a8a;
+        }
+        .saving-cashfree-box p {
+            margin: 0 0 12px;
+            font-size: 12.5px;
+            color: #334155;
+            line-height: 1.45;
+        }
+        .saving-cashfree-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-cashfree {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #fff !important;
+        }
+        .btn-cashfree:hover {
+            background: #1d4ed8 !important;
+            border-color: #1d4ed8 !important;
+            color: #fff !important;
+        }
+        .saving-manual-divider {
+            margin: 12px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .saving-manual-divider::before,
+        .saving-manual-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
         @media (max-width: 767px) {
             .dash-pay-modal-grid,
             .dash-pay-summary-row,
@@ -502,7 +556,7 @@
                                                 <span class="dash-pay-method-icon is-online"><i class="fa fa-qrcode"></i></span>
                                                 <span class="dash-pay-method-text">
                                                     <strong>Online</strong>
-                                                    <span>Pay via QR and submit UTR</span>
+                                                    <span>Pay with Cashfree, or submit UTR</span>
                                                 </span>
                                             </label>
                                         </div>
@@ -524,7 +578,19 @@
                                     </asp:Panel>
 
                                     <asp:Panel ID="pnlOnlinePaymentSection" runat="server">
-                                        <div class="dash-pay-section-label" style="margin-top:18px;"><i class="fa fa-check-square"></i> Payment Proof</div>
+                                        <div class="saving-cashfree-box">
+                                            <h4><i class="fa fa-shield-alt"></i> Pay Online with Cashfree</h4>
+                                            <p>UPI, card or net banking. After payment the installment request goes to admin for approval, same as UTR or cash.</p>
+                                            <div class="saving-cashfree-actions">
+                                                <asp:Button ID="btnPayCashfree" runat="server" CssClass="btn btn-primary btn-cashfree dash-pay-btn is-primary"
+                                                    Text="Pay with Cashfree" CausesValidation="false" OnClick="btnPayCashfree_Click" />
+                                                <asp:Label ID="lblCashfreeHint" runat="server" CssClass="saving-shipping-empty-text" />
+                                            </div>
+                                        </div>
+
+                                        <div class="saving-manual-divider">Or submit UTR payment proof</div>
+
+                                        <div class="dash-pay-section-label" style="margin-top:10px;"><i class="fa fa-check-square"></i> Payment Proof</div>
                                         <div class="form-group dash-pay-field">
                                             <label for="<%= txttransactionidedit.ClientID %>"><i class="fa fa-exchange-alt"></i> UTR No / Transaction ID</label>
                                             <asp:TextBox ID="txttransactionidedit" CssClass="form-control dash-pay-input" runat="server" placeholder="Enter UTR or transaction reference"></asp:TextBox>
@@ -573,6 +639,7 @@
         </ContentTemplate>
         <Triggers>
             <asp:PostBackTrigger ControlID="btnUpdate" />
+            <asp:PostBackTrigger ControlID="btnPayCashfree" />
         </Triggers>
     </asp:UpdatePanel>
     <script type="text/javascript">
@@ -849,5 +916,51 @@
                 initInstallmentPaymentUpload();
             }
         })();
+
+        window.startCashfreeCheckout = function (sessionId, mode) {
+            if (!sessionId) {
+                alert('Cashfree session is missing. Please try again.');
+                return;
+            }
+
+            function openCheckout() {
+                if (typeof Cashfree !== 'function') {
+                    alert('Cashfree checkout could not load. Please refresh and try again.');
+                    return;
+                }
+
+                try {
+                    var cashfree = Cashfree({ mode: mode || 'production' });
+                    var result = cashfree.checkout({
+                        paymentSessionId: sessionId,
+                        redirectTarget: '_self'
+                    });
+                    if (result && typeof result.then === 'function') {
+                        result.then(function (res) {
+                            if (res && res.error) {
+                                alert(res.error.message || 'Unable to open Cashfree checkout.');
+                            }
+                        }).catch(function () {
+                            alert('Unable to open Cashfree checkout. Please try again.');
+                        });
+                    }
+                } catch (ex) {
+                    alert((ex && ex.message) ? ex.message : 'Unable to open Cashfree checkout.');
+                }
+            }
+
+            if (window.Cashfree) {
+                openCheckout();
+                return;
+            }
+
+            var script = document.createElement('script');
+            script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+            script.onload = openCheckout;
+            script.onerror = function () {
+                alert('Unable to load Cashfree checkout. Please try again.');
+            };
+            document.head.appendChild(script);
+        };
     </script>
 </asp:Content>
