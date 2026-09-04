@@ -207,6 +207,11 @@
 
         #statusUpdateModal .saving-consignment-group {
             margin-top: 4px;
+            display: none;
+        }
+
+        #statusUpdateModal .saving-consignment-group.is-open {
+            display: block;
         }
     </style>
 </asp:Content>
@@ -430,14 +435,14 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="<%= ddModalDeliveryStatus.ClientID %>">Delivery Status</label>
-                                    <asp:DropDownList ID="ddModalDeliveryStatus" CssClass="form-control" runat="server">
+                                    <asp:DropDownList ID="ddModalDeliveryStatus" CssClass="form-control" runat="server" onchange="toggleConsignmentField();">
                                         <asp:ListItem>Confirmed</asp:ListItem>
                                         <asp:ListItem>Shipped</asp:ListItem>
                                         <asp:ListItem>Out for Delivery</asp:ListItem>
                                         <asp:ListItem>Delivered</asp:ListItem>
                                     </asp:DropDownList>
                                 </div>
-                                <asp:Panel ID="pnlConsignment" runat="server" CssClass="form-group saving-consignment-group" style="display:none;">
+                                <asp:Panel ID="pnlConsignment" runat="server" CssClass="form-group saving-consignment-group">
                                     <label for="<%= txtConsignmentNumber.ClientID %>">Consignment Number</label>
                                     <asp:TextBox ID="txtConsignmentNumber" runat="server" CssClass="form-control" MaxLength="100" placeholder="Enter consignment / AWB number" />
                                 </asp:Panel>
@@ -450,6 +455,26 @@
                     </div>
                 </div>
             </div>
+            <script type="text/javascript">
+                window.toggleConsignmentField = function () {
+                    var status = document.getElementById('<%= ddModalDeliveryStatus.ClientID %>');
+                    var panel = document.getElementById('<%= pnlConsignment.ClientID %>');
+                    if (!status || !panel) {
+                        return;
+                    }
+
+                    var value = status.value || '';
+                    if (status.selectedIndex >= 0 && status.options[status.selectedIndex]) {
+                        value = status.options[status.selectedIndex].text || value;
+                    }
+                    value = (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+                    var show = value === 'out for delivery' || value === 'out of delivery';
+                    panel.className = show ? 'form-group saving-consignment-group is-open' : 'form-group saving-consignment-group';
+                    panel.style.display = show ? 'block' : 'none';
+                };
+                window.toggleConsignmentField();
+            </script>
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
@@ -476,15 +501,17 @@
         });
 
         function initConsignmentToggle() {
-            var status = document.getElementById('<%= ddModalDeliveryStatus.ClientID %>');
-            if (!status || status.getAttribute('data-consign-bound') === '1') {
-                toggleConsignmentField();
-                return;
-            }
-
-            status.setAttribute('data-consign-bound', '1');
-            status.addEventListener('change', toggleConsignmentField);
+            $(document).off('change.savingConsignment').on(
+                'change.savingConsignment',
+                '#<%= ddModalDeliveryStatus.ClientID %>',
+                toggleConsignmentField
+            );
             toggleConsignmentField();
+        }
+
+        function isOutForDeliveryStatus(value) {
+            var status = (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+            return status === 'out for delivery' || status === 'out of delivery';
         }
 
         function toggleConsignmentField() {
@@ -494,8 +521,18 @@
                 return;
             }
 
-            var value = (status.value || '').toLowerCase();
-            panel.style.display = value === 'shipped' ? 'block' : 'none';
+            var value = status.value || '';
+            if (status.selectedIndex >= 0 && status.options[status.selectedIndex]) {
+                value = status.options[status.selectedIndex].text || value;
+            }
+
+            if (isOutForDeliveryStatus(value)) {
+                panel.className = 'form-group saving-consignment-group is-open';
+                panel.style.display = 'block';
+            } else {
+                panel.className = 'form-group saving-consignment-group';
+                panel.style.display = 'none';
+            }
         }
 
         function printSavingAddress() {

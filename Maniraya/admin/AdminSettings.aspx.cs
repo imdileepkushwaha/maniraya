@@ -330,7 +330,8 @@ WHERE LOWER(LTRIM(RTRIM(URL))) = 'fasttrack.aspx'");
             "Saving Direct Income Report|SavingDirectIncomeReport.aspx",
             "Saving Level Inst Income|SavingLevelinstDetail.aspx",
             "Saving Level Payout Report|PayoutReportSavingLevel.aspx",
-            "Saving Product GST Reports|SavingProductGSTReport.aspx"));
+            "Saving Product GST Reports|SavingProductGSTReport.aspx",
+            "Repurchase Level Income Report|RepurchaseLevelIncome.aspx"));
 
         list.Add(MakeGroup("Epin Management",
             "Epin Add|epinadd.aspx",
@@ -347,7 +348,8 @@ WHERE LOWER(LTRIM(RTRIM(URL))) = 'fasttrack.aspx'");
             "EMI Purchase Report|SavingInstallmentReport.aspx",
             "Bulk EMI Payment Report|SavingBulkInstallmentPaymentReport.aspx",
             "Pending Installment Report|SavingPendingInstallmentReport.aspx",
-            "Coupon Report|CouponReport.aspx"));
+            "Coupon Report|CouponReport.aspx",
+            "Bulk Reward Report|SavingBulkRewardReport.aspx"));
 
         list.Add(MakeGroup("Virtual Franchise",
             "Plan Request Approval|VirtualFranchisePlanRequestReport.aspx"));

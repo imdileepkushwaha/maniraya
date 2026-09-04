@@ -36,6 +36,10 @@
                 <asp:HiddenField ID="HDFilename" runat="server" />
                 <asp:HiddenField ID="hfPaymentMethod" runat="server" Value="online" />
                 <asp:HiddenField ID="hfSelectedBankId" runat="server" />
+                <asp:HiddenField ID="hfCouponRewardId" runat="server" />
+                <asp:HiddenField ID="hfCouponAmount" runat="server" />
+                <asp:HiddenField ID="hfCouponCode" runat="server" />
+                <asp:HiddenField ID="hfCouponCoversFull" runat="server" Value="0" />
 
                 <div class="upc-steps">
                     <div class="upc-step" id="step1Box" runat="server">
@@ -148,6 +152,10 @@
 
                         <asp:Panel ID="pnlStepPayment" runat="server" Visible="false">
                             <h3 class="upc-section-title"><i class="fa fa-credit-card"></i> Payment Method</h3>
+                            <asp:Panel ID="pnlCouponPaySkip" runat="server" Visible="false" CssClass="alert alert-success" style="margin-bottom:16px;">
+                                Coupon <strong><asp:Literal ID="litCouponPayCode" runat="server" /></strong> covers the payable amount. Payment proof is not required.
+                            </asp:Panel>
+                            <asp:Panel ID="pnlPaymentDetails" runat="server">
                             <p class="upc-pay-intro">Choose online bank transfer or scan QR, then submit your transaction ID and payment receipt.</p>
 
                             <div class="upc-pay-tabs" role="tablist" aria-label="Payment methods">
@@ -269,6 +277,7 @@
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                                 <span>After making the payment, enter your UTR/transaction ID and upload a clear screenshot. Your request will be verified by the admin team.</span>
                             </div>
+                            </asp:Panel>
                             <div class="upc-nav">
                                 <asp:Button ID="btnBackAddress" runat="server" CssClass="upc-btn upc-btn-outline" Text="Back" OnClick="btnBackAddress_Click" CausesValidation="false" />
                                 <asp:Button ID="btnToReview" runat="server" CssClass="upc-btn upc-btn-primary" Text="Continue to Review" OnClick="btnToReview_Click" CausesValidation="false" />
@@ -287,6 +296,9 @@
                                     Mode: <strong><asp:Literal ID="litReviewMode" runat="server" /></strong><br />
                                     UTR / Transaction ID: <strong><asp:Literal ID="litReviewTxn" runat="server" /></strong>
                                 </p>
+                                <asp:Panel ID="pnlReviewCoupon" runat="server" Visible="false">
+                                    <p class="upc-address-preview">Coupon discount: <strong>- &#8377;<asp:Literal ID="litReviewCouponDiscount" runat="server" /></strong></p>
+                                </asp:Panel>
                                 <asp:Image ID="imgReviewReceipt" runat="server" CssClass="upc-receipt" Visible="false" />
                             </div>
                             <div class="upc-review-block">
@@ -313,10 +325,23 @@
 
                     <aside class="upc-card upc-card-pad upc-summary">
                         <h3>Order Summary</h3>
+                        <asp:Panel ID="pnlBulkCoupon" runat="server" Visible="false" CssClass="alert alert-info" style="margin:0 0 14px;padding:10px 12px;">
+                            <asp:CheckBox ID="chkApplyCoupon" runat="server" AutoPostBack="true" OnCheckedChanged="chkApplyCoupon_CheckedChanged" />
+                            Apply coupon <strong><asp:Literal ID="litCouponCode" runat="server" /></strong>
+                            (Rs. <asp:Literal ID="litCouponAmount" runat="server" />) on DP / product amount.
+                            One invoice, minimum Rs. <asp:Literal ID="litCouponMinDp" runat="server" /> DP.
+                            <asp:Label ID="lblCouponMsg" runat="server" ForeColor="#b91c1c" style="display:block;margin-top:6px;"></asp:Label>
+                        </asp:Panel>
                         <div class="upc-summary-row">
                             <span>Subtotal</span>
                             <strong>&#8377;<asp:Literal ID="litSubtotal" runat="server" /></strong>
                         </div>
+                        <asp:Panel ID="pnlCouponSummary" runat="server" Visible="false">
+                            <div class="upc-summary-row">
+                                <span>Coupon discount</span>
+                                <strong>- &#8377;<asp:Literal ID="litCouponDiscount" runat="server" /></strong>
+                            </div>
+                        </asp:Panel>
                         <div class="upc-summary-row">
                             <span>Shipping</span>
                             <strong>&#8377;<asp:Literal ID="litShipping" runat="server" /></strong>

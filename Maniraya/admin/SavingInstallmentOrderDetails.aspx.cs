@@ -740,7 +740,7 @@ ORDER BY sa.id";
         if (e.CommandName == "updatestatus")
         {
             BindStatusModal(argument);
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "openStatusModal", "showAdminModal('statusUpdateModal'); toggleConsignmentField();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "openStatusModal", "showAdminModal('statusUpdateModal'); setTimeout(function(){ if (window.toggleConsignmentField) { window.toggleConsignmentField(); } }, 0);", true);
         }
     }
 
@@ -802,6 +802,22 @@ ORDER BY sa.id";
         txtConsignmentNumber.Text = row.Table.Columns.Contains("ConsignmentNumber")
             ? Convert.ToString(row["ConsignmentNumber"])
             : string.Empty;
+
+        SetConsignmentPanelVisibility(currentStatus);
+    }
+
+    void SetConsignmentPanelVisibility(string status)
+    {
+        if (IsOutForDeliveryStatus(status))
+        {
+            pnlConsignment.CssClass = "form-group saving-consignment-group is-open";
+            pnlConsignment.Style["display"] = "block";
+        }
+        else
+        {
+            pnlConsignment.CssClass = "form-group saving-consignment-group";
+            pnlConsignment.Style["display"] = "none";
+        }
     }
 
     protected void btnSaveDeliveryStatus_Click(object sender, EventArgs e)
@@ -817,15 +833,15 @@ ORDER BY sa.id";
         if (string.IsNullOrWhiteSpace(newStatus))
         {
             Message.Show("Select delivery status.");
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModal", "showAdminModal('statusUpdateModal'); toggleConsignmentField();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModal", "showAdminModal('statusUpdateModal'); setTimeout(function(){ if (window.toggleConsignmentField) { window.toggleConsignmentField(); } }, 0);", true);
             return;
         }
 
         string consignmentNumber = (txtConsignmentNumber.Text ?? string.Empty).Trim();
-        if (IsShippedStatus(newStatus) && string.IsNullOrWhiteSpace(consignmentNumber))
+        if (IsOutForDeliveryStatus(newStatus) && string.IsNullOrWhiteSpace(consignmentNumber))
         {
-            Message.Show("Enter consignment number for shipped order.");
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModalConsignment", "showAdminModal('statusUpdateModal'); toggleConsignmentField();", true);
+            Message.Show("Enter consignment number for out for delivery order.");
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModalConsignment", "showAdminModal('statusUpdateModal'); setTimeout(function(){ if (window.toggleConsignmentField) { window.toggleConsignmentField(); } }, 0);", true);
             return;
         }
 
@@ -837,7 +853,7 @@ ORDER BY sa.id";
         else
         {
             Message.Show("Unable to update delivery status.");
-            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModalFail", "showAdminModal('statusUpdateModal'); toggleConsignmentField();", true);
+            ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "reopenStatusModalFail", "showAdminModal('statusUpdateModal'); setTimeout(function(){ if (window.toggleConsignmentField) { window.toggleConsignmentField(); } }, 0);", true);
         }
     }
 
@@ -866,7 +882,7 @@ ORDER BY sa.id";
                     .Append(SqlEscape(updatedBy))
                     .Append("'");
 
-                if (SavingProductHelper.HasInstallmentConsignmentColumn() && IsShippedStatus(deliveryStatus))
+                if (SavingProductHelper.HasInstallmentConsignmentColumn() && IsOutForDeliveryStatus(deliveryStatus))
                 {
                     sql.Append(", ConsignmentNumber='").Append(SqlEscape(consignmentNumber)).Append("'");
                 }
@@ -887,9 +903,11 @@ ORDER BY sa.id";
         }
     }
 
-    static bool IsShippedStatus(string status)
+    static bool IsOutForDeliveryStatus(string status)
     {
-        return string.Equals((status ?? string.Empty).Trim(), "Shipped", StringComparison.OrdinalIgnoreCase);
+        string value = (status ?? string.Empty).Trim();
+        return string.Equals(value, "Out for Delivery", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(value, "Out of Delivery", StringComparison.OrdinalIgnoreCase);
     }
 
     static string SqlEscape(string value)

@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web;
+using System.Web.SessionState;
 
 public static class SavingProductHelper
 {
@@ -1156,7 +1157,10 @@ ORDER BY sd.id DESC");
         }
     }
 
-    const int BulkPaySchemaVersion = 3;
+    public const string SessionCouponRewardId = "BulkCouponRewardId";
+    public const string SessionCouponRedeemMode = "BulkCouponRedeemMode";
+
+    const int BulkPaySchemaVersion = 7;
     static int AppliedBulkPaySchemaVersion;
 
     static bool HasTable(string tableName)
@@ -1209,17 +1213,403 @@ BEGIN
 END");
         EnsureInstallmentDeliveryColumns();
 
+        EnsureBulkRewardSchema();
+
         RecreateProcedure("sp_add_SavingBulkInstallmentPayment", GetAddBulkInstallmentPaymentProcSql());
         RecreateProcedure("sp_approveSavingBulkInstallmentPayment", GetApproveBulkInstallmentPaymentProcSql());
         RecreateProcedure("sp_rejectSavingBulkInstallmentPayment", GetRejectBulkInstallmentPaymentProcSql());
+        RecreateProcedure("sp_redeemSavingBulkCoupon", GetRedeemBulkCouponProcSql());
+        RecreateProcedure("sp_restoreSavingBulkCoupon", GetRestoreBulkCouponProcSql());
 
         if (HasTable("SavingBulkInstallmentPayment")
+            && HasTable("SavingBulkReward")
+            && HasTable("TransactionDetail_dummy")
+            && HasTableColumn("SavingBulkReward", "RewardCouponCode")
             && ProcedureExists("sp_add_SavingBulkInstallmentPayment")
             && ProcedureExists("sp_approveSavingBulkInstallmentPayment")
-            && ProcedureExists("sp_rejectSavingBulkInstallmentPayment"))
+            && ProcedureExists("sp_rejectSavingBulkInstallmentPayment")
+            && ProcedureExists("sp_redeemSavingBulkCoupon")
+            && ProcedureExists("sp_restoreSavingBulkCoupon")
+            && HasTableColumn("SavingBulkReward", "RedeemOrderNo"))
         {
             AppliedBulkPaySchemaVersion = BulkPaySchemaVersion;
         }
+    }
+
+    public static void EnsureBulkRewardSchema()
+    {
+        RunNonQuery(@"
+IF OBJECT_ID('dbo.SavingBulkReward', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SavingBulkReward
+    (
+        Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        BulkPaymentId INT NOT NULL,
+        UserId NVARCHAR(100) NOT NULL,
+        OrderId NVARCHAR(100) NULL,
+        CouponCode NVARCHAR(100) NULL,
+        RewardCouponCode NVARCHAR(50) NULL,
+        ShoppingPointAmount DECIMAL(18,2) NOT NULL CONSTRAINT DF_SavingBulkReward_Shop DEFAULT (20000),
+        CouponAmount DECIMAL(18,2) NOT NULL CONSTRAINT DF_SavingBulkReward_Coupon DEFAULT (2000),
+        EntryDate DATETIME NOT NULL CONSTRAINT DF_SavingBulkReward_Entry DEFAULT (GETDATE()),
+        RedeemDate DATETIME NOT NULL,
+        Status NVARCHAR(50) NOT NULL CONSTRAINT DF_SavingBulkReward_Status DEFAULT ('Locked'),
+        CouponRedeemStatus NVARCHAR(50) NULL,
+        CouponRedeemDate DATETIME NULL,
+        RedeemOrderNo NVARCHAR(100) NULL,
+        ApproveBy NVARCHAR(100) NULL,
+        DummyTransactionId INT NULL,
+        Remark NVARCHAR(MAX) NULL
+    );
+    CREATE UNIQUE INDEX UQ_SavingBulkReward_BulkPaymentId ON dbo.SavingBulkReward(BulkPaymentId);
+END");
+        RunNonQuery(@"
+IF COL_LENGTH('dbo.SavingBulkReward', 'RewardCouponCode') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingBulkReward ADD RewardCouponCode NVARCHAR(50) NULL;
+END");
+        RunNonQuery(@"
+IF COL_LENGTH('dbo.SavingBulkReward', 'CouponRedeemStatus') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingBulkReward ADD CouponRedeemStatus NVARCHAR(50) NULL;
+END");
+        RunNonQuery(@"
+IF COL_LENGTH('dbo.SavingBulkReward', 'CouponRedeemDate') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingBulkReward ADD CouponRedeemDate DATETIME NULL;
+END");
+        RunNonQuery(@"
+IF COL_LENGTH('dbo.SavingBulkReward', 'RedeemOrderNo') IS NULL
+BEGIN
+    ALTER TABLE dbo.SavingBulkReward ADD RedeemOrderNo NVARCHAR(100) NULL;
+END");
+        RunNonQuery(@"
+UPDATE SavingBulkReward
+SET RewardCouponCode = 'CP' + CONVERT(NVARCHAR(20), Id) + RIGHT('0000' + CONVERT(NVARCHAR(20), ISNULL(BulkPaymentId, 0)), 4)
+WHERE NULLIF(LTRIM(RTRIM(ISNULL(RewardCouponCode, ''))), '') IS NULL");
+        RunNonQuery(@"
+UPDATE SavingBulkReward
+SET CouponRedeemStatus = 'Pending'
+WHERE NULLIF(LTRIM(RTRIM(ISNULL(CouponRedeemStatus, ''))), '') IS NULL");
+        RunNonQuery(@"
+IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.TransactionDetail_dummy
+    (
+        Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        transactionid INT NULL,
+        cramount DECIMAL(18,2) NULL,
+        dramount DECIMAL(18,2) NULL,
+        oldBalance DECIMAL(18,2) NULL,
+        currentBalance DECIMAL(18,2) NULL,
+        userid NVARCHAR(100) NULL,
+        transactiontype NVARCHAR(200) NULL,
+        remark NVARCHAR(MAX) NULL,
+        mentionby NVARCHAR(100) NULL,
+        mentiondate DATETIME NULL,
+        type INT NULL
+    );
+END");
+    }
+
+    public static DataTable GetUserBulkRewards(string userId)
+    {
+        EnsureBulkRewardSchema();
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId) || !HasTable("SavingBulkReward"))
+        {
+            return new DataTable();
+        }
+
+        return RunSelect(@"
+SELECT
+    r.Id,
+    r.BulkPaymentId,
+    r.UserId,
+    r.OrderId,
+    r.CouponCode,
+    r.RewardCouponCode,
+    r.ShoppingPointAmount,
+    r.CouponAmount,
+    r.EntryDate,
+    r.RedeemDate,
+    ISNULL(r.CouponRedeemStatus, 'Pending') AS CouponRedeemStatus,
+    CASE
+        WHEN CONVERT(date, r.RedeemDate) <= CONVERT(date, GETDATE()) THEN 'Redeemable'
+        ELSE 'Locked'
+    END AS RewardStatus
+FROM SavingBulkReward r WITH (NOLOCK)
+WHERE LTRIM(RTRIM(r.UserId)) = '" + Escape(userId) + @"'
+ORDER BY r.Id DESC");
+    }
+
+    public static string GetBulkRewardLinesSql(string extraWhere)
+    {
+        extraWhere = string.IsNullOrWhiteSpace(extraWhere) ? string.Empty : extraWhere;
+        return @"
+SELECT *
+FROM (
+    SELECT
+        r.Id,
+        r.BulkPaymentId,
+        r.UserId,
+        ud.username,
+        r.OrderId,
+        N'Coupon' AS RewardType,
+        r.CouponAmount AS Amount,
+        ISNULL(NULLIF(LTRIM(RTRIM(r.RewardCouponCode)), ''), '-') AS DisplayCouponCode,
+        r.EntryDate,
+        r.EntryDate AS RedeemAfterDate,
+        CASE
+            WHEN UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED' THEN N'Redeemed'
+            ELSE N'Available'
+        END AS RewardStatus,
+        r.ApproveBy,
+        CASE
+            WHEN UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED' THEN 0
+            ELSE 1
+        END AS CanRedeem,
+        0 AS CanPurchase
+    FROM SavingBulkReward r WITH (NOLOCK)
+    LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = r.UserId
+    WHERE ISNULL(r.CouponAmount, 0) > 0
+    UNION ALL
+    SELECT
+        r.Id,
+        r.BulkPaymentId,
+        r.UserId,
+        ud.username,
+        r.OrderId,
+        N'Shopping Point' AS RewardType,
+        r.ShoppingPointAmount AS Amount,
+        N'-' AS DisplayCouponCode,
+        r.EntryDate,
+        r.RedeemDate AS RedeemAfterDate,
+        CASE
+            WHEN CONVERT(date, r.RedeemDate) <= CONVERT(date, GETDATE()) THEN N'Redeemable'
+            ELSE N'Locked'
+        END AS RewardStatus,
+        r.ApproveBy,
+        0 AS CanRedeem,
+        CASE
+            WHEN CONVERT(date, r.RedeemDate) <= CONVERT(date, GETDATE()) THEN 1
+            ELSE 0
+        END AS CanPurchase
+    FROM SavingBulkReward r WITH (NOLOCK)
+    LEFT JOIN UserDetail ud WITH (NOLOCK) ON ud.UserId = r.UserId
+    WHERE ISNULL(r.ShoppingPointAmount, 0) > 0
+) x
+WHERE 1 = 1
+" + extraWhere + @"
+ORDER BY x.Id DESC, x.RewardType ASC";
+    }
+
+    public class BulkCouponInfo
+    {
+        public int Id { get; set; }
+        public string CouponCode { get; set; }
+        public decimal Amount { get; set; }
+    }
+
+    public static string GetCouponMinPurchaseMessage(decimal couponAmount)
+    {
+        if (couponAmount <= 0)
+        {
+            couponAmount = 2000;
+        }
+
+        return "Use this coupon with a single invoice. Minimum purchase of Rs. "
+            + couponAmount.ToString("0.00")
+            + " DP (product amount) is required to redeem this coupon.";
+    }
+
+    public static BulkCouponInfo GetActiveCoupon(HttpSessionState session, string userId)
+    {
+        int rewardId = GetSessionCouponRewardId(session);
+        BulkCouponInfo coupon = GetPendingBulkCoupon(userId, rewardId);
+        if (coupon == null && rewardId > 0)
+        {
+            coupon = GetPendingBulkCoupon(userId, 0);
+        }
+
+        return coupon;
+    }
+
+    public static BulkCouponInfo GetPendingBulkCoupon(string userId, int rewardId)
+    {
+        EnsureBulkRewardSchema();
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId) || !HasTable("SavingBulkReward"))
+        {
+            return null;
+        }
+
+        string idFilter = rewardId > 0 ? " AND r.Id = " + rewardId : string.Empty;
+        DataTable dt = RunSelect(@"
+SELECT TOP 1
+    r.Id,
+    ISNULL(NULLIF(LTRIM(RTRIM(r.RewardCouponCode)), ''), '-') AS CouponCode,
+    ISNULL(r.CouponAmount, 0) AS Amount
+FROM SavingBulkReward r WITH (NOLOCK)
+WHERE LTRIM(RTRIM(r.UserId)) = '" + Escape(userId) + @"'
+  AND ISNULL(r.CouponAmount, 0) > 0
+  AND UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) <> 'REDEEMED'
+" + idFilter + @"
+ORDER BY r.Id DESC");
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            return null;
+        }
+
+        decimal amount;
+        decimal.TryParse(Convert.ToString(dt.Rows[0]["Amount"]), out amount);
+        int id;
+        int.TryParse(Convert.ToString(dt.Rows[0]["Id"]), out id);
+        if (id <= 0 || amount <= 0)
+        {
+            return null;
+        }
+
+        return new BulkCouponInfo
+        {
+            Id = id,
+            CouponCode = Convert.ToString(dt.Rows[0]["CouponCode"]),
+            Amount = amount
+        };
+    }
+
+    public static void BeginCouponRedeem(HttpSessionState session, int rewardId)
+    {
+        if (session == null)
+        {
+            return;
+        }
+
+        session[SessionCouponRewardId] = rewardId;
+        session[SessionCouponRedeemMode] = "1";
+    }
+
+    public static void ClearCouponRedeem(HttpSessionState session)
+    {
+        if (session == null)
+        {
+            return;
+        }
+
+        session.Remove(SessionCouponRewardId);
+        session.Remove(SessionCouponRedeemMode);
+    }
+
+    public static bool IsCouponRedeemMode(HttpSessionState session)
+    {
+        return session != null && Convert.ToString(session[SessionCouponRedeemMode]) == "1";
+    }
+
+    public static int GetSessionCouponRewardId(HttpSessionState session)
+    {
+        int id;
+        if (session == null || !int.TryParse(Convert.ToString(session[SessionCouponRewardId]), out id))
+        {
+            return 0;
+        }
+
+        return id;
+    }
+
+    public static string RedeemBulkCoupon(int rewardId, string userId)
+    {
+        return RedeemBulkCoupon(rewardId, userId, null);
+    }
+
+    public static string RedeemBulkCoupon(int rewardId, string userId, string remark)
+    {
+        return RedeemBulkCoupon(rewardId, userId, remark, null);
+    }
+
+    public static string RedeemBulkCoupon(int rewardId, string userId, string remark, string orderNo)
+    {
+        EnsureBulkInstallmentPaymentSchema();
+        return ExecuteScalarProc("sp_redeemSavingBulkCoupon", new[]
+        {
+            new SqlParameter("@id", rewardId),
+            new SqlParameter("@UserId", userId ?? string.Empty),
+            new SqlParameter("@Remark", string.IsNullOrWhiteSpace(remark) ? (object)DBNull.Value : remark.Trim()),
+            new SqlParameter("@OrderNo", string.IsNullOrWhiteSpace(orderNo) ? (object)DBNull.Value : orderNo.Trim())
+        });
+    }
+
+    public static string RestoreBulkCouponForPurchase(string userId, string orderNo)
+    {
+        EnsureBulkInstallmentPaymentSchema();
+        return ExecuteScalarProc("sp_restoreSavingBulkCoupon", new[]
+        {
+            new SqlParameter("@UserId", userId ?? string.Empty),
+            new SqlParameter("@OrderNo", orderNo ?? string.Empty)
+        });
+    }
+
+    public static string GetLatestRepurchaseOrderNo(string userId)
+    {
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return string.Empty;
+        }
+
+        DataTable dt = RunSelect(@"
+SELECT TOP 1 OrderNo
+FROM UserFranchiseePurchaseMaster WITH (NOLOCK)
+WHERE LTRIM(RTRIM(UserId)) = '" + Escape(userId) + @"'
+ORDER BY PurchaseId DESC");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["OrderNo"] == DBNull.Value)
+        {
+            return string.Empty;
+        }
+
+        return Convert.ToString(dt.Rows[0]["OrderNo"]).Trim();
+    }
+
+    public static decimal GetUserDummyCouponBalance(string userId)
+    {
+        EnsureBulkRewardSchema();
+        userId = (userId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(userId) || !HasTable("TransactionDetail_dummy"))
+        {
+            return 0;
+        }
+
+        DataTable dt = RunSelect(@"
+SELECT ISNULL(SUM(ISNULL(cramount, 0)), 0) - ISNULL(SUM(ISNULL(dramount, 0)), 0) AS bal
+FROM TransactionDetail_dummy WITH (NOLOCK)
+WHERE LTRIM(RTRIM(userid)) = '" + Escape(userId) + "'");
+        if (dt == null || dt.Rows.Count == 0 || dt.Rows[0]["bal"] == DBNull.Value)
+        {
+            return 0;
+        }
+
+        decimal bal;
+        return decimal.TryParse(Convert.ToString(dt.Rows[0]["bal"]), out bal) ? bal : 0;
+    }
+
+    public static decimal GetUserShoppingPointTotal(string userId)
+    {
+        DataTable dt = GetUserBulkRewards(userId);
+        if (dt == null || dt.Rows.Count == 0 || !dt.Columns.Contains("ShoppingPointAmount"))
+        {
+            return 0;
+        }
+
+        decimal total = 0;
+        foreach (DataRow row in dt.Rows)
+        {
+            decimal amt;
+            if (decimal.TryParse(Convert.ToString(row["ShoppingPointAmount"]), out amt))
+            {
+                total += amt;
+            }
+        }
+
+        return total;
     }
 
     static bool ProcedureExists(string procName)
@@ -1385,16 +1775,17 @@ CREATE PROC dbo.sp_approveSavingBulkInstallmentPayment
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @status NVARCHAR(50), @orderId NVARCHAR(100), @userId NVARCHAR(100), @requestDate DATETIME, @bulkId INT = @id;
-    SELECT @status = bp.Status, @orderId = bp.OrderId, @userId = bp.UserId, @requestDate = bp.RequestDate
+    DECLARE @status NVARCHAR(50), @orderId NVARCHAR(100), @userId NVARCHAR(100), @couponCode NVARCHAR(100), @requestDate DATETIME, @bulkId INT = @id;
+    SELECT @status = bp.Status, @orderId = bp.OrderId, @userId = bp.UserId, @couponCode = bp.CouponCode, @requestDate = bp.RequestDate
     FROM SavingBulkInstallmentPayment bp WHERE bp.Id = @bulkId;
     IF (@status IS NULL) BEGIN SELECT '0'; RETURN; END
     IF (UPPER(LTRIM(RTRIM(ISNULL(@status, '')))) <> 'PROCESSING') BEGIN SELECT 'f'; RETURN; END
     DECLARE @baseDate DATE = CONVERT(date, ISNULL(@requestDate, GETDATE()));
     DECLARE @remarkText NVARCHAR(MAX) = LTRIM(RTRIM(ISNULL(@Remark, '')));
     DECLARE @adminUser NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@Approveby, '')));
+    DECLARE @now DATETIME = GETDATE();
     UPDATE SavingBulkInstallmentPayment
-    SET Status = 'Approved', ApproveDate = GETDATE(), ApproveBy = @adminUser,
+    SET Status = 'Approved', ApproveDate = @now, ApproveBy = @adminUser,
         Remark = CASE WHEN @remarkText = '' THEN Remark ELSE @remarkText END
     WHERE Id = @bulkId;
     UPDATE sa
@@ -1421,6 +1812,45 @@ BEGIN
         SET DeliveryStatus = 'Scheduled', DeliveryStatusUpdatedOn = GETDATE(), DeliveryStatusUpdatedBy = @adminUser
         WHERE ISNULL(BulkPaymentId, 0) = @bulkId
           AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) IN ('APPROVED', 'APPROVE', '1');
+    END
+    IF OBJECT_ID('dbo.SavingBulkReward', 'U') IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM SavingBulkReward WITH (NOLOCK) WHERE BulkPaymentId = @bulkId)
+    BEGIN
+        DECLARE @couponAmt DECIMAL(18,2) = 2000;
+        DECLARE @shopAmt DECIMAL(18,2) = 20000;
+        DECLARE @oldBal DECIMAL(18,2) = 0;
+        DECLARE @newBal DECIMAL(18,2) = 0;
+        DECLARE @txnId INT = 0;
+        DECLARE @rewardCode NVARCHAR(50) = N'CP' + CONVERT(NVARCHAR(20), @bulkId) + UPPER(LEFT(REPLACE(CONVERT(NVARCHAR(36), NEWID()), '-', ''), 4));
+        IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NOT NULL
+        BEGIN
+            SELECT @oldBal = ISNULL(SUM(ISNULL(cramount, 0)), 0) - ISNULL(SUM(ISNULL(dramount, 0)), 0)
+            FROM TransactionDetail_dummy WITH (NOLOCK)
+            WHERE LTRIM(RTRIM(userid)) = LTRIM(RTRIM(@userId));
+            SET @newBal = @oldBal + @couponAmt;
+            SELECT @txnId = ISNULL(MAX(transactionid), 0) + 1 FROM TransactionDetail_dummy;
+            INSERT INTO TransactionDetail_dummy (
+                transactionid, cramount, dramount, oldBalance, currentBalance,
+                userid, transactiontype, remark, mentionby, mentiondate, type
+            )
+            VALUES (
+                @txnId, @couponAmt, 0, @oldBal, @newBal,
+                @userId, N'Bulk Coupon',
+                N'Bulk EMI coupon ' + ISNULL(@rewardCode, '') + N' | Request #' + CONVERT(NVARCHAR(20), @bulkId),
+                @adminUser, @now, 4
+            );
+        END
+        INSERT INTO SavingBulkReward (
+            BulkPaymentId, UserId, OrderId, CouponCode, RewardCouponCode,
+            ShoppingPointAmount, CouponAmount, EntryDate, RedeemDate,
+            Status, CouponRedeemStatus, ApproveBy, DummyTransactionId, Remark
+        )
+        VALUES (
+            @bulkId, @userId, @orderId, @couponCode, @rewardCode,
+            @shopAmt, @couponAmt, @now, DATEADD(MONTH, 18, @now),
+            N'Locked', N'Pending', @adminUser, NULLIF(@txnId, 0),
+            N'Bulk EMI shopping point 20000 (purchase after 18 months) + coupon 2000'
+        );
     END
     SELECT 't';
 END";
@@ -1455,6 +1885,192 @@ BEGIN
                 SELECT LTRIM(RTRIM(ISNULL(CouponCode, ''))) FROM SavingBulkInstallmentPayment WHERE Id = @bulkId)
            AND ISNULL(TRY_CONVERT(INT, InstNo), 0) BETWEEN 2 AND 18
            AND UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) = 'PROCESSING');
+    SELECT 't';
+END";
+    }
+
+    static string GetRedeemBulkCouponProcSql()
+    {
+        return @"
+CREATE PROC dbo.sp_redeemSavingBulkCoupon
+    @id INT,
+    @UserId NVARCHAR(100),
+    @Remark NVARCHAR(MAX) = NULL,
+    @OrderNo NVARCHAR(100) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @user NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@UserId, '')));
+    DECLARE @rewardUser NVARCHAR(100);
+    DECLARE @couponAmt DECIMAL(18,2);
+    DECLARE @rewardCode NVARCHAR(50);
+    DECLARE @redeemStatus NVARCHAR(50);
+    IF (@user = '' OR ISNULL(@id, 0) <= 0) BEGIN SELECT 'n'; RETURN; END
+    SELECT
+        @rewardUser = LTRIM(RTRIM(UserId)),
+        @couponAmt = ISNULL(CouponAmount, 0),
+        @rewardCode = RewardCouponCode,
+        @redeemStatus = CouponRedeemStatus
+    FROM SavingBulkReward
+    WHERE Id = @id;
+    IF (@rewardUser IS NULL) BEGIN SELECT '0'; RETURN; END
+    IF (LTRIM(RTRIM(@rewardUser)) <> @user) BEGIN SELECT 'n'; RETURN; END
+    IF (UPPER(LTRIM(RTRIM(ISNULL(@redeemStatus, 'Pending')))) = 'REDEEMED') BEGIN SELECT 'f'; RETURN; END
+    IF (ISNULL(@couponAmt, 0) <= 0) BEGIN SELECT 'n'; RETURN; END
+    DECLARE @now DATETIME = GETDATE();
+    DECLARE @dummyBal DECIMAL(18,2) = 0;
+    DECLARE @order NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@OrderNo, '')));
+    DECLARE @note NVARCHAR(MAX) = N'Redeem coupon ' + ISNULL(@rewardCode, '') + N' against DP billing | Reward #' + CONVERT(NVARCHAR(20), @id);
+    IF (@order <> '')
+        SET @note = @note + N' | Order ' + @order;
+    IF (LTRIM(RTRIM(ISNULL(@Remark, ''))) <> '')
+        SET @note = @note + N' | ' + LTRIM(RTRIM(@Remark));
+    IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NOT NULL
+    BEGIN
+        SELECT @dummyBal = ISNULL(SUM(ISNULL(cramount, 0)), 0) - ISNULL(SUM(ISNULL(dramount, 0)), 0)
+        FROM TransactionDetail_dummy WITH (NOLOCK)
+        WHERE LTRIM(RTRIM(userid)) = @user;
+        IF (@dummyBal < @couponAmt) BEGIN SELECT 'b'; RETURN; END
+        DECLARE @dummyNew DECIMAL(18,2) = @dummyBal - @couponAmt;
+        DECLARE @dummyTxn INT = 0;
+        SELECT @dummyTxn = ISNULL(MAX(transactionid), 0) + 1 FROM TransactionDetail_dummy;
+        INSERT INTO TransactionDetail_dummy (
+            transactionid, cramount, dramount, oldBalance, currentBalance,
+            userid, transactiontype, remark, mentionby, mentiondate, type
+        )
+        VALUES (
+            @dummyTxn, 0, @couponAmt, @dummyBal, @dummyNew,
+            @user, N'Bulk Coupon Redeem',
+            @note,
+            @user, @now, 4
+        );
+    END
+    UPDATE SavingBulkReward
+    SET CouponRedeemStatus = N'Redeemed',
+        CouponRedeemDate = @now,
+        RedeemOrderNo = CASE WHEN @order = '' THEN RedeemOrderNo ELSE @order END
+    WHERE Id = @id;
+    SELECT 't';
+END";
+    }
+
+    static string GetRestoreBulkCouponProcSql()
+    {
+        return @"
+CREATE PROC dbo.sp_restoreSavingBulkCoupon
+    @UserId NVARCHAR(100),
+    @OrderNo NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @user NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@UserId, '')));
+    DECLARE @order NVARCHAR(100) = LTRIM(RTRIM(ISNULL(@OrderNo, '')));
+    IF (@user = '' OR @order = '') BEGIN SELECT 'n'; RETURN; END
+
+    DECLARE @rewardId INT = NULL;
+    DECLARE @couponAmt DECIMAL(18,2) = 0;
+    DECLARE @rewardCode NVARCHAR(50);
+    DECLARE @payMode NVARCHAR(50);
+    DECLARE @txn NVARCHAR(100);
+
+    IF COL_LENGTH('dbo.SavingBulkReward', 'RedeemOrderNo') IS NOT NULL
+    BEGIN
+        SELECT TOP 1
+            @rewardId = r.Id,
+            @couponAmt = ISNULL(r.CouponAmount, 0),
+            @rewardCode = r.RewardCouponCode
+        FROM SavingBulkReward r
+        WHERE LTRIM(RTRIM(r.UserId)) = @user
+          AND LTRIM(RTRIM(ISNULL(r.RedeemOrderNo, ''))) = @order
+          AND UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED'
+        ORDER BY r.Id DESC;
+    END
+
+    IF OBJECT_ID('dbo.UserFranchiseePurchaseMaster', 'U') IS NOT NULL
+    BEGIN
+        SELECT TOP 1
+            @payMode = LTRIM(RTRIM(ISNULL(PaymentMode, ''))),
+            @txn = LTRIM(RTRIM(ISNULL(Onlinetransactionid, ISNULL(OnlineTransactionId, ''))))
+        FROM UserFranchiseePurchaseMaster
+        WHERE LTRIM(RTRIM(UserId)) = @user
+          AND (LTRIM(RTRIM(ISNULL(OrderNo, ''))) = @order OR CONVERT(NVARCHAR(40), PurchaseId) = @order)
+        ORDER BY PurchaseId DESC;
+    END
+
+    IF (@rewardId IS NULL AND ISNULL(@txn, '') <> '')
+    BEGIN
+        SELECT TOP 1
+            @rewardId = r.Id,
+            @couponAmt = ISNULL(r.CouponAmount, 0),
+            @rewardCode = r.RewardCouponCode
+        FROM SavingBulkReward r
+        WHERE LTRIM(RTRIM(r.UserId)) = @user
+          AND LTRIM(RTRIM(ISNULL(r.RewardCouponCode, ''))) = @txn
+          AND UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED'
+        ORDER BY r.CouponRedeemDate DESC, r.Id DESC;
+    END
+
+    IF (@rewardId IS NULL AND (@payMode LIKE N'%Coupo%' OR @payMode LIKE N'%COUPO%'))
+    BEGIN
+        SELECT TOP 1
+            @rewardId = r.Id,
+            @couponAmt = ISNULL(r.CouponAmount, 0),
+            @rewardCode = r.RewardCouponCode
+        FROM SavingBulkReward r
+        WHERE LTRIM(RTRIM(r.UserId)) = @user
+          AND UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED'
+        ORDER BY r.CouponRedeemDate DESC, r.Id DESC;
+    END
+
+    IF (@rewardId IS NULL AND OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NOT NULL)
+    BEGIN
+        SELECT TOP 1
+            @rewardId = r.Id,
+            @couponAmt = ISNULL(r.CouponAmount, 0),
+            @rewardCode = r.RewardCouponCode
+        FROM SavingBulkReward r
+        WHERE LTRIM(RTRIM(r.UserId)) = @user
+          AND UPPER(LTRIM(RTRIM(ISNULL(r.CouponRedeemStatus, 'Pending')))) = 'REDEEMED'
+          AND EXISTS (
+                SELECT 1
+                FROM TransactionDetail_dummy d
+                WHERE LTRIM(RTRIM(d.userid)) = @user
+                  AND ISNULL(d.transactiontype, '') LIKE N'%Bulk Coupon Redeem%'
+                  AND ISNULL(d.remark, '') LIKE N'%' + @order + N'%'
+            )
+        ORDER BY r.CouponRedeemDate DESC, r.Id DESC;
+    END
+
+    IF (@rewardId IS NULL) BEGIN SELECT '0'; RETURN; END
+    IF (ISNULL(@couponAmt, 0) <= 0) BEGIN SELECT 'n'; RETURN; END
+
+    DECLARE @now DATETIME = GETDATE();
+    DECLARE @dummyBal DECIMAL(18,2) = 0;
+    IF OBJECT_ID('dbo.TransactionDetail_dummy', 'U') IS NOT NULL
+    BEGIN
+        SELECT @dummyBal = ISNULL(SUM(ISNULL(cramount, 0)), 0) - ISNULL(SUM(ISNULL(dramount, 0)), 0)
+        FROM TransactionDetail_dummy WITH (NOLOCK)
+        WHERE LTRIM(RTRIM(userid)) = @user;
+        DECLARE @dummyNew DECIMAL(18,2) = @dummyBal + @couponAmt;
+        DECLARE @dummyTxn INT = 0;
+        SELECT @dummyTxn = ISNULL(MAX(transactionid), 0) + 1 FROM TransactionDetail_dummy;
+        INSERT INTO TransactionDetail_dummy (
+            transactionid, cramount, dramount, oldBalance, currentBalance,
+            userid, transactiontype, remark, mentionby, mentiondate, type
+        )
+        VALUES (
+            @dummyTxn, @couponAmt, 0, @dummyBal, @dummyNew,
+            @user, N'Bulk Coupon Restore',
+            N'Restore coupon ' + ISNULL(@rewardCode, '') + N' after purchase reject | Order ' + @order,
+            @user, @now, 4
+        );
+    END
+
+    UPDATE SavingBulkReward
+    SET CouponRedeemStatus = N'Pending',
+        CouponRedeemDate = NULL,
+        RedeemOrderNo = NULL
+    WHERE Id = @rewardId;
     SELECT 't';
 END";
     }

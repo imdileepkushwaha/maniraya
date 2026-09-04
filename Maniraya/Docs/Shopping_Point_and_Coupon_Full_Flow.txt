@@ -1,0 +1,405 @@
+================================================================================
+MANIRAYA / MPREMIUM
+SHOPPING POINT AND COUPON — COMPLETE FLOW (ENGLISH)
+================================================================================
+Document type : Process / user + admin flow
+Format        : Plain text
+Date          : 01 September 2026
+================================================================================
+
+
+1. WHAT THIS FEATURE IS
+--------------------------------------------------------------------------------
+When a user pays remaining Saving Product EMIs in bulk (Installment 2 to 18)
+and Admin APPROVES that bulk EMI request, the user receives TWO rewards:
+
+  A) COUPON
+     - Amount     : Rs. 2,000
+     - Code       : Auto generated (example: CP10002)
+     - Available  : Immediately after approval
+     - Use        : Discount on one repurchase invoice (on DP / product amount)
+     - Not a cash wallet. Not shopping-wallet credit.
+
+  B) SHOPPING POINT
+     - Amount     : Rs. 20,000
+     - Available  : After 18 months from approval date
+     - Use        : Product purchase after unlock date
+     - Locked until the "Redeem After" date
+
+Both rewards appear as SEPARATE ROWS on the Shopping Point / Coupon report.
+
+
+2. MENU / PAGE NAMES
+--------------------------------------------------------------------------------
+USER PANEL
+  Menu path : Saving Product  ->  Shopping Point / Coupon
+  Page      : user/SavingBulkRewardReport.aspx
+  Dashboard : Dashboard shows two cards (Shopping Point + Coupon)
+              with a "View details" link to the same report.
+
+  Related pages:
+    Saving Product  ->  Bulk EMI Payment
+                        user/SavingBulkInstallmentPayment.aspx
+    My Repurchase   ->  Franchisee search, product catalog, cart, checkout
+                        user/FranchiseeSearchNew.aspx
+                        user/PurchaseItemRepurchase.aspx
+                        user/UserProductCart.aspx
+                        user/UserProductCheckout.aspx
+
+ADMIN PANEL
+  Menu path : Saving Product  ->  Bulk Reward Report
+  Page      : admin/SavingBulkRewardReport.aspx
+
+  Related pages:
+    Saving Product  ->  Bulk EMI Payment Report
+                        admin/SavingBulkInstallmentPaymentReport.aspx
+    Approve Purchase / User Repurchase Report
+                        admin/UserRepurchaseReport.aspx
+
+
+3. HOW THE REWARD IS CREATED (START OF FLOW)
+--------------------------------------------------------------------------------
+STEP 1 — User buys a Saving Product (bulk plan)
+  User: Saving Product -> Purchase Saving Product
+  First installment is paid as per existing saving-product purchase.
+
+STEP 2 — User pays remaining EMIs together
+  User: Saving Product -> Bulk EMI Payment
+  User uploads UTR / payment slip for remaining installments (Inst 2 to 18).
+  Status of this request: Processing
+
+STEP 3 — Admin approves the bulk EMI
+  Admin: Saving Product -> Bulk EMI Payment Report
+  Admin clicks Approve.
+
+  On APPROVE the system does all of the following:
+    - Marks the bulk EMI request as Approved
+    - Approves Installment 2 to 18 with due/approve dates one month apart
+    - Creates ONE reward record for that bulk payment
+    - Credits Rs. 2,000 coupon into dummy coupon ledger
+      (TransactionDetail_dummy, type 4)
+    - Does NOT credit Rs. 20,000 shopping point into any spendable wallet now
+    - Shopping point stays locked until Entry Date + 18 months
+
+  On REJECT of bulk EMI:
+    - Installments stay unpaid / rejected
+    - NO coupon and NO shopping point is created
+
+
+4. WHAT THE USER SEES AFTER APPROVAL
+--------------------------------------------------------------------------------
+A) DASHBOARD  (user/Dashboard.aspx)
+   Section: "Bulk EMI Rewards"
+     Card 1 — Shopping Point
+       Amount, Entry Date, Redeem After (18 months)
+     Card 2 — Coupon Amount
+       Amount, Coupon Code, Available Now balance, Redeem Status
+     Both cards have "View details" -> Shopping Point / Coupon report
+
+B) USER REPORT  (user/SavingBulkRewardReport.aspx)
+   Title: Shopping Point / Coupon
+   Note on page: "2000 coupon can be redeemed now. 20000 shopping point
+                  can be used for purchase after 18 months."
+
+   Filters:
+     From Date, To Date, User ID (fixed to logged-in user)
+
+   Grid columns:
+     # | Reward Type | Amount | Coupon Code | Entry Date | Redeem After | Status | Action
+
+   TWO ROWS for one approval:
+     Row 1  Reward Type = Coupon
+            Amount      = 2,000.00
+            Coupon Code = CP.....
+            Redeem After= same as Entry Date (usable now)
+            Status      = Available   (or Redeemed after use)
+            Action      = "Redeem on Purchase"  (only if Available)
+
+     Row 2  Reward Type = Shopping Point
+            Amount      = 20,000.00
+            Coupon Code = -
+            Redeem After= Entry Date + 18 months
+            Status      = Locked      (until redeem-after date)
+                          Redeemable  (after 18 months)
+            Action      = Locked  OR  Purchase button after unlock
+
+
+5. ADMIN REPORT  (admin/SavingBulkRewardReport.aspx)
+--------------------------------------------------------------------------------
+Title: Bulk Reward Report
+Intro: Each approval creates two rows: 2000 coupon (redeemable now with
+       coupon code) and 20000 shopping point (purchase after 18 months).
+
+Filters:
+  From Date, To Date, User Id, Coupon Code, Reward Type, Status
+
+Reward Type dropdown:
+  All / Coupon / Shopping Point
+
+Status dropdown:
+  All / Available / Redeemed / Locked / Redeemable
+
+Grid columns:
+  S.No | User Id | Name | Reward Type | Amount | Coupon Code |
+  Entry Date | Redeem After | Status | Approve By
+
+This is a VIEW-ONLY report. Admin does not redeem from this page.
+
+
+6. STATUS MEANING
+--------------------------------------------------------------------------------
+COUPON ROW
+  Available  = Coupon is unused. User can click "Redeem on Purchase".
+  Redeemed   = Coupon was applied on a successful repurchase invoice.
+
+SHOPPING POINT ROW
+  Locked     = 18 months not completed. Cannot purchase with it yet.
+  Redeemable = Unlock date reached. User can start purchase.
+
+These statuses are display labels. Coupon storage status in database is:
+  Pending  = Available on screen
+  Redeemed = Redeemed on screen
+
+
+7. COUPON REDEEM FLOW (USER) — FULL PATH
+--------------------------------------------------------------------------------
+IMPORTANT RULES
+  - Coupon is a BILLING DISCOUNT on DP (product amount / subtotal).
+  - It is NOT added to shopping wallet / UtilityBalance.
+  - It must be used on ONE invoice (single checkout).
+  - Cart DP subtotal must be at least the coupon amount (Rs. 2,000).
+  - Shipping is extra and is NOT covered by the coupon.
+  - If remaining payable after coupon is about zero, UTR/slip is not required.
+    Payment mode is saved as "Bulk Coupon".
+  - If cart is bigger than Rs. 2,000 DP, user pays the remaining amount by
+    QR / Online, and coupon still applies as Rs. 2,000 discount.
+
+STEP-BY-STEP
+
+  1. User opens  Saving Product -> Shopping Point / Coupon
+  2. On the Coupon row, clicks  "Redeem on Purchase"
+  3. System checks coupon is still Pending / Available
+       If already redeemed -> alert: "This coupon is not available to redeem."
+  4. Coupon is stored in session (redeem mode ON)
+  5. User is sent to Franchisee Search
+       Message shown:
+         Redeem coupon CPxxxx (Rs. 2000) on the next purchase as a DP /
+         billing discount. Minimum Rs. 2000 DP in a single invoice.
+  6. User selects a franchisee (cart icon)
+  7. Product catalog opens  (PurchaseItemRepurchase.aspx)
+  8. User clicks Add to Cart  (does NOT checkout on old purchase panel)
+  9. Cart page  (UserProductCart.aspx)
+       Note shown:
+         Coupon CPxxxx (Rs. 2000) will apply as a billing discount on checkout.
+         Use it on a single invoice with minimum Rs. 2000 DP.
+     User clicks Proceed to Checkout
+ 10. Checkout page  (UserProductCheckout.aspx)
+       Checkbox: Apply coupon CPxxxx (Rs. 2000) on DP / product amount
+       Auto-checked only if Subtotal (DP) >= 2000
+       If user checks it with DP below 2000:
+         Alert: "Use this coupon with a single invoice. Minimum purchase of
+                 Rs. 2000.00 DP (product amount) is required to redeem this
+                 coupon."
+         Checkbox is unchecked.
+       Order summary:
+         Subtotal
+         Coupon discount   (minus 2000 if applied)
+         Shipping
+         Total payable
+ 11. User submits the order
+ 12. On SUCCESS:
+       - Purchase order is created
+       - Coupon dummy ledger is DEBITED Rs. 2,000
+       - Coupon status becomes Redeemed
+       - Coupon is linked to that Order No (so reject can restore it)
+       - Session coupon is cleared
+       - Cart is cleared
+       Message: Purchase successful. Coupon discount Rs. 2000.00 applied
+                on billing.
+
+  If purchase fails (stock, balance, etc.), coupon stays Available.
+
+
+8. IF ADMIN REJECTS THE REPURCHASE
+--------------------------------------------------------------------------------
+Page: admin/UserRepurchaseReport.aspx
+Pending orders show Approve and Reject.
+
+If Admin REJECTS a purchase that used this coupon:
+  - Purchase status becomes Rejected
+  - SAME coupon becomes Available / Pending again
+  - Rs. 2,000 is credited back to dummy coupon ledger
+  - User can redeem the same coupon on a new purchase
+
+If Admin REJECTS a normal purchase (no coupon):
+  - Only the purchase is rejected
+  - Coupon is not changed
+
+If Admin APPROVES the purchase:
+  - Coupon stays Redeemed
+  - No restore
+
+
+9. SHOPPING POINT FLOW (AFTER 18 MONTHS)
+--------------------------------------------------------------------------------
+Until Redeem After date:
+  Status = Locked
+  Action = "Locked"
+  User cannot spend the 20,000 shopping point.
+
+On / after Redeem After date:
+  Status = Redeemable
+  Action = "Purchase"  (goes to franchisee search / repurchase)
+
+Shopping point is NOT the coupon.
+Shopping point is NOT credited as cash at approval time.
+It is a locked reward for product purchase after 18 months.
+
+
+10. AMOUNTS AND BUSINESS RULES (QUICK REFERENCE)
+--------------------------------------------------------------------------------
+Bulk EMI approve reward
+  Shopping Point : 20,000   locked 18 months
+  Coupon         :  2,000   usable immediately
+  Coupon code    : auto, unique per reward (example CP + id)
+
+Coupon redeem
+  Apply on       : DP / product amount (cart subtotal), one invoice
+  Minimum cart   : Rs. 2,000 DP
+  Shipping       : extra, always payable if shipping > 0
+  Wallet         : dummy coupon ledger only (not UtilityBalance)
+  Full cover     : if payable products become 0, payment mode = Bulk Coupon
+  Partial cover  : remaining amount paid by QR / Online + coupon discount
+
+Reject repurchase
+  Coupon used on that order is reactivated (same code, same amount)
+
+
+11. COMPLETE END-TO-END STORY (ONE USER)
+--------------------------------------------------------------------------------
+  1. User purchases Saving Product.
+  2. User pays remaining 17 EMIs from Bulk EMI Payment and uploads proof.
+  3. Admin approves Bulk EMI Payment Report.
+  4. System gives:
+        Coupon Rs. 2,000  +  code CPxxxx   (Available now)
+        Shopping Point Rs. 20,000           (Locked 18 months)
+  5. User dashboard and report show both rows.
+  6. User clicks Redeem on Purchase on coupon row.
+  7. User selects franchisee -> adds products worth at least Rs. 2,000 DP
+     -> cart -> checkout -> applies coupon.
+  8. Order is placed. Coupon status becomes Redeemed.
+  9. If admin later rejects that repurchase, coupon returns to Available.
+     User can use CPxxxx again on a new invoice.
+ 10. After 18 months, shopping point row becomes Redeemable.
+     User can purchase products using that unlocked shopping point.
+
+
+12. WHAT EACH PERSON SHOULD DO
+--------------------------------------------------------------------------------
+USER
+  - Submit Bulk EMI Payment and wait for admin approve.
+  - Open Shopping Point / Coupon report to see both rewards.
+  - Use "Redeem on Purchase" only for the Coupon row.
+  - Put enough products in ONE cart (minimum Rs. 2,000 DP).
+  - Apply coupon on checkout.
+  - Do not expect coupon money in shopping wallet.
+  - Wait 18 months for shopping point.
+
+ADMIN
+  - Approve / reject Bulk EMI from Bulk EMI Payment Report.
+    Approve creates the two reward rows.
+  - View all users in Bulk Reward Report (filter by user, code, type, status).
+  - Approve / reject repurchase from User Repurchase Report.
+    Reject of a coupon invoice reactivates the same coupon.
+
+
+13. REPORT SCREEN FIELD GUIDE
+--------------------------------------------------------------------------------
+Reward Type
+  Coupon           = Rs. 2,000 billing coupon
+  Shopping Point   = Rs. 20,000 locked points
+
+Coupon Code
+  Shown only on Coupon row
+  Shopping Point row shows "-"
+
+Entry Date
+  Date admin approved the bulk EMI (reward created)
+
+Redeem After
+  Coupon         : same as Entry Date (can use now)
+  Shopping Point : Entry Date + 18 months
+
+Status
+  Coupon Available / Redeemed
+  Shopping Point Locked / Redeemable
+
+Action (user report only)
+  Redeem on Purchase = start coupon checkout flow
+  Purchase           = shopping point unlocked, go to buy
+  Locked             = cannot use yet
+
+
+14. COMMON ALERTS / MESSAGES
+--------------------------------------------------------------------------------
+Coupon not available
+  "This coupon is not available to redeem."
+  Meaning: already Redeemed or not found.
+
+Minimum DP not met
+  "Use this coupon with a single invoice. Minimum purchase of Rs. 2000.00
+   DP (product amount) is required to redeem this coupon."
+  Meaning: add more products on the SAME invoice. Do not split into
+  two small bills.
+
+Purchase success with coupon
+  "Purchase successful. Coupon discount Rs. 2000.00 applied on billing."
+
+Bulk EMI approve (admin)
+  "Bulk EMI payment approved. User received 20000 shopping point
+   (redeem after 18 months) and 2000 coupon."
+
+
+15. FLOW DIAGRAM (TEXT)
+--------------------------------------------------------------------------------
+User Bulk EMI Payment (Processing)
+              |
+              v
+Admin Bulk EMI Report ---- REJECT ----> No reward
+              |
+           APPROVE
+              |
+              +--> Coupon Rs.2000  (Available now, dummy ledger credit)
+              |
+              +--> Shopping Point Rs.20000 (Locked 18 months)
+
+Coupon Available
+              |
+     Redeem on Purchase
+              |
+     Franchisee -> Catalog -> Cart -> Checkout
+              |
+     DP >= 2000 ? -- NO --> alert, coupon not applied
+              |
+             YES
+              |
+     Purchase created + coupon Redeemed + dummy ledger debit
+              |
+              +-- Admin APPROVE repurchase --> coupon stays Redeemed
+              |
+              +-- Admin REJECT repurchase  --> coupon back to Available
+                                               dummy ledger credit restore
+                                               user can use same code again
+
+Shopping Point Locked
+              |
+        wait 18 months
+              |
+        Status = Redeemable
+              |
+        Purchase button -> product purchase
+
+
+================================================================================
+END OF DOCUMENT
+================================================================================

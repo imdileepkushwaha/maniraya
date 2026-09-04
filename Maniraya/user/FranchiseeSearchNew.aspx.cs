@@ -30,6 +30,7 @@ public partial class FranchiseeSearchNew : System.Web.UI.Page
                     loadsusername();
                     loadstate();
                     loadProduct(1);
+                    BindCouponNotice();
                  //   Session.Remove("chktrans");
                // }
                // else
@@ -43,6 +44,30 @@ public partial class FranchiseeSearchNew : System.Web.UI.Page
         else
         {
             Response.Redirect("logout.aspx");
+        }
+    }
+
+    void BindCouponNotice()
+    {
+        if (pnlBulkCouponNotice == null)
+        {
+            return;
+        }
+
+        string userId = Convert.ToString(Session["userid"]);
+        int rewardId = SavingProductHelper.GetSessionCouponRewardId(Session);
+        SavingProductHelper.BulkCouponInfo coupon = SavingProductHelper.GetPendingBulkCoupon(userId, rewardId);
+        if (coupon == null && rewardId > 0)
+        {
+            coupon = SavingProductHelper.GetPendingBulkCoupon(userId, 0);
+        }
+
+        bool show = coupon != null && (SavingProductHelper.IsCouponRedeemMode(Session) || coupon.Id > 0);
+        pnlBulkCouponNotice.Visible = show && SavingProductHelper.IsCouponRedeemMode(Session);
+        if (pnlBulkCouponNotice.Visible)
+        {
+            lblBulkCouponNoticeCode.Text = coupon.CouponCode;
+            lblBulkCouponNoticeAmt.Text = coupon.Amount.ToString("0.00");
         }
     }
 

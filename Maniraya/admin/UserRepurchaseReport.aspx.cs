@@ -66,6 +66,18 @@ public partial class Franchisee_UserRepurchaseReport : System.Web.UI.Page
         DataTable dt = UpdateStatusTopupManual(lbluserid.Text, str_status, lblPurchaseID.Text);
         if (dt != null)
         {
+            if (string.Equals(str_status, "Failed", StringComparison.OrdinalIgnoreCase)
+                && dt.Rows.Count > 0
+                && Convert.ToString(dt.Rows[0][0]) == "1")
+            {
+                try
+                {
+                    SavingProductHelper.RestoreBulkCouponForPurchase(lbluserid.Text, lblPurchaseID.Text);
+                }
+                catch
+                {
+                }
+            }
             Message.Show(dt.Rows[0][1].ToString());
         }
         else

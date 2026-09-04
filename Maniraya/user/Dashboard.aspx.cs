@@ -71,6 +71,7 @@ public partial class user_Dashboard : System.Web.UI.Page
                 GetAllIncome();
                 LoadIncentiveCard();
                 LoadCouponCards();
+                LoadBulkRewards();
                 LoadPrizes();
                 LoadTopDirectRanking();
                 LoadDirectRank();
@@ -634,6 +635,110 @@ ORDER BY x.CouponCode ASC";
         }
 
         return dt;
+    }
+
+    void LoadBulkRewards()
+    {
+        if (pnlBulkRewards == null || Session["userid"] == null)
+        {
+            return;
+        }
+
+        string userId = Convert.ToString(Session["userid"]).Trim();
+        if (string.IsNullOrEmpty(userId))
+        {
+            pnlBulkRewards.Visible = false;
+            return;
+        }
+
+        SavingProductHelper.EnsureBulkInstallmentPaymentSchema();
+        DataTable dt = SavingProductHelper.GetUserBulkRewards(userId);
+        decimal couponBalance = SavingProductHelper.GetUserDummyCouponBalance(userId);
+        if ((dt == null || dt.Rows.Count == 0) && couponBalance <= 0)
+        {
+            pnlBulkRewards.Visible = false;
+            return;
+        }
+
+        decimal shoppingTotal = 0;
+        DateTime? latestEntry = null;
+        DateTime? latestRedeem = null;
+        string couponCode = "-";
+        string couponStatus = "Ready to redeem";
+        if (dt != null)
+        {
+            foreach (DataRow row in dt.Rows)
+            {
+                decimal amt;
+                if (decimal.TryParse(Convert.ToString(row["ShoppingPointAmount"]), out amt))
+                {
+                    shoppingTotal += amt;
+                }
+
+                DateTime entryDate;
+                if (row["EntryDate"] != DBNull.Value && DateTime.TryParse(Convert.ToString(row["EntryDate"]), out entryDate))
+                {
+                    if (!latestEntry.HasValue || entryDate > latestEntry.Value)
+                    {
+                        latestEntry = entryDate;
+                    }
+                }
+
+                DateTime redeemDate;
+                if (row["RedeemDate"] != DBNull.Value && DateTime.TryParse(Convert.ToString(row["RedeemDate"]), out redeemDate))
+                {
+                    if (!latestRedeem.HasValue || redeemDate > latestRedeem.Value)
+                    {
+                        latestRedeem = redeemDate;
+                    }
+                }
+
+                string rowCode = dt.Columns.Contains("RewardCouponCode")
+                    ? Convert.ToString(row["RewardCouponCode"]).Trim()
+                    : string.Empty;
+                string rowRedeemStatus = dt.Columns.Contains("CouponRedeemStatus")
+                    ? Convert.ToString(row["CouponRedeemStatus"]).Trim()
+                    : string.Empty;
+                if (!string.IsNullOrWhiteSpace(rowCode) && couponCode == "-")
+                {
+                    couponCode = rowCode;
+                    couponStatus = rowRedeemStatus.Equals("Redeemed", StringComparison.OrdinalIgnoreCase)
+                        ? "Redeemed"
+                        : "Ready to redeem";
+                }
+            }
+        }
+
+        if (lblBulkShoppingPoint != null)
+        {
+            lblBulkShoppingPoint.Text = shoppingTotal.ToString("N2");
+        }
+        if (lblBulkShoppingEntryDate != null)
+        {
+            lblBulkShoppingEntryDate.Text = latestEntry.HasValue ? latestEntry.Value.ToString("dd/MM/yyyy") : "-";
+        }
+        if (lblBulkShoppingRedeemDate != null)
+        {
+            lblBulkShoppingRedeemDate.Text = latestRedeem.HasValue ? latestRedeem.Value.ToString("dd/MM/yyyy") : "-";
+        }
+        if (lblBulkCouponAmount != null)
+        {
+            lblBulkCouponAmount.Text = couponBalance.ToString("N2");
+        }
+        if (lblBulkCouponBalance != null)
+        {
+            lblBulkCouponBalance.Text = couponBalance.ToString("N2");
+        }
+        if (lblBulkCouponCode != null)
+        {
+            lblBulkCouponCode.Text = couponCode;
+        }
+        if (lblBulkCouponStatus != null)
+        {
+            lblBulkCouponStatus.Text = couponStatus;
+        }
+
+        pnlBulkRewards.Visible = shoppingTotal > 0 || couponBalance > 0;
     }
 
     public string GetPrizeMonth(object value)

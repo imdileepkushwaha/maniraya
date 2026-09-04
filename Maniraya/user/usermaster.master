@@ -357,6 +357,7 @@
                             
                               <li><a href="LuckyDrawClosingReport.aspx"><i class="fa fa-angle-right"></i>Group Income</a></li>
                              <li><a href="LevelIncomeReport.aspx"><i class="fa fa-angle-right"></i>Level Income</a></li>
+							  <li><a href="RepurchaseLevelIncome.aspx"><i class="fa fa-angle-right"></i>Repurchase Level Income</a></li>
 							  <li><a href="AutoPoolIncomeReport.aspx"><i class="fa fa-angle-right"></i>Auto Pool Income</a></li>
                               <li><a href="GiftBalanceReport.aspx"><i class="fa fa-angle-right"></i>ROI Income</a></li>
                              
